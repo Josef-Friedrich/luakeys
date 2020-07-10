@@ -5,10 +5,12 @@ local assertEquals = luaunit.assertEquals
 
 local parser = luakeys.build_parser({
   integer = {
-    type = 'integer'
+    type = 'integer',
+    alias = 'int'
   },
   boolean = {
-    type = 'boolean'
+    type = 'boolean',
+    alias = { 'bool', 'b'} -- long alias first
   }
 })
 
@@ -16,6 +18,16 @@ parser:match('integer=1')
 
 local function parse(input)
   return parser:match(input)
+end
+
+function test_empty_string()
+  assertEquals(parse(''), {})
+end
+
+function test_alias()
+  assertEquals(parse('int=1'), { integer = 1 })
+  assertEquals(parse('b=yes'), { boolean = true })
+  assertEquals(parse('bool=true'), { boolean = true })
 end
 
 function test_datatype_integer()

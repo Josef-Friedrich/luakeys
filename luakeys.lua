@@ -95,12 +95,46 @@ local data_type_string = function()
   return capture(Range('az', 'AZ', '09')^1)
 end
 
+local data_types = {
+  boolean = data_type_boolean(),
+  integer = data_type_integer(),
+  --dimension = data_type_dimension(),
+  string = data_type_string(),
+}
+
+
 local white_space = Set(' \t\r\n')^0
 
 local capture_key_value_pair = function(arg1, arg2)
   print(arg1)
   print(arg2)
   return arg1, arg2
+end
+
+local build_single_key_value_definition = function(key, definition)
+  local key_pattern
+
+  if definition.alias then
+    -- alias = {'mlines', 'minlines'}
+    if type(definition.alias) == 'table' then
+      key_pattern = Pattern(key)
+      for _, value in ipairs(definition.alias) do
+        key_pattern = key_pattern + Pattern(value)  -- long alias first: 'bool', 'b'
+      end
+      key_pattern = (key_pattern) * capture_constant(key)
+    -- alias = 'minlines'
+    else
+      key_pattern =
+        (Pattern(key) + Pattern(definition.alias)) *
+        capture_constant(key)
+    end
+  else
+    key_pattern = capture(Pattern(key))
+  end
+  return
+    key_pattern * white_space *
+    Pattern('=') * white_space *
+    data_types[definition.type]
 end
 
 --- A naive key value parser written with Lpeg to get rid of kvoptions.
@@ -118,21 +152,11 @@ end
 --   string.
 --
 -- @treturn table The key value options as a table.
-local function build_parser(definition)
+local function build_parser(definitions)
   local key_values
 
-  local data_type = {
-    boolean = data_type_boolean(),
-    integer = data_type_integer(),
-    --dimension = data_type_dimension(),
-    string = data_type_string(),
-  }
-
-  for key, value in pairs(definition) do
-    local key_value =
-      capture(Pattern(key)) * white_space *
-      Pattern('=') * white_space *
-      data_type[value.type]
+  for key, definition in pairs(definitions) do
+    local key_value = build_single_key_value_definition(key, definition)
 
     if not key_values then
       key_values = key_value
@@ -141,31 +165,17 @@ local function build_parser(definition)
     end
   end
 
-  local minimun_lines =
-    (Pattern('minimumlines') + Pattern('minlines')) *
-    capture_constant('minimum lines')
-
-  local generic_key = capture(Range('az')^1)
-
-  local key =
-    white_space *
-    (minimun_lines + generic_key) *
-    white_space
-
-  local value =
-    white_space *
-    (data_type.integer + data_type.boolean + data_type.string) *
-    white_space
+  -- local generic_key = capture(Range('az')^1)
 
   -- For example: hide -> hide = true
-  local key_only =
-    key *
-    capture_constant(true)
+  -- local key_only =
+  --   key *
+  --   capture_constant(true)
 
-  local key_value =
-    key *
-    Pattern('=') *
-    value
+  -- local key_value =
+  --   key *
+  --   Pattern('=') *
+  --   value
 
   -- Catch left over keys or key value pairs for error reportings
   local generic_catcher = capture(Range('az')^1) * white_space *
