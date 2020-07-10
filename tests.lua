@@ -42,12 +42,12 @@ function test_datatype_integer()
 end
 
 function test_datatype_boolean()
+  local boolean_parser = luakeys.build_parser({
+    key = {
+      type = 'boolean'
+    }
+  })
   local function assert_boolean(boolean_string, value)
-    local boolean_parser = luakeys.build_parser({
-      key = {
-        type = 'boolean'
-      }
-    })
     assertEquals(boolean_parser:match('key=' .. boolean_string), { key = value })
   end
   assert_boolean('true', true)
@@ -61,20 +61,4 @@ function test_datatype_boolean()
   assert_boolean('NO', false)
 end
 
-
 os.exit( luaunit.LuaUnit.run() )
-
-
--- test('dimension', 'margin=2pt')
-
--- test('', 'hide,margin=2pt,textcolor =red,linecolor=green, show,')
--- test('', 'one=true,two=TRUE,three = false, four=FALSE,five')
--- test('', 'one=no,two=NO,three = yes, four=YES,five')
--- test('Multiline', [[
---   hide,
---   margin=2pt,
---   textcolor =red
--- ]])
-
-
--- test('minlines -> minimum lines', 'minlines=3')
