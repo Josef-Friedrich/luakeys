@@ -14,13 +14,18 @@ function test_datatype_integer()
 end
 
 function test_datatype_boolean()
-  local function assert_true(true_string)
-    assertEquals(parse('key=' .. true_string), { key = true })
+  local function assert_boolean(boolean_string, value)
+    assertEquals(parse('key=' .. boolean_string), { key = value })
   end
-  assert_true('true')
-  assert_true('TRUE')
-  assert_true('yes')
-  assert_true('YES')
+  assert_boolean('true', true)
+  assert_boolean('TRUE', true)
+  assert_boolean('yes', true)
+  assert_boolean('YES', true)
+
+  assert_boolean('false', false)
+  assert_boolean('FALSE', false)
+  assert_boolean('no', false)
+  assert_boolean('NO', false)
 end
 
 
