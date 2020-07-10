@@ -3,19 +3,33 @@ local luakeys = require('luakeys')
 
 local assertEquals = luaunit.assertEquals
 
-local parser = luakeys.build_parser()
+local parser = luakeys.build_parser({
+  integer = {
+    type = 'integer'
+  },
+  boolean = {
+    type = 'boolean'
+  }
+})
+
+parser:match('integer=1')
 
 local function parse(input)
   return parser:match(input)
 end
 
 function test_datatype_integer()
-  assertEquals(parse('key=1'), { key = 1 })
+  assertEquals(parse('integer=1'), { integer = 1 })
 end
 
 function test_datatype_boolean()
   local function assert_boolean(boolean_string, value)
-    assertEquals(parse('key=' .. boolean_string), { key = value })
+    local boolean_parser = luakeys.build_parser({
+      key = {
+        type = 'boolean'
+      }
+    })
+    assertEquals(boolean_parser:match('key=' .. boolean_string), { key = value })
   end
   assert_boolean('true', true)
   assert_boolean('TRUE', true)

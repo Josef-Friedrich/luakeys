@@ -95,6 +95,14 @@ local data_type_string = function()
   return capture(Range('az', 'AZ', '09')^1)
 end
 
+local white_space = Set(' \t\r\n')^0
+
+local capture_key_value_pair = function(arg1, arg2)
+  print(arg1)
+  print(arg2)
+  return arg1, arg2
+end
+
 --- A naive key value parser written with Lpeg to get rid of kvoptions.
 --
 -- * `patt^0` = `expression *` (peg.js)
@@ -110,8 +118,8 @@ end
 --   string.
 --
 -- @treturn table The key value options as a table.
-local function build_parser()
-  local white_space = Set(' \t\r\n')^0
+local function build_parser(definition)
+  local key_values
 
   local data_type = {
     boolean = data_type_boolean(),
@@ -119,6 +127,19 @@ local function build_parser()
     --dimension = data_type_dimension(),
     string = data_type_string(),
   }
+
+  for key, value in pairs(definition) do
+    local key_value =
+      capture(Pattern(key)) * white_space *
+      Pattern('=') * white_space *
+      data_type[value.type]
+
+    if not key_values then
+      key_values = key_value
+    else
+      key_values = key_values + key_value
+    end
+  end
 
   local minimun_lines =
     (Pattern('minimumlines') + Pattern('minlines')) *
@@ -146,10 +167,12 @@ local function build_parser()
     Pattern('=') *
     value
 
-  local keyval_groups = capture_group(
-    (key_value + key_only) *
-    Pattern(',')^-1
-  )
+  -- Catch left over keys or key value pairs for error reportings
+  local generic_catcher = capture(Range('az')^1) * white_space *
+    Pattern('=')^-1 * white_space *
+    capture(Range('09', 'az', 'AZ')^0) / capture_key_value_pair
+
+  local keyval_groups = capture_group(key_values + generic_catcher * Pattern(',')^-1)
 
   -- rawset (table, index, value)
   -- Sets the real value of table[index] to value, without invoking the
@@ -157,7 +180,6 @@ local function build_parser()
   -- different from nil and NaN, and value any Lua value.
   return capture_fold(capture_table('') * keyval_groups^0, rawset)
 end
-
 
 return {
   build_parser = build_parser,
