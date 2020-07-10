@@ -11,6 +11,9 @@ local parser = luakeys.build_parser({
   boolean = {
     type = 'boolean',
     alias = { 'bool', 'b'} -- long alias first
+  },
+  keyonly = {
+    type = 'keyonly'
   }
 })
 
@@ -28,6 +31,10 @@ function test_alias()
   assertEquals(parse('int=1'), { integer = 1 })
   assertEquals(parse('b=yes'), { boolean = true })
   assertEquals(parse('bool=true'), { boolean = true })
+end
+
+function test_keyonly()
+  assertEquals(parse('keyonly'), { keyonly = true })
 end
 
 function test_datatype_integer()

@@ -111,9 +111,12 @@ local capture_key_value_pair = function(arg1, arg2)
   return arg1, arg2
 end
 
+---
+--
+-- @tparam string key
+-- @tparam table definition keys: alias, type
 local build_single_key_value_definition = function(key, definition)
   local key_pattern
-
   if definition.alias then
     -- alias = {'mlines', 'minlines'}
     if type(definition.alias) == 'table' then
@@ -131,10 +134,17 @@ local build_single_key_value_definition = function(key, definition)
   else
     key_pattern = capture(Pattern(key))
   end
-  return
-    key_pattern * white_space *
-    Pattern('=') * white_space *
-    data_types[definition.type]
+
+  -- show -> show=true
+  if definition.type == 'keyonly' then
+    return key_pattern * capture_constant(true)
+  -- key=value
+  else
+    return
+      key_pattern * white_space *
+      Pattern('=') * white_space *
+      data_types[definition.type]
+  end
 end
 
 --- A naive key value parser written with Lpeg to get rid of kvoptions.
@@ -164,18 +174,6 @@ local function build_parser(definitions)
       key_values = key_values + key_value
     end
   end
-
-  -- local generic_key = capture(Range('az')^1)
-
-  -- For example: hide -> hide = true
-  -- local key_only =
-  --   key *
-  --   capture_constant(true)
-
-  -- local key_value =
-  --   key *
-  --   Pattern('=') *
-  --   value
 
   -- Catch left over keys or key value pairs for error reportings
   local generic_catcher = capture(Range('az')^1) * white_space *
