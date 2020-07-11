@@ -196,10 +196,14 @@ end
 --
 -- @tparam string key
 -- @tparam table definition keys: alias, type
+--
+-- @treturn userdata Lpeg patterns etc.
 local build_single_key_value_definition = function(key, definition)
   local key_pattern
   local destination_key_name
+  local value_pattern
 
+  -- Build the key pattern.
   if definition.rename_key then
     destination_key_name = definition.rename_key
   else
@@ -229,16 +233,21 @@ local build_single_key_value_definition = function(key, definition)
     end
   end
 
-  -- show -> show=true
+  -- Build the value pattern.
   if definition.data_type == 'keyonly' then
-    return key_pattern * capture_constant(true)
-  -- key=value
+    -- show -> show=true
+    value_pattern = capture_constant(true)
+  elseif definition.overwrite_value ~= nil then
+    value_pattern = capture_constant(definition.overwrite_value)
   else
-    return
-      key_pattern * white_space *
+    -- key=value
+    value_pattern =
+      white_space *
       Pattern('=') * white_space *
       data_types[definition.data_type]
   end
+
+  return key_pattern * value_pattern
 end
 
 --- Build a table with the default values. They are indexed by the key

@@ -131,4 +131,14 @@ function test_rename_key()
   assertEquals(parser:match('old_key=1'), { new_key = 1 })
 end
 
+function test_overwrite_value()
+  local parser = luakeys.build_parser({
+    key = {
+      data_type = 'integer',
+      overwrite_value = 2
+    }
+  })
+  assertEquals(parser:match('key=1'), { key = 2 })
+end
+
 os.exit( luaunit.LuaUnit.run() )
