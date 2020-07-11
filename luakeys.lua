@@ -100,6 +100,10 @@ end
 
 local white_space = Set(' \t\r\n')^0
 
+local function WsPattern(input)
+  return white_space * Pattern(input) * white_space
+end
+
 --- Define data type boolean.
 --
 -- @return Lpeg patterns
@@ -242,8 +246,7 @@ local build_single_key_value_definition = function(key, definition)
   else
     -- key=value
     value_pattern =
-      white_space *
-      Pattern('=') * white_space *
+      WsPattern('=') *
       data_types[definition.data_type]
   end
 
@@ -286,11 +289,12 @@ local function build_parser(definitions)
   end
 
   -- Catch left over keys or key value pairs for error reportings
-  local generic_catcher = capture(Range('az')^1) * white_space *
-    Pattern('=')^-1 * white_space *
+  local generic_catcher =
+    capture(Range('az')^1) *
+    WsPattern('=')^-1 *
     capture(Range('09', 'az', 'AZ')^0) / capture_key_value_pair
 
-  local keyval_groups = capture_group((key_values + generic_catcher) * Pattern(',')^-1 )
+  local keyval_groups = capture_group((key_values + generic_catcher) * WsPattern(',')^-1 )
 
   -- rawset (table, index, value)
   -- Sets the real value of table[index] to value, without invoking the
