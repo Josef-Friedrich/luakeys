@@ -30,6 +30,13 @@ local capture_group = lpeg.Cg
 --- See [lpeg.Cg](http://www.inf.puc-rio.br/~roberto/lpeg#cap-cc)
 local capture_constant = lpeg.Cc
 
+--- Dummy function for the tests.
+--
+if not tex then tex = { } end tex ['sp'] = function (input)
+  return 123
+end
+
+local white_space = Set(' \t\r\n')^0
 
 
 --- Define data type boolean.
@@ -69,24 +76,25 @@ end
 --- Define data type dimension.
 --
 -- @return Lpeg patterns
--- local function data_type_dimension()
---   local sign = Set('-+')
---   local integer = Range('09')^1
---   local number = integer^1 * Pattern('.')^0 * integer^0
---   local unit =
---     Pattern('pt') +
---     Pattern('cm') +
---     Pattern('mm') +
---     Pattern('sp') +
---     Pattern('bp') +
---     Pattern('in') +
---     Pattern('pc') +
---     Pattern('dd') +
---     Pattern('cc')
+local function data_type_dimension()
+  local sign = Set('-+')
+  local integer = Range('09')^1
+  local number = integer^1 * Set('.,')^0 * integer^0
+  local unit
+  -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+  for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
+    if unit then
+      unit = unit + Pattern(dimension_extension)
+    else
+      unit = Pattern(dimension_extension)
+    end
+  end
 
---   -- patt / function -> function capture
---   return (sign^0 * number * unit) / tex.sp
--- end
+  -- patt / function -> function capture
+  return (sign^0 * white_space * number * white_space * unit) / tex.sp
+end
+
+
 
 --- Define data type string.
 --
@@ -98,12 +106,11 @@ end
 local data_types = {
   boolean = data_type_boolean(),
   integer = data_type_integer(),
-  --dimension = data_type_dimension(),
+  dimension = data_type_dimension(),
   string = data_type_string(),
 }
 
 
-local white_space = Set(' \t\r\n')^0
 
 local capture_key_value_pair = function(arg1, arg2)
   print(arg1)

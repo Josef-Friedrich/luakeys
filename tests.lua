@@ -61,4 +61,38 @@ function test_datatype_boolean()
   assert_boolean('NO', false)
 end
 
+function test_datatype_dimension()
+  local dim_parser = luakeys.build_parser({
+    dim = {
+      type = 'dimension'
+    }
+  })
+
+  local function assert_dim(dim_string)
+    assertEquals(dim_parser:match('dim=' .. dim_string), { dim = 123 })
+  end
+  assert_dim('1.1cm')
+  assert_dim('1,1cm')
+  assert_dim('-1.1cm')
+  assert_dim('- 1.1cm')
+  assert_dim('+1.1cm')
+  assert_dim('+ 1.1cm')
+  assert_dim('1 cm')
+  assert_dim('1,1 cm')
+
+  assert_dim('1bp')
+  assert_dim('1cc')
+  assert_dim('1cm')
+  assert_dim('1dd')
+  assert_dim('1em')
+  assert_dim('1ex')
+  assert_dim('1in')
+  assert_dim('1mm')
+  assert_dim('1nc')
+  assert_dim('1nd')
+  assert_dim('1pc')
+  assert_dim('1pt')
+  assert_dim('1sp')
+end
+
 os.exit( luaunit.LuaUnit.run() )
