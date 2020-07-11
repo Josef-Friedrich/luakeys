@@ -10,6 +10,7 @@
 -- * [Dimension handling in lualibs](https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua)
 --
 --     local defintions = {
+--       -- data types:
 --       key_integer = {
 --         data_type = 'integer',
 --       },
@@ -24,6 +25,10 @@
 --       key_dimension = {
 --         data_type = 'dimension',
 --       },
+--       keyonly = {
+--         data_type = 'keyonly'
+--       },
+--
 --       -- kas=true -> key_alias_single=true
 --       key_alias_single = {
 --         data_type = 'boolean',
@@ -38,8 +43,15 @@
 --         data_type = 'boolean',
 --         default = true
 --       },
---       keyonly = {
---         data_type = 'keyonly'
+--       -- old_key=1 -> new_key=1
+--       old_key = {
+--         data_type = 'integer'
+--         rename_key = 'new_key'
+--       }
+--       -- key_overwrite_value=1 -> key_overwrite_value=2
+--       key_overwrite_value = {
+--         data_type = 'integer'
+--         overwrite_value = 2
 --       }
 --     }
 --
@@ -186,6 +198,14 @@ end
 -- @tparam table definition keys: alias, type
 local build_single_key_value_definition = function(key, definition)
   local key_pattern
+  local destination_key_name
+
+  if definition.rename_key then
+    destination_key_name = definition.rename_key
+  else
+    destination_key_name = key
+  end
+
   if definition.alias then
     -- alias = {'mlines', 'minlines'}
     if type(definition.alias) == 'table' then
@@ -193,15 +213,20 @@ local build_single_key_value_definition = function(key, definition)
       for _, value in ipairs(definition.alias) do
         key_pattern = key_pattern + Pattern(value)  -- long alias first: 'bool', 'b'
       end
-      key_pattern = (key_pattern) * capture_constant(key)
+      key_pattern = (key_pattern) * capture_constant(destination_key_name)
     -- alias = 'minlines'
     else
       key_pattern =
         (Pattern(key) + Pattern(definition.alias)) *
-        capture_constant(key)
+        capture_constant(destination_key_name)
     end
   else
-    key_pattern = capture(Pattern(key))
+    if definition.rename_key then
+      -- old_key=1 -> new_key=1
+      key_pattern = Pattern(key) * capture_constant(destination_key_name)
+    else
+      key_pattern = capture(Pattern(key))
+    end
   end
 
   -- show -> show=true

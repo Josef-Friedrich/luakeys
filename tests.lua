@@ -121,4 +121,14 @@ function test_defaults()
   assertEquals(defaults.boolean, true)
 end
 
+function test_rename_key()
+  local parser = luakeys.build_parser({
+    old_key = {
+      data_type = 'integer',
+      rename_key = 'new_key'
+    }
+  })
+  assertEquals(parser:match('old_key=1'), { new_key = 1 })
+end
+
 os.exit( luaunit.LuaUnit.run() )
