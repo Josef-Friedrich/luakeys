@@ -38,7 +38,6 @@ end
 
 local white_space = Set(' \t\r\n')^0
 
-
 --- Define data type boolean.
 --
 -- @return Lpeg patterns
@@ -94,8 +93,6 @@ local function data_type_dimension()
   return (sign^0 * white_space * number * white_space * unit) / tex.sp
 end
 
-
-
 --- Define data type string.
 --
 -- @return Lpeg patterns
@@ -109,8 +106,6 @@ local data_types = {
   dimension = data_type_dimension(),
   string = data_type_string(),
 }
-
-
 
 local capture_key_value_pair = function(arg1, arg2)
   print(arg1)
