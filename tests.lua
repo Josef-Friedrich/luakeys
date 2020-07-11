@@ -141,4 +141,32 @@ function test_overwrite_value()
   assertEquals(parser:match('key=1'), { key = 2 })
 end
 
+function test_white_spaces()
+  assertEquals(parse('integer=1'), { integer = 1 })
+  assertEquals(parse('integer = 2'), { integer = 2 })
+  assertEquals(parse('integer\t=\t3'), { integer = 3 })
+  assertEquals(parse('integer\n=\n4'), { integer = 4 })
+  assertEquals(parse('integer \t\n= \t\n5 , boolean'), { integer = 5 })
+  --assertEquals(parse('integer=1 , boolean=no'), { integer = 1, boolean = false })
+end
+
+function test_multiple_keys()
+  assertEquals(parse('integer=1,boolean=no'), { integer = 1, boolean = false })
+  --assertEquals(parse('integer=1 , boolean=no'), { integer = 1, boolean = false })
+end
+
+function test_edge_cases()
+  assertEquals(parse(',,'), {})
+  assertEquals(parse(',,,'), {})
+  assertEquals(parse(', , ,'), {})
+  assertEquals(parse(' ,'), {})
+  assertEquals(parse(', '), {})
+
+end
+
+function test_duplicate_keys()
+  assertEquals(parse('integer=1,integer=2'), { integer = 2})
+  --assertEquals(parse('integer=1 , integer=2'), { integer = 2})
+end
+
 os.exit( luaunit.LuaUnit.run() )

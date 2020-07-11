@@ -290,7 +290,7 @@ local function build_parser(definitions)
     Pattern('=')^-1 * white_space *
     capture(Range('09', 'az', 'AZ')^0) / capture_key_value_pair
 
-  local keyval_groups = capture_group(key_values + generic_catcher * Pattern(',')^-1)
+  local keyval_groups = capture_group((key_values + generic_catcher) * Pattern(',')^-1 )
 
   -- rawset (table, index, value)
   -- Sets the real value of table[index] to value, without invoking the
