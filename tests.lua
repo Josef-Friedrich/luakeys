@@ -54,11 +54,13 @@ function test_datatype_boolean()
   assert_boolean('TRUE', true)
   assert_boolean('yes', true)
   assert_boolean('YES', true)
+  assert_boolean('1', true)
 
   assert_boolean('false', false)
   assert_boolean('FALSE', false)
   assert_boolean('no', false)
   assert_boolean('NO', false)
+  assert_boolean('0', false)
 end
 
 function test_datatype_dimension()

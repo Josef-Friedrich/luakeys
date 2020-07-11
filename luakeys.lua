@@ -17,17 +17,19 @@
 --       key_float = {
 --         data_type = 'float',
 --       },
---       -- true: true TRUE yes YES, false: false FALSE no NO
+--       -- true: true TRUE yes YES 1, false: false FALSE no NO 0
 --       key_boolean = {
 --         data_type = 'boolean',
 --       },
 --       key_dimension = {
 --         data_type = 'dimension',
 --       },
+--       -- kas=true -> key_alias_single=true
 --       key_alias_single = {
 --         data_type = 'boolean',
 --         alias = 'kas', -- String -> single alias
 --       },
+--       -- kam=true or k=true -> key_alias_multiple=true
 --       key_alias_multiple = {
 --         data_type = 'boolean',
 --         alias = { 'kam', 'k' }, -- Table -> multiple aliases (long alias first)
@@ -94,14 +96,16 @@ local function data_type_boolean ()
     Pattern('true') +
     Pattern('TRUE') +
     Pattern('yes') +
-    Pattern('YES')
+    Pattern('YES') +
+    Pattern('1')
   ) * capture_constant(true)
 
   local boolean_false = (
     Pattern('false') +
     Pattern('FALSE') +
     Pattern('no') +
-    Pattern('NO')
+    Pattern('NO') +
+    Pattern('0')
   ) * capture_constant(false)
 
   return boolean_true + boolean_false
