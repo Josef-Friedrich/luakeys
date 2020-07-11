@@ -13,6 +13,11 @@
 --       key_integer = {
 --         data_type = 'integer',
 --       },
+--       -- 1.1 +1.1 -1.1 11e-02
+--       key_float = {
+--         data_type = 'float',
+--       },
+--       -- true: true TRUE yes YES, false: false FALSE no NO
 --       key_boolean = {
 --         data_type = 'boolean',
 --       },
@@ -115,6 +120,20 @@ local function data_type_integer()
   return Range('09')^1 / tonumber
 end
 
+--- Define data type integer.
+--
+-- @return Lpeg patterns
+local function data_type_float()
+  -- patt / function
+  local digits = Range('09')^1
+  local puls_minus = Set('+-')^-1
+  return
+  puls_minus * digits *
+    (Pattern('.') * digits)^-1 *
+    (Set('eE') * puls_minus * digits)^-1
+    / tonumber
+end
+
 --- Define data type dimension.
 --
 -- @return Lpeg patterns
@@ -146,6 +165,7 @@ end
 local data_types = {
   boolean = data_type_boolean(),
   integer = data_type_integer(),
+  float = data_type_float(),
   dimension = data_type_dimension(),
   string = data_type_string(),
 }

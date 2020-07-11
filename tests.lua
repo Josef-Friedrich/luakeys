@@ -95,6 +95,25 @@ function test_datatype_dimension()
   assert_dim('1sp')
 end
 
+function test_datatype_float()
+  local float_parser = luakeys.build_parser({
+    float = {
+      data_type = 'float'
+    }
+  })
+
+  local function assert_float(float_string, value)
+    assertEquals(float_parser:match('float=' .. float_string), { float = value })
+  end
+  assert_float('1.1', 1.1)
+  assert_float('+1.1', 1.1)
+  assert_float('-1.1', -1.1)
+  assert_float('11e-02', 0.11)
+  assert_float('11e-02', 11e-02)
+  assert_float('-11e-02', -0.11)
+  assert_float('+11e-02', 0.11)
+end
+
 function test_defaults()
   assertEquals(defaults.integer, 3)
   assertEquals(defaults.boolean, true)
