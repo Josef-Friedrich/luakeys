@@ -1,3 +1,43 @@
+--- A naive key value parser written with Lpeg to get rid of kvoptions.
+--
+-- * `patt^0` = `expression *` (peg.js)
+-- * `patt^1` = `expression +` (peg.js)
+-- * `patt^-1` = `expression ?` (peg.js)
+-- * `patt1 * patt2` = `expression1 expression2` (peg.js) -> Sequence
+-- * `patt1 + patt2` = `expression1 / expression2` (peg.js) -> Ordered choice
+--
+-- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf)
+-- * [Dimension handling in lualibs](https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua)
+--
+--     local defintions = {
+--       key_integer = {
+--         data_type = 'integer',
+--       },
+--       key_boolean = {
+--         data_type = 'boolean',
+--       },
+--       key_dimension = {
+--         data_type = 'dimension',
+--       },
+--       key_alias_single = {
+--         data_type = 'boolean',
+--         alias = 'kas', -- String -> single alias
+--       },
+--       key_alias_multiple = {
+--         data_type = 'boolean',
+--         alias = { 'kam', 'k' }, -- Table -> multiple aliases (long alias first)
+--       },
+--       key_default = {
+--         data_type = 'boolean',
+--         default = true
+--       },
+--       keyonly = {
+--         data_type = 'keyonly'
+--       }
+--     }
+--
+-- @module luakeys
+
 local lpeg = require('lpeg')
 
 --- See [lpeg.P](http://www.inf.puc-rio.br/~roberto/lpeg#op-p)
@@ -30,9 +70,12 @@ local capture_group = lpeg.Cg
 --- See [lpeg.Cg](http://www.inf.puc-rio.br/~roberto/lpeg#cap-cc)
 local capture_constant = lpeg.Cc
 
---- Dummy function for the tests.
---
-if not tex then tex = { } end tex ['sp'] = function (input)
+if not tex then
+  tex = {}
+end
+
+-- Dummy function for the tests.
+tex['sp'] = function (input)
   return 123
 end
 
@@ -138,32 +181,39 @@ local build_single_key_value_definition = function(key, definition)
   end
 
   -- show -> show=true
-  if definition.type == 'keyonly' then
+  if definition.data_type == 'keyonly' then
     return key_pattern * capture_constant(true)
   -- key=value
   else
     return
       key_pattern * white_space *
       Pattern('=') * white_space *
-      data_types[definition.type]
+      data_types[definition.data_type]
   end
 end
 
---- A naive key value parser written with Lpeg to get rid of kvoptions.
+--- Build a table with the default values. They are indexed by the key
+-- name.
 --
--- * `patt^0` = `expression *` (peg.js)
--- * `patt^1` = `expression +` (peg.js)
--- * `patt^-1` = `expression ?` (peg.js)
--- * `patt1 * patt2` = `expression1 expression2` (peg.js) -> Sequence
--- * `patt1 + patt2` = `expression1 / expression2` (peg.js) -> Ordered choice
+-- @tparam table definitions
 --
--- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf)
--- * [Dimension handling in lualibs](https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua)
+-- @treturn table defaults
+local build_defaults_table = function(definitions)
+  local defaults = {}
+  for key, definition in pairs(definitions) do
+    if definition['default'] ~= nil then
+      defaults[key] = definition.default
+    end
+  end
+  return defaults
+end
+
+--- Build a key value parser using Lpeg.
 --
--- @tparam string input The key value options in a unparsed fashion as a
---   string.
+-- @tparam table definitions
 --
--- @treturn table The key value options as a table.
+-- @treturn parser The Lpeg parser
+-- @treturn table defaults
 local function build_parser(definitions)
   local key_values
 
@@ -188,7 +238,7 @@ local function build_parser(definitions)
   -- Sets the real value of table[index] to value, without invoking the
   -- __newindex metamethod. table must be a table, index any value
   -- different from nil and NaN, and value any Lua value.
-  return capture_fold(capture_table('') * keyval_groups^0, rawset)
+  return capture_fold(capture_table('') * keyval_groups^0, rawset), build_defaults_table(definitions)
 end
 
 return {

@@ -3,21 +3,21 @@ local luakeys = require('luakeys')
 
 local assertEquals = luaunit.assertEquals
 
-local parser = luakeys.build_parser({
+local parser, defaults = luakeys.build_parser({
   integer = {
-    type = 'integer',
-    alias = 'int'
+    data_type = 'integer',
+    alias = 'int',
+    default = 3,
   },
   boolean = {
-    type = 'boolean',
-    alias = { 'bool', 'b'} -- long alias first
+    data_type = 'boolean',
+    alias = { 'bool', 'b'}, -- long alias first
+    default = true
   },
   keyonly = {
-    type = 'keyonly'
+    data_type = 'keyonly'
   }
 })
-
-parser:match('integer=1')
 
 local function parse(input)
   return parser:match(input)
@@ -44,7 +44,7 @@ end
 function test_datatype_boolean()
   local boolean_parser = luakeys.build_parser({
     key = {
-      type = 'boolean'
+      data_type = 'boolean'
     }
   })
   local function assert_boolean(boolean_string, value)
@@ -64,7 +64,7 @@ end
 function test_datatype_dimension()
   local dim_parser = luakeys.build_parser({
     dim = {
-      type = 'dimension'
+      data_type = 'dimension'
     }
   })
 
@@ -93,6 +93,11 @@ function test_datatype_dimension()
   assert_dim('1pc')
   assert_dim('1pt')
   assert_dim('1sp')
+end
+
+function test_defaults()
+  assertEquals(defaults.integer, 3)
+  assertEquals(defaults.boolean, true)
 end
 
 os.exit( luaunit.LuaUnit.run() )
