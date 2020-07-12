@@ -102,19 +102,20 @@ tex['sp'] = function (input)
 end
 
 local error_messages = {
-  E01 = 'The argument 1 of the function \'build_parser\' has to be a table.',
-  E02 = 'Key \'%s\': choices definition has to be a table.',
-  E03 = 'Undefined key \'%s\'.',
-  E04 = 'Unsupported data type \'%s\'.',
-  E05 = 'Not allowed choice \'%s\' for key \'%s\'.'
+  E01 = "The argument 1 of the function 'build_parser' has to be a table.",
+  E02 = "Key '%s': choices definition has to be a table.",
+  E03 = "Undefined key '%s'.",
+  E04 = "Unsupported data type '%s'.",
+  E05 = "Not allowed choice '%s' for key '%s'.",
+  E06 = "Wrong data type (key: '%s', value: '%s', defined data type: '%s', actual data type: '%s')"
 }
 
 --- Prefix all error messages and then throw an error.
 --
 -- @tparam string message A message text for the error.
-local function throw_error(error_code, arg1, arg2)
+local function throw_error(error_code, arg1, arg2, arg3, arg4)
   error('luakeys error (' .. error_code .. '): ' ..
-    string.format(error_messages[error_code], arg1, arg2))
+    string.format(error_messages[error_code], arg1, arg2, arg3, arg4))
 end
 
 ---
@@ -429,9 +430,8 @@ local function build_parser(definitions)
   end
   local key_values
 
-  for key, definition in pairs(definitions) do
-    local key_value = build_single_key_value_definition(key, definition)
-
+  for key, def in pairs(definitions) do
+    local key_value = build_single_key_value_definition(key, def)
     if not key_values then
       key_values = key_value
     else
@@ -439,15 +439,22 @@ local function build_parser(definitions)
     end
   end
 
+  --- Capture unmatched key value pairs to throw errors and warnings.
+  --
+  -- @tparam string key
+  -- @tparam string value
   local capture_unkown_key_value_pair = function(key, value)
-    if definitions[key] == nil then
+    local def = definitions[key]
+
+    if def == nil then
       throw_error('E03', key)
+    elseif def.choices then
+      throw_error('E05', value, key)
     end
 
-    local definition = definitions[key]
-
-    if definition.choices then
-      throw_error('E05', value, key)
+    local value_data_type = get_type(value)
+    if def.data_type ~= value_data_type then
+      throw_error('E06', key, value, def.data_type, value_data_type)
     end
   end
 
@@ -455,7 +462,7 @@ local function build_parser(definitions)
   local generic_catcher =
     capture(Range('az', 'AZ', '09') ^1) * -- key
     WsPattern('=')^-1 *
-    capture(Range('09', 'az', 'AZ')^0) / capture_unkown_key_value_pair
+    capture(Range('09', 'az', 'AZ')^0) * Pattern(-1) / capture_unkown_key_value_pair
 
   local keyval_groups = capture_group((key_values + generic_catcher) * WsPattern(',')^-1 )
 

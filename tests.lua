@@ -231,6 +231,18 @@ function test_error_E05_not_allowed_choice()
   )
 end
 
+function test_error_E06_wrong_data_type()
+  luaunit.assert_error_msg_contains(
+    "luakeys error (E06): Wrong data type (key: 'key', value: '5', defined data type: 'boolean', actual data type: 'integer')",
+    function()
+      local local_parser = luakeys.build_parser({
+        key = { data_type = 'boolean' }
+      })
+      local result = local_parser:match('key=5')
+    end
+  )
+end
+
 function test_function_get_type()
   luaunit.assert_equals(luakeys.get_type('1'), 'integer')
   luaunit.assert_equals(luakeys.get_type('1.1'), 'float')
