@@ -170,4 +170,25 @@ function test_duplicate_keys()
   assertEquals(parse('integer=1 , integer=2'), { integer = 2})
 end
 
+function test_choices()
+  local choices_parser = luakeys.build_parser({
+    key = {
+      choices = {'one', 'two', 'three'}
+    }
+  })
+
+  assertEquals(choices_parser:match('key=one'), { key = 'one'})
+end
+
+function test_choices_error()
+  luaunit.assert_error_msg_contains(
+    'Key \'key\': choices definition has to be a table.',
+    function()
+      luakeys.build_parser({
+        key = { choices = 'A String' }
+      })
+    end
+  )
+end
+
 os.exit( luaunit.LuaUnit.run() )

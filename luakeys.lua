@@ -28,7 +28,10 @@
 --       keyonly = {
 --         data_type = 'keyonly'
 --       },
---
+--       -- choices
+--       key_choices = {
+--         choices = {'one', 'two', 'three'}
+--       },
 --       -- kas=true -> key_alias_single=true
 --       key_alias_single = {
 --         data_type = 'boolean',
@@ -96,6 +99,13 @@ end
 -- Dummy function for the tests.
 tex['sp'] = function (input)
   return 123
+end
+
+--- Prefix all error messages and then throw an error.
+--
+-- @tparam string message A message text for the error.
+local function luakeys_error(message)
+  error('luakeys error: ' .. message)
 end
 
 ---
@@ -323,6 +333,19 @@ local build_single_key_value_definition = function(key, definition)
   if definition.data_type == 'keyonly' then
     -- show -> show=true
     value_pattern = capture_constant(true)
+  elseif definition.choices then
+    if type(definition.choices) ~= 'table' then
+      luakeys_error('Key \'' .. key .. '\': choices definition has to be a table.')
+    end
+    local choice_pattern
+    for _, choice in ipairs(definition.choices) do
+      if choice_pattern then
+        choice_pattern = choice_pattern + Pattern(choice)
+      else
+        choice_pattern = Pattern(choice)
+      end
+    end
+    value_pattern = WsPattern('=') * capture(choice_pattern)
   elseif definition.overwrite_value ~= nil then
     value_pattern = capture_constant(definition.overwrite_value)
   else
