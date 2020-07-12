@@ -191,4 +191,23 @@ function test_choices_error()
   )
 end
 
+function test_error_defintion_no_table()
+  luaunit.assert_error_msg_contains(
+    'luakeys error (E01): The argument 1 of the function \'build_parser\' has to be a table.',
+    function()
+      luakeys.build_parser('string')
+    end
+  )
+end
+
+function test_error_03_undefined_key()
+  luaunit.assert_error_msg_contains(
+    'luakeys error (E03): Undefined key \'key2\'.',
+    function()
+      local parser = luakeys.build_parser({ key1 = { data_type = 'integer' } })
+      parser:match('key2=1')
+    end
+  )
+end
+
 os.exit( luaunit.LuaUnit.run() )

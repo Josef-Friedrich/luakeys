@@ -101,11 +101,18 @@ tex['sp'] = function (input)
   return 123
 end
 
+local error_messages = {
+  E01 = 'The argument 1 of the function \'build_parser\' has to be a table.',
+  E02 = 'Key \'%s\': choices definition has to be a table.',
+  E03 = 'Undefined key \'%s\'.'
+}
+
 --- Prefix all error messages and then throw an error.
 --
 -- @tparam string message A message text for the error.
-local function luakeys_error(message)
-  error('luakeys error: ' .. message)
+local function luakeys_error(error_code, arg1, arg2)
+  error('luakeys error (' .. error_code .. '): ' ..
+    string.format(error_messages[error_code], arg1, arg2))
 end
 
 ---
@@ -282,11 +289,6 @@ local data_types = {
   string = data_type_string(),
 }
 
-local capture_key_value_pair = function(arg1, arg2)
-  print(arg1)
-  print(arg2)
-  return arg1, arg2
-end
 
 ---
 --
@@ -335,7 +337,7 @@ local build_single_key_value_definition = function(key, definition)
     value_pattern = capture_constant(true)
   elseif definition.choices then
     if type(definition.choices) ~= 'table' then
-      luakeys_error('Key \'' .. key .. '\': choices definition has to be a table.')
+      luakeys_error('E02', key)
     end
     local choice_pattern
     for _, choice in ipairs(definition.choices) do
@@ -381,6 +383,9 @@ end
 -- @treturn parser The Lpeg parser
 -- @treturn table defaults
 local function build_parser(definitions)
+  if type(definitions) ~= 'table' then
+    luakeys_error('E01')
+  end
   local key_values
 
   for key, definition in pairs(definitions) do
@@ -393,11 +398,17 @@ local function build_parser(definitions)
     end
   end
 
+  local capture_unkown_key_value_pair = function(key, value)
+    if definitions[key] == nil then
+      luakeys_error('E03', key)
+    end
+  end
+
   -- Catch left over keys or key value pairs for error reportings
   local generic_catcher =
-    capture(Range('az')^1) *
+    capture(Range('az', 'AZ', '09') ^1) * -- key
     WsPattern('=')^-1 *
-    capture(Range('09', 'az', 'AZ')^0) / capture_key_value_pair
+    capture(Range('09', 'az', 'AZ')^0) / capture_unkown_key_value_pair
 
   local keyval_groups = capture_group((key_values + generic_catcher) * WsPattern(',')^-1 )
 
