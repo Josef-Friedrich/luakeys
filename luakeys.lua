@@ -199,6 +199,26 @@ local function print_table(node)
   print(output_str)
 end
 
+--- Append patterns as a ordered choice (+) or as a sequence (*).
+--
+-- @tparam userdata container Container variable
+-- @tparam userdata pattern Lpeg pattern to combine
+-- @tparam string method 'sequence' (*) or 'choice' (+)
+local function append_pattern(method, container, pattern)
+  if not container then
+    -- start a new choice or sequence.
+    container = pattern
+  else
+    -- append to a existing choice or sequence
+    if method == 'choice' then
+      container = container + pattern
+    elseif method == 'sequence' then
+      container = container * pattern
+    end
+  end
+  return container
+end
+
 local white_space = Set(' \t\r\n')^0
 
 local function WsPattern(input)
@@ -256,11 +276,7 @@ local function data_type_dimension()
   local unit
   -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
   for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
-    if unit then
-      unit = unit + Pattern(dimension_extension)
-    else
-      unit = Pattern(dimension_extension)
-    end
+    unit = append_pattern('choice', unit, Pattern(dimension_extension))
   end
 
   -- patt / function -> function capture
@@ -297,15 +313,6 @@ local data_types = {
   string = data_type_string(),
 }
 
-local function add_pattern(container, pattern)
-  if container then
-    container = container + pattern
-  else
-    container = pattern
-  end
-  return container
-end
-
 --- Extended and TeX specialized version of Lua's type function.
 --
 -- @tparam string string A string to get the type from
@@ -314,13 +321,12 @@ end
 local function get_type(string)
   local parser
   for _, data_type in ipairs({ 'integer', 'float', 'dimension', 'boolean' }) do
-    parser = add_pattern(parser, (
+    parser = append_pattern('choice', parser, (
       data_type_patterns[data_type] *
       capture_constant(data_type) *
       Pattern(-1) -- match the whole input string
     ))
   end
-
   return parser:match(string)
 end
 
@@ -378,11 +384,7 @@ local build_single_key_value_definition = function(key, definition)
     end
     local choice_pattern
     for _, choice in ipairs(definition.choices) do
-      if choice_pattern then
-        choice_pattern = choice_pattern + Pattern(choice)
-      else
-        choice_pattern = Pattern(choice)
-      end
+      choice_pattern = append_pattern('choice', choice_pattern, Pattern(choice))
     end
     value_pattern = WsPattern('=') * capture(choice_pattern)
   elseif definition.overwrite_value ~= nil then
@@ -432,11 +434,7 @@ local function build_parser(definitions)
 
   for key, def in pairs(definitions) do
     local key_value = build_single_key_value_definition(key, def)
-    if not key_values then
-      key_values = key_value
-    else
-      key_values = key_values + key_value
-    end
+    key_values = append_pattern('choice', key_values, key_value)
   end
 
   --- Capture unmatched key value pairs to throw errors and warnings.

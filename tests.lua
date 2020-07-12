@@ -238,7 +238,7 @@ function test_error_E06_wrong_data_type()
       local local_parser = luakeys.build_parser({
         key = { data_type = 'boolean' }
       })
-      local result = local_parser:match('key=5')
+      local_parser:match('key=5')
     end
   )
 end
