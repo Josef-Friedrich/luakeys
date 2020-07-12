@@ -204,40 +204,32 @@ local function WsPattern(input)
   return white_space * Pattern(input) * white_space
 end
 
+local true_pattern =
+  Pattern('true') +
+  Pattern('TRUE') +
+  Pattern('yes') +
+  Pattern('YES') +
+  Pattern('1')
+
+local false_pattern =
+  Pattern('false') +
+  Pattern('FALSE') +
+  Pattern('no') +
+  Pattern('NO') +
+  Pattern('0')
+
 --- Define data type boolean.
 --
 -- @return Lpeg patterns
-local function data_type_boolean ()
-  local boolean_true = (
-    Pattern('true') +
-    Pattern('TRUE') +
-    Pattern('yes') +
-    Pattern('YES') +
-    Pattern('1')
-  ) * capture_constant(true)
-
-  local boolean_false = (
-    Pattern('false') +
-    Pattern('FALSE') +
-    Pattern('no') +
-    Pattern('NO') +
-    Pattern('0')
-  ) * capture_constant(false)
-
-  return boolean_true + boolean_false
+local function capture_data_type_boolean ()
+  return true_pattern * capture_constant(true) + false_pattern * capture_constant(false)
 end
 
 --- Define data type integer.
 --
 -- @return Lpeg patterns
 local function data_type_integer()
-  -- patt / function
-  -- Creates a function capture. It calls the given function passing
-  -- all captures made b nby patt as arguments, or the whole match if
-  -- patt made no capture. The values returned by the function are the
-  -- final values of the capture. In particular, if function returns
-  -- no value, there is no captured value
-  return Range('09')^1 / tonumber
+  return Range('09')^1
 end
 
 --- Define data type integer.
@@ -248,10 +240,9 @@ local function data_type_float()
   local digits = Range('09')^1
   local puls_minus = Set('+-')^-1
   return
-  puls_minus * digits *
+    puls_minus * digits *
     (Pattern('.') * digits)^-1 *
     (Set('eE') * puls_minus * digits)^-1
-    / tonumber
 end
 
 --- Define data type dimension.
@@ -272,7 +263,7 @@ local function data_type_dimension()
   end
 
   -- patt / function -> function capture
-  return (sign^0 * white_space * number * white_space * unit) / tex.sp
+  return sign^0 * white_space * number * white_space * unit
 end
 
 --- Define data type string.
@@ -282,13 +273,55 @@ local data_type_string = function()
   return capture(Range('az', 'AZ', '09')^1)
 end
 
-local data_types = {
-  boolean = data_type_boolean(),
+--- Data type patterens uncaptured
+local data_type_patterns = {
   integer = data_type_integer(),
   float = data_type_float(),
   dimension = data_type_dimension(),
+  boolean = true_pattern + false_pattern,
+}
+
+--- Captured data types
+-- patt / function
+-- Creates a function capture. It calls the given function passing
+-- all captures made b nby patt as arguments, or the whole match if
+-- patt made no capture. The values returned by the function are the
+-- final values of the capture. In particular, if function returns
+-- no value, there is no captured value
+local data_types = {
+  boolean = capture_data_type_boolean(),
+  integer = data_type_patterns.integer / tonumber,
+  float = data_type_patterns.float / tonumber,
+  dimension = data_type_patterns.dimension / tex.sp,
   string = data_type_string(),
 }
+
+local function add_pattern(container, pattern)
+  if container then
+    container = container + pattern
+  else
+    container = pattern
+  end
+  return container
+end
+
+--- Extended and TeX specialized version of Lua's type function.
+--
+-- @tparam string string A string to get the type from
+--
+-- @treturn string The type name like boolean integer
+local function get_type(string)
+  local parser
+  for _, data_type in ipairs({ 'integer', 'float', 'dimension', 'boolean' }) do
+    parser = add_pattern(parser, (
+      data_type_patterns[data_type] *
+      capture_constant(data_type) *
+      Pattern(-1) -- match the whole input string
+    ))
+  end
+
+  return parser:match(string)
+end
 
 --- Build the Lpeg pattern for a single key value pair. The resulting
 -- pattern has to capture two strings.
@@ -434,6 +467,7 @@ local function build_parser(definitions)
 end
 
 return {
+  get_type = get_type,
   print_table = print_table,
   build_parser = build_parser,
 }

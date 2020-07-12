@@ -231,4 +231,16 @@ function test_error_E05_not_allowed_choice()
   )
 end
 
+function test_function_get_type()
+  luaunit.assert_equals(luakeys.get_type('1'), 'integer')
+  luaunit.assert_equals(luakeys.get_type('1.1'), 'float')
+  luaunit.assert_equals(luakeys.get_type('1cm'), 'dimension')
+  luaunit.assert_equals(luakeys.get_type('-1.4cm'), 'dimension')
+  luaunit.assert_equals(luakeys.get_type('-0.4pt'), 'dimension')
+  luaunit.assert_equals(luakeys.get_type('true'), 'boolean')
+  luaunit.assert_equals(luakeys.get_type('yes'), 'boolean')
+  luaunit.assert_equals(luakeys.get_type('NO'), 'boolean')
+
+end
+
 os.exit( luaunit.LuaUnit.run() )
