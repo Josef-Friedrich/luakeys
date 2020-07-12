@@ -32,6 +32,10 @@
 --       key_choices = {
 --         choices = {'one', 'two', 'three'}
 --       },
+--       -- complementary
+--       key_compl = {
+--         complementary = {'show', 'hide'}
+--       },
 --       -- kas=true -> key_alias_single=true
 --       key_alias_single = {
 --         data_type = 'boolean',
