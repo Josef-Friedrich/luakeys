@@ -256,7 +256,7 @@ end
 --- Define data type integer.
 --
 -- @return Lpeg patterns
-local function data_type_float()
+local function assemble_data_type_float()
   -- patt / function
   local digits = Range('09')^1
   local puls_minus = Set('+-')^-1
@@ -269,7 +269,7 @@ end
 --- Define data type dimension.
 --
 -- @return Lpeg patterns
-local function data_type_dimension()
+local function assemble_data_type_dimension()
   local sign = Set('-+')
   local integer = Range('09')^1
   local number = integer^1 * Set('.,')^0 * integer^0
@@ -293,8 +293,8 @@ end
 --- Data type patterens uncaptured
 local data_type_patterns = {
   integer = data_type_integer(),
-  float = data_type_float(),
-  dimension = data_type_dimension(),
+  float = assemble_data_type_float(),
+  dimension = assemble_data_type_dimension(),
   boolean = true_pattern + false_pattern,
 }
 
@@ -334,37 +334,37 @@ end
 -- pattern has to capture two strings.
 --
 -- @tparam string key
--- @tparam table definition keys: alias, type
+-- @tparam table def keys: alias, type
 --
 -- @treturn userdata Lpeg patterns etc.
-local build_single_key_value_definition = function(key, definition)
+local build_key_value_pattern = function(key, def)
   local key_pattern
   local destination_key_name
   local value_pattern
 
   -- Build the key pattern.
-  if definition.rename_key then
-    destination_key_name = definition.rename_key
+  if def.rename_key then
+    destination_key_name = def.rename_key
   else
     destination_key_name = key
   end
 
-  if definition.alias then
+  if def.alias then
     -- alias = {'mlines', 'minlines'}
-    if type(definition.alias) == 'table' then
+    if type(def.alias) == 'table' then
       key_pattern = Pattern(key)
-      for _, value in ipairs(definition.alias) do
+      for _, value in ipairs(def.alias) do
         key_pattern = key_pattern + Pattern(value)  -- long alias first: 'bool', 'b'
       end
       key_pattern = (key_pattern) * capture_constant(destination_key_name)
     -- alias = 'minlines'
     else
       key_pattern =
-        (Pattern(key) + Pattern(definition.alias)) *
+        (Pattern(key) + Pattern(def.alias)) *
         capture_constant(destination_key_name)
     end
   else
-    if definition.rename_key then
+    if def.rename_key then
       -- old_key=1 -> new_key=1
       key_pattern = Pattern(key) * capture_constant(destination_key_name)
     else
@@ -373,32 +373,32 @@ local build_single_key_value_definition = function(key, definition)
   end
 
   -- Build the value pattern.
-  if definition.data_type == 'keyonly' then
+  if def.data_type == 'keyonly' then
     -- key only
     -- show -> show=true
     value_pattern = capture_constant(true)
-  elseif definition.choices then
+  elseif def.choices then
     -- Choices
-    if type(definition.choices) ~= 'table' then
+    if type(def.choices) ~= 'table' then
       throw_error('E02', key)
     end
     local choice_pattern
-    for _, choice in ipairs(definition.choices) do
+    for _, choice in ipairs(def.choices) do
       choice_pattern = append_pattern('choice', choice_pattern, Pattern(choice))
     end
     value_pattern = WsPattern('=') * capture(choice_pattern)
-  elseif definition.overwrite_value ~= nil then
+  elseif def.overwrite_value ~= nil then
     -- overwrite value
-    value_pattern = capture_constant(definition.overwrite_value)
+    value_pattern = capture_constant(def.overwrite_value)
   else
     -- Match by data type.
     -- key=data_type
-    if data_types[definition.data_type] == nil then
-      throw_error('E04', definition.data_type)
+    if data_types[def.data_type] == nil then
+      throw_error('E04', def.data_type)
     end
     value_pattern =
       WsPattern('=') *
-      data_types[definition.data_type]
+      data_types[def.data_type]
   end
 
   return key_pattern * value_pattern
@@ -412,9 +412,9 @@ end
 -- @treturn table defaults
 local build_defaults_table = function(definitions)
   local defaults = {}
-  for key, definition in pairs(definitions) do
-    if definition['default'] ~= nil then
-      defaults[key] = definition.default
+  for key, def in pairs(definitions) do
+    if def['default'] ~= nil then
+      defaults[key] = def.default
     end
   end
   return defaults
@@ -433,7 +433,7 @@ local function build_parser(definitions)
   local key_values
 
   for key, def in pairs(definitions) do
-    local key_value = build_single_key_value_definition(key, def)
+    local key_value = build_key_value_pattern(key, def)
     key_values = append_pattern('choice', key_values, key_value)
   end
 
