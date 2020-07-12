@@ -180,7 +180,16 @@ function test_choices()
   assertEquals(choices_parser:match('key=one'), { key = 'one'})
 end
 
-function test_choices_error()
+function test_error_E01_defintion_no_table()
+  luaunit.assert_error_msg_contains(
+    'luakeys error (E01): The argument 1 of the function \'build_parser\' has to be a table.',
+    function()
+      luakeys.build_parser('string')
+    end
+  )
+end
+
+function test_error_E02_choices_no_table()
   luaunit.assert_error_msg_contains(
     'Key \'key\': choices definition has to be a table.',
     function()
@@ -191,21 +200,33 @@ function test_choices_error()
   )
 end
 
-function test_error_defintion_no_table()
-  luaunit.assert_error_msg_contains(
-    'luakeys error (E01): The argument 1 of the function \'build_parser\' has to be a table.',
-    function()
-      luakeys.build_parser('string')
-    end
-  )
-end
-
-function test_error_03_undefined_key()
+function test_error_E03_undefined_key()
   luaunit.assert_error_msg_contains(
     'luakeys error (E03): Undefined key \'key2\'.',
     function()
       local parser = luakeys.build_parser({ key1 = { data_type = 'integer' } })
       parser:match('key2=1')
+    end
+  )
+end
+
+function test_error_E04_unsupported_data_type()
+  luaunit.assert_error_msg_contains(
+    'luakeys error (E04): Unsupported data type \'lol\'.',
+    function()
+      luakeys.build_parser({ key = { data_type = 'lol' } })
+    end
+  )
+end
+
+function test_error_E05_not_allowed_choice()
+  luaunit.assert_error_msg_contains(
+    'luakeys error (E05): Not allowed choice \'four\' for key \'key\'.',
+    function()
+      local choices_parser = luakeys.build_parser({
+        key = { choices = {'one', 'two', 'three'} }
+      })
+      choices_parser:match('key=four')
     end
   )
 end

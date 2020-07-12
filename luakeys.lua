@@ -104,13 +104,15 @@ end
 local error_messages = {
   E01 = 'The argument 1 of the function \'build_parser\' has to be a table.',
   E02 = 'Key \'%s\': choices definition has to be a table.',
-  E03 = 'Undefined key \'%s\'.'
+  E03 = 'Undefined key \'%s\'.',
+  E04 = 'Unsupported data type \'%s\'.',
+  E05 = 'Not allowed choice \'%s\' for key \'%s\'.'
 }
 
 --- Prefix all error messages and then throw an error.
 --
 -- @tparam string message A message text for the error.
-local function luakeys_error(error_code, arg1, arg2)
+local function throw_error(error_code, arg1, arg2)
   error('luakeys error (' .. error_code .. '): ' ..
     string.format(error_messages[error_code], arg1, arg2))
 end
@@ -123,70 +125,69 @@ local function print_table(node)
   local output_str = "{\n"
 
   while true do
-      local size = 0
-      for k,v in pairs(node) do
-          size = size + 1
-      end
+    local size = 0
+    for k,v in pairs(node) do
+      size = size + 1
+    end
 
-      local cur_index = 1
-      for k,v in pairs(node) do
-          if (cache[node] == nil) or (cur_index >= cache[node]) then
+    local cur_index = 1
+    for k,v in pairs(node) do
+      if (cache[node] == nil) or (cur_index >= cache[node]) then
+        if (string.find(output_str,"}",output_str:len())) then
+          output_str = output_str .. ",\n"
+        elseif not (string.find(output_str,"\n",output_str:len())) then
+          output_str = output_str .. "\n"
+        end
 
-              if (string.find(output_str,"}",output_str:len())) then
-                  output_str = output_str .. ",\n"
-              elseif not (string.find(output_str,"\n",output_str:len())) then
-                  output_str = output_str .. "\n"
-              end
+        -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+        table.insert(output,output_str)
+        output_str = ""
 
-              -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
-              table.insert(output,output_str)
-              output_str = ""
+        local key
+        if (type(k) == "number" or type(k) == "boolean") then
+          key = "["..tostring(k).."]"
+        else
+          key = "['"..tostring(k).."']"
+        end
 
-              local key
-              if (type(k) == "number" or type(k) == "boolean") then
-                  key = "["..tostring(k).."]"
-              else
-                  key = "['"..tostring(k).."']"
-              end
-
-              if (type(v) == "number" or type(v) == "boolean") then
-                  output_str = output_str .. string.rep('\t',depth) .. key .. " = "..tostring(v)
-              elseif (type(v) == "table") then
-                  output_str = output_str .. string.rep('\t',depth) .. key .. " = {\n"
-                  table.insert(stack,node)
-                  table.insert(stack,v)
-                  cache[node] = cur_index+1
-                  break
-              else
-                  output_str = output_str .. string.rep('\t',depth) .. key .. " = '"..tostring(v).."'"
-              end
-
-              if (cur_index == size) then
-                  output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
-              else
-                  output_str = output_str .. ","
-              end
-          else
-              -- close the table
-              if (cur_index == size) then
-                  output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
-              end
-          end
-
-          cur_index = cur_index + 1
-      end
-
-      if (size == 0) then
-          output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
-      end
-
-      if (#stack > 0) then
-          node = stack[#stack]
-          stack[#stack] = nil
-          depth = cache[node] == nil and depth + 1 or depth - 1
-      else
+        if (type(v) == "number" or type(v) == "boolean") then
+          output_str = output_str .. string.rep('\t',depth) .. key .. " = "..tostring(v)
+        elseif (type(v) == "table") then
+          output_str = output_str .. string.rep('\t',depth) .. key .. " = {\n"
+          table.insert(stack,node)
+          table.insert(stack,v)
+          cache[node] = cur_index+1
           break
+        else
+          output_str = output_str .. string.rep('\t',depth) .. key .. " = '"..tostring(v).."'"
+        end
+
+        if (cur_index == size) then
+          output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+        else
+          output_str = output_str .. ","
+        end
+      else
+        -- close the table
+        if (cur_index == size) then
+          output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+        end
       end
+
+      cur_index = cur_index + 1
+    end
+
+    if (size == 0) then
+      output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+    end
+
+    if (#stack > 0) then
+      node = stack[#stack]
+      stack[#stack] = nil
+      depth = cache[node] == nil and depth + 1 or depth - 1
+    else
+      break
+    end
   end
 
   -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
@@ -289,8 +290,8 @@ local data_types = {
   string = data_type_string(),
 }
 
-
----
+--- Build the Lpeg pattern for a single key value pair. The resulting
+-- pattern has to capture two strings.
 --
 -- @tparam string key
 -- @tparam table definition keys: alias, type
@@ -333,11 +334,13 @@ local build_single_key_value_definition = function(key, definition)
 
   -- Build the value pattern.
   if definition.data_type == 'keyonly' then
+    -- key only
     -- show -> show=true
     value_pattern = capture_constant(true)
   elseif definition.choices then
+    -- Choices
     if type(definition.choices) ~= 'table' then
-      luakeys_error('E02', key)
+      throw_error('E02', key)
     end
     local choice_pattern
     for _, choice in ipairs(definition.choices) do
@@ -349,9 +352,14 @@ local build_single_key_value_definition = function(key, definition)
     end
     value_pattern = WsPattern('=') * capture(choice_pattern)
   elseif definition.overwrite_value ~= nil then
+    -- overwrite value
     value_pattern = capture_constant(definition.overwrite_value)
   else
-    -- key=value
+    -- Match by data type.
+    -- key=data_type
+    if data_types[definition.data_type] == nil then
+      throw_error('E04', definition.data_type)
+    end
     value_pattern =
       WsPattern('=') *
       data_types[definition.data_type]
@@ -384,7 +392,7 @@ end
 -- @treturn table defaults
 local function build_parser(definitions)
   if type(definitions) ~= 'table' then
-    luakeys_error('E01')
+    throw_error('E01')
   end
   local key_values
 
@@ -400,7 +408,13 @@ local function build_parser(definitions)
 
   local capture_unkown_key_value_pair = function(key, value)
     if definitions[key] == nil then
-      luakeys_error('E03', key)
+      throw_error('E03', key)
+    end
+
+    local definition = definitions[key]
+
+    if definition.choices then
+      throw_error('E05', value, key)
     end
   end
 
