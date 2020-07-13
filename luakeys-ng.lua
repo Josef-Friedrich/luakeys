@@ -78,16 +78,19 @@ end
 local json = Pattern({
   'list',
   value =
+    Variable('object') +
     Variable('bool_value') +
-    Variable('string_value') +
     Variable('number_value') +
-    Variable('object'),
+    Variable('string_value') +
+    Variable('string_value_unquoted'),
 
   bool_value =
     attr(('true'), true) + attr(('false'), false),
 
   string_value =
     white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
+
+  string_value_unquoted = white_space * capture((1 - Set('{},='))^0) * white_space,
 
   number_value =
     white_space * number * white_space,
@@ -109,7 +112,7 @@ local input = [[
     font size ="12",
     menu id= {
       id= "file",
-      value= "File",
+      value= File,
       pop up item= {
         menuitem= {
           value= "New",
