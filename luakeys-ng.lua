@@ -109,17 +109,16 @@ local json = Pattern({
 })
 
 local input = [[
-    font size ="12",
-    menu id= {
-      id= "file",
-      value= File,
-      pop up item= {
-        menuitem= {
-          value= "New",
-          onclick = "CreateNewDoc()"
-        }
-      }
-    }
+  key with spaces = String without quotes,
+  string= "String with quotes: ,{}=",
+  number = 2,
+  float = 1.2,
+  list = {one=one,two=two,three=three},
+  nested key = {
+    nested key 2= {
+      key = value,
+    },
+  },
 ]]
 
 print(inspect(json:match(input)))
