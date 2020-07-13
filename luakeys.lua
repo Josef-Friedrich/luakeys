@@ -456,7 +456,7 @@ local function build_parser(definitions)
 
   -- Catch left over keys or key value pairs for error reportings
   local generic_catcher =
-    capture(Range('az', 'AZ', '09') ^1) * -- key
+    capture(Range('az', 'AZ', '09')^1) * -- key
     WsPattern('=')^-1 *
     capture(Range('09', 'az', 'AZ')^0) * Pattern(-1) / capture_unkown_key_value_pair
 

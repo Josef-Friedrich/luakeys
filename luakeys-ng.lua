@@ -8,60 +8,6 @@
 --
 -- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf)
 -- * [Dimension handling in lualibs](https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua)
---
---     local defintions = {
---       -- data types:
---       key_integer = {
---         data_type = 'integer',
---       },
---       -- 1.1 +1.1 -1.1 11e-02
---       key_float = {
---         data_type = 'float',
---       },
---       -- true: true TRUE yes YES 1, false: false FALSE no NO 0
---       key_boolean = {
---         data_type = 'boolean',
---       },
---       key_dimension = {
---         data_type = 'dimension',
---       },
---       keyonly = {
---         data_type = 'keyonly'
---       },
---       -- choices
---       key_choices = {
---         choices = {'one', 'two', 'three'}
---       },
---       -- complementary
---       key_compl = {
---         complementary = {'show', 'hide'}
---       },
---       -- kas=true -> key_alias_single=true
---       key_alias_single = {
---         data_type = 'boolean',
---         alias = 'kas', -- String -> single alias
---       },
---       -- kam=true or k=true -> key_alias_multiple=true
---       key_alias_multiple = {
---         data_type = 'boolean',
---         alias = { 'kam', 'k' }, -- Table -> multiple aliases (long alias first)
---       },
---       key_default = {
---         data_type = 'boolean',
---         default = true
---       },
---       -- old_key=1 -> new_key=1
---       old_key = {
---         data_type = 'integer'
---         rename_key = 'new_key'
---       }
---       -- key_overwrite_value=1 -> key_overwrite_value=2
---       key_overwrite_value = {
---         data_type = 'integer'
---         overwrite_value = 2
---       }
---     }
---
 -- @module luakeys
 
 local lpeg = require('lpeg')
@@ -132,15 +78,10 @@ end
 local json = Pattern({
   'list',
   value =
-    Variable('null_value') +
     Variable('bool_value') +
     Variable('string_value') +
-    Variable('key_value') +
     Variable('number_value') +
     Variable('object'),
-
-  null_value =
-    attr(('null'), nil),
 
   bool_value =
     attr(('true'), true) + attr(('false'), false),
@@ -148,15 +89,15 @@ local json = Pattern({
   string_value =
     white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
 
-  key_word = Range('az', 'AZ', '09'),
-
-  key_value = white_space * capture(Variable('key_word')^1 * (Pattern(' ')^1 * Variable('key_word')^1)^0) * white_space,
-
   number_value =
     white_space * number * white_space,
 
+  key_word = Range('az', 'AZ', '09'),
+
+  key = white_space * capture(Variable('key_word')^1 * (Pattern(' ')^1 * Variable('key_word')^1)^0) * white_space,
+
   member_pair =
-    capture_group(Variable('key_value') * lit('=') * Variable('value')) * lit(',')^-1,
+    capture_group(Variable('key') * lit('=') * Variable('value')) * lit(',')^-1,
 
   list = capture_fold(capture_table('') * Variable('member_pair')^0, rawset),
 
