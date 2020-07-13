@@ -135,8 +135,8 @@ local json = Pattern{
     Variable('null_value') +
     Variable('bool_value') +
     Variable('string_value') +
+    Variable('key_value') +
     Variable('number_value') +
-    Variable('array') +
     Variable('object'),
 
   null_value =
@@ -148,36 +148,31 @@ local json = Pattern{
   string_value =
     white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
 
+  key_value = capture(Range('az', 'AZ', '01')^1),
+
   number_value =
     white_space * number * white_space,
 
-  array =
-    lit('[') * capture_table((Variable('value') * lit(',')^-1)^0) * lit(']'),
-
   member_pair =
-    capture_group(Variable('string_value') * lit(':') * Variable('value')) * lit(',')^-1,
+    capture_group(Variable('key_value') * lit('=') * Variable('value')) * lit(',')^-1,
 
   object =
     lit('{') * capture_fold(capture_table('') * Variable('member_pair')^0, rawset) * lit('}')
 }
 
 local input = [[
-  {"menu": {
-    "id": "file",
-
-    "value": "File",
-  "popup": {
-  "menuitem": [
-  {"value": "New",
-  "onclick": "CreateNewDoc()"},
-  {"value": "Open",
-  "onclick": "OpenDoc()"},
-  {"value": "Close",
-  "onclick": "CloseDoc()"}
-
-  ]
+  {
+    menu= {
+      id= "file",
+      value= "File",
+      popup= {
+        menuitem= {
+          value= "New",
+          onclick = "CreateNewDoc()"
+        }
+      }
+    }
   }
-  }}
 ]]
 
 print(inspect(json:match(input)))
