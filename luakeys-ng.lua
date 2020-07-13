@@ -103,7 +103,7 @@ local capture_constant = lpeg.Cc
 local inspect = require('inspect')
 
 -- number parsing
-local number = Pattern{('number'),
+local number = Pattern({('number'),
   number = (Variable('int') * Variable('frac')^-1 * Variable('exp')^-1) / tonumber,
   int = Variable('sign')^-1 * (Range('19') * Variable('digits') + Variable('digit')),
   sign = Set('+-'),
@@ -111,7 +111,7 @@ local number = Pattern{('number'),
   digits = Variable('digit') * Variable('digits') + Variable('digit'),
   frac = Pattern('.') * Variable('digits'),
   exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
-}
+})
 
 -- optional whitespace
 local white_space = Set(' \t\n\r')^0
@@ -129,8 +129,8 @@ local attr = function(str, attr)
 end
 
 -- JSON grammar
-local json = Pattern{
-  ('object'),
+local json = Pattern({
+  'list',
   value =
     Variable('null_value') +
     Variable('bool_value') +
@@ -148,7 +148,7 @@ local json = Pattern{
   string_value =
     white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
 
-  key_value = capture(Range('az', 'AZ', '01')^1),
+  key_value = capture(Range('az', 'AZ', '09', '  ')^1),
 
   number_value =
     white_space * number * white_space,
@@ -156,13 +156,15 @@ local json = Pattern{
   member_pair =
     capture_group(Variable('key_value') * lit('=') * Variable('value')) * lit(',')^-1,
 
+  list = capture_fold(capture_table('') * Variable('member_pair')^0, rawset),
+
   object =
-    lit('{') * capture_fold(capture_table('') * Variable('member_pair')^0, rawset) * lit('}')
-}
+    lit('{') * Variable('list')  * lit('}')
+})
 
 local input = [[
-  {
-    menu= {
+    font size="12",
+    menu id= {
       id= "file",
       value= "File",
       popup= {
@@ -172,7 +174,6 @@ local input = [[
         }
       }
     }
-  }
 ]]
 
 print(inspect(json:match(input)))
