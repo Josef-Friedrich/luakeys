@@ -116,6 +116,17 @@ function test_datatype_float()
   assert_float('+11e-02', 0.11)
 end
 
+function test_datatype_string()
+  local local_parser = luakeys.build_parser({ string = { data_type = 'string' } })
+
+  local function assert_string(input, value)
+    assertEquals(local_parser:match('string=' .. input), { string = value })
+  end
+  assert_string('"1"', '1')
+  assert_string('"1\\\"test\\\"2"', '1\\\"test\\\"2')
+  assert_string('"1,2"', '1,2')
+end
+
 function test_defaults()
   assertEquals(defaults.integer, 3)
   assertEquals(defaults.boolean, true)
@@ -252,7 +263,7 @@ function test_function_get_type()
   luaunit.assert_equals(luakeys.get_type('true'), 'boolean')
   luaunit.assert_equals(luakeys.get_type('yes'), 'boolean')
   luaunit.assert_equals(luakeys.get_type('NO'), 'boolean')
-
+  luaunit.assert_equals(luakeys.get_type('"lol"'), 'string')
 end
 
 os.exit( luaunit.LuaUnit.run() )

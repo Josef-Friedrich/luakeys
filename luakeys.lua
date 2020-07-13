@@ -287,19 +287,13 @@ local function assemble_data_type_dimension()
   return sign^0 * white_space * number * white_space * unit
 end
 
---- Define data type string.
---
--- @return Lpeg patterns
-local data_type_string = function()
-  return capture(Range('az', 'AZ', '09')^1)
-end
-
 --- Data type patterens uncaptured
 local data_type_patterns = {
   integer = data_type_integer(),
   float = assemble_data_type_float(),
   dimension = assemble_data_type_dimension(),
   boolean = true_pattern + false_pattern,
+  string = Pattern('"') * (Pattern('\\"') + 1 - Pattern('"'))^0 * Pattern'"',
 }
 
 --- Captured data types
@@ -314,7 +308,7 @@ local data_types = {
   integer = data_type_patterns.integer / tonumber,
   float = data_type_patterns.float / tonumber,
   dimension = data_type_patterns.dimension / tex.sp,
-  string = data_type_string(),
+  string = Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern'"',
 }
 
 --- Extended and TeX specialized version of Lua's type function.
@@ -324,7 +318,7 @@ local data_types = {
 -- @treturn string The type name like boolean integer
 local function get_type(string)
   local parser
-  for _, data_type in ipairs({ 'integer', 'float', 'dimension', 'boolean' }) do
+  for _, data_type in ipairs({ 'integer', 'float', 'dimension', 'boolean', 'string' }) do
     parser = append_pattern('choice', parser, (
       data_type_patterns[data_type] *
       capture_constant(data_type) *
