@@ -148,7 +148,9 @@ local json = Pattern({
   string_value =
     white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
 
-  key_value = capture(Range('az', 'AZ', '09', '  ')^1),
+  key_word = Range('az', 'AZ', '09'),
+
+  key_value = white_space * capture(Variable('key_word')^1 * (Pattern(' ')^1 * Variable('key_word')^1)^0) * white_space,
 
   number_value =
     white_space * number * white_space,
@@ -163,11 +165,11 @@ local json = Pattern({
 })
 
 local input = [[
-    font size="12",
+    font size ="12",
     menu id= {
       id= "file",
       value= "File",
-      popup= {
+      pop up item= {
         menuitem= {
           value= "New",
           onclick = "CreateNewDoc()"
