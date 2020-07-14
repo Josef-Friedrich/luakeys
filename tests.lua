@@ -41,6 +41,7 @@ function test_datatype_integer()
   assertEquals(parse('integer=1'), { integer = 1 })
 end
 
+--- @todo remove
 function test_datatype_boolean()
   local boolean_parser = luakeys.build_parser({
     key = {
@@ -54,13 +55,28 @@ function test_datatype_boolean()
   assert_boolean('TRUE', true)
   assert_boolean('yes', true)
   assert_boolean('YES', true)
-  assert_boolean('1', true)
 
   assert_boolean('false', false)
   assert_boolean('FALSE', false)
   assert_boolean('no', false)
   assert_boolean('NO', false)
-  assert_boolean('0', false)
+end
+
+--- @todo remove
+function test_datatype_boolean_ng()
+  local local_parser = luakeys.generate_parser()
+  local function assert_boolean(boolean_string, value)
+    assertEquals(local_parser:match('key=' .. boolean_string), { key = value })
+  end
+  assert_boolean('true', true)
+  assert_boolean('TRUE', true)
+  assert_boolean('yes', true)
+  assert_boolean('YES', true)
+
+  assert_boolean('false', false)
+  assert_boolean('FALSE', false)
+  assert_boolean('no', false)
+  assert_boolean('NO', false)
 end
 
 function test_datatype_dimension()
@@ -97,6 +113,7 @@ function test_datatype_dimension()
   assert_dim('1sp')
 end
 
+-- @todo: remove
 function test_datatype_float()
   local float_parser = luakeys.build_parser({
     float = {
@@ -114,6 +131,22 @@ function test_datatype_float()
   assert_float('11e-02', 11e-02)
   assert_float('-11e-02', -0.11)
   assert_float('+11e-02', 0.11)
+end
+
+function test_datatype_number()
+  local local_parser = luakeys.generate_parser()
+
+  local assert_equals = function(input, output)
+    luaunit.assert_equals(local_parser:match('key=' .. input), { key = output })
+  end
+
+  assert_equals('1.1', 1.1)
+  assert_equals('+1.1', 1.1)
+  assert_equals('-1.1', -1.1)
+  assert_equals('11e-02', 0.11)
+  assert_equals('11e-02', 11e-02)
+  assert_equals('-11e-02', -0.11)
+  assert_equals('+11e-02', 0.11)
 end
 
 function test_datatype_string()

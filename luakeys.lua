@@ -226,32 +226,48 @@ local function append_pattern(method, container, pattern)
   return container
 end
 
-local white_space = Set(' \t\r\n')^0
+-- Optional whitespace
+local white_space = Set(' \t\n\r')^0
 
-local function WsPattern(input)
-  return white_space * Pattern(input) * white_space
+--- Match literal string surrounded by whitespace
+local WhiteSpacedPattern = function(match)
+  return white_space * Pattern(match) * white_space
 end
 
-local true_pattern =
-  Pattern('true') +
-  Pattern('TRUE') +
-  Pattern('yes') +
-  Pattern('YES') +
-  Pattern('1')
+local patterns = {
+  boolean_true =
+    Pattern('true') +
+    Pattern('TRUE') +
+    Pattern('yes') +
+    Pattern('YES'),
 
-local false_pattern =
-  Pattern('false') +
-  Pattern('FALSE') +
-  Pattern('no') +
-  Pattern('NO') +
-  Pattern('0')
+  boolean_false =
+    Pattern('false') +
+    Pattern('FALSE') +
+    Pattern('no') +
+    Pattern('NO'),
 
---- Define data type boolean.
---
--- @return Lpeg patterns
-local function capture_data_type_boolean ()
-  return true_pattern * capture_constant(true) + false_pattern * capture_constant(false)
-end
+  number = Pattern({'number',
+    number =
+      Variable('int') *
+      Variable('frac')^-1 *
+      Variable('exp')^-1,
+
+    int = Variable('sign')^-1 * (
+      Range('19') * Variable('digits') + Variable('digit')
+    ),
+
+    sign = Set('+-'),
+
+    digit = Range('09'),
+
+    digits = Variable('digit') * Variable('digits') + Variable('digit'),
+
+    frac = Pattern('.') * Variable('digits'),
+
+    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
+  })
+}
 
 --- Define data type integer.
 --
@@ -295,7 +311,7 @@ local data_type_patterns = {
   integer = data_type_integer(),
   float = assemble_data_type_float(),
   dimension = assemble_data_type_dimension(),
-  boolean = true_pattern + false_pattern,
+  boolean = patterns.boolean_true + patterns.boolean_false,
   string = Pattern('"') * (Pattern('\\"') + 1 - Pattern('"'))^0 * Pattern'"',
 }
 
@@ -306,8 +322,12 @@ local data_type_patterns = {
 -- patt made no capture. The values returned by the function are the
 -- final values of the capture. In particular, if function returns
 -- no value, there is no captured value
-local data_types = {
-  boolean = capture_data_type_boolean(),
+local captures = {
+  boolean =
+    patterns.boolean_true * capture_constant(true) +
+    patterns.boolean_false * capture_constant(false),
+
+  number = patterns.number / tonumber,
   integer = data_type_patterns.integer / tonumber,
   float = data_type_patterns.float / tonumber,
   dimension = data_type_patterns.dimension / tex.sp,
@@ -387,19 +407,19 @@ local build_key_value_pattern = function(key, def)
     for _, choice in ipairs(def.choices) do
       choice_pattern = append_pattern('choice', choice_pattern, Pattern(choice))
     end
-    value_pattern = WsPattern('=') * capture(choice_pattern)
+    value_pattern = WhiteSpacedPattern('=') * capture(choice_pattern)
   elseif def.overwrite_value ~= nil then
     -- overwrite value
     value_pattern = capture_constant(def.overwrite_value)
   else
     -- Match by data type.
     -- key=data_type
-    if data_types[def.data_type] == nil then
+    if captures[def.data_type] == nil then
       throw_error('E04', def.data_type)
     end
     value_pattern =
-      WsPattern('=') *
-      data_types[def.data_type]
+      WhiteSpacedPattern('=') *
+      captures[def.data_type]
   end
 
   return key_pattern * value_pattern
@@ -461,10 +481,10 @@ local function build_parser(definitions)
   -- Catch left over keys or key value pairs for error reportings
   local generic_catcher =
     capture(Range('az', 'AZ', '09')^1) * -- key
-    WsPattern('=')^-1 *
+    WhiteSpacedPattern('=')^-1 *
     capture(Range('09', 'az', 'AZ')^0) * Pattern(-1) / capture_unkown_key_value_pair
 
-  local keyval_groups = capture_group((key_values + generic_catcher) * WsPattern(',')^-1 )
+  local keyval_groups = capture_group((key_values + generic_catcher) * WhiteSpacedPattern(',')^-1 )
 
   -- rawset (table, index, value)
   -- Sets the real value of table[index] to value, without invoking the
@@ -511,46 +531,6 @@ end
 --
 -- @treturn userdata The parser
 local function generate_parser()
-  -- number parsing
-  local number = Pattern({('number'),
-    number = (
-      Variable('int') *
-      Variable('frac')^-1 *
-      Variable('exp')^-1
-    ) / tonumber,
-
-    int = Variable('sign')^-1 * (
-      Range('19') * Variable('digits') + Variable('digit')
-    ),
-
-    sign = Set('+-'),
-
-    digit = Range('09'),
-
-    digits = Variable('digit') * Variable('digits') + Variable('digit'),
-
-    frac = Pattern('.') * Variable('digits'),
-
-    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
-  })
-
-  -- optional whitespace
-  local white_space = Set(' \t\n\r')^0
-
-  --- Match literal string surrounded by whitespace
-  local WhiteSpacedPattern = function(match)
-    return white_space * Pattern(match) * white_space
-  end
-
-  --- Match literal string and synthesize
-  -- an attribute
-  local synthesize_capture = function(match, capture)
-    return
-      white_space *
-      Pattern(match) / function() return capture end *
-      white_space
-  end
-
   --- Add values to a table in a two modes:
   --
   -- # Key value pair
@@ -585,8 +565,7 @@ local function generate_parser()
       Variable('string_value') +
       Variable('string_value_unquoted'),
 
-    bool_value =
-      synthesize_capture(('true'), true) + synthesize_capture(('false'), false),
+    bool_value = captures.boolean,
 
     string_value =
       white_space * Pattern('"') *
@@ -599,7 +578,7 @@ local function generate_parser()
       white_space,
 
     number_value =
-      white_space * number * white_space,
+      white_space * captures.number * white_space,
 
     key_word = Range('az', 'AZ', '09'),
 
