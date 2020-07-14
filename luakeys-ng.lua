@@ -70,12 +70,12 @@ local number = Pattern({('number'),
 -- optional whitespace
 local white_space = Set(' \t\n\r')^0
 
---- match literal string surrounded by whitespace
-local WhiteSpacedPattern = function(str)
-  return white_space * Pattern(str) * white_space
+--- Match literal string surrounded by whitespace
+local WhiteSpacedPattern = function(match)
+  return white_space * Pattern(match) * white_space
 end
 
---- match literal string and synthesize
+--- Match literal string and synthesize
 -- an attribute
 local synthesize_capture = function(match, capture)
   return
@@ -84,6 +84,22 @@ local synthesize_capture = function(match, capture)
     white_space
 end
 
+--- Add values to a table in a two modes:
+--
+-- # Key value pair
+--
+-- If arg1 and arg2 are not nil, then arg1 is the key and arg2 is the
+-- value of a new table entry.
+--
+-- # Index value
+--
+-- If arg2 is nil, then arg1 is the value and is add as a indexed (by an
+-- integer) value
+--
+-- @tparam table table @tparam mixed arg1 @tparam mixed arg2 If arg2 is
+-- empty
+--
+-- @treturn table
 local add_to_table = function(table, arg1, arg2)
   if arg2 == nil then
     local index = #table + 1
