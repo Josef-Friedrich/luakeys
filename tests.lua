@@ -266,4 +266,20 @@ function test_function_get_type()
   luaunit.assert_equals(luakeys.get_type('"lol"'), 'string')
 end
 
+function test_function_generate_parser()
+  local local_parser = luakeys.generate_parser()
+
+  local assert_equals = function(input, output)
+    luaunit.assert_equals(local_parser:match(input), output)
+  end
+
+  assert_equals('one,two,three', {'one', 'two', 'three'})
+  assert_equals('1,2,3', {1, 2, 3})
+  assert_equals('level1={level2={level3=level3}}', {level1={level2={level3="level3"}}})
+  assert_equals('string = without quotes', {string="without quotes"})
+  assert_equals('string = "with quotes: ,={}"', {string="with quotes: ,={}"})
+  assert_equals('number = -0.123', {number=-0.123})
+
+end
+
 os.exit( luaunit.LuaUnit.run() )
