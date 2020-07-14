@@ -234,40 +234,55 @@ local WhiteSpacedPattern = function(match)
   return white_space * Pattern(match) * white_space
 end
 
-local patterns = {
-  boolean_true =
-    Pattern('true') +
-    Pattern('TRUE') +
-    Pattern('yes') +
-    Pattern('YES'),
+-- Pattern without captures --------------------------------------------
 
-  boolean_false =
-    Pattern('false') +
-    Pattern('FALSE') +
-    Pattern('no') +
-    Pattern('NO'),
+local boolean_true =
+  Pattern('true') +
+  Pattern('TRUE') +
+  Pattern('yes') +
+  Pattern('YES')
 
-  number = Pattern({'number',
-    number =
-      Variable('int') *
-      Variable('frac')^-1 *
-      Variable('exp')^-1,
+local boolean_false =
+  Pattern('false') +
+  Pattern('FALSE') +
+  Pattern('no') +
+  Pattern('NO')
 
-    int = Variable('sign')^-1 * (
-      Range('19') * Variable('digits') + Variable('digit')
-    ),
+local number = Pattern({'number',
+  number =
+    Variable('int') *
+    Variable('frac')^-1 *
+    Variable('exp')^-1,
 
-    sign = Set('+-'),
+  int = Variable('sign')^-1 * (
+    Range('19') * Variable('digits') + Variable('digit')
+  ),
 
-    digit = Range('09'),
+  sign = Set('+-'),
 
-    digits = Variable('digit') * Variable('digits') + Variable('digit'),
+  digit = Range('09'),
 
-    frac = Pattern('.') * Variable('digits'),
+  digits = Variable('digit') * Variable('digits') + Variable('digit'),
 
-    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
-  })
-}
+  frac = Pattern('.') * Variable('digits'),
+
+  exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
+})
+
+--- Define data type dimension.
+--
+-- @return Lpeg patterns
+local function assemble_dimension()
+  local units
+  -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+  for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
+    units = append_pattern('choice', units, Pattern(dimension_extension))
+  end
+
+  return number * units
+end
+
+local dimension = assemble_dimension()
 
 --- Define data type integer.
 --
@@ -289,29 +304,12 @@ local function assemble_data_type_float()
     (Set('eE') * puls_minus * digits)^-1
 end
 
---- Define data type dimension.
---
--- @return Lpeg patterns
-local function assemble_data_type_dimension()
-  local sign = Set('-+')
-  local integer = Range('09')^1
-  local number = integer^1 * Set('.,')^0 * integer^0
-  local unit
-  -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
-  for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
-    unit = append_pattern('choice', unit, Pattern(dimension_extension))
-  end
-
-  -- patt / function -> function capture
-  return sign^0 * white_space * number * white_space * unit
-end
-
 --- Data type patterens uncaptured
 local data_type_patterns = {
   integer = data_type_integer(),
   float = assemble_data_type_float(),
-  dimension = assemble_data_type_dimension(),
-  boolean = patterns.boolean_true + patterns.boolean_false,
+  dimension = assemble_dimension(),
+  boolean = boolean_true + boolean_false,
   string = Pattern('"') * (Pattern('\\"') + 1 - Pattern('"'))^0 * Pattern'"',
 }
 
@@ -324,13 +322,13 @@ local data_type_patterns = {
 -- no value, there is no captured value
 local captures = {
   boolean =
-    patterns.boolean_true * capture_constant(true) +
-    patterns.boolean_false * capture_constant(false),
+    boolean_true * capture_constant(true) +
+    boolean_false * capture_constant(false),
 
-  number = patterns.number / tonumber,
+  number = number / tonumber,
   integer = data_type_patterns.integer / tonumber,
   float = data_type_patterns.float / tonumber,
-  dimension = data_type_patterns.dimension / tex.sp,
+  dimension = dimension / tex.sp,
   string = Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern'"',
 }
 
