@@ -42,50 +42,58 @@ local capture_fold = lpeg.Cf
 --- See [lpeg.Cg](http://www.inf.puc-rio.br/~roberto/lpeg#cap-g)
 local capture_group = lpeg.Cg
 
---- See [lpeg.Cg](http://www.inf.puc-rio.br/~roberto/lpeg#cap-cc)
-local capture_constant = lpeg.Cc
--- https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf
-
 local inspect = require('inspect')
 
 -- number parsing
 local number = Pattern({('number'),
-  number = (Variable('int') * Variable('frac')^-1 * Variable('exp')^-1) / tonumber,
-  int = Variable('sign')^-1 * (Range('19') * Variable('digits') + Variable('digit')),
+  number = (
+    Variable('int') *
+    Variable('frac')^-1 *
+    Variable('exp')^-1
+  ) / tonumber,
+
+  int = Variable('sign')^-1 * (
+    Range('19') * Variable('digits') + Variable('digit')
+  ),
+
   sign = Set('+-'),
+
   digit = Range('09'),
+
   digits = Variable('digit') * Variable('digits') + Variable('digit'),
+
   frac = Pattern('.') * Variable('digits'),
+
   exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
 })
 
 -- optional whitespace
 local white_space = Set(' \t\n\r')^0
 
--- match literal string surrounded by whitespace
-local lit = function(str)
+--- match literal string surrounded by whitespace
+local WhiteSpacedPattern = function(str)
   return white_space * Pattern(str) * white_space
 end
 
--- match literal string and synthesize
+--- match literal string and synthesize
 -- an attribute
-local attr = function(str, attr)
-  return white_space * Pattern(str) /
-  function() return attr end * white_space
+local synthesize_capture = function(match, capture)
+  return
+    white_space *
+    Pattern(match) / function() return capture end *
+    white_space
 end
-
 
 local add_to_table = function(table, arg1, arg2)
   if arg2 == nil then
-    local index = rawlen(table) + 1
+    local index = #table + 1
     return rawset(table, index, arg1)
   else
     return rawset(table, arg1, arg2)
   end
 end
 
--- JSON grammar
-local json = Pattern({
+local keys_grammar = Pattern({
   'list',
   value =
     Variable('object') +
@@ -95,33 +103,48 @@ local json = Pattern({
     Variable('string_value_unquoted'),
 
   bool_value =
-    attr(('true'), true) + attr(('false'), false),
+    synthesize_capture(('true'), true) + synthesize_capture(('false'), false),
 
   string_value =
-    white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
+    white_space * Pattern('"') *
+    capture((Pattern('\\"') + 1 - Pattern('"'))^0) *
+    Pattern('"') * white_space,
 
-  string_value_unquoted = white_space * capture((1 - Set('{},='))^1) * white_space,
+  string_value_unquoted =
+    white_space *
+    capture((1 - Set('{},='))^1) *
+    white_space,
 
   number_value =
     white_space * number * white_space,
 
   key_word = Range('az', 'AZ', '09'),
 
-  key = white_space * capture(Variable('key_word')^1 * (Pattern(' ')^1 * Variable('key_word')^1)^0) * white_space,
+  key = white_space * capture(
+    Variable('key_word')^1 *
+    (Pattern(' ')^1 * Variable('key_word')^1)^0
+  ) * white_space,
 
   value_without_key =
     Variable('string_value') +
     Variable('string_value_unquoted'),
 
-  key_value_pair = Variable('key') * lit('=') * Variable('value'),
+  key_value_pair =
+    Variable('key') * WhiteSpacedPattern('=') * Variable('value'),
 
   member_pair =
-    capture_group(Variable('key_value_pair') + Variable('value_without_key')) * lit(',')^-1,
+    capture_group(
+      Variable('key_value_pair') +
+      Variable('value_without_key')
+    ) * WhiteSpacedPattern(',')^-1,
 
-  list = capture_fold(capture_table('') * Variable('member_pair')^0, add_to_table),
+  list = capture_fold(
+    capture_table('') * Variable('member_pair')^0,
+    add_to_table
+  ),
 
   object =
-    lit('{') * Variable('list')  * lit('}')
+    WhiteSpacedPattern('{') * Variable('list')  * WhiteSpacedPattern('}')
 })
 
 local input = [[
@@ -138,4 +161,4 @@ local input = [[
   },
 ]]
 
-print(inspect(json:match(input)))
+print(inspect(keys_grammar:match(input)))
