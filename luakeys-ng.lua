@@ -74,6 +74,16 @@ local attr = function(str, attr)
   function() return attr end * white_space
 end
 
+
+local add_to_table = function(table, arg1, arg2)
+  if arg2 == nil then
+    local index = rawlen(table) + 1
+    return rawset(table, index, arg1)
+  else
+    return rawset(table, arg1, arg2)
+  end
+end
+
 -- JSON grammar
 local json = Pattern({
   'list',
@@ -90,7 +100,7 @@ local json = Pattern({
   string_value =
     white_space * Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern('"') * white_space,
 
-  string_value_unquoted = white_space * capture((1 - Set('{},='))^0) * white_space,
+  string_value_unquoted = white_space * capture((1 - Set('{},='))^1) * white_space,
 
   number_value =
     white_space * number * white_space,
@@ -99,16 +109,23 @@ local json = Pattern({
 
   key = white_space * capture(Variable('key_word')^1 * (Pattern(' ')^1 * Variable('key_word')^1)^0) * white_space,
 
-  member_pair =
-    capture_group(Variable('key') * lit('=') * Variable('value')) * lit(',')^-1,
+  value_without_key =
+    Variable('string_value') +
+    Variable('string_value_unquoted'),
 
-  list = capture_fold(capture_table('') * Variable('member_pair')^0, rawset),
+  key_value_pair = Variable('key') * lit('=') * Variable('value'),
+
+  member_pair =
+    capture_group(Variable('key_value_pair') + Variable('value_without_key')) * lit(',')^-1,
+
+  list = capture_fold(capture_table('') * Variable('member_pair')^0, add_to_table),
 
   object =
     lit('{') * Variable('list')  * lit('}')
 })
 
 local input = [[
+  show,hide, "lol,lol",
   key with spaces = String without quotes,
   string= "String with quotes: ,{}=",
   number = 2,
