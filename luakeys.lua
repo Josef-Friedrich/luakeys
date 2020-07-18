@@ -620,7 +620,7 @@ end
 --
 -- @tparam table defs The key-value defintions.
 -- @tparam table raw A raw key-value input returned by the Lpeg parser.
-local normalize_keys = function(defs, raw)
+local normalize_alias_keys = function(defs, raw)
 
 end
 
