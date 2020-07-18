@@ -283,6 +283,39 @@ function test_error_E06_wrong_data_type()
   )
 end
 
+function test_error_E07_duplicate_complementary_value()
+  local normalize = function(raw)
+    luakeys.normalize_complementary_values(
+      {
+        show = {
+          complementary = {
+            'show', 'hide'
+          }
+        }
+      },
+      raw
+    )
+  end
+
+  luaunit.assert_error_msg_contains(
+    "Duplicate usage of the complementary value 'hide' that gets stored under the key 'show'.",
+    function() normalize({ 'hide', 'hide' }) end
+  )
+
+  luaunit.assert_error_msg_contains(
+    "Duplicate usage of the complementary value 'show' that gets stored under the key 'show'.",
+    function() normalize({ 'show', 'show' }) end
+  )
+  luaunit.assert_error_msg_contains(
+    "Duplicate usage of the complementary value 'show' that gets stored under the key 'show'.",
+    function() normalize({ 'hide', 'show' }) end
+  )
+  luaunit.assert_error_msg_contains(
+    "Duplicate usage of the complementary value 'hide' that gets stored under the key 'show'.",
+    function() normalize({ 'show', 'hide' }) end
+  )
+end
+
 function test_function_get_type()
   luaunit.assert_equals(luakeys.get_type('1'), 'integer')
   luaunit.assert_equals(luakeys.get_type('1.1'), 'float')
@@ -308,7 +341,28 @@ function test_function_generate_parser()
   assert_equals('string = without quotes', {string="without quotes"})
   assert_equals('string = "with quotes: ,={}"', {string="with quotes: ,={}"})
   assert_equals('number = -0.123', {number=-0.123})
+end
 
+function test_function_normalize_complementary_values()
+  local normalize = luakeys.normalize_complementary_values
+
+  local defs = {
+    show = {
+      complementary = {
+        'show', 'hide'
+      }
+    }
+  }
+
+  local assert_equals = function(raw, output)
+    luaunit.assert_equals(normalize(defs, raw), output)
+  end
+
+  assert_equals({ 'hide' }, { show = false })
+  assert_equals({ 'show' }, { show = true })
+  assert_equals({ 'show', key = 'value' }, { show = true, key = 'value' })
+  assert_equals({ 'show', 'value' }, { show = true, 'value' })
+  assert_equals({ 'value' , 'show' }, { 'value', show = true })
 end
 
 os.exit( luaunit.LuaUnit.run() )

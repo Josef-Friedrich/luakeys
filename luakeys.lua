@@ -114,7 +114,8 @@ local error_messages = {
   E03 = "Undefined key '%s'.",
   E04 = "Unsupported data type '%s'.",
   E05 = "Not allowed choice '%s' for key '%s'.",
-  E06 = "Wrong data type (key: '%s', value: '%s', defined data type: '%s', actual data type: '%s')"
+  E06 = "Wrong data type (key: '%s', value: '%s', defined data type: '%s', actual data type: '%s')",
+  E07 = "Duplicate usage of the complementary value '%s' that gets stored under the key '%s'.",
 }
 
 --- Prefix all error messages and then throw an error.
@@ -615,7 +616,64 @@ local check_definitions = function(definitions)
   end
 end
 
+--- Check the definitions table and throw errors.
+--
+-- @tparam table defs The key-value defintions.
+-- @tparam table raw A raw key-value input returned by the Lpeg parser.
+local normalize_keys = function(defs, raw)
+
+end
+
+--- Normalize two complementary values into a key and a boolean value.
+--
+--       defs = {
+--         show = {
+--           complementary = {'show', 'hide'}
+--         },
+--       }
+--
+-- @tparam table defs The key-value defintions.
+-- @tparam table raw A raw key-value input returned by the Lpeg parser.
+local normalize_complementary_values = function(defs, raw)
+  -- To be able to throw errors when duplicate complementary values
+  -- are specifed we store the already found complementary keys.
+  local duplicates = {}
+
+  local function lookup_value_in_defs(value, defs)
+    for key, def in pairs(defs) do
+      if type(def.complementary) == 'table' then
+        if def.complementary[1] == value then
+          return key, true
+        elseif def.complementary[2] == value then
+          return key, false
+        end
+      end
+    end
+  end
+
+  --- We have to reindex the table, so we must call ipairs over and over
+  --  again recursively.
+  local function normalize_one_value(raw, defs)
+    for i, compl_value in ipairs(raw) do
+      local key, value = lookup_value_in_defs(compl_value, defs)
+      if key ~= nil and value ~= nil then
+        if duplicates[key] == true then
+          throw_error('E07', compl_value, key)
+        end
+        table.remove(raw, i)
+        raw[key] = value
+        duplicates[key] = true
+        return normalize_one_value(raw, defs)
+      end
+    end
+    return raw
+  end
+
+  return normalize_one_value(raw, defs)
+end
+
 return {
+  normalize_complementary_values = normalize_complementary_values,
   check_definitions = check_definitions,
   get_type = get_type,
   print_table = print_table,
