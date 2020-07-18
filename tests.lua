@@ -222,9 +222,9 @@ end
 
 function test_error_E01_defintion_no_table()
   luaunit.assert_error_msg_contains(
-    'luakeys error (E01): The argument 1 of the function \'build_parser\' has to be a table.',
+    'luakeys error (E01): The key-value defintions must be a table.',
     function()
-      luakeys.build_parser('string')
+      luakeys.check_definitions('string')
     end
   )
 end

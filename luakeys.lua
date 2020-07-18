@@ -109,7 +109,7 @@ tex['sp'] = function (input)
 end
 
 local error_messages = {
-  E01 = "The argument 1 of the function 'build_parser' has to be a table.",
+  E01 = "The key-value defintions must be a table.",
   E02 = "Key '%s': choices definition has to be a table.",
   E03 = "Undefined key '%s'.",
   E04 = "Unsupported data type '%s'.",
@@ -447,9 +447,6 @@ end
 -- @treturn parser The Lpeg parser
 -- @treturn table defaults
 local function build_parser(definitions)
-  if type(definitions) ~= 'table' then
-    throw_error('E01')
-  end
   local key_values
 
   for key, def in pairs(definitions) do
@@ -609,7 +606,17 @@ local function generate_parser()
   })
 end
 
+--- Check the definitions table and throw errors.
+--
+-- @tparam table definitions
+local check_definitions = function(definitions)
+  if type(definitions) ~= 'table' then
+    throw_error('E01')
+  end
+end
+
 return {
+  check_definitions = check_definitions,
   get_type = get_type,
   print_table = print_table,
   build_parser = build_parser,

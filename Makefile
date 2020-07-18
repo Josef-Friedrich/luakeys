@@ -11,7 +11,7 @@ install:
 	cp -f $(jobname).sty $(installdir)
 
 test:
-	lua5.1 tests.lua
+	lua5.3 tests.lua
 
 doc_lua:
 	ldoc .
