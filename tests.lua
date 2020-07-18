@@ -365,7 +365,7 @@ function test_function_normalize_complementary_values()
   assert_equals({ 'value' , 'show' }, { 'value', show = true })
 end
 
-function test_function_normalize_alias_keys()
+function test_function_normalize_alias_keys_table()
   local normalize = luakeys.normalize_alias_keys
 
   local defs = {
@@ -384,7 +384,25 @@ function test_function_normalize_alias_keys()
   assert_equals({ key2 = true }, { key = true })
   assert_equals({ key = true }, { key = true })
   assert_equals({ some_key = true }, { some_key = true })
+end
 
+function test_function_normalize_alias_keys_string()
+  local normalize = luakeys.normalize_alias_keys
+
+  local defs = {
+    key = {
+      alias = 'key1'
+    }
+  }
+
+  local assert_equals = function(raw, output)
+    luaunit.assert_equals(normalize(defs, raw), output)
+  end
+
+  assert_equals({ key1 = true }, { key = true })
+  assert_equals({ key2 = true }, { key2 = true })
+  assert_equals({ key = true }, { key = true })
+  assert_equals({ some_key = true }, { some_key = true })
 end
 
 os.exit( luaunit.LuaUnit.run() )

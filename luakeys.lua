@@ -629,6 +629,10 @@ local normalize_alias_keys = function(defs, raw)
             return key, alias
           end
         end
+      elseif type(defs[key].alias) == 'string'  then
+        if defs[key].alias == name then
+          return key, defs[key].alias
+        end
       end
     end
   end
