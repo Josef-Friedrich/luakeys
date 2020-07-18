@@ -120,14 +120,19 @@ local error_messages = {
 
 --- Prefix all error messages and then throw an error.
 --
--- @tparam string message A message text for the error.
+-- @tparam string error_code The error code (for example E01)
+-- @tparam mixed arg1 Frist argument to pass to string.format() of the error message.
+-- @tparam mixed arg2 Second argument to pass to string.format() of the error message.
+-- @tparam mixed arg3 Third argument to pass to string.format() of the error message.
+-- @tparam mixed arg4 Fourth argument to pass to string.format() of the error message.
 local function throw_error(error_code, arg1, arg2, arg3, arg4)
   error('luakeys error (' .. error_code .. '): ' ..
     string.format(error_messages[error_code], arg1, arg2, arg3, arg4))
 end
 
----
--- @see https://stackoverflow.com/a/42062321/10193818
+--- Pretty print a table.
+--
+-- see https://stackoverflow.com/a/42062321/10193818
 local function print_table(node)
   local cache, stack, output = {},{},{}
   local depth = 1
@@ -209,9 +214,9 @@ end
 
 --- Append patterns as a ordered choice (+) or as a sequence (*).
 --
+-- @tparam string method 'sequence' (*) or 'choice' (+)
 -- @tparam userdata container Container variable
 -- @tparam userdata pattern Lpeg pattern to combine
--- @tparam string method 'sequence' (*) or 'choice' (+)
 local function append_pattern(method, container, pattern)
   if not container then
     -- start a new choice or sequence.
@@ -285,6 +290,13 @@ end
 
 local dimension = assemble_dimension()
 
+local string_pat =
+  Pattern('"') *
+  (Pattern('\\"') + 1 - Pattern('"'))^0 *
+  Pattern('"')
+
+local string_unquoted_pat = (1 - Set('{},='))^1
+
 --- Define data type integer.
 --
 -- @return Lpeg patterns
@@ -306,12 +318,14 @@ local function assemble_data_type_float()
 end
 
 --- Data type patterens uncaptured
-local data_type_patterns = {
+local patterns = {
   integer = data_type_integer(),
   float = assemble_data_type_float(),
-  dimension = assemble_dimension(),
+  number = number,
+  dimension = dimension,
   boolean = boolean_true + boolean_false,
-  string = Pattern('"') * (Pattern('\\"') + 1 - Pattern('"'))^0 * Pattern'"',
+  string = string_pat,
+  string_unquoted = string_unquoted_pat,
 }
 
 --- Captured data types
@@ -327,8 +341,8 @@ local captures = {
     boolean_false * capture_constant(false),
 
   number = number / tonumber,
-  integer = data_type_patterns.integer / tonumber,
-  float = data_type_patterns.float / tonumber,
+  integer = patterns.integer / tonumber,
+  float = patterns.float / tonumber,
   dimension = dimension / tex.sp,
   string = Pattern('"') * capture((Pattern('\\"') + 1 - Pattern('"'))^0) * Pattern'"',
 }
@@ -340,14 +354,19 @@ local captures = {
 -- @treturn string The type name like boolean integer
 local function get_type(string)
   local parser
-  for _, data_type in ipairs({ 'integer', 'float', 'dimension', 'boolean', 'string' }) do
+  for _, data_type in ipairs({ 'number', 'dimension', 'boolean', 'string', 'string_unquoted' }) do
     parser = append_pattern('choice', parser, (
-      data_type_patterns[data_type] *
+      WhiteSpacedPattern(patterns[data_type]) *
       capture_constant(data_type) *
       Pattern(-1) -- match the whole input string
     ))
   end
-  return parser:match(string)
+  local data_type = parser:match(string)
+
+  if data_type == 'string_unquoted' then
+    return 'string'
+  end
+  return data_type
 end
 
 --- Build the Lpeg pattern for a single key value pair. The resulting
@@ -539,8 +558,9 @@ local function generate_parser()
   -- If arg2 is nil, then arg1 is the value and is added as an indexed
   -- (by an integer) value.
   --
-  -- @tparam table table @tparam mixed arg1 @tparam mixed arg2 If arg2
-  -- is empty
+  -- @tparam table table
+  -- @tparam mixed arg1
+  -- @tparam mixed arg2
   --
   -- @treturn table
   local add_to_table = function(table, arg1, arg2)

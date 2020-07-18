@@ -29,6 +29,7 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Tables">Tables</a></li>
 <li><a href="#Fields">Fields</a></li>
 <li><a href="#Local_Functions">Local Functions</a></li>
 </ul>
@@ -76,7 +77,14 @@
   keyonly = {
     data_type = <span class="string">'keyonly'</span>
   },
-
+  <span class="comment">-- choices
+</span>  key_choices = {
+    choices = {<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>}
+  },
+  <span class="comment">-- complementary
+</span>  key_compl = {
+    complementary = {<span class="string">'show'</span>, <span class="string">'hide'</span>}
+  },
   <span class="comment">-- kas=true -&gt; key_alias_single=true
 </span>  key_alias_single = {
     data_type = <span class="string">'boolean'</span>,
@@ -106,6 +114,19 @@
 </p>
 
 
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#patterns">patterns</a></td>
+	<td class="summary">Data type patterens uncaptured</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#captures">captures</a></td>
+	<td class="summary">Captured data types
+ patt / function
+ Creates a function capture.</td>
+	</tr>
+</table>
 <h2><a href="#Fields">Fields</a></h2>
 <table class="function_list">
 	<tr>
@@ -119,6 +140,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#Set">Set</a></td>
 	<td class="summary">See <a href="http://www.inf.puc-rio.br/~roberto/lpeg#op-s">lpeg.S</a></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Variable">Variable</a></td>
+	<td class="summary">See <a href="http://www.inf.puc-rio.br/~roberto/lpeg#op-v">lpeg.V</a></td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#capture">capture</a></td>
@@ -144,28 +169,40 @@
 <h2><a href="#Local_Functions">Local Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#data_type_boolean">data_type_boolean ()</a></td>
-	<td class="summary">Define data type boolean.</td>
+	<td class="name" nowrap><a href="#throw_error">throw_error (error_code, arg1, arg2, arg3, arg4)</a></td>
+	<td class="summary">Prefix all error messages and then throw an error.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#print_table">print_table (node)</a></td>
+	<td class="summary">Pretty print a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#append_pattern">append_pattern (method, container, pattern)</a></td>
+	<td class="summary">Append patterns as a ordered choice (+) or as a sequence (*).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#WhiteSpacedPattern">WhiteSpacedPattern (match)</a></td>
+	<td class="summary">Match literal string surrounded by whitespace</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#assemble_dimension">assemble_dimension ()</a></td>
+	<td class="summary">Define data type dimension.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#data_type_integer">data_type_integer ()</a></td>
 	<td class="summary">Define data type integer.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#data_type_float">data_type_float ()</a></td>
+	<td class="name" nowrap><a href="#assemble_data_type_float">assemble_data_type_float ()</a></td>
 	<td class="summary">Define data type integer.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#data_type_dimension">data_type_dimension ()</a></td>
-	<td class="summary">Define data type dimension.</td>
+	<td class="name" nowrap><a href="#get_type">get_type (string)</a></td>
+	<td class="summary">Extended and TeX specialized version of Lua&rsquo;s type function.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#data_type_string">data_type_string ()</a></td>
-	<td class="summary">Define data type string.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#build_single_key_value_definition">build_single_key_value_definition (key, definition)</a></td>
-	<td class="summary"></td>
+	<td class="name" nowrap><a href="#build_key_value_pattern">build_key_value_pattern (key, def)</a></td>
+	<td class="summary">Build the Lpeg pattern for a single key value pair.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#build_defaults_table">build_defaults_table (definitions)</a></td>
@@ -175,12 +212,130 @@
 	<td class="name" nowrap><a href="#build_parser">build_parser (definitions)</a></td>
 	<td class="summary">Build a key value parser using Lpeg.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#capture_unkown_key_value_pair">capture_unkown_key_value_pair (key, value)</a></td>
+	<td class="summary">Capture unmatched key value pairs to throw errors and warnings.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#generate_parser">generate_parser ()</a></td>
+	<td class="summary">Generate a PEG parser to be able to parse key value strings
+ like this example:</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add_to_table">add_to_table (table, arg1, arg2)</a></td>
+	<td class="summary">Add values to a table in a two modes:</p>
+
+<p> # Key value pair</p>
+
+<p> If arg1 and arg2 are not nil, then arg1 is the key and arg2 is the
+ value of a new table entry.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#check_definitions">check_definitions (definitions)</a></td>
+	<td class="summary">Check the definitions table and throw errors.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_alias_keys">normalize_alias_keys (defs, raw)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_complementary_values">normalize_complementary_values (defs, raw)</a></td>
+	<td class="summary">Normalize two complementary values into a key and a boolean value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_one_value">normalize_one_value (raw, defs)</a></td>
+	<td class="summary">We have to reindex the table, so we must call ipairs over and over
+  again recursively.</td>
+	</tr>
 </table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "patterns"></a>
+    <strong>patterns</strong>
+    </dt>
+    <dd>
+    Data type patterens uncaptured
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">integer</span>
+
+        </li>
+        <li><span class="parameter">float</span>
+
+        </li>
+        <li><span class="parameter">number</span>
+
+        </li>
+        <li><span class="parameter">dimension</span>
+
+        </li>
+        <li><span class="parameter">boolean</span>
+
+        </li>
+        <li><span class="parameter">string</span>
+
+        </li>
+        <li><span class="parameter">string_unquoted</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "captures"></a>
+    <strong>captures</strong>
+    </dt>
+    <dd>
+    Captured data types
+ patt / function
+ Creates a function capture.  It calls the given function passing
+ all captures made b nby patt as arguments, or the whole match if
+ patt made no capture. The values returned by the function are the
+ final values of the capture. In particular, if function returns
+ no value, there is no captured value
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">boolean</span>
+
+        </li>
+        <li><span class="parameter">number</span>
+
+        </li>
+        <li><span class="parameter">integer</span>
+
+        </li>
+        <li><span class="parameter">float</span>
+
+        </li>
+        <li><span class="parameter">dimension</span>
+
+        </li>
+        <li><span class="parameter">string</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Fields"></a>Fields</h2>
 
     <dl class="function">
@@ -218,6 +373,20 @@
     </dt>
     <dd>
     See <a href="http://www.inf.puc-rio.br/~roberto/lpeg#op-s">lpeg.S</a>  Like <code>[characters]</code> in peg.js.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Variable"></a>
+    <strong>Variable</strong>
+    </dt>
+    <dd>
+    See <a href="http://www.inf.puc-rio.br/~roberto/lpeg#op-v">lpeg.V</a>
 
 
 
@@ -301,11 +470,119 @@
 
     <dl class="function">
     <dt>
-    <a name = "data_type_boolean"></a>
-    <strong>data_type_boolean ()</strong>
+    <a name = "throw_error"></a>
+    <strong>throw_error (error_code, arg1, arg2, arg3, arg4)</strong>
     </dt>
     <dd>
-    Define data type boolean.
+    Prefix all error messages and then throw an error.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">error_code</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         The error code (for example E01)
+        </li>
+        <li><span class="parameter">arg1</span>
+            <span class="types"><span class="type">mixed</span></span>
+         Frist argument to pass to string.format() of the error message.
+        </li>
+        <li><span class="parameter">arg2</span>
+            <span class="types"><span class="type">mixed</span></span>
+         Second argument to pass to string.format() of the error message.
+        </li>
+        <li><span class="parameter">arg3</span>
+            <span class="types"><span class="type">mixed</span></span>
+         Third argument to pass to string.format() of the error message.
+        </li>
+        <li><span class="parameter">arg4</span>
+            <span class="types"><span class="type">mixed</span></span>
+         Fourth argument to pass to string.format() of the error message.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "print_table"></a>
+    <strong>print_table (node)</strong>
+    </dt>
+    <dd>
+    Pretty print a table.</p>
+
+<p> see https://stackoverflow.com/a/42062321/10193818
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">node</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "append_pattern"></a>
+    <strong>append_pattern (method, container, pattern)</strong>
+    </dt>
+    <dd>
+    Append patterns as a ordered choice (+) or as a sequence (*).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">method</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         &lsquo;sequence&rsquo; (*) or &lsquo;choice&rsquo; (+)
+        </li>
+        <li><span class="parameter">container</span>
+            <span class="types"><span class="type">userdata</span></span>
+         Container variable
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><span class="type">userdata</span></span>
+         Lpeg pattern to combine
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "WhiteSpacedPattern"></a>
+    <strong>WhiteSpacedPattern (match)</strong>
+    </dt>
+    <dd>
+    Match literal string surrounded by whitespace
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">match</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "assemble_dimension"></a>
+    <strong>assemble_dimension ()</strong>
+    </dt>
+    <dd>
+    Define data type dimension.
 
 
 
@@ -339,8 +616,8 @@
 
 </dd>
     <dt>
-    <a name = "data_type_float"></a>
-    <strong>data_type_float ()</strong>
+    <a name = "assemble_data_type_float"></a>
+    <strong>assemble_data_type_float ()</strong>
     </dt>
     <dd>
     Define data type integer.
@@ -358,18 +635,26 @@
 
 </dd>
     <dt>
-    <a name = "data_type_dimension"></a>
-    <strong>data_type_dimension ()</strong>
+    <a name = "get_type"></a>
+    <strong>get_type (string)</strong>
     </dt>
     <dd>
-    Define data type dimension.
+    Extended and TeX specialized version of Lua&rsquo;s type function.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         A string to get the type from
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        Lpeg patterns
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+        The type name like boolean integer
     </ol>
 
 
@@ -377,30 +662,12 @@
 
 </dd>
     <dt>
-    <a name = "data_type_string"></a>
-    <strong>data_type_string ()</strong>
+    <a name = "build_key_value_pattern"></a>
+    <strong>build_key_value_pattern (key, def)</strong>
     </dt>
     <dd>
-    Define data type string.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-        Lpeg patterns
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "build_single_key_value_definition"></a>
-    <strong>build_single_key_value_definition (key, definition)</strong>
-    </dt>
-    <dd>
-
+    Build the Lpeg pattern for a single key value pair.  The resulting
+ pattern has to capture two strings.
 
 
     <h3>Parameters:</h3>
@@ -409,7 +676,7 @@
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
 
         </li>
-        <li><span class="parameter">definition</span>
+        <li><span class="parameter">def</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
          keys: alias, type
         </li>
@@ -484,6 +751,231 @@
 
 
 </dd>
+    <dt>
+    <a name = "capture_unkown_key_value_pair"></a>
+    <strong>capture_unkown_key_value_pair (key, value)</strong>
+    </dt>
+    <dd>
+    Capture unmatched key value pairs to throw errors and warnings.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "generate_parser"></a>
+    <strong>generate_parser ()</strong>
+    </dt>
+    <dd>
+    <p>Generate a PEG parser to be able to parse key value strings
+ like this example:      show,
+     hide,
+     &ldquo;string,with,commas&rdquo;,
+     key with spaces = String without quotes,
+     string=&ldquo;String with quotes: ,{}=&rdquo;,
+     number = 2,
+     float = 1.2,
+     list = {one=one,two=two,three=three},
+     nested key = {
+       nested key 2= {
+         key = value,
+       },
+     },</p>
+
+<p> The string above results in this table:</p>
+
+<pre><code> { "show", "hide", "string,with,commas",
+   float = 1.2,
+   ["key with spaces"] = "String without quotes",
+   number = 2,
+   string = "String with quotes: ,{}="
+   list = {
+     one = "one",
+     three = "three",
+     two = "two"
+   },
+   ["nested key"] = {
+     ["nested key 2"] = {
+       key = "value"
+     }
+   },
+ }
+</code></pre>
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">userdata</span></span>
+        The parser
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add_to_table"></a>
+    <strong>add_to_table (table, arg1, arg2)</strong>
+    </dt>
+    <dd>
+    Add values to a table in a two modes:</p>
+
+<p> # Key value pair</p>
+
+<p> If arg1 and arg2 are not nil, then arg1 is the key and arg2 is the
+ value of a new table entry.</p>
+
+<p> # Index value</p>
+
+<p> If arg2 is nil, then arg1 is the value and is added as an indexed
+ (by an integer) value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+
+        </li>
+        <li><span class="parameter">arg1</span>
+            <span class="types"><span class="type">mixed</span></span>
+
+        </li>
+        <li><span class="parameter">arg2</span>
+            <span class="types"><span class="type">mixed</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "check_definitions"></a>
+    <strong>check_definitions (definitions)</strong>
+    </dt>
+    <dd>
+    Check the definitions table and throw errors.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">definitions</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize_alias_keys"></a>
+    <strong>normalize_alias_keys (defs, raw)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">defs</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         The key-value defintions.
+        </li>
+        <li><span class="parameter">raw</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A raw key-value input returned by the Lpeg parser.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize_complementary_values"></a>
+    <strong>normalize_complementary_values (defs, raw)</strong>
+    </dt>
+    <dd>
+    <p>Normalize two complementary values into a key and a boolean value.</p>
+
+<pre><code>   defs = {
+     show = {
+       complementary = {'show', 'hide'}
+     },
+   }
+</code></pre>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">defs</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         The key-value defintions.
+        </li>
+        <li><span class="parameter">raw</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A raw key-value input returned by the Lpeg parser.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize_one_value"></a>
+    <strong>normalize_one_value (raw, defs)</strong>
+    </dt>
+    <dd>
+    We have to reindex the table, so we must call ipairs over and over
+  again recursively.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">raw</span>
+
+        </li>
+        <li><span class="parameter">defs</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
 </dl>
 
 
@@ -491,7 +983,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-07-11 21:30:50 </i>
+<i style="float:right;">Last updated 2020-07-18 23:14:44 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

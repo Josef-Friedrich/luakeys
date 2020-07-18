@@ -273,7 +273,7 @@ end
 
 function test_error_E06_wrong_data_type()
   luaunit.assert_error_msg_contains(
-    "luakeys error (E06): Wrong data type (key: 'key', value: '5', defined data type: 'boolean', actual data type: 'integer')",
+    "luakeys error (E06): Wrong data type (key: 'key', value: '5', defined data type: 'boolean', actual data type: 'number')",
     function()
       local local_parser = luakeys.build_parser({
         key = { data_type = 'boolean' }
@@ -317,8 +317,11 @@ function test_error_E07_duplicate_complementary_value()
 end
 
 function test_function_get_type()
-  luaunit.assert_equals(luakeys.get_type('1'), 'integer')
-  luaunit.assert_equals(luakeys.get_type('1.1'), 'float')
+  luaunit.assert_equals(luakeys.get_type('1'), 'number')
+  luaunit.assert_equals(luakeys.get_type(' 1 '), 'number')
+  luaunit.assert_equals(luakeys.get_type('1 lol'), 'string')
+  luaunit.assert_equals(luakeys.get_type(' 1 lol '), 'string')
+  luaunit.assert_equals(luakeys.get_type('1.1'), 'number')
   luaunit.assert_equals(luakeys.get_type('1cm'), 'dimension')
   luaunit.assert_equals(luakeys.get_type('-1.4cm'), 'dimension')
   luaunit.assert_equals(luakeys.get_type('-0.4pt'), 'dimension')
