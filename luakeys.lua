@@ -616,12 +616,33 @@ local check_definitions = function(definitions)
   end
 end
 
---- Check the definitions table and throw errors.
+---
 --
 -- @tparam table defs The key-value defintions.
 -- @tparam table raw A raw key-value input returned by the Lpeg parser.
 local normalize_alias_keys = function(defs, raw)
+  local function lookup_alias(name)
+    for key, _ in pairs(defs) do
+      if type(defs[key].alias) == 'table' then
+        for _, alias in ipairs(defs[key].alias) do
+          if alias == name then
+            return key, alias
+          end
+        end
+      end
+    end
+  end
 
+  for key, value in pairs(raw) do
+    if defs[key] == nil then
+      local new_key = lookup_alias(key)
+      if new_key then
+        raw[new_key] = value
+        raw[key] = nil
+      end
+    end
+  end
+  return raw
 end
 
 --- Normalize two complementary values into a key and a boolean value.
@@ -673,6 +694,7 @@ local normalize_complementary_values = function(defs, raw)
 end
 
 return {
+  normalize_alias_keys = normalize_alias_keys,
   normalize_complementary_values = normalize_complementary_values,
   check_definitions = check_definitions,
   get_type = get_type,
