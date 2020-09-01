@@ -202,7 +202,6 @@ function test_edge_cases()
   assertEquals(parse(', , ,'), {})
   assertEquals(parse(' ,'), {})
   assertEquals(parse(', '), {})
-
 end
 
 function test_duplicate_keys()
