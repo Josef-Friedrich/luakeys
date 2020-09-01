@@ -1,5 +1,5 @@
 local luaunit = require('luaunit')
-local generate_parser = require('luakeys-lpeg-parser')
+local generate_parser = require('luakeys').generate_parser
 
 local parser = generate_parser()
 
@@ -14,17 +14,33 @@ function test_empty_string()
 end
 
 function test_datatype_number()
-  local assert_equals = function(input, output)
+  local assert_number = function(input, output)
     assertEquals(parse('key=' .. input), { key = output })
   end
+  assert_number('1', 1)
+  assert_number('1.1', 1.1)
+  assert_number('+1.1', 1.1)
+  assert_number('-1.1', -1.1)
+  assert_number('11e-02', 0.11)
+  assert_number('11e-02', 11e-02)
+  assert_number('-11e-02', -0.11)
+  assert_number('+11e-02', 0.11)
+end
 
-  assert_equals('1.1', 1.1)
-  assert_equals('+1.1', 1.1)
-  assert_equals('-1.1', -1.1)
-  assert_equals('11e-02', 0.11)
-  assert_equals('11e-02', 11e-02)
-  assert_equals('-11e-02', -0.11)
-  assert_equals('+11e-02', 0.11)
+--- @todo remove
+function test_datatype_boolean_ng()
+  local function assert_boolean(boolean_string, value)
+    assertEquals(parse('key=' .. boolean_string), { key = value })
+  end
+  assert_boolean('true', true)
+  assert_boolean('TRUE', true)
+  assert_boolean('yes', true)
+  assert_boolean('YES', true)
+
+  assert_boolean('false', false)
+  assert_boolean('FALSE', false)
+  assert_boolean('no', false)
+  assert_boolean('NO', false)
 end
 
 function test_datatype_string()
@@ -52,6 +68,7 @@ function test_multiple_keys()
 end
 
 function test_edge_cases()
+  assertEquals(parse(''), {})
   assertEquals(parse(',,'), {})
   assertEquals(parse(',,,'), {})
   assertEquals(parse(', , ,'), {})
