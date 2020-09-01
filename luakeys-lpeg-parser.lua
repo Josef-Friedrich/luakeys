@@ -4,7 +4,9 @@
 
 local lpeg = require('lpeg')
 
---- Generate a PEG parser to be able to parse key value strings
+--- See [luakeys project on github](https://github.com/Josef-Friedrich/luakeys)
+--
+-- Generate a PEG parser to be able to parse key value strings
 -- like this example:
 --
 --     show,
@@ -41,7 +43,7 @@ local lpeg = require('lpeg')
 --     }
 --
 -- @treturn userdata The parser
-local function generate_parser()
+local function generate_key_value_parser()
   -- Optional whitespace
   local white_space = lpeg.S(' \t\n\r')^0
 
@@ -162,4 +164,4 @@ local function generate_parser()
   })
 end
 
-return generate_parser
+return generate_key_value_parser

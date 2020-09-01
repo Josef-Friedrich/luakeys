@@ -13,6 +13,29 @@ function test_empty_string()
   assertEquals(true, true)
 end
 
+function test_datatype_number()
+  local assert_equals = function(input, output)
+    assertEquals(parse('key=' .. input), { key = output })
+  end
+
+  assert_equals('1.1', 1.1)
+  assert_equals('+1.1', 1.1)
+  assert_equals('-1.1', -1.1)
+  assert_equals('11e-02', 0.11)
+  assert_equals('11e-02', 11e-02)
+  assert_equals('-11e-02', -0.11)
+  assert_equals('+11e-02', 0.11)
+end
+
+function test_datatype_string()
+  local function assert_string(input, value)
+    assertEquals(parse('string=' .. input), { string = value })
+  end
+  assert_string('"1"', '1')
+  assert_string('"1\\\"test\\\"2"', '1\\\"test\\\"2')
+  assert_string('"1,2"', '1,2')
+end
+
 function test_white_spaces()
   assertEquals(parse('integer=1'), { integer = 1 })
   assertEquals(parse('integer = 2'), { integer = 2 })
