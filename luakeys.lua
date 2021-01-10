@@ -88,6 +88,26 @@ local function generate_parser()
     exp = lpeg.S('eE') * lpeg.V('sign')^-1 * lpeg.V('digits'),
   })
 
+  --- Define data type dimension.
+  --
+  -- @return Lpeg patterns
+  local function build_dimension_pattern()
+    local sign = lpeg.S('-+')
+    local integer = lpeg.R('09')^1
+    local number = integer^1 * lpeg.P('.')^0 * integer^0
+    local unit
+    -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+    for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
+      if unit then
+        unit = unit + lpeg.P(dimension_extension)
+      else
+        unit = lpeg.P(dimension_extension)
+      end
+    end
+
+    return (sign^0 * number * unit)
+  end
+
   --- Add values to a table in a two modes:
   --
   -- # Key value pair
@@ -119,6 +139,7 @@ local function generate_parser()
     value =
       lpeg.V('object') +
       lpeg.V('bool_value') +
+      lpeg.V('dimension_value') +
       lpeg.V('number_value') +
       lpeg.V('string_value') +
       lpeg.V('string_value_unquoted'),
@@ -126,6 +147,8 @@ local function generate_parser()
     bool_value =
       boolean_true * lpeg.Cc(true) +
       boolean_false * lpeg.Cc(false),
+
+    dimension_value = lpeg.C(build_dimension_pattern()),
 
     string_value =
       white_space * lpeg.P('"') *
@@ -140,7 +163,8 @@ local function generate_parser()
     number_value =
       white_space * (number / tonumber) * white_space,
 
-    key_word = lpeg.R('az', 'AZ', '09'),
+    -- ./ for tikz style keys
+    key_word = lpeg.R('az', 'AZ', '09', './'),
 
     key = white_space * lpeg.C(
       lpeg.V('key_word')^1 *
@@ -148,6 +172,7 @@ local function generate_parser()
     ) * white_space,
 
     value_without_key =
+      lpeg.V('dimension_value') +
       lpeg.V('number_value') +
       lpeg.V('string_value') +
       lpeg.V('string_value_unquoted'),

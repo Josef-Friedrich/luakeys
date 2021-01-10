@@ -82,14 +82,23 @@ end
 function test_all()
   assertEquals(parse('one,two,three'), {'one', 'two', 'three'})
   assertEquals(parse('1,2,3'), {1, 2, 3})
-  assertEquals(parse('level1={level2={level3=level3}}'), {level1={level2={level3="level3"}}})
-  assertEquals(parse('string = without quotes'), {string="without quotes"})
-  assertEquals(parse('string = "with quotes: ,={}"'), {string="with quotes: ,={}"})
-  assertEquals(parse('number = -0.123'), {number=-0.123})
+  assertEquals(
+    parse('level1={level2={level3=level3}}'),
+    {
+      level1 = {
+        level2 = {
+          level3 = "level3"
+        }
+      }
+    }
+  )
+  assertEquals(parse('string = without quotes'), { string = "without quotes" })
+  assertEquals(parse('string = "with quotes: ,={}"'), { string = "with quotes: ,={}" })
+  assertEquals(parse('number = -0.123'), { number = -0.123 })
 end
 
 function test_tikz()
-  -- tikz manual page 3030
+  -- tikz manual page 330
   assertEquals(
     parse(
       'matrix of math nodes,\n' ..
@@ -98,12 +107,104 @@ function test_tikz()
       'nodes={circle, draw, minimum size=7.5mm}'
     ),
     {
-      "matrix of math nodes",
-      ["column sep"] = { 2, "cm", "between origins" },
-      nodes = { "circle", "draw", "mm", ["minimum size"] = 7.5 },
-      ["row sep"] = { 3, "cm", "between origins" }
+      'matrix of math nodes',
+      ['column sep'] = { '2cm', 'between origins' },
+      nodes = { 'circle', 'draw', ['minimum size'] = '7.5mm' },
+      ['row sep'] = { '3cm', 'between origins' }
     }
   )
+
+  -- page 241
+  assertEquals(
+    parse(
+      'every node/.style=draw'
+    ),
+    {
+      ['every node/.style'] = 'draw'
+    }
+  )
+
+  -- page 237
+  assertEquals(
+    parse(
+      'fill=yellow!80!black,text width=3cm,align=flush center'
+    ),
+    {
+      align = 'flush center',
+      fill = 'yellow!80!black',
+      ['text width'] = '3cm'
+    }
+  )
+
+end
+
+function test_hyperref()
+  -- manual page 6
+  assertEquals(
+    parse('pdfborder={0 0 0}'),
+    {
+      pdfborder = {0, 0, 0}
+    }
+  )
+
+  assertEquals(
+    parse('backref,\npdfpagemode=FullScreen,\ncolorlinks=true'),
+    { 'backref', colorlinks = true, pdfpagemode = 'FullScreen' }
+  )
+
+  assertEquals(
+    parse('backref,\npdfpagemode=FullScreen,\ncolorlinks=true'),
+    { 'backref', colorlinks = true, pdfpagemode = 'FullScreen' }
+  )
+
+  -- page 15
+  assertEquals(
+    parse('pdfinfo={\nTitle={My Title},\nSubject={My Subject},\nNewKey={Foobar},\n}'),
+    {
+      pdfinfo = {
+        NewKey = { "Foobar" },
+        Subject = { "My Subject" },
+        Title = { "My Title" }
+      }
+    }
+  )
+end
+
+function test_geometry()
+  -- manual page 17
+  assertEquals(
+    parse('a5paper, landscape, twocolumn, twoside,\n' ..
+    'left=2cm, hmarginratio=2:1, includemp, marginparwidth=43pt,\n' ..
+    'bottom=1cm, foot=.7cm, includefoot, textheight=11cm, heightrounded,\n' ..
+    'columnsep=1cm, dvips, verbose'),
+    {
+      'a5paper',
+      'landscape',
+      'twocolumn',
+      'twoside',
+      ':1', --??? hmarginratio = '2:1'
+      'includemp',
+      'includefoot',
+      'heightrounded',
+      'dvips',
+      'verbose',
+      bottom = '1cm',
+      columnsep = '1cm',
+      foot = '.7cm',
+      hmarginratio = 2,
+      left = '2cm',
+      marginparwidth = '43pt',
+      textheight = '11cm'
+  })
+
+  assertEquals(
+    parse('hdivide={*,0.9\\paperwidth,*}, vdivide={*,0.9\\paperheight,*}'),
+    {
+      hdivide = { '*', 0.9, '\\paperwidth', '*' }, -- ??? '0.9\\paperwidth',???
+      vdivide = { '*', 0.9, '\\paperheight', '*' }
+    }
+  )
+
 end
 
 os.exit( luaunit.LuaUnit.run() )
