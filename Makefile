@@ -12,11 +12,29 @@ install:
 test:
 	lua5.3 tests.lua
 
+doc_pdf:
+	lualatex --shell-escape documentation.tex
+	makeindex -s gglo.ist -o documentation.gls documentation.glo
+	makeindex -s gind.ist -o documentation.ind documentation.idx
+	lualatex --shell-escape documentation.tex
+	mkdir -p $(texmf)/doc
+	mv documentation.pdf $(jobname).pdf
+	cp $(jobname).pdf $(texmf)/doc
+
 doc_lua:
 	ldoc .
 
 doc_lua_open:
 	ldoc .
 	xdg-open docs/index.html
+
+ctan: doc_pdf
+	rm -rf $(jobname)
+	mkdir $(jobname)
+	cp -f README.md $(jobname)/
+	cp -f $(jobname).lua $(jobname)/
+	cp -f $(jobname).pdf $(jobname)/
+	tar cvfz $(jobname).tar.gz $(jobname)
+	rm -rf $(jobname)
 
 .PHONY: all doc_lua doc_lua_open

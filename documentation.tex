@@ -1,0 +1,51 @@
+%!TEX program = lualatex
+\documentclass{ltxdoc}
+
+\usepackage[
+  colorlinks=true,
+  linkcolor=red,
+  filecolor=red,
+  urlcolor=red,
+]{hyperref}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+
+\usepackage{minted}
+\usemintedstyle{colorful}
+\BeforeBeginEnvironment{minted}{\begin{mdframed}[backgroundcolor=gray!3]}
+\AfterEndEnvironment{minted}{\end{mdframed}}
+\setminted{
+  breaklines=true,
+  fontsize=\footnotesize,
+}
+
+\begin{document}
+
+\providecommand*{\url}{\texttt}
+
+\title{The \textsf{luakeys} package}
+\author{%
+  Josef Friedrich\\%
+  \url{josef@friedrich.rocks}\\%
+  \href{https://github.com/Josef-Friedrich/nodetree}{github.com/Josef-Friedrich/luakeys}%
+}
+\date{v0.1 from 2021/01/10}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+%-----------------------------------------------------------------------
+% Index
+%-----------------------------------------------------------------------
+
+\pagebreak
+\PrintChanges
+\pagebreak
+\PrintIndex
+\end{document}

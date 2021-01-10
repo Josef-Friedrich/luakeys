@@ -1,5 +1,7 @@
 local luaunit = require('luaunit')
 local luakeys = require('luakeys')
+-- luarocks install inspect
+-- local inspect = require('inspect')
 
 local parse = luakeys.parse
 
@@ -84,6 +86,24 @@ function test_all()
   assertEquals(parse('string = without quotes'), {string="without quotes"})
   assertEquals(parse('string = "with quotes: ,={}"'), {string="with quotes: ,={}"})
   assertEquals(parse('number = -0.123'), {number=-0.123})
+end
+
+function test_tikz()
+  -- tikz manual page 3030
+  assertEquals(
+    parse(
+      'matrix of math nodes,\n' ..
+      'column sep={2cm,between origins},\n' ..
+      'row sep={3cm,between origins},\n' ..
+      'nodes={circle, draw, minimum size=7.5mm}'
+    ),
+    {
+      "matrix of math nodes",
+      ["column sep"] = { 2, "cm", "between origins" },
+      nodes = { "circle", "draw", "mm", ["minimum size"] = 7.5 },
+      ["row sep"] = { 3, "cm", "between origins" }
+    }
+  )
 end
 
 os.exit( luaunit.LuaUnit.run() )
