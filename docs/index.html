@@ -29,6 +29,7 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Functions">Functions</a></li>
 <li><a href="#Local_Functions">Local Functions</a></li>
 </ul>
 
@@ -56,16 +57,26 @@
 </p>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#parse">parse (input)</a></td>
+	<td class="summary">Parse a LaTeX/TeX style key-value string into a Lua table.</td>
+	</tr>
+</table>
 <h2><a href="#Local_Functions">Local Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#generate_parser">generate_parser ()</a></td>
-	<td class="summary">Generate a PEG parser to be able to parse key value strings
- like this example:</td>
+	<td class="summary">Generate the PEG parser using Lpeg.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#WhiteSpacedPattern">WhiteSpacedPattern (match)</a></td>
 	<td class="summary">Match literal string surrounded by whitespace</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#build_dimension_pattern">build_dimension_pattern ()</a></td>
+	<td class="summary">Define data type dimension.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#add_to_table">add_to_table (table, arg1, arg2)</a></td>
@@ -76,12 +87,105 @@
 <p> If arg1 and arg2 are not nil, then arg1 is the key and arg2 is the
  value of a new table entry.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_array_size">get_array_size (value)</a></td>
+	<td class="summary">Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_table_size">get_table_size (value)</a></td>
+	<td class="summary">Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unpack_single_valued_array_table">unpack_single_valued_array_table (value)</a></td>
+	<td class="summary">Unpack a single valued array table like <code>{ &apos;one&apos; }</code> into <code>one</code> or
+ <code>{ 1 }</code> into <code>into</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize">normalize (raw)</a></td>
+	<td class="summary"><p>This normalization tasks are performed on the raw input table
+ coming directly from the PEG parser:</p>
+
+<ol>
+<li></li>
+</ol>
+</td>
+	</tr>
 </table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "parse"></a>
+    <strong>parse (input)</strong>
+    </dt>
+    <dd>
+    <p>Parse a LaTeX/TeX style key-value string into a Lua table.  With
+ this function you should be able to parse key-value strings like
+ this example:</p>
+
+<pre><code> show,
+ hide,
+ 'string,with,commas inside single quotes',
+ key with spaces = String without quotes,
+ string="String with double quotes: ,{}=",
+ number = 2,
+ float = 1.2,
+ list = {one,two,three},
+ key value list = {one=one,two=two,three=three},
+ nested key = {
+   nested key 2= {
+     key = value,
+   },
+ },
+</code></pre>
+
+<p> The string above results in this Lua table:</p>
+
+<pre><code> { 'show', 'hide', 'string,with,commas inside single quotes'',
+   float = 1.2,
+   ['key with spaces'] = 'String without quotes',
+   number = 2,
+   string = 'String with quotes: ,{}=',
+   list = {'one', 'two', 'three'},
+   key value list = {
+     one = 'one',
+     three = 'three',
+     two = 'two'
+   },
+   ['nested key'] = {
+     ['nested key 2'] = {
+       key = 'value'
+     }
+   },
+ }
+</code></pre>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">input</span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+        A hopefully properly parsed table you can
+ do something useful with.
+    </ol>
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
 
     <dl class="function">
@@ -90,40 +194,7 @@
     <strong>generate_parser ()</strong>
     </dt>
     <dd>
-    <p>Generate a PEG parser to be able to parse key value strings
- like this example:      show,
-     hide,
-     &ldquo;string,with,commas&rdquo;,
-     key with spaces = String without quotes,
-     string=&ldquo;String with quotes: ,{}=&rdquo;,
-     number = 2,
-     float = 1.2,
-     list = {one=one,two=two,three=three},
-     nested key = {
-       nested key 2= {
-         key = value,
-       },
-     },</p>
-
-<p> The string above results in this table:</p>
-
-<pre><code> { "show", "hide", "string,with,commas",
-   float = 1.2,
-   ["key with spaces"] = "String without quotes",
-   number = 2,
-   string = "String with quotes: ,{}="
-   list = {
-     one = "one",
-     three = "three",
-     two = "two"
-   },
-   ["nested key"] = {
-     ["nested key 2"] = {
-       key = "value"
-     }
-   },
- }
-</code></pre>
+    Generate the PEG parser using Lpeg.
 
 
 
@@ -153,6 +224,25 @@
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "build_dimension_pattern"></a>
+    <strong>build_dimension_pattern ()</strong>
+    </dt>
+    <dd>
+    Define data type dimension.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Lpeg patterns
+    </ol>
 
 
 
@@ -203,6 +293,126 @@
 
 
 </dd>
+    <dt>
+    <a name = "get_array_size"></a>
+    <strong>get_array_size (value)</strong>
+    </dt>
+    <dd>
+    Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table or any input.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The size of the array like table. 0 if the input is
+ no table or the table is empty.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_table_size"></a>
+    <strong>get_table_size (value)</strong>
+    </dt>
+    <dd>
+    Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table or any input.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The size of the array like table. 0 if the input is
+ no table or the table is empty.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unpack_single_valued_array_table"></a>
+    <strong>unpack_single_valued_array_table (value)</strong>
+    </dt>
+    <dd>
+    Unpack a single valued array table like <code>{ &apos;one&apos; }</code> into <code>one</code> or
+ <code>{ 1 }</code> into <code>into</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">If</span></span>
+        the value is a array like table with one non table typed
+ value in it, the unpacked value, else the unchanged input.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize"></a>
+    <strong>normalize (raw)</strong>
+    </dt>
+    <dd>
+    <p>This normalization tasks are performed on the raw input table
+ coming directly from the PEG parser:</p>
+
+<ol>
+<li>Trim all strings: <code> text \n</code> into <code>text</code></li>
+<li>Unpack all single valued array like tables: <code>{ &apos;text&apos; }</code>
+into <code>text</code></li>
+</ol>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">raw</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         The raw input table coming directly from the PEG
+   parser
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+        A normalized table ready for the outside world.
+    </ol>
+
+
+
+
+</dd>
 </dl>
 
 
@@ -210,7 +420,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-01-10 21:51:35 </i>
+<i style="float:right;">Last updated 2021-01-11 18:17:24 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

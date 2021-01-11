@@ -162,9 +162,9 @@ function test_hyperref()
     parse('pdfinfo={\nTitle={My Title},\nSubject={My Subject},\nNewKey={Foobar},\n}'),
     {
       pdfinfo = {
-        NewKey = { "Foobar" },
-        Subject = { "My Subject" },
-        Title = { "My Title" }
+        NewKey = 'Foobar',
+        Subject = 'My Subject',
+        Title = 'My Title'
       }
     }
   )
@@ -205,6 +205,54 @@ function test_geometry()
     }
   )
 
+end
+
+function test_fontspec()
+  -- manual page 11
+  assertEquals(
+    parse('Extension = .ttf ,\n' ..
+    'UprightFont = CharisSILR,\n' ..
+    'BoldFont = CharisSILB,\n' ..
+    'ItalicFont = CharisSILI,\n' ..
+    'BoldItalicFont = CharisSILBI,\n' ..
+    '% <any other desired options>\n'),
+    {
+      '% <any other desired options>',  -- ???
+      BoldFont = 'CharisSILB',
+      BoldItalicFont = 'CharisSILBI',
+      Extension = '.ttf',
+      ItalicFont = 'CharisSILI',
+      UprightFont = 'CharisSILR'
+    }
+  )
+
+  -- 17
+  assertEquals(
+    parse('Extension = .otf ,\n' ..
+    'UprightFont = *-Light ,\n' ..
+    'BoldFont = *-Regular ,\n' ..
+    'FontFace = {k}{n}{*-Black} ,'),
+    {
+      Extension = '.otf',
+      UprightFont = '*-Light',
+      BoldFont = '*-Regular',
+      FontFace = 'k', -- ???
+    }
+  )
+
+  -- 18
+  assertEquals(
+    parse('lots and lots ,\n' ..
+    'and more and more ,\n' ..
+    'an excessive number really ,\n' ..
+    'of font features could go here\n'),
+    {
+      'lots and lots',
+      'and more and more',
+      'an excessive number really',
+      'of font features could go here'
+    }
+  )
 end
 
 os.exit( luaunit.LuaUnit.run() )

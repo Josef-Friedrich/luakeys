@@ -13,41 +13,7 @@
 
 local lpeg = require('lpeg')
 
---- Generate a PEG parser to be able to parse key value strings
--- like this example:
---
---     show,
---     hide,
---     "string,with,commas",
---     key with spaces = String without quotes,
---     string="String with quotes: ,{}=",
---     number = 2,
---     float = 1.2,
---     list = {one=one,two=two,three=three},
---     nested key = {
---       nested key 2= {
---         key = value,
---       },
---     },
---
--- The string above results in this table:
---
---     { "show", "hide", "string,with,commas",
---       float = 1.2,
---       ["key with spaces"] = "String without quotes",
---       number = 2,
---       string = "String with quotes: ,{}="
---       list = {
---         one = "one",
---         three = "three",
---         two = "two"
---       },
---       ["nested key"] = {
---         ["nested key 2"] = {
---           key = "value"
---         }
---       },
---     }
+--- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser
 local function generate_parser()
@@ -196,10 +162,133 @@ local function generate_parser()
   })
 end
 
+local function trim(input_string)
+  return input_string:gsub('^%s*(.-)%s*$', '%1')
+end
+
+--- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
+--
+-- @tparam table value A table or any input.
+--
+-- @treturn number The size of the array like table. 0 if the input is
+-- no table or the table is empty.
+local function get_array_size(value)
+  local count = 0
+  if type(value) == 'table' then
+    for _ in ipairs(value) do count = count + 1 end
+  end
+  return count
+end
+
+--- Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
+--
+-- @tparam table value A table or any input.
+--
+-- @treturn number The size of the array like table. 0 if the input is
+-- no table or the table is empty.
+local function get_table_size(value)
+  local count = 0
+  if type(value) == 'table' then
+    for _ in pairs(value) do count = count + 1 end
+  end
+  return count
+end
+
+--- Unpack a single valued array table like `{ 'one' }` into `one` or
+-- `{ 1 }` into `into`.
+--
+-- @treturn If the value is a array like table with one non table typed
+-- value in it, the unpacked value, else the unchanged input.
+local function unpack_single_valued_array_table(value)
+  if
+    type(value) == 'table' and
+    get_array_size(value) == 1 and
+    get_table_size(value) == 1 and
+    type(value[1]) ~= 'table'
+  then
+    return value[1]
+  end
+  return value
+end
+
+--- This normalization tasks are performed on the raw input table
+-- coming directly from the PEG parser:
+--
+-- 1. Trim all strings: ` text \n` into `text`
+-- 2. Unpack all single valued array like tables: `{ 'text' }`
+--    into `text`
+--
+-- @tparam table raw The raw input table coming directly from the PEG
+--   parser
+--
+-- @treturn table A normalized table ready for the outside world.
+local function normalize(raw)
+  local function normalize_recursive(raw, result)
+    for key, value in pairs(raw) do
+      value = unpack_single_valued_array_table(value)
+      if type(value) == 'table' then
+        result[key] = normalize_recursive(value, {})
+      elseif type(value) == 'string' then
+        result[key] = trim(value)
+      else
+        result[key] = value
+      end
+    end
+    return result
+  end
+  return normalize_recursive(raw, {})
+end
+
 local parser = generate_parser()
 
 return {
+  --- Parse a LaTeX/TeX style key-value string into a Lua table. With
+  -- this function you should be able to parse key-value strings like
+  -- this example:
+  --
+  --     show,
+  --     hide,
+  --     'string,with,commas inside single quotes',
+  --     key with spaces = String without quotes,
+  --     string="String with double quotes: ,{}=",
+  --     dimension = 1cm,
+  --     number = 2,
+  --     float = 1.2,
+  --     list = {one,two,three},
+  --     key value list = {one=one,two=two,three=three},
+  --     nested key = {
+  --       nested key 2= {
+  --         key = value,
+  --       },
+  --     },
+  --
+  -- The string above results in this Lua table:
+  --
+  --     {
+  --       'show',
+  --       'hide',
+  --       'string,with,commas inside single quotes',
+  --       ['key with spaces'] = 'String without quotes',
+  --       string = 'String with double quotes: ,{}=',
+  --       dimension = '1cm',
+  --       number = 2,
+  --       float = 1.2,
+  --       list = {'one', 'two', 'three'},
+  --       key value list = {
+  --         one = 'one',
+  --         three = 'three',
+  --         two = 'two'
+  --       },
+  --       ['nested key'] = {
+  --         ['nested key 2'] = {
+  --           key = 'value'
+  --         }
+  --       },
+  --     }
+  --
+  -- @treturn table A hopefully properly parsed table you can
+  -- do something useful with.
   parse = function (input)
-    return parser:match(input)
+    return normalize(parser:match(input))
   end
 }
