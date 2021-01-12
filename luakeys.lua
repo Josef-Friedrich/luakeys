@@ -13,6 +13,15 @@
 
 local lpeg = require('lpeg')
 
+if not tex then
+  tex = {}
+
+  -- Dummy function for the tests.
+  tex['sp'] = function (input)
+    return 1234567
+  end
+end
+
 --- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser
@@ -114,7 +123,7 @@ local function generate_parser()
       boolean_true * lpeg.Cc(true) +
       boolean_false * lpeg.Cc(false),
 
-    dimension_value = lpeg.C(build_dimension_pattern()),
+    dimension_value = build_dimension_pattern() / tex.sp,
 
     string_value =
       white_space * lpeg.P('"') *
@@ -242,6 +251,91 @@ end
 local parser = generate_parser()
 
 return {
+
+  --- Pretty print a table.
+  --
+  -- @tparam value A table to print.
+  --
+  -- see https://stackoverflow.com/a/42062321/10193818
+  print_table = function (input)
+    local cache, stack, output = {},{},{}
+    local depth = 1
+    local output_str = "{\n"
+
+    while true do
+      local size = 0
+      for k,v in pairs(input) do
+        size = size + 1
+      end
+
+      local cur_index = 1
+      for k,v in pairs(input) do
+        if (cache[input] == nil) or (cur_index >= cache[input]) then
+          if (string.find(output_str,"}",output_str:len())) then
+            output_str = output_str .. ",\n"
+          elseif not (string.find(output_str,"\n",output_str:len())) then
+            output_str = output_str .. "\n"
+          end
+
+          -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+          table.insert(output,output_str)
+          output_str = ""
+
+          local key
+          if (type(k) == "number" or type(k) == "boolean") then
+            key = "["..tostring(k).."]"
+          else
+            key = "['"..tostring(k).."']"
+          end
+
+          if (type(v) == "number" or type(v) == "boolean") then
+            output_str = output_str .. string.rep('\t',depth) .. key .. " = "..tostring(v)
+          elseif (type(v) == "table") then
+            output_str = output_str .. string.rep('\t',depth) .. key .. " = {\n"
+            table.insert(stack,input)
+            table.insert(stack,v)
+            cache[input] = cur_index+1
+            break
+          else
+            output_str = output_str .. string.rep('\t',depth) .. key .. " = '"..tostring(v).."'"
+          end
+
+          if (cur_index == size) then
+            output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+          else
+            output_str = output_str .. ","
+          end
+        else
+          -- close the table
+          if (cur_index == size) then
+            output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+          end
+        end
+
+        cur_index = cur_index + 1
+      end
+
+      if (size == 0) then
+        output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+      end
+
+      if (#stack > 0) then
+        input = stack[#stack]
+        stack[#stack] = nil
+        depth = cache[input] == nil and depth + 1 or depth - 1
+      else
+        break
+      end
+    end
+
+    -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+    table.insert(output,output_str)
+    output_str = table.concat(output)
+
+    print() -- Insert an empty line.
+    print(output_str)
+  end,
+
   --- Parse a LaTeX/TeX style key-value string into a Lua table. With
   -- this function you should be able to parse key-value strings like
   -- this example:
