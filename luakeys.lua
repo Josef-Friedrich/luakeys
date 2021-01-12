@@ -22,6 +22,12 @@ if not tex then
   end
 end
 
+local settings = {
+  convert_dimensions = true,
+  unpack_single_array_value = true,
+  debug_output_target = 'tex',
+}
+
 --- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser
@@ -30,21 +36,19 @@ local function generate_parser()
   local white_space = lpeg.S(' \t\n\r')^0
 
   --- Match literal string surrounded by whitespace
-  local WhiteSpacedPattern = function(match)
+  local ws = function(match)
     return white_space * lpeg.P(match) * white_space
   end
 
   local boolean_true =
     lpeg.P('true') +
     lpeg.P('TRUE') +
-    lpeg.P('yes') +
-    lpeg.P('YES')
+    lpeg.P('True')
 
   local boolean_false =
     lpeg.P('false') +
     lpeg.P('FALSE') +
-    lpeg.P('no') +
-    lpeg.P('NO')
+    lpeg.P('False')
 
   local number = lpeg.P({'number',
     number =
@@ -69,7 +73,7 @@ local function generate_parser()
   local function build_dimension_pattern()
     local sign = lpeg.S('-+')
     local integer = lpeg.R('09')^1
-    local number = integer^1 * lpeg.P('.')^0 * integer^0
+    local tex_number = (integer^1 * (lpeg.P('.') * integer^1)^0) + (lpeg.P('.') * integer^1)
     local unit
     -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
     for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
@@ -80,7 +84,13 @@ local function generate_parser()
       end
     end
 
-    return (sign^0 * number * unit)
+    local dimension = (sign^0 * tex_number * unit)
+
+    if settings.convert_dimensions then
+      return dimension / tex.sp
+    else
+      return lpeg.C(dimension)
+    end
   end
 
   --- Add values to a table in a two modes:
@@ -123,7 +133,7 @@ local function generate_parser()
       boolean_true * lpeg.Cc(true) +
       boolean_false * lpeg.Cc(false),
 
-    dimension_value = build_dimension_pattern() / tex.sp,
+    dimension_value = build_dimension_pattern(),
 
     string_value =
       white_space * lpeg.P('"') *
@@ -153,13 +163,13 @@ local function generate_parser()
       lpeg.V('string_value_unquoted'),
 
     key_value_pair =
-      lpeg.V('key') * WhiteSpacedPattern('=') * lpeg.V('value'),
+      lpeg.V('key') * ws('=') * lpeg.V('value'),
 
     member_pair =
       lpeg.Cg(
         lpeg.V('key_value_pair') +
         lpeg.V('value_without_key')
-      ) * WhiteSpacedPattern(',')^-1,
+      ) * ws(',')^-1,
 
     list = lpeg.Cf(
       lpeg.Ct('') * lpeg.V('member_pair')^0,
@@ -167,7 +177,7 @@ local function generate_parser()
     ),
 
     object =
-      WhiteSpacedPattern('{') * lpeg.V('list') * WhiteSpacedPattern('}')
+      ws('{') * lpeg.V('list') * ws('}')
   })
 end
 
@@ -234,7 +244,9 @@ end
 local function normalize(raw)
   local function normalize_recursive(raw, result)
     for key, value in pairs(raw) do
-      value = unpack_single_valued_array_table(value)
+      if settings.unpack_single_array_value then
+        value = unpack_single_valued_array_table(value)
+      end
       if type(value) == 'table' then
         result[key] = normalize_recursive(value, {})
       elseif type(value) == 'string' then
@@ -248,8 +260,6 @@ local function normalize(raw)
   return normalize_recursive(raw, {})
 end
 
-local parser = generate_parser()
-
 return {
 
   --- Pretty print a table.
@@ -257,10 +267,23 @@ return {
   -- @tparam value A table to print.
   --
   -- see https://stackoverflow.com/a/42062321/10193818
-  print_table = function (input)
-    local cache, stack, output = {},{},{}
+  stringify_table = function (input)
+    local cache, stack, output = {}, {}, {}
     local depth = 1
-    local output_str = "{\n"
+    local line_break, start_bracket, end_bracket, indent
+    if settings.debug_output_target == 'tex' then
+      line_break = '\\par'
+      start_bracket = '$\\{$'
+      end_bracket = '$\\}$'
+      indent = '\\ \\ '
+    else
+      line_break = '\n'
+      start_bracket = '{'
+      end_bracket = '}'
+      indent = '  '
+    end
+
+    local output_str = start_bracket
 
     while true do
       local size = 0
@@ -271,10 +294,10 @@ return {
       local cur_index = 1
       for k,v in pairs(input) do
         if (cache[input] == nil) or (cur_index >= cache[input]) then
-          if (string.find(output_str,"}",output_str:len())) then
-            output_str = output_str .. ",\n"
-          elseif not (string.find(output_str,"\n",output_str:len())) then
-            output_str = output_str .. "\n"
+          if (string.find(output_str, end_bracket, output_str:len())) then
+            output_str = output_str .. "," .. line_break
+          elseif not (string.find(output_str, line_break, output_str:len())) then
+            output_str = output_str .. line_break
           end
 
           -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
@@ -289,26 +312,26 @@ return {
           end
 
           if (type(v) == "number" or type(v) == "boolean") then
-            output_str = output_str .. string.rep('\t',depth) .. key .. " = "..tostring(v)
+            output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. tostring(v)
           elseif (type(v) == "table") then
-            output_str = output_str .. string.rep('\t',depth) .. key .. " = {\n"
-            table.insert(stack,input)
-            table.insert(stack,v)
-            cache[input] = cur_index+1
+            output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. start_bracket .. line_break
+            table.insert(stack, input)
+            table.insert(stack, v)
+            cache[input] = cur_index + 1
             break
           else
-            output_str = output_str .. string.rep('\t',depth) .. key .. " = '"..tostring(v).."'"
+            output_str = output_str .. string.rep(indent, depth) .. key .. " = '" .. tostring(v) .. "'"
           end
 
           if (cur_index == size) then
-            output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+            output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
           else
             output_str = output_str .. ","
           end
         else
           -- close the table
           if (cur_index == size) then
-            output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+            output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
           end
         end
 
@@ -316,7 +339,7 @@ return {
       end
 
       if (size == 0) then
-        output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+        output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
       end
 
       if (#stack > 0) then
@@ -329,11 +352,20 @@ return {
     end
 
     -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
-    table.insert(output,output_str)
+    table.insert(output, output_str)
     output_str = table.concat(output)
-
-    print() -- Insert an empty line.
     print(output_str)
+    return output_str
+  end,
+
+  configure = function(options)
+    for key, value in pairs(options) do
+      if settings[key] ~= nil then
+        settings[key] = value
+      else
+        print('Unknown config key: ' .. key)
+      end
+    end
   end,
 
   --- Parse a LaTeX/TeX style key-value string into a Lua table. With
@@ -383,6 +415,11 @@ return {
   -- @treturn table A hopefully properly parsed table you can
   -- do something useful with.
   parse = function (input)
+    print(input)
+    if input == nil then
+      return {}
+    end
+    local parser = generate_parser()
     return normalize(parser:match(input))
   end
 }

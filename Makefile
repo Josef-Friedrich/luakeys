@@ -8,6 +8,7 @@ all: install doc_lua
 install:
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
+	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
 test:

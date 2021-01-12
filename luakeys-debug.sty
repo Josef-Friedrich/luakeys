@@ -1,25 +1,4 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{luakeys-debug}[2020/01/12 Some debug makros for the package luakeys.]
 
-\directlua{
-  luakeys = require('luakeys')
-}
-
-\newcommand{\LuakeysMandatoryArgument}[1]{
-  \directlua{
-    print()
-    print('Input:', '#1')
-    local result = luakeys.parse('#1')
-    luakeys.print_table(result)
-  }
-  Test mandatory argument
-}
-
-\newcommand{\LuakeysOptionalArgument}[2][]{
-  \directlua{
-    print()
-    print('Input:', '#1')
-    local result = luakeys.parse('#1')
-    luakeys.print_table(result)
-  }
-}
+\input luakeys-debug.tex

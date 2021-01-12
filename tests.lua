@@ -3,6 +3,24 @@ local luakeys = require('luakeys')
 -- luarocks install inspect
 -- local inspect = require('inspect')
 
+local example = [[
+  show,
+  hide,
+  'string,with,commas inside single quotes',
+  key with spaces = String without quotes,
+  string="String with double quotes: ,{}=",
+  dimension = 1cm,
+  number = 2,
+  float = 1.2,
+  list = {one,two,three},
+  key value list = {one=one,two=two,three=three},
+  nested key = {
+    nested key 2= {
+      key = value,
+    },
+  },
+]]
+
 local parse = luakeys.parse
 
 local assertEquals = luaunit.assertEquals
@@ -25,20 +43,17 @@ function test_datatype_number()
   assert_number('+11e-02', 0.11)
 end
 
---- @todo remove
-function test_datatype_boolean_ng()
+function test_datatype_boolean()
   local function assert_boolean(boolean_string, value)
     assertEquals(parse('key=' .. boolean_string), { key = value })
   end
   assert_boolean('true', true)
   assert_boolean('TRUE', true)
-  assert_boolean('yes', true)
-  assert_boolean('YES', true)
+  assert_boolean('True', true)
 
   assert_boolean('false', false)
   assert_boolean('FALSE', false)
-  assert_boolean('no', false)
-  assert_boolean('NO', false)
+  assert_boolean('False', false)
 end
 
 function test_datatype_string()
@@ -55,14 +70,14 @@ function test_white_spaces()
   assertEquals(parse('integer = 2'), { integer = 2 })
   assertEquals(parse('integer\t=\t3'), { integer = 3 })
   assertEquals(parse('integer\n=\n4'), { integer = 4 })
-  assertEquals(parse('integer \t\n= \t\n5 , boolean=no'), { integer = 5, boolean = false })
-  assertEquals(parse('integer=1 , boolean=no'), { integer = 1, boolean = false })
-  assertEquals(parse('integer \t\n= \t\n1 \t\n, \t\nboolean \t\n= \t\nno'), { integer = 1, boolean = false })
+  assertEquals(parse('integer \t\n= \t\n5 , boolean=false'), { integer = 5, boolean = false })
+  assertEquals(parse('integer=1 , boolean=false'), { integer = 1, boolean = false })
+  assertEquals(parse('integer \t\n= \t\n1 \t\n, \t\nboolean \t\n= \t\nfalse'), { integer = 1, boolean = false })
 end
 
 function test_multiple_keys()
-  assertEquals(parse('integer=1,boolean=no'), { integer = 1, boolean = false })
-  assertEquals(parse('integer=1 , boolean=no'), { integer = 1, boolean = false })
+  assertEquals(parse('integer=1,boolean=false'), { integer = 1, boolean = false })
+  assertEquals(parse('integer=1 , boolean=false'), { integer = 1, boolean = false })
 end
 
 function test_edge_cases()
@@ -92,7 +107,7 @@ function test_all()
       }
     }
   )
-  assertEquals(parse('string = without quotes'), { string = "without quotes" })
+  assertEquals(parse('string = without \'quotes\''), { string = "without \'quotes\'" })
   assertEquals(parse('string = "with quotes: ,={}"'), { string = "with quotes: ,={}" })
   assertEquals(parse('number = -0.123'), { number = -0.123 })
 end
@@ -108,9 +123,9 @@ function test_tikz()
     ),
     {
       'matrix of math nodes',
-      ['column sep'] = { '2cm', 'between origins' },
-      nodes = { 'circle', 'draw', ['minimum size'] = '7.5mm' },
-      ['row sep'] = { '3cm', 'between origins' }
+      ['column sep'] = { 1234567, 'between origins' },
+      nodes = { 'circle', 'draw', ['minimum size'] = 1234567 },
+      ['row sep'] = { 1234567, 'between origins' }
     }
   )
 
@@ -126,13 +141,13 @@ function test_tikz()
 
   -- page 237
   assertEquals(
-    parse(
+    luakeys.parse(
       'fill=yellow!80!black,text width=3cm,align=flush center'
     ),
     {
       align = 'flush center',
       fill = 'yellow!80!black',
-      ['text width'] = '3cm'
+      ['text width'] = 1234567
     }
   )
 
@@ -188,13 +203,13 @@ function test_geometry()
       'heightrounded',
       'dvips',
       'verbose',
-      bottom = '1cm',
-      columnsep = '1cm',
-      foot = '.7cm',
+      bottom = 1234567,
+      columnsep = 1234567,
+      foot = 1234567,
       hmarginratio = 2,
-      left = '2cm',
-      marginparwidth = '43pt',
-      textheight = '11cm'
+      left = 1234567,
+      marginparwidth = 1234567,
+      textheight = 1234567
   })
 
   assertEquals(
@@ -253,6 +268,10 @@ function test_fontspec()
       'of font features could go here'
     }
   )
+end
+
+function test_function_stringify_table()
+  print(luakeys.stringify_table(luakeys.parse(example, 'lol')))
 end
 
 os.exit( luaunit.LuaUnit.run() )

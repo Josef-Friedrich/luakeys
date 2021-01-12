@@ -1,0 +1,28 @@
+\input luakeys-debug.tex
+
+\luakeysdebug{one=1cm,two=2,three=3}
+
+\luakeysdebug{show={one,two={tree={four}}}}
+
+  %'string,with,commas inside single quotes',
+
+  % string="String with double quotes: ,{}=",
+
+\luakeysdebug{  show,
+  hide,
+  "sdf, sdf" ,
+  key with spaces = String without quotes,
+  string="String with double quotes: ,{}=",
+  dimension = 1cm,
+  number = 2,
+  float = 1.2,
+  list = {one,two,three},
+  key value list = {one=one,two=two,three=three},
+  nested key = {
+    nested key 2= {
+      key = value,
+    },
+  },
+}
+
+\bye
