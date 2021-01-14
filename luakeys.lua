@@ -126,6 +126,7 @@ local function generate_parser()
       lpeg.V('bool_value') +
       lpeg.V('dimension_value') +
       lpeg.V('number_value') +
+      -- lpeg.V('string_single_quoted') +
       lpeg.V('string_value') +
       lpeg.V('string_value_unquoted'),
 
@@ -139,6 +140,11 @@ local function generate_parser()
       white_space * lpeg.P('"') *
       lpeg.C((lpeg.P('\\"') + 1 - lpeg.P('"'))^0) *
       lpeg.P('"') * white_space,
+
+    -- string_single_quoted =
+    --   white_space * lpeg.P('\'') *
+    --   lpeg.C((lpeg.P('\\\'') + 1 - lpeg.P('\''))^0) *
+    --   lpeg.P('\'') * white_space,
 
     string_value_unquoted =
       white_space *
