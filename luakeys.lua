@@ -260,102 +260,108 @@ local function normalize(raw)
   return normalize_recursive(raw, {})
 end
 
-return {
+--- Pretty print a table.
+--
+-- @tparam value A table to print.
+--
+-- see https://stackoverflow.com/a/42062321/10193818
+local function stringify_table (input)
+  local cache, stack, output = {}, {}, {}
+  local depth = 1
+  local line_break, start_bracket, end_bracket, indent
+  if settings.debug_output_target == 'tex' then
+    line_break = '\\par'
+    start_bracket = '$\\{$'
+    end_bracket = '$\\}$'
+    indent = '\\ \\ '
+  else
+    line_break = '\n'
+    start_bracket = '{'
+    end_bracket = '}'
+    indent = '  '
+  end
 
-  --- Pretty print a table.
-  --
-  -- @tparam value A table to print.
-  --
-  -- see https://stackoverflow.com/a/42062321/10193818
-  stringify_table = function (input)
-    local cache, stack, output = {}, {}, {}
-    local depth = 1
-    local line_break, start_bracket, end_bracket, indent
-    if settings.debug_output_target == 'tex' then
-      line_break = '\\par'
-      start_bracket = '$\\{$'
-      end_bracket = '$\\}$'
-      indent = '\\ \\ '
-    else
-      line_break = '\n'
-      start_bracket = '{'
-      end_bracket = '}'
-      indent = '  '
+  local output_str = start_bracket
+
+  while true do
+    local size = 0
+    for k,v in pairs(input) do
+      size = size + 1
     end
 
-    local output_str = start_bracket
-
-    while true do
-      local size = 0
-      for k,v in pairs(input) do
-        size = size + 1
-      end
-
-      local cur_index = 1
-      for k,v in pairs(input) do
-        if (cache[input] == nil) or (cur_index >= cache[input]) then
-          if (string.find(output_str, end_bracket, output_str:len())) then
-            output_str = output_str .. "," .. line_break
-          elseif not (string.find(output_str, line_break, output_str:len())) then
-            output_str = output_str .. line_break
-          end
-
-          -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
-          table.insert(output,output_str)
-          output_str = ""
-
-          local key
-          if (type(k) == "number" or type(k) == "boolean") then
-            key = "["..tostring(k).."]"
-          else
-            key = "['"..tostring(k).."']"
-          end
-
-          if (type(v) == "number" or type(v) == "boolean") then
-            output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. tostring(v)
-          elseif (type(v) == "table") then
-            output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. start_bracket .. line_break
-            table.insert(stack, input)
-            table.insert(stack, v)
-            cache[input] = cur_index + 1
-            break
-          else
-            output_str = output_str .. string.rep(indent, depth) .. key .. " = '" .. tostring(v) .. "'"
-          end
-
-          if (cur_index == size) then
-            output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
-          else
-            output_str = output_str .. ","
-          end
-        else
-          -- close the table
-          if (cur_index == size) then
-            output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
-          end
+    local cur_index = 1
+    for k,v in pairs(input) do
+      if (cache[input] == nil) or (cur_index >= cache[input]) then
+        if (string.find(output_str, end_bracket, output_str:len())) then
+          output_str = output_str .. "," .. line_break
+        elseif not (string.find(output_str, line_break, output_str:len())) then
+          output_str = output_str .. line_break
         end
 
-        cur_index = cur_index + 1
-      end
+        -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+        table.insert(output,output_str)
+        output_str = ""
 
-      if (size == 0) then
-        output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
-      end
+        local key
+        if (type(k) == "number" or type(k) == "boolean") then
+          key = "["..tostring(k).."]"
+        else
+          key = "['"..tostring(k).."']"
+        end
 
-      if (#stack > 0) then
-        input = stack[#stack]
-        stack[#stack] = nil
-        depth = cache[input] == nil and depth + 1 or depth - 1
+        if (type(v) == "number" or type(v) == "boolean") then
+          output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. tostring(v)
+        elseif (type(v) == "table") then
+          output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. start_bracket .. line_break
+          table.insert(stack, input)
+          table.insert(stack, v)
+          cache[input] = cur_index + 1
+          break
+        else
+          output_str = output_str .. string.rep(indent, depth) .. key .. " = '" .. tostring(v) .. "'"
+        end
+
+        if (cur_index == size) then
+          output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
+        else
+          output_str = output_str .. ","
+        end
       else
-        break
+        -- close the table
+        if (cur_index == size) then
+          output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
+        end
       end
+
+      cur_index = cur_index + 1
     end
 
-    -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
-    table.insert(output, output_str)
-    output_str = table.concat(output)
-    print(output_str)
-    return output_str
+    if (size == 0) then
+      output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
+    end
+
+    if (#stack > 0) then
+      input = stack[#stack]
+      stack[#stack] = nil
+      depth = cache[input] == nil and depth + 1 or depth - 1
+    else
+      break
+    end
+  end
+
+  -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+  table.insert(output, output_str)
+  output_str = table.concat(output)
+  print(output_str)
+  return output_str
+end
+
+return {
+
+  stringify_table,
+
+  print_table = function(table)
+    print(stringify_table(table))
   end,
 
   configure = function(options)

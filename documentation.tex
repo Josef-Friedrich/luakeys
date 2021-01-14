@@ -11,9 +11,10 @@
 \CodelineIndex
 \RecordChanges
 
+\usepackage{mdframed}
 \usepackage{minted}
-\usemintedstyle{colorful}
-\BeforeBeginEnvironment{minted}{\begin{mdframed}[backgroundcolor=gray!3]}
+\usemintedstyle{friendly}
+\BeforeBeginEnvironment{minted}{\begin{mdframed}}
 \AfterEndEnvironment{minted}{\end{mdframed}}
 \setminted{
   breaklines=true,
@@ -34,11 +35,53 @@
 
 \maketitle
 
+\noindent
+test.lua:
+
+\begin{minted}{lua}
+local luakeys = require('luakeys')
+local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}')
+luakeys.print_table(kv)
+\end{minted}
+
+\noindent
+Result:
+
+\begin{center}
+\begin{minted}{lua}
+{
+  ['level1'] = {
+    ['level2'] = {
+      ['level3'] = {
+        ['dim'] = 1864679,
+        ['bool'] = true,
+        ['num'] = -0.001
+        ['str'] = 'lua',
+      }
+    }
+  }
+}
+\end{minted}
+\end{center}
+
 \newpage
 
 \tableofcontents
 
 \newpage
+
+\noindent
+|luakeys| is a Lua module that can parse key-value options like the
+\TeX{} packages \href{https://www.ctan.org/pkg/keyval}{keyval},
+\href{https://www.ctan.org/pkg/kvsetkeys}{kvsetkeys},
+\href{https://www.ctan.org/pkg/kvoptions}{kvoptions},
+\href{https://www.ctan.org/pkg/xkeyval}{xkeyval},
+\href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc. But |luakeys|
+accompilshes this task entirely in the Lua language and doesn’t rely on
+\TeX{} macros. Therefore this package can only be used with the \TeX{}
+engine Lua\TeX{}. Since |luakeys| uses
+\href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
+mechanism should be pretty robust.
 
 %-----------------------------------------------------------------------
 % Index
