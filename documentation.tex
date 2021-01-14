@@ -1,4 +1,3 @@
-%!TEX program = lualatex
 \documentclass{ltxdoc}
 
 \usepackage[
@@ -13,6 +12,8 @@
 
 \usepackage{mdframed}
 \usepackage{minted}
+\usepackage{luakeys-debug}
+\usepackage{multicol}
 \usemintedstyle{friendly}
 \BeforeBeginEnvironment{minted}{\begin{mdframed}}
 \AfterEndEnvironment{minted}{\end{mdframed}}
@@ -35,8 +36,7 @@
 
 \maketitle
 
-\noindent
-test.lua:
+\vfill
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
@@ -64,6 +64,10 @@ Result:
 \end{minted}
 \end{center}
 
+\vfill
+
+\strut
+
 \newpage
 
 \tableofcontents
@@ -86,6 +90,131 @@ mechanism should be pretty robust.
 %-----------------------------------------------------------------------
 % Index
 %-----------------------------------------------------------------------
+
+\section{Data types}
+
+\subsection{boolean}
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\luakeysdebug{
+  lower case true = true,
+  upper case true = TRUE,
+  title case true = True
+  lower case false = false,
+  upper case false = FALSE,
+  title case false = False,
+}
+\end{minted}
+\begin{minted}{lua}
+{
+  ['lower case true'] = true,
+  ['upper case true'] = true,
+  ['title case true'] = true,
+  ['lower case false'] = false,
+  ['upper case false'] = false
+  ['title case false'] = false,
+}
+\end{minted}
+\end{multicols}
+
+\subsection{number}
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\luakeysdebug{
+  num1 = 4,
+  num2 = 4,
+  num3 = 0.4,
+  num4 = 4.57e-3,
+  num5 = 0.3e12,
+  num6 = 5e+20
+}
+\end{minted}
+\begin{minted}{lua}
+{
+  ['num1'] = 4,
+  ['num2'] = 4,
+  ['num3'] = 0.4,
+  ['num4'] = 0.00457,
+  ['num5'] = 300000000000.0,
+  ['num6'] = 5e+20
+}
+\end{minted}
+\end{multicols}
+
+\subsection{dimensions}
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\luakeysdebug{
+  bp = 1bp,
+  cc = 1cc,
+  cm = 1cm,
+  dd = 1dd,
+  em = 1em,
+  ex = 1ex,
+  in = 1in,
+  mm = 1mm,
+  nc = 1nc,
+  nd = 1nd,
+  pc = 1pc,
+  pt = 1pt,
+  sp = 1sp,
+}
+\end{minted}
+\begin{minted}{lua}
+{
+  ['bp'] = 65781,
+  ['cc'] = 841489,
+  ['cm'] = 1864679,
+  ['dd'] = 70124,
+  ['em'] = 655360,
+  ['ex'] = 282460,
+  ['in'] = 4736286,
+  ['mm'] = 186467,
+  ['nc'] = 839105,
+  ['nd'] = 69925,
+  ['pc'] = 786432,
+  ['pt'] = 65536,
+  ['sp'] = 1,
+}
+\end{minted}
+\end{multicols}
+
+\subsection{strings}
+
+\luakeysdebug{
+  string1 = without quotes,
+  string3 = "with double quotes",
+}
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\luakeysdebug{
+  string1 = without quotes,
+  %string2 = 'with single quotes',
+  string3 = "with double quotes",
+}
+\end{minted}
+\begin{minted}{lua}
+{
+  ['bp'] = 65781,
+  ['cc'] = 841489,
+  ['cm'] = 1864679,
+  ['dd'] = 70124,
+  ['em'] = 655360,
+  ['ex'] = 282460,
+  ['in'] = 4736286,
+  ['mm'] = 186467,
+  ['nc'] = 839105,
+  ['nd'] = 69925,
+  ['pc'] = 786432,
+  ['pt'] = 65536,
+  ['sp'] = 1,
+}
+\end{minted}
+\end{multicols}
 
 \pagebreak
 \PrintChanges

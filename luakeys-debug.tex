@@ -3,24 +3,13 @@
 }
 
 \def\luakeysdebug#1{
-  \noindent
-  Input:\par
-
-  \noindent
-  #1\par
-
-  \bigskip
-
-  \noindent
-  Parsed Lua table:\par
-  \bigskip
-
   {
     \tt
     \parindent=0pt
     \directlua{
       local result = luakeys.parse('#1')
-      tex.print(luakeys.stringify_table(result))
+      tex.print(luakeys.stringify_table(result, true))
+      luakeys.print_table(result)
     }
   }
 }

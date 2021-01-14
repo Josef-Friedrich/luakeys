@@ -265,11 +265,11 @@ end
 -- @tparam value A table to print.
 --
 -- see https://stackoverflow.com/a/42062321/10193818
-local function stringify_table (input)
+local function stringify_table (input, for_tex)
   local cache, stack, output = {}, {}, {}
   local depth = 1
   local line_break, start_bracket, end_bracket, indent
-  if settings.debug_output_target == 'tex' then
+  if for_tex then
     line_break = '\\par'
     start_bracket = '$\\{$'
     end_bracket = '$\\}$'
@@ -352,16 +352,15 @@ local function stringify_table (input)
   -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
   table.insert(output, output_str)
   output_str = table.concat(output)
-  print(output_str)
   return output_str
 end
 
 return {
 
-  stringify_table,
+  stringify_table = stringify_table,
 
   print_table = function(table)
-    print(stringify_table(table))
+    print(stringify_table(table, false))
   end,
 
   configure = function(options)
