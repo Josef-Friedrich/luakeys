@@ -39,7 +39,7 @@
 
 \vfill
 
-\luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
+% \luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
@@ -84,9 +84,9 @@ Result:
 \href{https://www.ctan.org/pkg/kvoptions}{kvoptions},
 \href{https://www.ctan.org/pkg/xkeyval}{xkeyval},
 \href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc. But |luakeys|
-accompilshes this task entirely in the Lua language and doesn’t rely on
-\TeX{} macros. Therefore this package can only be used with the \TeX{}
-engine Lua\TeX{}. Since |luakeys| uses
+accompilshes this task entirely using the Lua language and doesn’t rely
+on \TeX{} macros. Therefore this package can only be used with the
+\TeX{} engine Lua\TeX{}. Since |luakeys| uses
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
 mechanism should be pretty robust.
 
@@ -94,7 +94,7 @@ mechanism should be pretty robust.
 % Index
 %-----------------------------------------------------------------------
 
-\section{Data types}
+\section{Recognized data types}
 
 %-----------------------------------------------------------------------
 %
@@ -158,7 +158,7 @@ mechanism should be pretty robust.
 %
 %-----------------------------------------------------------------------
 
-\subsection{dimensions}
+\subsection{dimension}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
@@ -201,7 +201,7 @@ mechanism should be pretty robust.
 %
 %-----------------------------------------------------------------------
 
-\subsection{strings}
+\subsection{string}
 
 \luakeysdebug{
   string1 = without quotes,
@@ -239,11 +239,61 @@ mechanism should be pretty robust.
 
 \subsection{\lua{luakeys.parse(input_string, options)}}
 
+The function \lua{parse(input_string, options)} is the main method of
+this module.
+
+\begin{minted}{latex}
+\newcommand{\mykeyvalcmd}[1][]{
+  \directlua{
+    result = luakeys.parse('#1')
+    luakeys.print(result)
+  }
+  #2
+}
+\mykeyvalcmd[one=1]{test}
+\end{minted}
+
+In plain \TeX:
+
+\begin{minted}{latex}
+\def\mykeyvalcommand#1{
+  \directlua{
+    result = luakeys.parse('#1')
+    luakeys.print(result)
+  }
+}
+\mykeyvalcmd{one=1}
+\end{minted}
+
 \subsection{\lua{luakeys.print(lua_table)}}
+
+\subsection{\lua{luakeys.stringify(lua_table, for_tex)}}
 
 \subsection{\lua{luakeys.render(lua_table)}}
 
-\subsection{\lua{luakeys.stringify(lua_table, for_tex)}}
+The function \lua{render(lua_table)} works in reverse of the function
+\lua{parse(lua_table)}. It takes a Lua table and converts this table
+into a key-value string. The resulting string usually has a different
+order as your input table.
+
+\begin{minted}{lua}
+result = luakeys.parse('one=1,two=2,tree=3,')
+print(luakeys.render(result))
+--- one=1,two=2,tree=3,
+--- or:
+--- two=2,one=1,tree=3,
+--- or:
+--- ...
+\end{minted}
+
+In Lua, only tables with 1-based consecutive integer keys (a.k.a. array
+tables) can be parsed in order.
+
+\begin{minted}{lua}
+result = luakeys.parse('one,two,three')
+print(luakeys.render(result))
+--- one,two,three, (always)
+\end{minted}
 
 \pagebreak
 \PrintChanges

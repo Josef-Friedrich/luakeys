@@ -159,6 +159,7 @@ local function generate_parser(options)
     value_without_key =
       lpeg.V('dimension_value') +
       lpeg.V('number_value') +
+      lpeg.V('bool_value') +
       lpeg.V('string_value') +
       lpeg.V('string_value_unquoted'),
 
@@ -260,6 +261,34 @@ local function normalize(raw, options)
   return normalize_recursive(raw, {}, options)
 end
 
+local function render(input)
+  local function render_inner(input)
+    local output = {}
+    local function add(text)
+      table.insert(output, text)
+    end
+    for key, value in pairs(input) do
+      if (key and type(key) == 'string') then
+        if (type(value) == 'table') then
+          if (next(value)) then
+            add(key .. '={');
+            add(render_inner(value));
+            add('},');
+          else
+            add(key .. '={},');
+          end
+        else
+          add(key .. '=' .. tostring(value) .. ',');
+        end
+      else
+        add(tostring(value) .. ',')
+      end
+    end
+    return table.concat(output)
+  end
+  return render_inner(input)
+end
+
 --- Stringify a table that means convert the table into a string to be able to pretty print a table.
 --
 -- @tparam table input A table to stringify.
@@ -292,25 +321,25 @@ local function stringify(input, for_tex)
     end
 
     for key, value in pairs(input) do
-      if (key and type(key) == "number" or type(key) == "string") then
-        key = string.format("[\"%s\"]", key);
+      if (key and type(key) == 'number' or type(key) == 'string') then
+        key = string.format('[\'%s\']', key);
 
-        if (type(value) == "table") then
+        if (type(value) == 'table') then
           if (next(value)) then
-            add(depth, key .. " = " .. start_bracket);
+            add(depth, key .. ' = ' .. start_bracket);
             add(0, stringify_inner(value, depth + 1, for_tex));
-            add(depth, end_bracket .. ",");
+            add(depth, end_bracket .. ',');
           else
-            add(depth, key .. " = " .. start_bracket .. end_bracket .. ",");
+            add(depth, key .. ' = ' .. start_bracket .. end_bracket .. ',');
           end
         else
-          if (type(value) == "string") then
-            value = string.format("\"%s\"", value);
+          if (type(value) == 'string') then
+            value = string.format('\'%s\'', value);
           else
             value = tostring(value);
           end
 
-          add(depth, key .. " = " .. value .. ",");
+          add(depth, key .. ' = ' .. value .. ',');
         end
       end
     end
@@ -323,13 +352,15 @@ end
 
 return {
 
+  render = render,
+
   stringify = stringify,
 
   print = function(table)
     print(stringify(table, false))
   end,
 
-  --- Parse a LaTeX/TeX style key-value string into a Lua table. With
+  --- Parse a LaTeX/TeX style key-value string into a Lua table. WithW
   -- this function you should be able to parse key-value strings like
   -- this example:
   --
