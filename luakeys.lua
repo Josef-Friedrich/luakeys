@@ -361,12 +361,67 @@ local function stringify_table (input, for_tex)
   return output_str
 end
 
+---A helper function to print a table's contents.
+-- https://stackoverflow.com/a/54593224/10193818
+---@param tbl table @The table to print.
+---@param depth number @The depth of sub-tables to traverse through and print.
+---@param n number @Do NOT manually set this. This controls formatting through recursion.
+local function stringify_table_ng(tbl, depth, for_tex)
+  local output = {}
+  depth = depth or 0;
+
+  local line_break, start_bracket, end_bracket, indent
+
+  if for_tex then
+    line_break = '\\par'
+    start_bracket = '$\\{$'
+    end_bracket = '$\\}$'
+    indent = '\\ \\ '
+  else
+    line_break = '\n'
+    start_bracket = '{'
+    end_bracket = '}'
+    indent = '  '
+  end
+
+  local function add(depth, text)
+    table.insert(output, string.rep(indent, depth) .. text)
+  end
+
+  for key, value in pairs(tbl) do
+    if (key and type(key) == "number" or type(key) == "string") then
+      key = string.format("[\"%s\"]", key);
+
+      if (type(value) == "table") then
+        if (next(value)) then
+          add(depth, key .. " = " .. start_bracket);
+          add(0, stringify_table_ng(value, depth + 1, for_tex));
+          add(depth, end_bracket .. ",");
+        else
+          add(depth, key .. " = " .. start_bracket .. end_bracket .. ",");
+        end
+      else
+        if (type(value) == "string") then
+          value = string.format("\"%s\"", value);
+        else
+          value = tostring(value);
+        end
+
+        add(depth, key .. " = " .. value .. ",");
+      end
+    end
+  end
+
+  return table.concat(output, line_break)
+end
+
 return {
 
   stringify_table = stringify_table,
 
   print_table = function(table)
-    print(stringify_table(table, false))
+    print(stringify_table_ng(table))
+    --print(stringify_table(table, false))
   end,
 
   configure = function(options)

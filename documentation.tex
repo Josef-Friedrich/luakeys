@@ -38,6 +38,8 @@
 
 \vfill
 
+\luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
+
 \begin{minted}{lua}
 local luakeys = require('luakeys')
 local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}')
@@ -94,6 +96,15 @@ mechanism should be pretty robust.
 \section{Data types}
 
 \subsection{boolean}
+
+\luakeysdebug{
+  lower case true = true,
+  upper case true = TRUE,
+  title case true = True
+  lower case false = false,
+  upper case false = FALSE,
+  title case false = False,
+}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
