@@ -366,7 +366,6 @@ return {
   --
   --     show,
   --     hide,
-  --     'string,with,commas inside single quotes',
   --     key with spaces = String without quotes,
   --     string="String with double quotes: ,{}=",
   --     dimension = 1cm,
@@ -385,7 +384,6 @@ return {
   --     {
   --       'show',
   --       'hide',
-  --       'string,with,commas inside single quotes',
   --       ['key with spaces'] = 'String without quotes',
   --       string = 'String with double quotes: ,{}=',
   --       dimension = '1cm',

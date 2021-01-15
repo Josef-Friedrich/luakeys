@@ -39,7 +39,7 @@
 
 \vfill
 
-% \luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
+\luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
@@ -77,6 +77,8 @@ Result:
 
 \newpage
 
+\section{Introduction}
+
 \noindent
 |luakeys| is a Lua module that can parse key-value options like the
 \TeX{} packages \href{https://www.ctan.org/pkg/keyval}{keyval},
@@ -91,14 +93,14 @@ on \TeX{} macros. Therefore this package can only be used with the
 mechanism should be pretty robust.
 
 %-----------------------------------------------------------------------
-% Index
+%
 %-----------------------------------------------------------------------
 
 \section{Recognized data types}
 
-%-----------------------------------------------------------------------
+%%
 %
-%-----------------------------------------------------------------------
+%%
 
 \subsection{boolean}
 
@@ -125,9 +127,9 @@ mechanism should be pretty robust.
 \end{minted}
 \end{multicols}
 
-%-----------------------------------------------------------------------
+%%
 %
-%-----------------------------------------------------------------------
+%%
 
 \subsection{number}
 
@@ -154,9 +156,9 @@ mechanism should be pretty robust.
 \end{minted}
 \end{multicols}
 
-%-----------------------------------------------------------------------
+%%
 %
-%-----------------------------------------------------------------------
+%%
 
 \subsection{dimension}
 
@@ -197,50 +199,51 @@ mechanism should be pretty robust.
 \end{minted}
 \end{multicols}
 
-%-----------------------------------------------------------------------
+%%
 %
-%-----------------------------------------------------------------------
+%%
 
 \subsection{string}
-
-\luakeysdebug{
-  string1 = without quotes,
-  string3 = "with double quotes",
-}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
 \luakeysdebug{
-  string1 = without quotes,
-  %string2 = 'with single quotes',
-  string3 = "with double quotes",
+  without quotes = no commas and equal signs are allowed,
+  with double quotes = ", and = are allowed",
 }
 \end{minted}
 \begin{minted}{lua}
 {
-  ['bp'] = 65781,
-  ['cc'] = 841489,
-  ['cm'] = 1864679,
-  ['dd'] = 70124,
-  ['em'] = 655360,
-  ['ex'] = 282460,
-  ['in'] = 4736286,
-  ['mm'] = 186467,
-  ['nc'] = 839105,
-  ['nd'] = 69925,
-  ['pc'] = 786432,
-  ['pt'] = 65536,
-  ['sp'] = 1,
+  ['without quotes'] = 'no commas and equal signs are allowed',
+  ['with double quotes'] = ', and = are allowed',
 }
 \end{minted}
 \end{multicols}
 
-\section{Exported functions of the luakeys.lua module}
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
 
-\subsection{\lua{luakeys.parse(input_string, options)}}
+\section{Exported functions of the Lua module \texttt{luakeys.lua}}
+
+The Lua module exports this functions:
+
+\begin{minted}{lua}
+local luakeys = require('luakeys')
+local parse = luakeys.parse
+local render = luakeys.render
+local print = luakeys.print
+local stringify = luakeys.stringify
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{parse(kv\_string, options)}: table}
 
 The function \lua{parse(input_string, options)} is the main method of
-this module.
+this module. It parses a key-value string into a Lua table.
 
 \begin{minted}{latex}
 \newcommand{\mykeyvalcmd}[1][]{
@@ -253,6 +256,7 @@ this module.
 \mykeyvalcmd[one=1]{test}
 \end{minted}
 
+\noindent
 In plain \TeX:
 
 \begin{minted}{latex}
@@ -265,13 +269,24 @@ In plain \TeX:
 \mykeyvalcmd{one=1}
 \end{minted}
 
-\subsection{\lua{luakeys.print(lua_table)}}
+\noindent
+The function can be called with a options table. This two options are
+supported.
 
-\subsection{\lua{luakeys.stringify(lua_table, for_tex)}}
+\begin{minted}{lua}
+local result = parse('one,two,three', {
+  convert_dimensions = false,
+  unpack_single_array_value = false
+})
+\end{minted}
 
-\subsection{\lua{luakeys.render(lua_table)}}
+%%
+%
+%%
 
-The function \lua{render(lua_table)} works in reverse of the function
+\subsection{\texttt{render(tbl)}: string}
+
+The function \lua{render(tbl)} works in reverse of the function
 \lua{parse(lua_table)}. It takes a Lua table and converts this table
 into a key-value string. The resulting string usually has a different
 order as your input table.
@@ -294,6 +309,53 @@ result = luakeys.parse('one,two,three')
 print(luakeys.render(result))
 --- one,two,three, (always)
 \end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{print(tbl): void}}
+
+The function \lua{print(tbl)} pretty prints a Lua table to stdout. It is
+a utility function that can be used to debug and inspect the resulting
+Lua table from the parse function. You have to use a console to compile
+your \TeX{} document to see the terminal output.
+
+\begin{minted}{md}
+{
+  ['level1'] = {
+    ['level2'] = {
+      ['level3'] = {
+        ['str'] = 'lua',
+        ['bool'] = true,
+        ['num'] = -0.001,
+        ['dim'] = 1864679,
+      },
+    },
+  },
+}
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{stringify(tbl, for\_tex): string}}
+
+The function \lua{stringify(tbl, for_tex)} converts a Lua table into a
+printable string. This function is used to realize the print() function
+from above. \lua{stringify(tbl, true)} (\lua{for_tex = true}) generates
+a string which can be embeded into \TeX{}-documents. The macro
+|\luakeysdebug{}| uses this option. \lua{stringify(tbl, false)} or
+\lua{stringify(tbl)} generating a string suitable for the terminal.
+
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
+
+\section{Implementation}
+
+\inputminted{lua}{luakeys.lua}
 
 \pagebreak
 \PrintChanges
