@@ -22,16 +22,10 @@ if not tex then
   end
 end
 
-local settings = {
-  convert_dimensions = true,
-  unpack_single_array_value = true,
-  debug_output_target = 'tex',
-}
-
 --- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser
-local function generate_parser()
+local function generate_parser(options)
   -- Optional whitespace
   local white_space = lpeg.S(' \t\n\r')^0
 
@@ -86,7 +80,7 @@ local function generate_parser()
 
     local dimension = (sign^0 * tex_number * unit)
 
-    if settings.convert_dimensions then
+    if options.convert_dimensions then
       return dimension / tex.sp
     else
       return lpeg.C(dimension)
@@ -247,14 +241,14 @@ end
 --   parser
 --
 -- @treturn table A normalized table ready for the outside world.
-local function normalize(raw)
-  local function normalize_recursive(raw, result)
+local function normalize(raw, options)
+  local function normalize_recursive(raw, result, options)
     for key, value in pairs(raw) do
-      if settings.unpack_single_array_value then
+      if options.unpack_single_array_value then
         value = unpack_single_valued_array_table(value)
       end
       if type(value) == 'table' then
-        result[key] = normalize_recursive(value, {})
+        result[key] = normalize_recursive(value, {}, options)
       elseif type(value) == 'string' then
         result[key] = trim(value)
       else
@@ -263,119 +257,24 @@ local function normalize(raw)
     end
     return result
   end
-  return normalize_recursive(raw, {})
+  return normalize_recursive(raw, {}, options)
 end
 
---- Pretty print a table.
+--- Stringify a table that means convert the table into a string to be able to pretty print a table.
 --
--- @tparam value A table to print.
+-- @tparam table input A table to stringify.
+-- @tparam boolean for_tex Stringify the table into a text string that can be
+--   embeded inside a TeX document via tex.print(). Curly braces and whites
+--   spaces are escaped
 --
--- see https://stackoverflow.com/a/42062321/10193818
-local function stringify_table (input, for_tex)
-  local cache, stack, output = {}, {}, {}
-  local depth = 1
-  local line_break, start_bracket, end_bracket, indent
-  if for_tex then
-    line_break = '\\par'
-    start_bracket = '$\\{$'
-    end_bracket = '$\\}$'
-    indent = '\\ \\ '
-  else
-    line_break = '\n'
-    start_bracket = '{'
-    end_bracket = '}'
-    indent = '  '
-  end
-
-  local output_str = start_bracket
-
-  while true do
-    local size = 0
-    for k,v in pairs(input) do
-      size = size + 1
-    end
-
-    local cur_index = 1
-    for k,v in pairs(input) do
-      if (cache[input] == nil) or (cur_index >= cache[input]) then
-        if (string.find(output_str, end_bracket, output_str:len())) then
-          output_str = output_str .. "," .. line_break
-        elseif not (string.find(output_str, line_break, output_str:len())) then
-          output_str = output_str .. line_break
-        end
-
-        -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
-        table.insert(output,output_str)
-        output_str = ""
-
-        local key
-        if (type(k) == "number" or type(k) == "boolean") then
-          key = "["..tostring(k).."]"
-        else
-          key = "['"..tostring(k).."']"
-        end
-
-        if (type(v) == "number" or type(v) == "boolean") then
-          output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. tostring(v)
-        elseif (type(v) == "table") then
-          output_str = output_str .. string.rep(indent, depth) .. key .. " = " .. start_bracket .. line_break
-          table.insert(stack, input)
-          table.insert(stack, v)
-          cache[input] = cur_index + 1
-          break
-        else
-          output_str = output_str .. string.rep(indent, depth) .. key .. " = '" .. tostring(v) .. "'"
-        end
-
-        if (cur_index == size) then
-          output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
-        else
-          output_str = output_str .. ","
-        end
-      else
-        -- close the table
-        if (cur_index == size) then
-          output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
-        end
-      end
-
-      cur_index = cur_index + 1
-    end
-
-    if (size == 0) then
-      output_str = output_str .. line_break .. string.rep(indent, depth - 1) .. end_bracket
-    end
-
-    if (#stack > 0) then
-      input = stack[#stack]
-      stack[#stack] = nil
-      depth = cache[input] == nil and depth + 1 or depth - 1
-    else
-      break
-    end
-  end
-
-  -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
-  table.insert(output, output_str)
-  output_str = table.concat(output)
-  return output_str
-end
-
----A helper function to print a table's contents.
 -- https://stackoverflow.com/a/54593224/10193818
----@param tbl table @The table to print.
----@param depth number @The depth of sub-tables to traverse through and print.
----@param n number @Do NOT manually set this. This controls formatting through recursion.
-local function stringify_table_ng(tbl, depth, for_tex)
-  local output = {}
-  depth = depth or 0;
-
+local function stringify(input, for_tex)
   local line_break, start_bracket, end_bracket, indent
 
   if for_tex then
     line_break = '\\par'
-    start_bracket = '$\\{$'
-    end_bracket = '$\\}$'
+    start_bracket = '\\{'
+    end_bracket = '\\}'
     indent = '\\ \\ '
   else
     line_break = '\n'
@@ -384,54 +283,50 @@ local function stringify_table_ng(tbl, depth, for_tex)
     indent = '  '
   end
 
-  local function add(depth, text)
-    table.insert(output, string.rep(indent, depth) .. text)
-  end
+  local function stringify_inner(input, depth)
+    local output = {}
+    depth = depth or 0;
 
-  for key, value in pairs(tbl) do
-    if (key and type(key) == "number" or type(key) == "string") then
-      key = string.format("[\"%s\"]", key);
+    local function add(depth, text)
+      table.insert(output, string.rep(indent, depth) .. text)
+    end
 
-      if (type(value) == "table") then
-        if (next(value)) then
-          add(depth, key .. " = " .. start_bracket);
-          add(0, stringify_table_ng(value, depth + 1, for_tex));
-          add(depth, end_bracket .. ",");
+    for key, value in pairs(input) do
+      if (key and type(key) == "number" or type(key) == "string") then
+        key = string.format("[\"%s\"]", key);
+
+        if (type(value) == "table") then
+          if (next(value)) then
+            add(depth, key .. " = " .. start_bracket);
+            add(0, stringify_inner(value, depth + 1, for_tex));
+            add(depth, end_bracket .. ",");
+          else
+            add(depth, key .. " = " .. start_bracket .. end_bracket .. ",");
+          end
         else
-          add(depth, key .. " = " .. start_bracket .. end_bracket .. ",");
-        end
-      else
-        if (type(value) == "string") then
-          value = string.format("\"%s\"", value);
-        else
-          value = tostring(value);
-        end
+          if (type(value) == "string") then
+            value = string.format("\"%s\"", value);
+          else
+            value = tostring(value);
+          end
 
-        add(depth, key .. " = " .. value .. ",");
+          add(depth, key .. " = " .. value .. ",");
+        end
       end
     end
+
+    return table.concat(output, line_break)
   end
 
-  return table.concat(output, line_break)
+  return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
 end
 
 return {
 
-  stringify_table = stringify_table,
+  stringify = stringify,
 
-  print_table = function(table)
-    print(stringify_table_ng(table))
-    --print(stringify_table(table, false))
-  end,
-
-  configure = function(options)
-    for key, value in pairs(options) do
-      if settings[key] ~= nil then
-        settings[key] = value
-      else
-        print('Unknown config key: ' .. key)
-      end
-    end
+  print = function(table)
+    print(stringify(table, false))
   end,
 
   --- Parse a LaTeX/TeX style key-value string into a Lua table. With
@@ -480,12 +375,23 @@ return {
   --
   -- @treturn table A hopefully properly parsed table you can
   -- do something useful with.
-  parse = function (input)
-    print(input)
+  parse = function (input, options)
+    if options == nil then
+      options = {}
+    end
+
+    if options.convert_dimensions == nil then
+      options.convert_dimensions = true
+    end
+
+    if options.unpack_single_array_value == nil then
+      options.unpack_single_array_value = true
+    end
+
     if input == nil then
       return {}
     end
-    local parser = generate_parser()
-    return normalize(parser:match(input))
+    local parser = generate_parser(options)
+    return normalize(parser:match(input), options)
   end
 }

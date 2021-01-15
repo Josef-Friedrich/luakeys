@@ -270,8 +270,8 @@ function test_fontspec()
   )
 end
 
-function test_function_stringify_table()
-  print(luakeys.stringify_table(luakeys.parse(example, 'lol')))
+function test_function_stringify()
+  print(luakeys.stringify(luakeys.parse(example, 'lol')))
 end
 
 os.exit( luaunit.LuaUnit.run() )

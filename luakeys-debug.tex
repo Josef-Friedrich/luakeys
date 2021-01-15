@@ -8,8 +8,8 @@
     \parindent=0pt
     \directlua{
       local result = luakeys.parse('#1')
-      tex.print(luakeys.stringify_table(result, true))
-      luakeys.print_table(result)
+      tex.print(luakeys.stringify(result, true))
+      luakeys.print(result)
     }
   }
 }

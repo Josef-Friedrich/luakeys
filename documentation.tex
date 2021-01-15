@@ -21,6 +21,7 @@
   breaklines=true,
   fontsize=\footnotesize,
 }
+\def\lua#1{\mintinline{lua}|#1|}
 
 \begin{document}
 
@@ -43,7 +44,7 @@
 \begin{minted}{lua}
 local luakeys = require('luakeys')
 local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}')
-luakeys.print_table(kv)
+luakeys.print(kv)
 \end{minted}
 
 \noindent
@@ -95,16 +96,11 @@ mechanism should be pretty robust.
 
 \section{Data types}
 
-\subsection{boolean}
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
 
-\luakeysdebug{
-  lower case true = true,
-  upper case true = TRUE,
-  title case true = True
-  lower case false = false,
-  upper case false = FALSE,
-  title case false = False,
-}
+\subsection{boolean}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
@@ -128,6 +124,10 @@ mechanism should be pretty robust.
 }
 \end{minted}
 \end{multicols}
+
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
 
 \subsection{number}
 
@@ -153,6 +153,10 @@ mechanism should be pretty robust.
 }
 \end{minted}
 \end{multicols}
+
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
 
 \subsection{dimensions}
 
@@ -193,6 +197,10 @@ mechanism should be pretty robust.
 \end{minted}
 \end{multicols}
 
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
+
 \subsection{strings}
 
 \luakeysdebug{
@@ -226,6 +234,16 @@ mechanism should be pretty robust.
 }
 \end{minted}
 \end{multicols}
+
+\section{Exported functions of the luakeys.lua module}
+
+\subsection{\lua{luakeys.parse(input_string, options)}}
+
+\subsection{\lua{luakeys.print(lua_table)}}
+
+\subsection{\lua{luakeys.render(lua_table)}}
+
+\subsection{\lua{luakeys.stringify(lua_table, for_tex)}}
 
 \pagebreak
 \PrintChanges
