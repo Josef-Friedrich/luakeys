@@ -11,8 +11,8 @@ install:
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
-test:
-	lua5.3 tests.lua
+test: install
+	lua5.3 test/tests.lua
 
 doc_pdf:
 	lualatex --shell-escape documentation.tex
@@ -39,4 +39,4 @@ ctan: doc_pdf
 	tar cvfz $(jobname).tar.gz $(jobname)
 	rm -rf $(jobname)
 
-.PHONY: all doc_lua doc_lua_open
+.PHONY: all doc_lua doc_lua_open test

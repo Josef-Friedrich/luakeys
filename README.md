@@ -7,5 +7,5 @@ kvsetkeys, kvoptions, xkeyval, pgfkeys but in Lua
 
 ```
 luarocks install luaunit
-lua5.1 tests.lua
+lua5.1 test/tests.lua
 ```
