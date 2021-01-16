@@ -14,6 +14,8 @@
 \usepackage{minted}
 \usepackage{luakeys-debug}
 \usepackage{multicol}
+\usepackage{luacode}
+\usepackage{syntax}
 \usemintedstyle{friendly}
 \BeforeBeginEnvironment{minted}{\begin{mdframed}}
 \AfterEndEnvironment{minted}{\end{mdframed}}
@@ -39,7 +41,7 @@
 
 \vfill
 
-\luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
+%\luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
@@ -100,6 +102,28 @@ by Joseph Wright and Christian Feuersänger
 %-----------------------------------------------------------------------
 
 \section{Recognized data types}
+
+\begin{grammar}
+<list> ::= <value> | <value-without-key>
+
+<list-elements> ::= `}'
+
+<value> ::= <object>
+  \alt <boolean>
+  \alt <dimension>
+  \alt <number>
+  \alt <string-quoted>
+  \alt <string-unquoted>
+
+<value-without-key> ::= <dimension>
+  \alt <boolean>
+  \alt <number>
+  \alt <string-quoted>
+  \alt <string-unquoted>
+
+<list-container> ::== `{' <list> `}'
+
+\end{grammar}
 
 %%
 %
@@ -179,24 +203,12 @@ local result = parse('dim=1cm', {
 If you want to convert a scale point into a unit string you can used the module
 \href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
 
-\directlua{
-local dim = require('lualibs')
-print('-----------------------------------------------')
-print(dim)
-print(number.tocentimeters(1864679))
-tex.print(number.tocentimeters(1864679, 'lol'))
-}
-
-function number.topoints      (n,fmt) return numbertodimen(n,"pt",fmt) end
-function number.toinches      (n,fmt) return numbertodimen(n,"in",fmt) end
-function number.tocentimeters (n,fmt) return numbertodimen(n,"cm",fmt) end
-function number.tomillimeters (n,fmt) return numbertodimen(n,"mm",fmt) end
-function number.toscaledpoints(n,fmt) return numbertodimen(n,"sp",fmt) end
-function number.toscaledpoints(n)     return            n .. "sp"      end
-function number.tobasepoints  (n,fmt) return numbertodimen(n,"bp",fmt) end
-function number.topicas       (n,fmt) return numbertodimen(n "pc",fmt) end
-function number.todidots      (n,fmt) return numbertodimen(n,"dd",fmt) end
-function number.tociceros     (n,fmt) return numbertodimen(n,"cc",fmt) end
+\begin{minted}{latex}
+\begin{luacode}
+require('lualibs')
+tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
+\end{luacode}
+\end{minted}
 
 \begin{tabular}{rl}
 \textbf{Unit name} & \textbf{Description} \\\hline
@@ -258,6 +270,10 @@ sp & scaledpoint \\
 
 \subsection{string}
 
+There are two ways to specify strings: With or without quotes. If the
+text have to contain commas or equal signs, then double quotation
+marks must be used.
+
 \begin{multicols}{2}
 \begin{minted}{latex}
 \luakeysdebug{
@@ -285,7 +301,7 @@ The Lua module exports this functions:
 local luakeys = require('luakeys')
 local parse = luakeys.parse
 local render = luakeys.render
-local print = luakeys.print
+--local print = luakeys.print -- print is a reserved word, use luakeys.print()
 local stringify = luakeys.stringify
 \end{minted}
 
