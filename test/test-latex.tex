@@ -2,6 +2,12 @@
 \usepackage{luakeys-debug}
 \begin{document}
 
-\luakeysdebug{one=1cm,two=2,three=3}
+\luakeysdebug{one=1cm,two={2},three=3}
+
+\luakeysdebug[unpack single array value=false]{one=1cm,two={2},three=3}
+
+\luakeysdebug[convert dimensions = false]{one=1cm,two={2},three=3}
+
+\luakeysdebug[convert dimensions=false, unpack single array value=false]{one=1cm,two={2},three=3}
 
 \end{document}

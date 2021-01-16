@@ -352,6 +352,21 @@ end
 
 return {
 
+  normalize_parse_options = function (options_raw)
+
+    local options = {}
+
+    if options_raw['unpack single array value'] ~= nil then
+      options['unpack_single_array_value'] = options_raw['unpack single array value']
+    end
+
+    if options_raw['convert dimensions'] ~= nil then
+      options['convert_dimensions'] = options_raw['convert dimensions']
+    end
+
+    return options
+  end,
+
   render = render,
 
   stringify = stringify,

@@ -1,4 +1,21 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{luakeys-debug}[2020/01/12 Some debug makros for the package luakeys.]
 
-\input luakeys-debug.tex
+%\input luakeys-debug.tex
+
+\directlua{
+  luakeys = require('luakeys')
+}
+
+\newcommand{\luakeysdebug}[2][]{
+  {
+    \tt
+    \parindent=0pt
+    \directlua{
+      local options_raw = luakeys.parse('#1')
+      local result = luakeys.parse('#2', luakeys.normalize_parse_options(options_raw))
+      tex.print(luakeys.stringify(result, true))
+      luakeys.print(result)
+    }
+  }
+}

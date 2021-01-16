@@ -2,9 +2,9 @@
 
 \usepackage[
   colorlinks=true,
-  linkcolor=red,
-  filecolor=red,
-  urlcolor=red,
+  linkcolor=blue,
+  filecolor=blue,
+  urlcolor=blue,
 ]{hyperref}
 \EnableCrossrefs
 \CodelineIndex
@@ -92,6 +92,9 @@ on \TeX{} macros. Therefore this package can only be used with the
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
 mechanism should be pretty robust.
 
+\href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}{“Implementing key–value input: An introduction” (TUGboat, Volume 30 (2009), No. 1)}
+by Joseph Wright and Christian Feuersänger
+
 %-----------------------------------------------------------------------
 %
 %-----------------------------------------------------------------------
@@ -161,6 +164,56 @@ mechanism should be pretty robust.
 %%
 
 \subsection{dimension}
+
+|luakeys| detects \TeX{} dimensions and automatically converts the
+dimensions into scaled points using the function \lua{tex.sp(dim)}. Use
+the option \lua{convert_dimensions} of the function
+\lua{parse(kv_string, options)} to disalbe the automatic conversion.
+
+\begin{minted}{lua}
+local result = parse('dim=1cm', {
+  convert_dimensions = false,
+})
+\end{minted}
+
+If you want to convert a scale point into a unit string you can used the module
+\href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
+
+\directlua{
+local dim = require('lualibs')
+print('-----------------------------------------------')
+print(dim)
+print(number.tocentimeters(1864679))
+tex.print(number.tocentimeters(1864679, 'lol'))
+}
+
+function number.topoints      (n,fmt) return numbertodimen(n,"pt",fmt) end
+function number.toinches      (n,fmt) return numbertodimen(n,"in",fmt) end
+function number.tocentimeters (n,fmt) return numbertodimen(n,"cm",fmt) end
+function number.tomillimeters (n,fmt) return numbertodimen(n,"mm",fmt) end
+function number.toscaledpoints(n,fmt) return numbertodimen(n,"sp",fmt) end
+function number.toscaledpoints(n)     return            n .. "sp"      end
+function number.tobasepoints  (n,fmt) return numbertodimen(n,"bp",fmt) end
+function number.topicas       (n,fmt) return numbertodimen(n "pc",fmt) end
+function number.todidots      (n,fmt) return numbertodimen(n,"dd",fmt) end
+function number.tociceros     (n,fmt) return numbertodimen(n,"cc",fmt) end
+
+\begin{tabular}{rl}
+\textbf{Unit name} & \textbf{Description} \\\hline
+bp & big point \\
+cc & cicero \\
+cm & centimeter \\
+dd & didot \\
+em & horizontal measure of \emph{M} \\
+ex & vertical measure of \emph{x} \\
+in & inch \\
+mm & milimeter \\
+nc & new cicero \\
+nd & new didot \\
+pc & pica \\
+pt & point \\
+sp & scaledpoint \\
+\end{tabular}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
