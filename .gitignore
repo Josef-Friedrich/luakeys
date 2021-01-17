@@ -276,3 +276,5 @@ TSWLatexianTemp*
 *.lpz
 
 *.pdf
+
+__latexindent_temp.tex

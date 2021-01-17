@@ -94,14 +94,27 @@ on \TeX{} macros. Therefore this package can only be used with the
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
 mechanism should be pretty robust.
 
-\href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}{“Implementing key–value input: An introduction” (TUGboat, Volume 30 (2009), No. 1)}
-by Joseph Wright and Christian Feuersänger
+The TUGboat article
+\href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}
+{“Implementing key–value input: An introduction” (Volume 30 (2009), No. 1)}
+by Joseph Wright and Christian Feuersänger gives a good overview of the
+available key-value packages.
+
+This package would not be possible without the article
+\href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
+{Parsing complex data formats in LuaTEX with LPEG (Volume 40 (2019), No. 2)}.
 
 %-----------------------------------------------------------------------
 %
 %-----------------------------------------------------------------------
 
 \section{Syntax of the recognized key-value format}
+
+A key-value pair is definied by an equal sign (\texttt{key=value}).
+Several key-value pairs or values without keys are lined up with commas
+(\texttt{key=value,value}) and build a key-value list. Curly brackets
+can be used to create a recursive data structure of nested key-value
+lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
 
 \begin{grammar}
 <list> ::= <list-item> | <list-item> <list>
@@ -110,16 +123,9 @@ by Joseph Wright and Christian Feuersänger
 
 <list-container> ::== `{' <list> `}'
 
-<value> ::= <list-container>
-  \alt <boolean>
+<value> ::= <boolean>
   \alt <dimension>
   \alt <number>
-  \alt <string-quoted>
-  \alt <string-unquoted>
-
-<value-without-key> ::= <dimension>
-  \alt <number>
-  \alt <boolean>
   \alt <string-quoted>
   \alt <string-unquoted>
 
@@ -132,6 +138,10 @@ by Joseph Wright and Christian Feuersänger
 \subsection{Recognized data types}
 
 \subsubsection{boolean}
+
+The strings \texttt{true}, \texttt{TRUE} and \texttt{True} are converted
+into Lua’s boolean type \lua{true}, the strings \texttt{false},
+\texttt{FALSE} and \texttt{False} into \lua{false}.
 
 \begin{multicols}{2}
 \begin{minted}{latex}
@@ -166,7 +176,7 @@ by Joseph Wright and Christian Feuersänger
 \begin{minted}{latex}
 \luakeysdebug{
   num1 = 4,
-  num2 = 4,
+  num2 = -4,
   num3 = 0.4,
   num4 = 4.57e-3,
   num5 = 0.3e12,
@@ -176,7 +186,7 @@ by Joseph Wright and Christian Feuersänger
 \begin{minted}{lua}
 {
   ['num1'] = 4,
-  ['num2'] = 4,
+  ['num2'] = -4,
   ['num3'] = 0.4,
   ['num4'] = 0.00457,
   ['num5'] = 300000000000.0,
