@@ -127,11 +127,21 @@ local function generate_parser(options)
     list_item =
       lpeg.Cg(
         lpeg.V('key_value_pair') +
-        lpeg.V('value_without_key')
+        lpeg.V('value')
       ) * ws(',')^-1,
 
+    key_value_pair =
+      (lpeg.V('key') * ws('=')) * (lpeg.V('list_container') + lpeg.V('value')),
+
+    -- ./ for tikz style keys
+    key_word = lpeg.R('az', 'AZ', '09', './'),
+
+    key = white_space * lpeg.C(
+      lpeg.V('key_word')^1 *
+      (lpeg.P(' ')^1 * lpeg.V('key_word')^1)^0
+    ) * white_space,
+
     value =
-      lpeg.V('list_container') +
       lpeg.V('boolean') +
       lpeg.V('dimension') +
       lpeg.V('number') +
@@ -156,24 +166,6 @@ local function generate_parser(options)
 
     number =
       white_space * (number / tonumber) * white_space,
-
-    -- ./ for tikz style keys
-    key_word = lpeg.R('az', 'AZ', '09', './'),
-
-    key = white_space * lpeg.C(
-      lpeg.V('key_word')^1 *
-      (lpeg.P(' ')^1 * lpeg.V('key_word')^1)^0
-    ) * white_space,
-
-    value_without_key =
-      lpeg.V('boolean') +
-      lpeg.V('dimension') +
-      lpeg.V('number') +
-      lpeg.V('string_quoted') +
-      lpeg.V('string_unquoted'),
-
-    key_value_pair =
-      (lpeg.V('key') * ws('=')) * lpeg.V('value'),
 
   })
 end
