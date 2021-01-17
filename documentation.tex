@@ -1,11 +1,6 @@
 \documentclass{ltxdoc}
 
-\usepackage[
-  colorlinks=true,
-  linkcolor=blue,
-  filecolor=blue,
-  urlcolor=blue,
-]{hyperref}
+\usepackage{hyperref}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
@@ -108,13 +103,27 @@ This package would not be possible without the article
 %
 %-----------------------------------------------------------------------
 
+\clearpage
+
 \section{Syntax of the recognized key-value format}
+
+%%
+%
+%%
+
+\subsection{Attempt to put the syntax into words}
 
 A key-value pair is definied by an equal sign (\texttt{key=value}).
 Several key-value pairs or values without keys are lined up with commas
 (\texttt{key=value,value}) and build a key-value list. Curly brackets
 can be used to create a recursive data structure of nested key-value
 lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
+
+%%
+%
+%%
+
+\subsection{(Incomplete) attempt to put the syntax into the (Extended) Backus-Naur form}
 
 \begin{grammar}
 <list> ::= <list-item> | <list-item> <list>
@@ -170,6 +179,8 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 %
 %%
 
+\clearpage
+
 \subsubsection{number}
 
 \begin{multicols}{2}
@@ -199,6 +210,8 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 %
 %%
 
+\clearpage
+
 \subsubsection{dimension}
 
 |luakeys| detects \TeX{} dimensions and automatically converts the
@@ -222,6 +235,7 @@ tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 \end{luacode}
 \end{minted}
 
+\begin{center}
 \begin{tabular}{rl}
 \textbf{Unit name} & \textbf{Description} \\\hline
 bp & big point \\
@@ -238,6 +252,7 @@ pc & pica \\
 pt & point \\
 sp & scaledpoint \\
 \end{tabular}
+\end{center}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
@@ -280,7 +295,7 @@ sp & scaledpoint \\
 %
 %%
 
-\subsection{string}
+\subsubsection{string}
 
 There are two ways to specify strings: With or without quotes. If the
 text have to contain commas or equal signs, then double quotation
@@ -305,6 +320,8 @@ marks must be used.
 %
 %-----------------------------------------------------------------------
 
+\clearpage
+
 \section{Exported functions of the Lua module \texttt{luakeys.lua}}
 
 The Lua module exports this functions:
@@ -313,8 +330,7 @@ The Lua module exports this functions:
 local luakeys = require('luakeys')
 local parse = luakeys.parse
 local render = luakeys.render
---local print = luakeys.print -- print is a reserved word, use luakeys.print()
-local stringify = luakeys.stringify
+--local print = luakeys.print -- That would overwrite the built-in Lua function
 \end{minted}
 
 %%
@@ -367,10 +383,10 @@ local result = parse('one,two,three', {
 
 \subsection{\texttt{render(tbl)}: string}
 
-The function \lua{render(tbl)} works in reverse of the function
-\lua{parse(lua_table)}. It takes a Lua table and converts this table
+The function \lua{render(tbl)} reverses the function
+\lua{parse(kv_string)}. It takes a Lua table and converts this table
 into a key-value string. The resulting string usually has a different
-order as your input table.
+order as the input table.
 
 \begin{minted}{lua}
 result = luakeys.parse('one=1,two=2,tree=3,')
@@ -382,7 +398,8 @@ print(luakeys.render(result))
 --- ...
 \end{minted}
 
-In Lua, only tables with 1-based consecutive integer keys (a.k.a. array
+\noindent
+In Lua only tables with 1-based consecutive integer keys (a.k.a. array
 tables) can be parsed in order.
 
 \begin{minted}{lua}
@@ -397,46 +414,121 @@ print(luakeys.render(result))
 
 \subsection{\texttt{print(tbl): void}}
 
-The function \lua{print(tbl)} pretty prints a Lua table to stdout. It is
-a utility function that can be used to debug and inspect the resulting
-Lua table from the parse function. You have to use a console to compile
-your \TeX{} document to see the terminal output.
+The function \lua{print(tbl)} pretty prints a Lua table to standard
+output (stdout). It is a utility function that can be used to debug and
+inspect the resulting Lua table of the function \lua{parse}. You have to
+compile your \TeX{} document in a console to see the terminal output.
+
+%\luakeysdebug{level1={level2={key=value}}}
+
+\begin{minted}{lua}
+result = luakeys.parse('level1={level2={key=value}}')
+luakeys.print(result)
+\end{minted}
+
+\noindent
+The output should look like this:
 
 \begin{minted}{md}
 {
   ['level1'] = {
     ['level2'] = {
-      ['level3'] = {
-        ['str'] = 'lua',
-        ['bool'] = true,
-        ['num'] = -0.001,
-        ['dim'] = 1864679,
-      },
-    },
+      ['key'] = 'value',
   },
 }
+\end{minted}
+
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
+
+\clearpage
+
+\section{Debug packages}
+
+Two small debug packages are included in |luakeys|. One debug package
+can be used in \LaTeX{} (luakeys-debug.sty) and one can be used in plain
+\TeX{} (luakeys-debug.tex). Both packages provide only one command:
+|\luakeysdebug{kv-string}|
+
+\begin{minted}{latex}
+\luakeysdebug{one,two,three}
+\end{minted}
+
+\noindent
+Then the following output should appear in the document:
+\bigskip
+
+\luakeysdebug{one,two,three}
+
+%%
+%
+%%
+
+\subsection{For plain \TeX: luakeys-debug.tex}
+
+An example of how to use the command in plain \TeX:
+
+\begin{minted}{latex}
+\input luakeys-debug.tex
+\luakeysdebug{one,two,three}
+\bye
 \end{minted}
 
 %%
 %
 %%
 
-\subsection{\texttt{stringify(tbl, for\_tex): string}}
+\subsection{For \LaTeX: luakeys-debug.sty}
 
-The function \lua{stringify(tbl, for_tex)} converts a Lua table into a
-printable string. This function is used to realize the print() function
-from above. \lua{stringify(tbl, true)} (\lua{for_tex = true}) generates
-a string which can be embeded into \TeX{}-documents. The macro
-|\luakeysdebug{}| uses this option. \lua{stringify(tbl, false)} or
-\lua{stringify(tbl)} generating a string suitable for the terminal.
+An example of how to use the command in \LaTeX:
+
+\begin{minted}{latex}
+\documentclass{article}
+\usepackage{luakeys-debug}
+\begin{document}
+\luakeysdebug[
+  unpack single array values=false,
+  convert dimensions=false
+]{one,two,three}
+\end{document}
+\end{minted}
 
 %-----------------------------------------------------------------------
 %
 %-----------------------------------------------------------------------
 
+\clearpage
+
 \section{Implementation}
 
-\inputminted{lua}{luakeys.lua}
+%%
+%
+%%
+
+\subsection{luakeys.lua}
+
+\inputminted[linenos=true]{lua}{luakeys.lua}
+
+%%
+%
+%%
+
+\clearpage
+
+\subsection{luakeys-debug.tex}
+
+\inputminted[linenos=true]{latex}{luakeys-debug.tex}
+
+%%
+%
+%%
+
+\clearpage
+
+\subsection{luakeys-debug.sty}
+
+\inputminted[linenos=true]{latex}{luakeys-debug.sty}
 
 \pagebreak
 \PrintChanges

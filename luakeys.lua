@@ -1,13 +1,14 @@
---- A key value parser written with Lpeg.
+--- A key-value parser written with Lpeg.
 --
--- * `patt^0` = `expression *`
--- * `patt^1` = `expression +`
--- * `patt^-1` = `expression ?`
--- * `patt1 * patt2` = `expression1 expression2` -> Sequence
--- * `patt1 + patt2` = `expression1 / expression2` -> Ordered choice
+-- Explanations of some LPeg notation forms:
+--
+-- * `patt ^ 0` = `expression *`
+-- * `patt ^ 1` = `expression +`
+-- * `patt ^ -1` = `expression ?`
+-- * `patt1 * patt2` = `expression1 expression2`: Sequence
+-- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
 --
 -- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf)
--- * [Dimension handling in lualibs](https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua)
 --
 -- @module luakeys
 
@@ -233,7 +234,7 @@ end
 local function normalize(raw, options)
   local function normalize_recursive(raw, result, options)
     for key, value in pairs(raw) do
-      if options.unpack_single_array_value then
+      if options.unpack_single_array_values then
         value = unpack_single_valued_array_table(value)
       end
       if type(value) == 'table' then
@@ -249,40 +250,19 @@ local function normalize(raw, options)
   return normalize_recursive(raw, {}, options)
 end
 
-local function render(input)
-  local function render_inner(input)
-    local output = {}
-    local function add(text)
-      table.insert(output, text)
-    end
-    for key, value in pairs(input) do
-      if (key and type(key) == 'string') then
-        if (type(value) == 'table') then
-          if (next(value)) then
-            add(key .. '={');
-            add(render_inner(value));
-            add('},');
-          else
-            add(key .. '={},');
-          end
-        else
-          add(key .. '=' .. tostring(value) .. ',');
-        end
-      else
-        add(tostring(value) .. ',')
-      end
-    end
-    return table.concat(output)
-  end
-  return render_inner(input)
-end
-
---- Stringify a table that means convert the table into a string to be able to pretty print a table.
+--- The function `stringify(tbl, for_tex)` converts a Lua table into a
+--   printable string. Stringify a table means to convert the table into
+--   a string. This function is used to realize the `print` function.
+--   `stringify(tbl, true)` (`for_tex = true`) generates a string which
+--   can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
+--   this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
+--   string suitable for the terminal.
 --
 -- @tparam table input A table to stringify.
--- @tparam boolean for_tex Stringify the table into a text string that can be
---   embeded inside a TeX document via tex.print(). Curly braces and whites
---   spaces are escaped
+--
+-- @tparam boolean for_tex Stringify the table into a text string that
+--   can be embeded inside a TeX document via tex.print(). Curly braces
+--   and whites spaces are escaped.
 --
 -- https://stackoverflow.com/a/54593224/10193818
 local function stringify(input, for_tex)
@@ -338,32 +318,42 @@ local function stringify(input, for_tex)
   return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
 end
 
+--- For the LaTeX version of the macro
+--  `\luakeysdebug[options]{kv-string}`.
+--
+-- @tparam table options_raw Options in a raw format. The table may be
+-- empty or some keys are not set.
+--
+-- @treturn table
+local function normalize_parse_options (options_raw)
+  if options_raw == nil then
+    options_raw = {}
+  end
+  local options = {}
+
+  if options_raw['unpack single array values'] ~= nil then
+    options['unpack_single_array_values'] = options_raw['unpack single array values']
+  end
+
+  if options_raw['convert dimensions'] ~= nil then
+    options['convert_dimensions'] = options_raw['convert dimensions']
+  end
+
+  if options.convert_dimensions == nil then
+    options.convert_dimensions = true
+  end
+
+  if options.unpack_single_array_values == nil then
+    options.unpack_single_array_values = true
+  end
+
+  return options
+end
+
 return {
-
-  normalize_parse_options = function (options_raw)
-
-    local options = {}
-
-    if options_raw['unpack single array value'] ~= nil then
-      options['unpack_single_array_value'] = options_raw['unpack single array value']
-    end
-
-    if options_raw['convert dimensions'] ~= nil then
-      options['convert_dimensions'] = options_raw['convert dimensions']
-    end
-
-    return options
-  end,
-
-  render = render,
-
   stringify = stringify,
 
-  print = function(table)
-    print(stringify(table, false))
-  end,
-
-  --- Parse a LaTeX/TeX style key-value string into a Lua table. WithW
+  --- Parse a LaTeX/TeX style key-value string into a Lua table. With
   -- this function you should be able to parse key-value strings like
   -- this example:
   --
@@ -372,8 +362,7 @@ return {
   --     key with spaces = String without quotes,
   --     string="String with double quotes: ,{}=",
   --     dimension = 1cm,
-  --     number = 2,
-  --     float = 1.2,
+  --     number = -1.2,
   --     list = {one,two,three},
   --     key value list = {one=one,two=two,three=three},
   --     nested key = {
@@ -389,9 +378,8 @@ return {
   --       'hide',
   --       ['key with spaces'] = 'String without quotes',
   --       string = 'String with double quotes: ,{}=',
-  --       dimension = '1cm',
-  --       number = 2,
-  --       float = 1.2,
+  --       dimension = 1864679,
+  --       number = -1.2,
   --       list = {'one', 'two', 'three'},
   --       key value list = {
   --         one = 'one',
@@ -404,26 +392,74 @@ return {
   --         }
   --       },
   --     }
+
+  -- @tparam string kv_string A string in the TeX/LaTeX style key-value
+  --   format as described above.
   --
-  -- @treturn table A hopefully properly parsed table you can
-  -- do something useful with.
-  parse = function (input, options)
-    if options == nil then
-      options = {}
-    end
-
-    if options.convert_dimensions == nil then
-      options.convert_dimensions = true
-    end
-
-    if options.unpack_single_array_value == nil then
-      options.unpack_single_array_value = true
-    end
-
-    if input == nil then
+  -- @tparam table options A table containing
+  -- settings: `convert_dimensions` `unpack_single_array_values`
+  --
+  -- @treturn table A hopefully properly parsed table you can do
+  -- something useful with.
+  parse = function (kv_string, options)
+    if kv_string == nil then
       return {}
     end
+    options = normalize_parse_options()
+
     local parser = generate_parser(options)
-    return normalize(parser:match(input), options)
-  end
+    return normalize(parser:match(kv_string), options)
+  end,
+
+  --- The function `render(tbl)` reverses the function
+  --  `parse(kv_string)`. It takes a Lua table and converts this table
+  --  into a key-value string. The resulting string usually has a
+  --  different order as the input table. In Lua only tables with
+  --  1-based consecutive integer keys (a.k.a. array tables) can be
+  --  parsed in order.
+  --
+  -- @tparam table tbl A table to be converted into a key-value string.
+  --
+  -- @treturn string A key-value string that can be passed to a TeX
+  -- macro.
+  render = function (tbl)
+    local function render_inner(tbl)
+      local output = {}
+      local function add(text)
+        table.insert(output, text)
+      end
+      for key, value in pairs(tbl) do
+        if (key and type(key) == 'string') then
+          if (type(value) == 'table') then
+            if (next(value)) then
+              add(key .. '={');
+              add(render_inner(value));
+              add('},');
+            else
+              add(key .. '={},');
+            end
+          else
+            add(key .. '=' .. tostring(value) .. ',');
+          end
+        else
+          add(tostring(value) .. ',')
+        end
+      end
+      return table.concat(output)
+    end
+    return render_inner(tbl)
+  end,
+
+  --- The function `print(tbl)` pretty prints a Lua table to standard
+  --   output (stdout). It is a utility function that can be used to
+  --   debug and inspect the resulting Lua table of the function
+  --   `parse`. You have to compile your TeX document in a console to
+  --   see the terminal output.
+  --
+  -- @tparam table tbl A table to be printed to standard output for
+  -- debugging purposes.
+  print = function(tbl)
+    print(stringify(tbl, false))
+  end,
+
 }

@@ -44,15 +44,16 @@
 <div id="content">
 
 <h1>Module <code>luakeys</code></h1>
-<p>A key value parser written with Lpeg.</p>
-<p><ul>
-<li><code>patt<sup>0</sup></code> = <code>expression *</code> (peg.js)</li>
-<li><code>patt<sup>1</sup></code> = <code>expression +</code> (peg.js)</li>
-<li><code>patt^-1</code> = <code>expression ?</code> (peg.js)</li>
-<li><code>patt1 * patt2</code> = <code>expression1 expression2</code> (peg.js) -> Sequence</li>
-<li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code> (peg.js) -> Ordered choice</p></li>
+<p>A key-value parser written with Lpeg.</p>
+<p><p> Explanations of some LPeg notation forms:</p>
+
+<ul>
+<li><code>patt ^ 0</code> = <code>expression *</code></li>
+<li><code>patt ^ 1</code> = <code>expression +</code></li>
+<li><code>patt ^ -1</code> = <code>expression ?</code></li>
+<li><code>patt1 * patt2</code> = <code>expression1 expression2</code>: Sequence</li>
+<li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code>: Ordered choice</p></li>
 <li><p><a href="https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf">TUGboat article: Parsing complex data formats in LuaTEX with LPEG</a></p></li>
-<li><a href="https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua">Dimension handling in lualibs</a></li>
 </ul>
 </p>
 
@@ -62,6 +63,16 @@
 	<tr>
 	<td class="name" nowrap><a href="#parse">parse (input, options)</a></td>
 	<td class="summary">Parse a LaTeX/TeX style key-value string into a Lua table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#render">render (tbl)</a></td>
+	<td class="summary">The function <code>render(tbl)</code> reverses the function
+  <code>parse(kv_string)</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#print">print (tbl)</a></td>
+	<td class="summary">The function <code>print(tbl)</code> pretty prints a Lua table to standard
+   output (stdout).</td>
 	</tr>
 </table>
 <h2><a href="#Local_Functions">Local Functions</a></h2>
@@ -114,6 +125,11 @@
 	<td class="name" nowrap><a href="#stringify">stringify (input, for_tex)</a></td>
 	<td class="summary">Stringify a table that means convert the table into a string to be able to pretty print a table.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_parse_options">normalize_parse_options (table)</a></td>
+	<td class="summary">For the LaTeX version of the macro
+  <code>\luakeysdebug[options]{kv-string}</code>.</td>
+	</tr>
 </table>
 
 <br/>
@@ -128,18 +144,16 @@
     <strong>parse (input, options)</strong>
     </dt>
     <dd>
-    <p>Parse a LaTeX/TeX style key-value string into a Lua table.  WithW
+    <p>Parse a LaTeX/TeX style key-value string into a Lua table.  With
  this function you should be able to parse key-value strings like
  this example:</p>
 
 <pre><code> show,
  hide,
- 'string,with,commas inside single quotes',
  key with spaces = String without quotes,
  string="String with double quotes: ,{}=",
  dimension = 1cm,
- number = 2,
- float = 1.2,
+ number = -1.2,
  list = {one,two,three},
  key value list = {one=one,two=two,three=three},
  nested key = {
@@ -154,12 +168,10 @@
 <pre><code> {
    'show',
    'hide',
-   'string,with,commas inside single quotes',
    ['key with spaces'] = 'String without quotes',
    string = 'String with double quotes: ,{}=',
-   dimension = '1cm',
-   number = 2,
-   float = 1.2,
+   dimension = 1864679,
+   number = -1.2,
    list = {'one', 'two', 'three'},
    key value list = {
      one = 'one',
@@ -192,6 +204,65 @@
         A hopefully properly parsed table you can
  do something useful with.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "render"></a>
+    <strong>render (tbl)</strong>
+    </dt>
+    <dd>
+    The function <code>render(tbl)</code> reverses the function
+  <code>parse(kv_string)</code>.  It takes a Lua table and converts this table
+  into a key-value string. The resulting string usually has a
+  different order as the input table. In Lua only tables with
+  1-based consecutive integer keys (a.k.a. array tables) can be
+  parsed in order.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table to be converted into a key-value string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+        A key-value string that can be passed to a TeX
+ macro.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "print"></a>
+    <strong>print (tbl)</strong>
+    </dt>
+    <dd>
+    The function <code>print(tbl)</code> pretty prints a Lua table to standard
+   output (stdout).  It is a utility function that can be used to
+   debug and inspect the resulting Lua table of the function
+   <a href="index.html#parse">parse</a>. You have to compile your TeX document in a console to
+   see the terminal output.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table to be printed to standard output for
+ debugging purposes.
+        </li>
+    </ul>
+
 
 
 
@@ -460,6 +531,35 @@ into <code>text</code></li>
 
 
 </dd>
+    <dt>
+    <a name = "normalize_parse_options"></a>
+    <strong>normalize_parse_options (table)</strong>
+    </dt>
+    <dd>
+    For the LaTeX version of the macro
+  <code>\luakeysdebug[options]{kv-string}</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><span class="type">options_raw</span></span>
+         Options in a raw format. The table may be
+ empty or some keys are not set.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+
+    </ol>
+
+
+
+
+</dd>
 </dl>
 
 
@@ -467,7 +567,7 @@ into <code>text</code></li>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-01-15 22:04:13 </i>
+<i style="float:right;">Last updated 2021-01-17 12:44:08 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

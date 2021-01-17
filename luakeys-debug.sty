@@ -13,7 +13,7 @@
     \parindent=0pt
     \directlua{
       local options_raw = luakeys.parse('#1')
-      local result = luakeys.parse('#2', luakeys.normalize_parse_options(options_raw))
+      local result = luakeys.parse('#2', options_raw)
       tex.print(luakeys.stringify(result, true))
       luakeys.print(result)
     }
