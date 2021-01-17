@@ -1,10 +1,10 @@
 --- A key value parser written with Lpeg.
 --
--- * `patt^0` = `expression *` (peg.js)
--- * `patt^1` = `expression +` (peg.js)
--- * `patt^-1` = `expression ?` (peg.js)
--- * `patt1 * patt2` = `expression1 expression2` (peg.js) -> Sequence
--- * `patt1 + patt2` = `expression1 / expression2` (peg.js) -> Ordered choice
+-- * `patt^0` = `expression *`
+-- * `patt^1` = `expression +`
+-- * `patt^-1` = `expression ?`
+-- * `patt1 * patt2` = `expression1 expression2` -> Sequence
+-- * `patt1 + patt2` = `expression1 / expression2` -> Ordered choice
 --
 -- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf)
 -- * [Dimension handling in lualibs](https://github.com/lualatex/lualibs/blob/master/lualibs-util-dim.lua)
@@ -115,37 +115,46 @@ local function generate_parser(options)
 
   return lpeg.P({
     'list',
-    value =
-      lpeg.V('object') +
-      lpeg.V('bool_value') +
-      lpeg.V('dimension_value') +
-      lpeg.V('number_value') +
-      -- lpeg.V('string_single_quoted') +
-      lpeg.V('string_value') +
-      lpeg.V('string_value_unquoted'),
 
-    bool_value =
+    list = lpeg.Cf(
+      lpeg.Ct('') * lpeg.V('list_item')^0,
+      add_to_table
+    ),
+
+    list_container =
+      ws('{') * lpeg.V('list') * ws('}'),
+
+    list_item =
+      lpeg.Cg(
+        lpeg.V('key_value_pair') +
+        lpeg.V('value_without_key')
+      ) * ws(',')^-1,
+
+    value =
+      lpeg.V('list_container') +
+      lpeg.V('boolean') +
+      lpeg.V('dimension') +
+      lpeg.V('number') +
+      lpeg.V('string_quoted') +
+      lpeg.V('string_unquoted'),
+
+    boolean =
       boolean_true * lpeg.Cc(true) +
       boolean_false * lpeg.Cc(false),
 
-    dimension_value = build_dimension_pattern(),
+    dimension = build_dimension_pattern(),
 
-    string_value =
+    string_quoted =
       white_space * lpeg.P('"') *
       lpeg.C((lpeg.P('\\"') + 1 - lpeg.P('"'))^0) *
       lpeg.P('"') * white_space,
 
-    -- string_single_quoted =
-    --   white_space * lpeg.P('\'') *
-    --   lpeg.C((lpeg.P('\\\'') + 1 - lpeg.P('\''))^0) *
-    --   lpeg.P('\'') * white_space,
-
-    string_value_unquoted =
+    string_unquoted =
       white_space *
       lpeg.C((1 - lpeg.S('{},='))^1) *
       white_space,
 
-    number_value =
+    number =
       white_space * (number / tonumber) * white_space,
 
     -- ./ for tikz style keys
@@ -157,28 +166,15 @@ local function generate_parser(options)
     ) * white_space,
 
     value_without_key =
-      lpeg.V('dimension_value') +
-      lpeg.V('number_value') +
-      lpeg.V('bool_value') +
-      lpeg.V('string_value') +
-      lpeg.V('string_value_unquoted'),
+      lpeg.V('boolean') +
+      lpeg.V('dimension') +
+      lpeg.V('number') +
+      lpeg.V('string_quoted') +
+      lpeg.V('string_unquoted'),
 
     key_value_pair =
-      lpeg.V('key') * ws('=') * lpeg.V('value'),
+      (lpeg.V('key') * ws('=')) * lpeg.V('value'),
 
-    member_pair =
-      lpeg.Cg(
-        lpeg.V('key_value_pair') +
-        lpeg.V('value_without_key')
-      ) * ws(',')^-1,
-
-    list = lpeg.Cf(
-      lpeg.Ct('') * lpeg.V('member_pair')^0,
-      add_to_table
-    ),
-
-    object =
-      ws('{') * lpeg.V('list') * ws('}')
   })
 end
 

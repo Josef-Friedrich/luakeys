@@ -101,14 +101,16 @@ by Joseph Wright and Christian Feuersänger
 %
 %-----------------------------------------------------------------------
 
-\section{Recognized data types}
+\section{Syntax of the recognized key-value format}
 
 \begin{grammar}
-<list> ::= <value> | <value-without-key>
+<list> ::= <list-item> | <list-item> <list>
 
-<list-elements> ::= `}'
+<list-item> ::= ( <key-value-pair> | <value-without-key> ) [ `,' ]
 
-<value> ::= <object>
+<list-container> ::== `{' <list> `}'
+
+<value> ::= <list-container>
   \alt <boolean>
   \alt <dimension>
   \alt <number>
@@ -116,12 +118,10 @@ by Joseph Wright and Christian Feuersänger
   \alt <string-unquoted>
 
 <value-without-key> ::= <dimension>
-  \alt <boolean>
   \alt <number>
+  \alt <boolean>
   \alt <string-quoted>
   \alt <string-unquoted>
-
-<list-container> ::== `{' <list> `}'
 
 \end{grammar}
 
@@ -129,7 +129,9 @@ by Joseph Wright and Christian Feuersänger
 %
 %%
 
-\subsection{boolean}
+\subsection{Recognized data types}
+
+\subsubsection{boolean}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
@@ -158,7 +160,7 @@ by Joseph Wright and Christian Feuersänger
 %
 %%
 
-\subsection{number}
+\subsubsection{number}
 
 \begin{multicols}{2}
 \begin{minted}{latex}
@@ -187,7 +189,7 @@ by Joseph Wright and Christian Feuersänger
 %
 %%
 
-\subsection{dimension}
+\subsubsection{dimension}
 
 |luakeys| detects \TeX{} dimensions and automatically converts the
 dimensions into scaled points using the function \lua{tex.sp(dim)}. Use
