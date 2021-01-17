@@ -14,6 +14,8 @@ install:
 test: install
 	lua5.3 test/tests.lua
 
+doc: doc_pdf doc_lua
+
 doc_pdf:
 	lualatex --shell-escape documentation.tex
 	makeindex -s gglo.ist -o documentation.gls documentation.glo
@@ -36,6 +38,8 @@ ctan: doc_pdf
 	cp -f README.md $(jobname)/
 	cp -f $(jobname).lua $(jobname)/
 	cp -f $(jobname).pdf $(jobname)/
+	cp -f $(jobname)-debug.tex $(jobname)/
+	cp -f $(jobname)-debug.sty $(jobname)/
 	tar cvfz $(jobname).tar.gz $(jobname)
 	rm -rf $(jobname)
 

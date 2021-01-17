@@ -30,7 +30,7 @@
   \url{josef@friedrich.rocks}\\%
   \href{https://github.com/Josef-Friedrich/nodetree}{github.com/Josef-Friedrich/luakeys}%
 }
-\date{v0.1 from 2021/01/10}
+\date{v0.1 from 2021/01/17}
 
 \maketitle
 
@@ -82,9 +82,9 @@ Result:
 \href{https://www.ctan.org/pkg/kvsetkeys}{kvsetkeys},
 \href{https://www.ctan.org/pkg/kvoptions}{kvoptions},
 \href{https://www.ctan.org/pkg/xkeyval}{xkeyval},
-\href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc. But |luakeys|
-accompilshes this task entirely using the Lua language and doesn’t rely
-on \TeX{} macros. Therefore this package can only be used with the
+\href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc. do. |luakeys|,
+however, accompilshes this task entirely, by using the Lua language and
+doesn’t rely on \TeX{}. Therefore this package can only be used with the
 \TeX{} engine Lua\TeX{}. Since |luakeys| uses
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
 mechanism should be pretty robust.
@@ -111,7 +111,7 @@ This package would not be possible without the article
 %
 %%
 
-\subsection{Attempt to put the syntax into words}
+\subsection{A attempt to put the syntax into words}
 
 A key-value pair is definied by an equal sign (\texttt{key=value}).
 Several key-value pairs or values without keys are lined up with commas
@@ -123,7 +123,7 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
 %
 %%
 
-\subsection{(Incomplete) attempt to put the syntax into the (Extended) Backus-Naur form}
+\subsection{An (incomplete) attempt to put the syntax into the (Extended) Backus-Naur form}
 
 \begin{grammar}
 <list> ::= <list-item> | <list-item> <list>
@@ -137,8 +137,9 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
   \alt <number>
   \alt <string-quoted>
   \alt <string-unquoted>
-
 \end{grammar}
+
+... to be continued
 
 %%
 %
@@ -324,7 +325,11 @@ marks must be used.
 
 \section{Exported functions of the Lua module \texttt{luakeys.lua}}
 
-The Lua module exports this functions:
+To learn more about the individual functions (local functions), pleasecommand
+read the \href{https://josef-friedrich.github.io/luakeys/}{source code
+documentation}, which was created with
+\href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
+this functions:
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
@@ -529,6 +534,8 @@ An example of how to use the command in \LaTeX:
 \subsection{luakeys-debug.sty}
 
 \inputminted[linenos=true]{latex}{luakeys-debug.sty}
+
+\changes{v0.1}{2020/01/17}{Inital release}
 
 \pagebreak
 \PrintChanges
