@@ -36,6 +36,7 @@ ctan: doc_pdf
 	rm -rf $(jobname)
 	mkdir $(jobname)
 	cp -f README.md $(jobname)/
+	cp -f documentation.tex $(jobname)/luakeys.tex
 	cp -f $(jobname).lua $(jobname)/
 	cp -f $(jobname).pdf $(jobname)/
 	cp -f $(jobname)-debug.tex $(jobname)/
