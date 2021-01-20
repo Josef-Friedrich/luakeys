@@ -20,14 +20,38 @@
   luakeys = require('luakeys')
 }
 
-\def\luakeysdebug#1{
+% https://tex.stackexchange.com/a/418401/42311
+\catcode`\@=11
+\long\def\luakeysdebug@ifnextchar#1#2#3{%
+  \let\@tmpa=#1%
+  \def\@tmpb{#2}%
+  \def\@tmpc{#3}%
+  \futurelet\@future\luakeysdebug@ifnextchar@i%
+}%
+\def\luakeysdebug@ifnextchar@i{%
+  \ifx\@tmpa\@future%
+    \expandafter\@tmpb
+  \else
+    \expandafter\@tmpc
+  \fi
+}%
+\def\luakeysdebug@parse@options#1{
+  \directlua{
+    luakeys.options_raw = luakeys.parse('#1')
+  }
+}%
+\def\luakeysdebug@output#1{
   {
     \tt
     \parindent=0pt
     \directlua{
-      local result = luakeys.parse('#1')
+      local result = luakeys.parse('#1', luakeys.options_raw)
       tex.print(luakeys.stringify(result, true))
       luakeys.print(result)
     }
   }
-}
+}%
+\def\luakeysdebug@oarg[#1]#2{\luakeysdebug@parse@options{#1}\luakeysdebug@output{#2}}%
+\def\luakeysdebug@marg#1{\luakeysdebug@output{#1}}%
+\def\luakeysdebug{\luakeysdebug@ifnextchar[{\luakeysdebug@oarg}{\luakeysdebug@marg}}%
+\catcode`\@=12

@@ -278,8 +278,8 @@ local function stringify(input, for_tex)
 
   if for_tex then
     line_break = '\\par'
-    start_bracket = '\\{'
-    end_bracket = '\\}'
+    start_bracket = '$\\{$'
+    end_bracket = '$\\}$'
     indent = '\\ \\ '
   else
     line_break = '\n'
@@ -294,6 +294,10 @@ local function stringify(input, for_tex)
 
     local function add(depth, text)
       table.insert(output, string.rep(indent, depth) .. text)
+    end
+
+    if type(input) ~= 'table' then
+      return tostring(input)
     end
 
     for key, value in pairs(input) do
@@ -413,7 +417,7 @@ return {
     if kv_string == nil then
       return {}
     end
-    options = normalize_parse_options()
+    options = normalize_parse_options(options)
 
     local parser = generate_parser(options)
     return normalize(parser:match(kv_string), options)

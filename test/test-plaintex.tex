@@ -23,4 +23,16 @@
 }
 
 \luakeysdebug{key level 1={level2={level3={dimension=1cm,boolean=true,number=-123e-03,string="luakeys},{"}}}}
+
+\luakeysdebug{one=1cm,two={2},three=3}
+
+\luakeysdebug[unpack single array values=false]{one=1cm,two={2},three=3}
+
+\luakeysdebug[convert dimensions = false]{one=1cm,two={2},three=3}
+
+\luakeysdebug[
+  convert dimensions=false,
+  unpack single array values=false
+]{one=1cm,two={2},three=3}
+
 \bye
