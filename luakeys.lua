@@ -150,15 +150,7 @@ local function generate_parser(options)
       ) * ws(',')^-1,
 
     key_value_pair =
-      (lpeg.V('key') * ws('=')) * (lpeg.V('list_container') + lpeg.V('value')),
-
-    -- ./ for tikz style keys
-    key_word = lpeg.R('az', 'AZ', '09', './'),
-
-    key = white_space * lpeg.C(
-      lpeg.V('key_word')^1 *
-      (lpeg.P(' ')^1 * lpeg.V('key_word')^1)^0
-    ) * white_space,
+      (lpeg.V('value') * ws('=')) * (lpeg.V('list_container') + lpeg.V('value')),
 
     value =
       lpeg.V('boolean') +
@@ -180,17 +172,17 @@ local function generate_parser(options)
 
     string_unquoted =
       white_space *
-      lpeg.C((1 - lpeg.S('{},='))^1) *
+      lpeg.C(
+        lpeg.V('word_unquoted')^1 *
+        (lpeg.S(' \t')^1 * lpeg.V('word_unquoted')^1)^0) *
       white_space,
+
+    word_unquoted = (1 - lpeg.S(' \t\n\r') - lpeg.S('{},='))^1;
 
     number =
       white_space * (number / tonumber) * white_space,
 
   })
-end
-
-local function trim(input_string)
-  return input_string:gsub('^%s*(.-)%s*$', '%1')
 end
 
 --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
@@ -257,8 +249,6 @@ local function normalize(raw, options)
       end
       if type(value) == 'table' then
         result[key] = normalize_recursive(value, {}, options)
-      elseif type(value) == 'string' then
-        result[key] = trim(value)
       else
         result[key] = value
       end
