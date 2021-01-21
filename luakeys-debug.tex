@@ -22,13 +22,13 @@
 
 % https://tex.stackexchange.com/a/418401/42311
 \catcode`\@=11
-\long\def\luakeysdebug@ifnextchar#1#2#3{%
+\long\def\LuaKeysIfNextChar#1#2#3{%
   \let\@tmpa=#1%
   \def\@tmpb{#2}%
   \def\@tmpc{#3}%
-  \futurelet\@future\luakeysdebug@ifnextchar@i%
+  \futurelet\@future\LuaKeysIfNextChar@i%
 }%
-\def\luakeysdebug@ifnextchar@i{%
+\def\LuaKeysIfNextChar@i{%
   \ifx\@tmpa\@future%
     \expandafter\@tmpb
   \else
@@ -51,7 +51,12 @@
     }
   }
 }%
-\def\luakeysdebug@oarg[#1]#2{\luakeysdebug@parse@options{#1}\luakeysdebug@output{#2}}%
-\def\luakeysdebug@marg#1{\luakeysdebug@output{#1}}%
-\def\luakeysdebug{\luakeysdebug@ifnextchar[{\luakeysdebug@oarg}{\luakeysdebug@marg}}%
+\def\luakeysdebug@oarg[#1]#2{%
+  \luakeysdebug@parse@options{#1}%
+  \luakeysdebug@output{#2}%
+}%
+\def\luakeysdebug@marg#1{%
+  \luakeysdebug@output{#1}%
+}%
+\def\luakeysdebug{\LuaKeysIfNextChar[{\luakeysdebug@oarg}{\luakeysdebug@marg}}%
 \catcode`\@=12
