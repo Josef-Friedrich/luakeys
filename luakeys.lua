@@ -49,11 +49,11 @@ local result_store = {}
 -- @treturn userdata The parser.
 local function generate_parser(options)
   -- Optional whitespace
-  local white_space = lpeg.S(' \t\n\r')^0
+  local white_space = lpeg.S(' \t\n\r')
 
   --- Match literal string surrounded by whitespace
   local ws = function(match)
-    return white_space * lpeg.P(match) * white_space
+    return white_space^0 * lpeg.P(match) * white_space^0
   end
 
   local boolean_true =
@@ -90,17 +90,24 @@ local function generate_parser(options)
     local sign = lpeg.S('-+')
     local integer = lpeg.R('09')^1
     local tex_number = (integer^1 * (lpeg.P('.') * integer^1)^0) + (lpeg.P('.') * integer^1)
-    local unit
-    -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
-    for _, dimension_extension in ipairs({'bp', 'cc', 'cm', 'dd', 'em', 'ex', 'in', 'mm', 'nc', 'nd', 'pc', 'pt', 'sp'}) do
-      if unit then
-        unit = unit + lpeg.P(dimension_extension)
-      else
-        unit = lpeg.P(dimension_extension)
-      end
-    end
 
-    local dimension = (sign^0 * tex_number * unit)
+    -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+    local unit =
+      lpeg.P('bp') + lpeg.P('BP') +
+      lpeg.P('cc') + lpeg.P('CC') +
+      lpeg.P('cm') + lpeg.P('CM') +
+      lpeg.P('dd') + lpeg.P('DD') +
+      lpeg.P('em') + lpeg.P('EM') +
+      lpeg.P('ex') + lpeg.P('EX') +
+      lpeg.P('in') + lpeg.P('IN') +
+      lpeg.P('mm') + lpeg.P('MM') +
+      lpeg.P('nc') + lpeg.P('NC') +
+      lpeg.P('nd') + lpeg.P('ND') +
+      lpeg.P('pc') + lpeg.P('PC') +
+      lpeg.P('pt') + lpeg.P('PT') +
+      lpeg.P('sp') + lpeg.P('SP')
+
+    local dimension = (sign^0 * white_space^0 * tex_number * white_space^0 * unit)
 
     if options.convert_dimensions then
       return dimension / tex.sp
@@ -169,21 +176,21 @@ local function generate_parser(options)
     dimension = build_dimension_pattern(),
 
     string_quoted =
-      white_space * lpeg.P('"') *
+      white_space^0 * lpeg.P('"') *
       lpeg.C((lpeg.P('\\"') + 1 - lpeg.P('"'))^0) *
-      lpeg.P('"') * white_space,
+      lpeg.P('"') * white_space^0,
 
     string_unquoted =
-      white_space *
+      white_space^0 *
       lpeg.C(
         lpeg.V('word_unquoted')^1 *
         (lpeg.S(' \t')^1 * lpeg.V('word_unquoted')^1)^0) *
-      white_space,
+      white_space^0,
 
-    word_unquoted = (1 - lpeg.S(' \t\n\r') - lpeg.S('{},='))^1;
+    word_unquoted = (1 - white_space - lpeg.S('{},='))^1;
 
     number =
-      white_space * (number / tonumber) * white_space,
+      white_space^0 * (number / tonumber) * white_space^0,
 
   })
 end
@@ -233,15 +240,18 @@ local function unpack_single_valued_array_table(value)
   return value
 end
 
---- This normalization tasks are performed on the raw input table
--- coming directly from the PEG parser:
+--- This normalization tasks are performed on the raw input table coming
+--  directly from the PEG parser:
 --
 -- 1. Trim all strings: ` text \n` into `text`
--- 2. Unpack all single valued array like tables: `{ 'text' }`
---    into `text`
+-- 2. Unpack all single valued array like tables: `{ 'text' }` into
+--    `text`
 --
 -- @tparam table raw The raw input table coming directly from the PEG
 --   parser
+--
+-- @tparam table options Some options. A table with the key
+--   `unpack_single_array_values`
 --
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, options)
@@ -483,8 +493,10 @@ return {
   --  store results for the later usage.
   --
   -- @tparam string identifier The identifier under which the result is
-  --   saved. @tparam table result A result to be stored and that was
-  --   created by the key-value parser.
+  --   saved.
+  --
+  -- @tparam table result A result to be stored and that was created by
+  --   the key-value parser.
   save = function(identifier, result)
     result_store[identifier] = result
   end,

@@ -30,6 +30,7 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
 <li><a href="#Local_Functions">Local Functions</a></li>
 </ul>
 
@@ -74,6 +75,23 @@
 	<td class="summary">The function <code>print(tbl)</code> pretty prints a Lua table to standard
    output (stdout).</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#save">save (identifier, result)</a></td>
+	<td class="summary">The function <code>save(identifier, result): void</code> saves a result (a
+  table from a previous run of <a href="index.html#parse">parse</a>) under an identifier.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get">get (identifier)</a></td>
+	<td class="summary">The function <code>get(identifier): table</code> retrieves a saved result
+  from the result store.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#result_store">result_store</a></td>
+	<td class="summary">A table to store parsed key-value results.</td>
+	</tr>
 </table>
 <h2><a href="#Local_Functions">Local Functions</a></h2>
 <table class="function_list">
@@ -91,7 +109,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#add_to_table">add_to_table (table, arg1, arg2)</a></td>
-	<td class="summary">Add values to a table in a two modes:</p>
+	<td class="summary">Add values to a table in two modes:</p>
 
 <p> # Key value pair</p>
 
@@ -112,9 +130,9 @@
  <code>{ 1 }</code> into <code>into</code>.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize">normalize (raw)</a></td>
-	<td class="summary"><p>This normalization tasks are performed on the raw input table
- coming directly from the PEG parser:</p>
+	<td class="name" nowrap><a href="#normalize">normalize (raw, options)</a></td>
+	<td class="summary"><p>This normalization tasks are performed on the raw input table coming
+  directly from the PEG parser:</p>
 
 <ol>
 <li></li>
@@ -273,6 +291,77 @@
 
 
 </dd>
+    <dt>
+    <a name = "save"></a>
+    <strong>save (identifier, result)</strong>
+    </dt>
+    <dd>
+    The function <code>save(identifier, result): void</code> saves a result (a
+  table from a previous run of <a href="index.html#parse">parse</a>) under an identifier.
+  Therefore, it is not necessary to pollute the global namespace to
+  store results for the later usage.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">identifier</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         The identifier under which the result is
+   saved.
+        </li>
+        <li><span class="parameter">result</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A result to be stored and that was created by
+   the key-value parser.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get"></a>
+    <strong>get (identifier)</strong>
+    </dt>
+    <dd>
+    The function <code>get(identifier): table</code> retrieves a saved result
+  from the result store.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">identifier</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         The identifier under which the result was
+   saved.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "result_store"></a>
+    <strong>result_store</strong>
+    </dt>
+    <dd>
+    A table to store parsed key-value results.
+
+
+
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
 
@@ -296,7 +385,7 @@
     <ol>
 
            <span class="types"><span class="type">userdata</span></span>
-        The parser
+        The parser.
     </ol>
 
 
@@ -347,7 +436,7 @@
     <strong>add_to_table (table, arg1, arg2)</strong>
     </dt>
     <dd>
-    Add values to a table in a two modes:</p>
+    Add values to a table in two modes:</p>
 
 <p> # Key value pair</p>
 
@@ -473,16 +562,16 @@
 </dd>
     <dt>
     <a name = "normalize"></a>
-    <strong>normalize (raw)</strong>
+    <strong>normalize (raw, options)</strong>
     </dt>
     <dd>
-    <p>This normalization tasks are performed on the raw input table
- coming directly from the PEG parser:</p>
+    <p>This normalization tasks are performed on the raw input table coming
+  directly from the PEG parser:</p>
 
 <ol>
 <li>Trim all strings: <code> text \n</code> into <code>text</code></li>
-<li>Unpack all single valued array like tables: <code>{ &apos;text&apos; }</code>
-into <code>text</code></li>
+<li>Unpack all single valued array like tables: <code>{ &apos;text&apos; }</code> into
+<code>text</code></li>
 </ol>
 
 
@@ -493,6 +582,11 @@ into <code>text</code></li>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
          The raw input table coming directly from the PEG
    parser
+        </li>
+        <li><span class="parameter">options</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         Some options. A table with the key
+   <code>unpack_single_array_values</code>
         </li>
     </ul>
 
@@ -578,7 +672,7 @@ into <code>text</code></li>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-01-17 15:03:10 </i>
+<i style="float:right;">Last updated 2021-01-21 14:06:37 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
