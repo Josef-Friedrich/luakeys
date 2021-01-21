@@ -41,9 +41,12 @@ if not tex then
   end
 end
 
+--- A table to store parsed key-value results.
+local result_store = {}
+
 --- Generate the PEG parser using Lpeg.
 --
--- @treturn userdata The parser
+-- @treturn userdata The parser.
 local function generate_parser(options)
   -- Optional whitespace
   local white_space = lpeg.S(' \t\n\r')^0
@@ -106,7 +109,7 @@ local function generate_parser(options)
     end
   end
 
-  --- Add values to a table in a two modes:
+  --- Add values to a table in two modes:
   --
   -- # Key value pair
   --
@@ -472,6 +475,27 @@ return {
   -- debugging purposes.
   print = function(tbl)
     print(stringify(tbl, false))
+  end,
+
+  --- The function `save(identifier, result): void` saves a result (a
+  --  table from a previous run of `parse`) under an identifier.
+  --  Therefore, it is not necessary to pollute the global namespace to
+  --  store results for the later usage.
+  --
+  -- @tparam string identifier The identifier under which the result is
+  --   saved. @tparam table result A result to be stored and that was
+  --   created by the key-value parser.
+  save = function(identifier, result)
+    result_store[identifier] = result
+  end,
+
+  --- The function `get(identifier): table` retrieves a saved result
+  --  from the result store.
+  --
+  -- @tparam string identifier The identifier under which the result was
+  --   saved.
+  get = function(identifier)
+    return result_store[identifier]
   end,
 
 }

@@ -325,7 +325,7 @@ marks must be used.
 
 \section{Exported functions of the Lua module \texttt{luakeys.lua}}
 
-To learn more about the individual functions (local functions), pleasecommand
+To learn more about the individual functions (local functions), please
 read the \href{https://josef-friedrich.github.io/luakeys/}{source code
 documentation}, which was created with
 \href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
@@ -336,6 +336,8 @@ local luakeys = require('luakeys')
 local parse = luakeys.parse
 local render = luakeys.render
 --local print = luakeys.print -- That would overwrite the built-in Lua function
+local save = luakeys.save
+local get = luakeys.get
 \end{minted}
 
 %%
@@ -442,6 +444,26 @@ The output should look like this:
   },
 }
 \end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{save(identifier, result): void}}
+
+The function \lua{save(identifier, result)} saves a result (a
+table from a previous run of \lua{parse}) under an identifier.
+Therefore, it is not necessary to pollute the global namespace to
+store results for the later usage.
+
+%%
+%
+%%
+
+\subsection{\texttt{get(identifier): table}}
+
+The function \lua{get(identifier)} retrieves a saved result from the
+result store.
 
 %-----------------------------------------------------------------------
 %

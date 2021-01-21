@@ -37,7 +37,7 @@
 }%
 \def\luakeysdebug@parse@options#1{
   \directlua{
-    luakeys.options_raw = luakeys.parse('#1')
+    luakeys.save('debug_options', luakeys.parse('#1'))
   }
 }%
 \def\luakeysdebug@output#1{
@@ -45,7 +45,7 @@
     \tt
     \parindent=0pt
     \directlua{
-      local result = luakeys.parse('#1', luakeys.options_raw)
+      local result = luakeys.parse('#1', luakeys.get('debug_options'))
       tex.print(luakeys.stringify(result, true))
       luakeys.print(result)
     }
