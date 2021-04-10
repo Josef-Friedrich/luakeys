@@ -105,6 +105,27 @@ This package would not be possible without the article
 
 \clearpage
 
+\section{Usage}
+
+\begin{minted}{latex}
+\documentclass{article}
+\directlua{
+  luakeys = require('luakeys')
+}
+
+\newcommand{\helloworld}[2][]{
+  \directlua{
+    local keys = luakeys.parse('\luaescapestring{\unexpanded{#1}}')
+    luakeys.print(keys)
+    local marg = '#2'
+    tex.print(keys.greeting .. ', ' .. marg .. keys.punctuation)
+  }
+}
+\begin{document}
+\helloworld[greeting=hello,punctuation=!]{world}
+\end{document}
+\end{minted}
+
 \section{Syntax of the recognized key-value format}
 
 %%
