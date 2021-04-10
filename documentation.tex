@@ -144,7 +144,7 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
 %
 %%
 
-\subsection{An (incomplete) attempt to put the syntax into the (Extended) Backus-Naur form}
+\subsection{An (incomplete) attempt to put the syntax into the Extended Backus-Naur Form}
 
 \begin{grammar}
 <list> ::= <list-item> | <list-item> <list>
@@ -158,6 +158,25 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
   \alt <number>
   \alt <string-quoted>
   \alt <string-unquoted>
+
+<sign> ::= `-' | `+'
+
+<integer> ::= `0' | `1' | `2' | `3' | `4' | `5' | `6' | `7' | `8' | `9'
+
+<unit> ::= `bp' | `BP'
+  \alt `cc' | `CC'
+  \alt `cm' | `CM'
+  \alt `dd' | `DD'
+  \alt `em' | `EM'
+  \alt `ex' | `EX'
+  \alt `in' | `IN'
+  \alt `mm' | `MM'
+  \alt `nc' | `NC'
+  \alt `nd' | `ND'
+  \alt `pc' | `PC'
+  \alt `pt' | `PT'
+  \alt `sp' | `SP'
+
 \end{grammar}
 
 ... to be continued
