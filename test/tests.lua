@@ -130,6 +130,7 @@ end
 function test_keys()
   assertEquals(parse('umlaute öäü=1'), {["umlaute öäü"] = 1})
   assertEquals(parse('2=2'), {[2] = 2})
+  assertEquals(parse('1=a,b'), {'a', 'b'})
   assertEquals(parse('under_score=1'), {["under_score"] = 1})
   assertEquals(parse('true=true'), {[true] = true})
 

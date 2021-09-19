@@ -6,6 +6,7 @@ installdir = $(texmftex)/$(jobname)
 all: install doc_lua
 
 install:
+	-tlmgr uninstall --force luakeys
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
 	cp -f $(jobname)-debug.tex $(installdir)
