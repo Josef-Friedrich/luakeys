@@ -28,9 +28,9 @@
 \author{%
   Josef Friedrich\\%
   \url{josef@friedrich.rocks}\\%
-  \href{https://github.com/Josef-Friedrich/nodetree}{github.com/Josef-Friedrich/luakeys}%
+  \href{https://github.com/Josef-Friedrich/luakeys}{github.com/Josef-Friedrich/luakeys}%
 }
-\date{v0.1 from 2021/01/18}
+\date{v0.2 from 2021/09/19}
 
 \maketitle
 
@@ -266,7 +266,8 @@ local result = parse('dim=1cm', {
 })
 \end{minted}
 
-If you want to convert a scale point into a unit string you can used the module
+\noindent
+If you want to convert a scale point into a unit string you can use the module
 \href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
 
 \begin{minted}{latex}
@@ -354,6 +355,46 @@ marks must be used.
   ['without quotes'] = 'no commas and equal signs are allowed',
   ['with double quotes'] = ', and = are allowed',
 }
+\end{minted}
+\end{multicols}
+
+\subsubsection{Standalone values}
+
+Standalone values are values without a key. They are converted into an
+array. In Lua an array is a table with numeric indexes (The first index
+is 1).
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\luakeysdebug{one,two,three}
+\end{minted}
+\columnbreak
+\begin{minted}{lua}
+{ 'one', 'two', 'three' }
+\end{minted}
+
+\noindent
+is equivalent to
+
+\begin{minted}{lua}
+{
+  [1] = 'one',
+  [2] = 'two',
+  [3] = 'three',
+}
+\end{minted}
+\end{multicols}
+
+\noindent
+All recognized data types can be used as standalone values.
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\luakeysdebug{one,2,3cm}
+\end{minted}
+\columnbreak
+\begin{minted}{lua}
+{ 'one', 2, 5594039 }
 \end{minted}
 \end{multicols}
 
@@ -597,8 +638,12 @@ An example of how to use the command in \LaTeX:
 
 \inputminted[linenos=true]{latex}{luakeys-debug.sty}
 
-\changes{v0.1}{2020/01/17}{Inital release}
-
+\changes{v0.1}{2021/01/18}{Inital release}
+\changes{v0.2}{2021/09/19}{
+* Allow all recognized data types as keys
+* Allow TeX macros in the values
+* New public Lua functions: save(identifier, result), get(identifier)
+}
 \pagebreak
 \PrintChanges
 \pagebreak
