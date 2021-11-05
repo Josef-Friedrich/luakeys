@@ -20,12 +20,12 @@ test: install
 doc: doc_pdf doc_lua
 
 doc_pdf:
-	lualatex --shell-escape documentation.tex
-	makeindex -s gglo.ist -o documentation.gls documentation.glo
-	makeindex -s gind.ist -o documentation.ind documentation.idx
-	lualatex --shell-escape documentation.tex
+	lualatex --shell-escape $(jobname)-doc.tex
+	makeindex -s gglo.ist -o $(jobname)-doc.gls $(jobname)-doc.glo
+	makeindex -s gind.ist -o $(jobname)-doc.ind $(jobname)-doc.idx
+	lualatex --shell-escape $(jobname)-doc.tex
 	mkdir -p $(texmf)/doc
-	mv documentation.pdf $(jobname).pdf
+	mv $(jobname)-doc.pdf $(jobname).pdf
 	cp $(jobname).pdf $(texmf)/doc
 
 doc_lua:
@@ -39,7 +39,7 @@ ctan: doc_pdf
 	rm -rf $(jobname)
 	mkdir $(jobname)
 	cp -f README.md $(jobname)/
-	cp -f documentation.tex $(jobname)/
+	cp -f $(jobname)-doc.tex $(jobname)/
 	cp -f $(jobname).lua $(jobname)/
 	cp -f $(jobname).sty $(jobname)/
 	cp -f $(jobname).tex $(jobname)/
