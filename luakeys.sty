@@ -1,4 +1,4 @@
-%% luakeys-debug.sty
+%% luakeys.sty
 %% Copyright 2021 Josef Friedrich
 %
 % This work may be distributed and/or modified under the
@@ -17,6 +17,5 @@
 % luakeys-debug.sty and luakeys-debug.tex.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luakeys-debug}[2021/11/05 v0.3 Debug package for luakeys.]
-
-\input luakeys-debug.tex
+\ProvidesPackage{luakeys}[2021/11/05 v0.3 Parsing key-value options using Lua.]
+\directlua{luakeys = require('luakeys')}

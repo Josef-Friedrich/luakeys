@@ -1,4 +1,4 @@
--- luakeys-debug.tex
+-- luakeys.lua
 -- Copyright 2021 Josef Friedrich
 --
 -- This work may be distributed and/or modified under the
@@ -13,8 +13,8 @@
 --
 -- The Current Maintainer of this work is Josef Friedrich.
 --
--- This work consists of the files luakeys.lua, luakeys-debug.sty
--- and luakeys-debug.tex.
+-- This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
+-- luakeys-debug.sty and luakeys-debug.tex.
 
 --- A key-value parser written with Lpeg.
 --

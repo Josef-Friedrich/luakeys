@@ -9,6 +9,8 @@ install:
 	-tlmgr uninstall --force luakeys
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
+	cp -f $(jobname).sty $(installdir)
+	cp -f $(jobname).tex $(installdir)
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
@@ -37,8 +39,10 @@ ctan: doc_pdf
 	rm -rf $(jobname)
 	mkdir $(jobname)
 	cp -f README.md $(jobname)/
-	cp -f documentation.tex $(jobname)/luakeys.tex
+	cp -f documentation.tex $(jobname)/
 	cp -f $(jobname).lua $(jobname)/
+	cp -f $(jobname).sty $(jobname)/
+	cp -f $(jobname).tex $(jobname)/
 	cp -f $(jobname).pdf $(jobname)/
 	cp -f $(jobname)-debug.tex $(jobname)/
 	cp -f $(jobname)-debug.sty $(jobname)/

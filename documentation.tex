@@ -30,7 +30,7 @@
   \url{josef@friedrich.rocks}\\%
   \href{https://github.com/Josef-Friedrich/luakeys}{github.com/Josef-Friedrich/luakeys}%
 }
-\date{v0.2 from 2021/09/19}
+\date{v0.3 from 2021/11/05}
 
 \maketitle
 
@@ -107,6 +107,16 @@ This package would not be possible without the article
 
 \section{Usage}
 
+%%
+%
+%%
+
+\subsection{Using the Lua module \texttt{luakeys.lua}}
+
+The core functionality of this package is realized in Lua. So you can
+use \texttt{luakeys} without using the wrapper \TeX{} files
+\texttt{luakeys.sty} and \texttt{luakeys.tex}.
+
 \begin{minted}{latex}
 \documentclass{article}
 \directlua{
@@ -124,6 +134,66 @@ This package would not be possible without the article
 \begin{document}
 \helloworld[greeting=hello,punctuation=!]{world}
 \end{document}
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{Using the Lua\LaTeX{} wrapper \texttt{luakeys.sty}}
+
+The supplied Lua\LaTeX{} file is quite small:
+
+\begin{minted}{latex}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luakeys}
+\directlua{luakeys = require('luakeys')}
+\end{minted}
+
+\noindent
+It loads the Lua module into the global variable \texttt{luakeys}.
+
+\begin{minted}{latex}
+\documentclass{article}
+\usepackage{luakeys}
+
+\begin{document}
+  \directlua{
+    local keys = luakeys.parse('one,two,three')
+    tex.print(keys[1])
+    tex.print(keys[2])
+    tex.print(keys[3])
+  }
+\end{document}
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{Using the plain Lua\TeX{} wrapper \texttt{luakeys.tex}}
+
+Even smaller is the file \texttt{luakeys.tex}. It consists of only one
+line:
+
+\begin{minted}{latex}
+\directlua{luakeys = require('luakeys')}
+\end{minted}
+
+\noindent
+It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
+\texttt{luakeys.lua} into the global variable \texttt{luakeys}.
+
+\begin{minted}{latex}
+\input luakeys.tex
+
+\directlua{
+  local keys = luakeys.parse('one,two,three')
+  tex.print(keys[1])
+  tex.print(keys[2])
+  tex.print(keys[3])
+}
+\bye
 \end{minted}
 
 \section{Syntax of the recognized key-value format}
@@ -643,6 +713,11 @@ An example of how to use the command in \LaTeX:
 * Allow all recognized data types as keys
 * Allow TeX macros in the values
 * New public Lua functions: save(identifier, result), get(identifier)
+}
+\changes{v0.3}{2021/11/05}{
+* Add a LuaLaTeX wrapper “luakeys.sty”
+* Add a plain LuaTeX wrapper “luakeys.tex”
+* Rename the documentation “luakeys.tex” to “documentation.tex”
 }
 \pagebreak
 \PrintChanges

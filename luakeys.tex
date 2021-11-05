@@ -1,4 +1,4 @@
-%% luakeys-debug.sty
+%% luakeys.tex
 %% Copyright 2021 Josef Friedrich
 %
 % This work may be distributed and/or modified under the
@@ -16,7 +16,4 @@
 % This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
 % luakeys-debug.sty and luakeys-debug.tex.
 
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luakeys-debug}[2021/11/05 v0.3 Debug package for luakeys.]
-
-\input luakeys-debug.tex
+\directlua{luakeys = require('luakeys')}
