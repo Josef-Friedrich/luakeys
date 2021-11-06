@@ -100,6 +100,7 @@ local function generate_parser(options)
     local integer = Range('09')^1
     local tex_number = (integer^1 * (Pattern('.') * integer^1)^0) + (Pattern('.') * integer^1)
 
+    -- 'bp' / 'BP' / 'cc' / etc.
     -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
     local unit =
       Pattern('bp') + Pattern('BP') +
@@ -154,14 +155,17 @@ local function generate_parser(options)
   return Pattern({
     'list',
 
+    -- list_item*
     list = CaptureFolding(
       CaptureTable('') * Variable('list_item')^0,
       add_to_table
     ),
 
+    -- '{' list '}'
     list_container =
       ws('{') * Variable('list') * ws('}'),
 
+    -- ( list_container / key_value_pair / value ) ','?
     list_item =
       CaptureGroup(
         Variable('list_container') +
@@ -169,9 +173,11 @@ local function generate_parser(options)
         Variable('value')
       ) * ws(',')^-1,
 
+    -- value '=' (list_container / value)
     key_value_pair =
       (Variable('value') * ws('=')) * (Variable('list_container') + Variable('value')),
 
+    -- boolean / dimension / number / string_quoted / string_unquoted
     value =
       Variable('boolean') +
       Variable('dimension') +
@@ -179,6 +185,7 @@ local function generate_parser(options)
       Variable('string_quoted') +
       Variable('string_unquoted'),
 
+    -- boolean_true / boolean_false
     boolean =
       boolean_true * CaptureConstant(true) +
       boolean_false * CaptureConstant(false),
@@ -188,6 +195,7 @@ local function generate_parser(options)
     number =
       white_space^0 * (number / tonumber) * white_space^0,
 
+    -- '"' ('\"' / !'"')* '"'
     string_quoted =
       white_space^0 * Pattern('"') *
       CaptureSimple((Pattern('\\"') + 1 - Pattern('"'))^0) *
