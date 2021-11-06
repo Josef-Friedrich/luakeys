@@ -65,10 +65,10 @@ Update copyright in:
 
 Update version in:
 
-* documentation.tex
+* luakeys-doc.tex
 * luakeys-debug.sty
 * luakeys.sty
 
-Summarize the changes in the documentation.tex as changes.
+Summarize the changes in the luakeys-doc.tex as changes.
 
 Create a new git tag `git tag -sa v0.3`. Prefix the version with “v”.
