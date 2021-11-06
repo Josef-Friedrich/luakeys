@@ -24,6 +24,7 @@ doc_pdf:
 	makeindex -s gglo.ist -o $(jobname)-doc.gls $(jobname)-doc.glo
 	makeindex -s gind.ist -o $(jobname)-doc.ind $(jobname)-doc.idx
 	lualatex --shell-escape $(jobname)-doc.tex
+	sleep 1
 	mkdir -p $(texmf)/doc
 	mv $(jobname)-doc.pdf $(jobname).pdf
 	cp $(jobname).pdf $(texmf)/doc
@@ -36,7 +37,8 @@ doc_lua_open:
 	xdg-open docs/index.html
 
 ctan: doc_pdf
-	rm -rf $(jobname)
+	rm -rf $(jobname).tar.gz
+	rm -rf $(jobname)/
 	mkdir $(jobname)
 	cp -f README.md $(jobname)/
 	cp -f $(jobname)-doc.tex $(jobname)/
