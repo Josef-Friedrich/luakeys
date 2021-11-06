@@ -155,6 +155,7 @@ local function generate_parser(options)
 
     list_item =
       lpeg.Cg(
+        lpeg.V('list_container') +
         lpeg.V('key_value_pair') +
         lpeg.V('value')
       ) * ws(',')^-1,
@@ -167,11 +168,7 @@ local function generate_parser(options)
       lpeg.V('dimension') +
       lpeg.V('number') +
       lpeg.V('string_quoted') +
-      lpeg.V('string_unquoted') +
-      lpeg.V('array'),
-
-    array =
-      ws('{') * lpeg.Ct((lpeg.V('value') * ws(',')^-1)^0) * ws('}'),
+      lpeg.V('string_unquoted'),
 
     boolean =
       boolean_true * lpeg.Cc(true) +

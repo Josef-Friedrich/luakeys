@@ -253,24 +253,24 @@ function test_fontspec()
 
   -- 17
   assertEquals(parse('Extension = .otf ,\n' .. 'UprightFont = *-Light ,\n' ..
-                       'BoldFont = *-Regular ,\n' ..
-                       'FontFace = {*-Black} ,'), {
+                       'BoldFont = *-Regular ,\n' .. 'FontFace = {*-Black} ,'),
+               {
     Extension = '.otf',
     UprightFont = '*-Light',
     BoldFont = '*-Regular',
     FontFace = '*-Black' -- ???
   })
 
---   {
---     "n",
---     "*-Black",
---     BoldFont="*-Regular",
---     Extension=".otf",
---     FontFace="k",
---     UprightFont="*-Light"
--- }
+  --   {
+  --     "n",
+  --     "*-Black",
+  --     BoldFont="*-Regular",
+  --     Extension=".otf",
+  --     FontFace="k",
+  --     UprightFont="*-Light"
+  -- }
 
--- {BoldFont="*-Regular", Extension=".otf", FontFace="k", UprightFont="*-Light"}
+  -- {BoldFont="*-Regular", Extension=".otf", FontFace="k", UprightFont="*-Light"}
 
   -- 18
   assertEquals(parse('lots and lots ,\n' .. 'and more and more ,\n' ..
@@ -301,7 +301,8 @@ function test_array()
   assertEquals(parse('t={a,b},z={{a,b},{c,d}}'),
                {t = {'a', 'b'}, z = {{'a', 'b'}, {'c', 'd'}}})
   assertEquals(parse('{one,two,tree}'), {{'one', 'two', 'tree'}})
-  -- assertEquals(parse('{one,two,tree={four}}'), {{'one', 'two', 'tree'}})
+  assertEquals(parse('{one,two,tree={four}}'), {{'one', 'two', tree = 'four'}})
+  assertEquals(parse('{{{one}}}'), {{{'one'}}})
 
 end
 
