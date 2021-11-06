@@ -49,4 +49,7 @@ ctan: doc_pdf
 	tar cvfz $(jobname).tar.gz $(jobname)
 	rm -rf $(jobname)
 
+clean:
+	git clean -fdx
+
 .PHONY: all doc_lua doc_lua_open test
