@@ -26,11 +26,20 @@
 -- * `patt1 * patt2` = `expression1 expression2`: Sequence
 -- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
 --
--- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf)
+-- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf)
 --
 -- @module luakeys
 
 local lpeg = require('lpeg')
+local Variable = lpeg.V
+local Pattern = lpeg.P
+local Set = lpeg.S
+local Range = lpeg.R
+local CaptureGroup = lpeg.Cg
+local CaptureFolding = lpeg.Cf
+local CaptureTable = lpeg.Ct
+local CaptureConstant = lpeg.Cc
+local CaptureSimple = lpeg.C
 
 if not tex then
   tex = {}
@@ -49,70 +58,70 @@ local result_store = {}
 -- @treturn userdata The parser.
 local function generate_parser(options)
   -- Optional whitespace
-  local white_space = lpeg.S(' \t\n\r')
+  local white_space = Set(' \t\n\r')
 
   --- Match literal string surrounded by whitespace
   local ws = function(match)
-    return white_space^0 * lpeg.P(match) * white_space^0
+    return white_space^0 * Pattern(match) * white_space^0
   end
 
   local boolean_true =
-    lpeg.P('true') +
-    lpeg.P('TRUE') +
-    lpeg.P('True')
+    Pattern('true') +
+    Pattern('TRUE') +
+    Pattern('True')
 
   local boolean_false =
-    lpeg.P('false') +
-    lpeg.P('FALSE') +
-    lpeg.P('False')
+    Pattern('false') +
+    Pattern('FALSE') +
+    Pattern('False')
 
-  local number = lpeg.P({'number',
+  local number = Pattern({'number',
     number =
-      lpeg.V('int') *
-      lpeg.V('frac')^-1 *
-      lpeg.V('exp')^-1,
+      Variable('int') *
+      Variable('frac')^-1 *
+      Variable('exp')^-1,
 
-    int = lpeg.V('sign')^-1 * (
-      lpeg.R('19') * lpeg.V('digits') + lpeg.V('digit')
+    int = Variable('sign')^-1 * (
+      Range('19') * Variable('digits') + Variable('digit')
     ),
 
-    sign = lpeg.S('+-'),
-    digit = lpeg.R('09'),
-    digits = lpeg.V('digit') * lpeg.V('digits') + lpeg.V('digit'),
-    frac = lpeg.P('.') * lpeg.V('digits'),
-    exp = lpeg.S('eE') * lpeg.V('sign')^-1 * lpeg.V('digits'),
+    sign = Set('+-'),
+    digit = Range('09'),
+    digits = Variable('digit') * Variable('digits') + Variable('digit'),
+    frac = Pattern('.') * Variable('digits'),
+    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
   })
 
   --- Define data type dimension.
   --
   -- @return Lpeg patterns
   local function build_dimension_pattern()
-    local sign = lpeg.S('-+')
-    local integer = lpeg.R('09')^1
-    local tex_number = (integer^1 * (lpeg.P('.') * integer^1)^0) + (lpeg.P('.') * integer^1)
+    local sign = Set('-+')
+    local integer = Range('09')^1
+    local tex_number = (integer^1 * (Pattern('.') * integer^1)^0) + (Pattern('.') * integer^1)
 
     -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
     local unit =
-      lpeg.P('bp') + lpeg.P('BP') +
-      lpeg.P('cc') + lpeg.P('CC') +
-      lpeg.P('cm') + lpeg.P('CM') +
-      lpeg.P('dd') + lpeg.P('DD') +
-      lpeg.P('em') + lpeg.P('EM') +
-      lpeg.P('ex') + lpeg.P('EX') +
-      lpeg.P('in') + lpeg.P('IN') +
-      lpeg.P('mm') + lpeg.P('MM') +
-      lpeg.P('nc') + lpeg.P('NC') +
-      lpeg.P('nd') + lpeg.P('ND') +
-      lpeg.P('pc') + lpeg.P('PC') +
-      lpeg.P('pt') + lpeg.P('PT') +
-      lpeg.P('sp') + lpeg.P('SP')
+      Pattern('bp') + Pattern('BP') +
+      Pattern('cc') + Pattern('CC') +
+      Pattern('cm') + Pattern('CM') +
+      Pattern('dd') + Pattern('DD') +
+      Pattern('em') + Pattern('EM') +
+      Pattern('ex') + Pattern('EX') +
+      Pattern('in') + Pattern('IN') +
+      Pattern('mm') + Pattern('MM') +
+      Pattern('nc') + Pattern('NC') +
+      Pattern('nd') + Pattern('ND') +
+      Pattern('pc') + Pattern('PC') +
+      Pattern('pt') + Pattern('PT') +
+      Pattern('sp') + Pattern('SP')
 
     local dimension = (sign^0 * white_space^0 * tex_number * white_space^0 * unit)
 
     if options.convert_dimensions then
       return dimension / tex.sp
     else
-      return lpeg.C(dimension)
+      return CaptureSimple(dimension)
     end
   end
 
@@ -142,37 +151,37 @@ local function generate_parser(options)
     end
   end
 
-  return lpeg.P({
+  return Pattern({
     'list',
 
-    list = lpeg.Cf(
-      lpeg.Ct('') * lpeg.V('list_item')^0,
+    list = CaptureFolding(
+      CaptureTable('') * Variable('list_item')^0,
       add_to_table
     ),
 
     list_container =
-      ws('{') * lpeg.V('list') * ws('}'),
+      ws('{') * Variable('list') * ws('}'),
 
     list_item =
-      lpeg.Cg(
-        lpeg.V('list_container') +
-        lpeg.V('key_value_pair') +
-        lpeg.V('value')
+      CaptureGroup(
+        Variable('list_container') +
+        Variable('key_value_pair') +
+        Variable('value')
       ) * ws(',')^-1,
 
     key_value_pair =
-      (lpeg.V('value') * ws('=')) * (lpeg.V('list_container') + lpeg.V('value')),
+      (Variable('value') * ws('=')) * (Variable('list_container') + Variable('value')),
 
     value =
-      lpeg.V('boolean') +
-      lpeg.V('dimension') +
-      lpeg.V('number') +
-      lpeg.V('string_quoted') +
-      lpeg.V('string_unquoted'),
+      Variable('boolean') +
+      Variable('dimension') +
+      Variable('number') +
+      Variable('string_quoted') +
+      Variable('string_unquoted'),
 
     boolean =
-      boolean_true * lpeg.Cc(true) +
-      boolean_false * lpeg.Cc(false),
+      boolean_true * CaptureConstant(true) +
+      boolean_false * CaptureConstant(false),
 
     dimension = build_dimension_pattern(),
 
@@ -180,18 +189,18 @@ local function generate_parser(options)
       white_space^0 * (number / tonumber) * white_space^0,
 
     string_quoted =
-      white_space^0 * lpeg.P('"') *
-      lpeg.C((lpeg.P('\\"') + 1 - lpeg.P('"'))^0) *
-      lpeg.P('"') * white_space^0,
+      white_space^0 * Pattern('"') *
+      CaptureSimple((Pattern('\\"') + 1 - Pattern('"'))^0) *
+      Pattern('"') * white_space^0,
 
     string_unquoted =
       white_space^0 *
-      lpeg.C(
-        lpeg.V('word_unquoted')^1 *
-        (lpeg.S(' \t')^1 * lpeg.V('word_unquoted')^1)^0) *
+      CaptureSimple(
+        Variable('word_unquoted')^1 *
+        (Set(' \t')^1 * Variable('word_unquoted')^1)^0) *
       white_space^0,
 
-    word_unquoted = (1 - white_space - lpeg.S('{},='))^1;
+    word_unquoted = (1 - white_space - Set('{},='))^1;
   })
 end
 
