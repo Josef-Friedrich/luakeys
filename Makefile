@@ -26,8 +26,7 @@ doc_pdf:
 	lualatex --shell-escape $(jobname)-doc.tex
 	sleep 1
 	mkdir -p $(texmf)/doc
-	mv $(jobname)-doc.pdf $(jobname).pdf
-	cp $(jobname).pdf $(texmf)/doc
+	cp $(jobname)-doc.pdf $(texmf)/doc
 
 doc_lua:
 	ldoc .
@@ -45,7 +44,7 @@ ctan: doc_pdf
 	cp -f $(jobname).lua $(jobname)/
 	cp -f $(jobname).sty $(jobname)/
 	cp -f $(jobname).tex $(jobname)/
-	cp -f $(jobname).pdf $(jobname)/
+	cp -f $(jobname)-doc.pdf $(jobname)/
 	cp -f $(jobname)-debug.tex $(jobname)/
 	cp -f $(jobname)-debug.sty $(jobname)/
 	tar cvfz $(jobname).tar.gz $(jobname)
