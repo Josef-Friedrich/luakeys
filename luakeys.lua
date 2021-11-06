@@ -167,13 +167,20 @@ local function generate_parser(options)
       lpeg.V('dimension') +
       lpeg.V('number') +
       lpeg.V('string_quoted') +
-      lpeg.V('string_unquoted'),
+      lpeg.V('string_unquoted') +
+      lpeg.V('array'),
+
+    array =
+      ws('{') * lpeg.Ct((lpeg.V('value') * ws(',')^-1)^0) * ws('}'),
 
     boolean =
       boolean_true * lpeg.Cc(true) +
       boolean_false * lpeg.Cc(false),
 
     dimension = build_dimension_pattern(),
+
+    number =
+      white_space^0 * (number / tonumber) * white_space^0,
 
     string_quoted =
       white_space^0 * lpeg.P('"') *
@@ -188,10 +195,6 @@ local function generate_parser(options)
       white_space^0,
 
     word_unquoted = (1 - white_space - lpeg.S('{},='))^1;
-
-    number =
-      white_space^0 * (number / tonumber) * white_space^0,
-
   })
 end
 

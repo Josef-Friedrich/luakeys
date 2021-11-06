@@ -44,14 +44,14 @@ end
 
 function test_datatypes()
   local function assert_type(value, expected_type)
-    local result = luakeys.parse('key='.. value)
+    local result = luakeys.parse('key=' .. value)
     luaunit.assert_equals(type(result.key), expected_type)
   end
 
   assert_type('1', 'number')
   assert_type(' 1 ', 'number')
-  --assert_type('1 lol', 'string')
-  --assert_type(' 1 lol ', 'string')
+  -- assert_type('1 lol', 'string')
+  -- assert_type(' 1 lol ', 'string')
   assert_type('1.1', 'number')
   assert_type('1cm', 'number')
   assert_type('-1.4cm', 'number')
@@ -86,7 +86,7 @@ end
 
 function test_datatype_dimension()
   local function assert_dimension(value)
-    local result = luakeys.parse('key='.. value)
+    local result = luakeys.parse('key=' .. value)
     luaunit.assert_equals(result.key, 1234567)
   end
 
@@ -254,12 +254,23 @@ function test_fontspec()
   -- 17
   assertEquals(parse('Extension = .otf ,\n' .. 'UprightFont = *-Light ,\n' ..
                        'BoldFont = *-Regular ,\n' ..
-                       'FontFace = {k}{n}{*-Black} ,'), {
+                       'FontFace = {*-Black} ,'), {
     Extension = '.otf',
     UprightFont = '*-Light',
     BoldFont = '*-Regular',
-    FontFace = 'k' -- ???
+    FontFace = '*-Black' -- ???
   })
+
+--   {
+--     "n",
+--     "*-Black",
+--     BoldFont="*-Regular",
+--     Extension=".otf",
+--     FontFace="k",
+--     UprightFont="*-Light"
+-- }
+
+-- {BoldFont="*-Regular", Extension=".otf", FontFace="k", UprightFont="*-Light"}
 
   -- 18
   assertEquals(parse('lots and lots ,\n' .. 'and more and more ,\n' ..
@@ -284,6 +295,13 @@ function test_function_render()
   assertEquals(luakeys.render(luakeys.parse('1cm')), '1234567,')
   assertEquals(luakeys.render(luakeys.parse('TRUE')), 'true,')
   assertEquals(luakeys.render(luakeys.parse('one,two,three')), 'one,two,three,')
+end
+
+function test_array()
+  assertEquals(parse('t={a,b},z={{a,b},{c,d}}'),
+               {t = {'a', 'b'}, z = {{'a', 'b'}, {'c', 'd'}}})
+  assertEquals(parse('{one,two,tree}'), {{'one', 'two', 'tree'}})
+  assertEquals(parse('{one,two,tree={four}}'), {{'one', 'two', 'tree'}})
 
 end
 
