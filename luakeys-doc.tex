@@ -217,11 +217,13 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
 \subsection{An (incomplete) attempt to put the syntax into the Extended Backus-Naur Form}
 
 \begin{grammar}
-<list> ::= <list-item> | <list-item> <list>
+<list> ::= \{ <list-item> \}
 
-<list-item> ::= ( <key-value-pair> | <value-without-key> ) [ `,' ]
+<list-container> ::= `{' <list> `}'
 
-<list-container> ::== `{' <list> `}'
+<list-item> ::= ( <list-container> | <key-value-pair> | <value> ) [ `,' ]
+
+<key-value-pair> ::= <value> `=' ( <list-container> | <value> )
 
 <value> ::= <boolean>
   \alt <dimension>
@@ -247,6 +249,11 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
   \alt `pt' | `PT'
   \alt `sp' | `SP'
 
+<boolean> ::= <boolean-true> | <boolean-false>
+
+<boolean-true> ::= `true' | `TRUE' | `True'
+
+<boolean-false> ::= `false' | `FALSE' | `False'
 \end{grammar}
 
 ... to be continued

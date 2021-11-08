@@ -65,15 +65,13 @@ local function generate_parser(options)
     return white_space^0 * Pattern(match) * white_space^0
   end
 
-  local boolean_true =
-    Pattern('true') +
-    Pattern('TRUE') +
-    Pattern('True')
-
-  local boolean_false =
-    Pattern('false') +
-    Pattern('FALSE') +
-    Pattern('False')
+  local capture_dimension = function (input)
+    if options.convert_dimensions then
+      return tex.sp(input)
+    else
+      return CaptureSimple(input)
+    end
+  end
 
   local number = Pattern({'number',
     number =
@@ -91,40 +89,6 @@ local function generate_parser(options)
     frac = Pattern('.') * Variable('digits'),
     exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
   })
-
-  --- Define data type dimension.
-  --
-  -- @return Lpeg patterns
-  local function build_dimension_pattern()
-    local sign = Set('-+')
-    local integer = Range('09')^1
-    local tex_number = (integer^1 * (Pattern('.') * integer^1)^0) + (Pattern('.') * integer^1)
-
-    -- 'bp' / 'BP' / 'cc' / etc.
-    -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
-    local unit =
-      Pattern('bp') + Pattern('BP') +
-      Pattern('cc') + Pattern('CC') +
-      Pattern('cm') + Pattern('CM') +
-      Pattern('dd') + Pattern('DD') +
-      Pattern('em') + Pattern('EM') +
-      Pattern('ex') + Pattern('EX') +
-      Pattern('in') + Pattern('IN') +
-      Pattern('mm') + Pattern('MM') +
-      Pattern('nc') + Pattern('NC') +
-      Pattern('nd') + Pattern('ND') +
-      Pattern('pc') + Pattern('PC') +
-      Pattern('pt') + Pattern('PT') +
-      Pattern('sp') + Pattern('SP')
-
-    local dimension = (sign^0 * white_space^0 * tex_number * white_space^0 * unit)
-
-    if options.convert_dimensions then
-      return dimension / tex.sp
-    else
-      return CaptureSimple(dimension)
-    end
-  end
 
   --- Add values to a table in two modes:
   --
@@ -187,10 +151,45 @@ local function generate_parser(options)
 
     -- boolean_true / boolean_false
     boolean =
-      boolean_true * CaptureConstant(true) +
-      boolean_false * CaptureConstant(false),
+      Variable('boolean_true') * CaptureConstant(true) +
+      Variable('boolean_false') * CaptureConstant(false),
 
-    dimension = build_dimension_pattern(),
+    boolean_true =
+      Pattern('true') +
+      Pattern('TRUE') +
+      Pattern('True'),
+
+    boolean_false =
+      Pattern('false') +
+      Pattern('FALSE') +
+      Pattern('False'),
+
+    sign = Set('-+'),
+
+    integer = Range('09')^1,
+
+    tex_number =
+      (Variable('integer')^1 * (Pattern('.') * Variable('integer')^1)^0) +
+      (Pattern('.') * Variable('integer')^1),
+
+    -- 'bp' / 'BP' / 'cc' / etc.
+    -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+    unit =
+      Pattern('bp') + Pattern('BP') +
+      Pattern('cc') + Pattern('CC') +
+      Pattern('cm') + Pattern('CM') +
+      Pattern('dd') + Pattern('DD') +
+      Pattern('em') + Pattern('EM') +
+      Pattern('ex') + Pattern('EX') +
+      Pattern('in') + Pattern('IN') +
+      Pattern('mm') + Pattern('MM') +
+      Pattern('nc') + Pattern('NC') +
+      Pattern('nd') + Pattern('ND') +
+      Pattern('pc') + Pattern('PC') +
+      Pattern('pt') + Pattern('PT') +
+      Pattern('sp') + Pattern('SP'),
+
+    dimension = (Variable('sign')^0 * white_space^0 * Variable('tex_number') * white_space^0 * Variable('unit')) / capture_dimension,
 
     number =
       white_space^0 * (number / tonumber) * white_space^0,
