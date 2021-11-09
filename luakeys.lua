@@ -73,23 +73,6 @@ local function generate_parser(options)
     end
   end
 
-  local number = Pattern({'number',
-    number =
-      Variable('int') *
-      Variable('frac')^-1 *
-      Variable('exp')^-1,
-
-    int = Variable('sign')^-1 * (
-      Range('19') * Variable('digits') + Variable('digit')
-    ),
-
-    sign = Set('+-'),
-    digit = Range('09'),
-    digits = Variable('digit') * Variable('digits') + Variable('digit'),
-    frac = Pattern('.') * Variable('digits'),
-    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
-  })
-
   --- Add values to a table in two modes:
   --
   -- # Key value pair
@@ -192,7 +175,21 @@ local function generate_parser(options)
     dimension = (Variable('sign')^0 * white_space^0 * Variable('tex_number') * white_space^0 * Variable('unit')) / capture_dimension,
 
     number =
-      white_space^0 * (number / tonumber) * white_space^0,
+      white_space^0 * (Variable('lua_number') / tonumber) * white_space^0,
+
+    lua_number =
+      Variable('int') *
+      Variable('frac')^-1 *
+      Variable('exp')^-1,
+
+    int = Variable('sign')^-1 * (
+      Range('19') * Variable('digits') + Variable('digit')
+    ),
+
+    digit = Range('09'),
+    digits = Variable('digit') * Variable('digits') + Variable('digit'),
+    frac = Pattern('.') * Variable('digits'),
+    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
 
     -- '"' ('\"' / !'"')* '"'
     string_quoted =
