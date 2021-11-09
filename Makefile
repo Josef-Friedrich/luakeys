@@ -15,7 +15,9 @@ install:
 	cp -f $(jobname)-debug.sty $(installdir)
 
 test: install
+	lua5.3 test/data-types.lua
 	lua5.3 test/tests.lua
+	busted -o TAP test/busted.lua
 
 doc: doc_pdf doc_lua
 

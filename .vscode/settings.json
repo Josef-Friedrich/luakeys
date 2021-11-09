@@ -145,5 +145,9 @@
     "**/*.sta": true,
     "**/*.lpz": true,
     "**/*.pdf": true
-  }
+  },
+  "Lua.diagnostics.globals": [
+    "describe",
+    "it"
+  ]
 }
