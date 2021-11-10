@@ -17,7 +17,7 @@ install:
 test: install
 	lua5.3 test/data-types.lua
 	lua5.3 test/tests.lua
-	busted -o TAP test/busted.lua
+	busted --exclude-tags=skip test/*_busted.lua
 
 doc: doc_pdf doc_lua
 
