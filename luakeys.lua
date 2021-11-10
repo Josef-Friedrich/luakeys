@@ -134,8 +134,10 @@ local function generate_parser(options)
 
     -- boolean_true / boolean_false
     boolean =
-      Variable('boolean_true') * CaptureConstant(true) +
-      Variable('boolean_false') * CaptureConstant(false),
+      (
+        Variable('boolean_true') * CaptureConstant(true) +
+        Variable('boolean_false') * CaptureConstant(false)
+      ) * -Variable('string_unquoted'),
 
     boolean_true =
       Pattern('true') +

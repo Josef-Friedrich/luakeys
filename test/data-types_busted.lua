@@ -79,8 +79,20 @@ describe('Boolean', function()
     assert_value('1', 1)
   end)
 
-  it('Not a boolean: truee #skip', function()
+  it('Not a boolean: truee', function()
     assert_value('truee', 'truee')
+  end)
+
+  it('Not a boolean: true e', function()
+    assert_value('true e', 'true e')
+  end)
+
+  it('Not a boolean: falsee', function()
+    assert_value('falsee', 'falsee')
+  end)
+
+  it('Not a boolean: false e', function()
+    assert_value('false e', 'false e')
   end)
 end)
 
