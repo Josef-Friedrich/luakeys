@@ -122,7 +122,12 @@ local function generate_parser(options)
 
     -- value '=' (list_container / value)
     key_value_pair =
-      (Variable('value') * ws('=')) * (Variable('list_container') + Variable('value')),
+      (Variable('key') * ws('=')) * (Variable('list_container') + Variable('value')),
+
+    key =
+      Variable('number') +
+      Variable('string_quoted') +
+      Variable('string_unquoted'),
 
     -- boolean / dimension / number / string_quoted / string_unquoted
     value =

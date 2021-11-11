@@ -15,8 +15,8 @@ install:
 	cp -f $(jobname)-debug.sty $(installdir)
 
 test: install
-	lua5.3 test/tests.lua
-	busted --exclude-tags=skip test/*_busted.lua
+	lua5.3 test/lua/tests.lua
+	busted --exclude-tags=skip test/lua/*_busted.lua
 
 doc: doc_pdf doc_lua
 

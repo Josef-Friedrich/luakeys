@@ -56,15 +56,6 @@ function test_edge_cases()
   assertEquals(parse(', '), {})
 end
 
-function test_keys()
-  assertEquals(parse('umlaute öäü=1'), {["umlaute öäü"] = 1})
-  assertEquals(parse('2=2'), {[2] = 2})
-  assertEquals(parse('1=a,b'), {'a', 'b'})
-  assertEquals(parse('under_score=1'), {["under_score"] = 1})
-  assertEquals(parse('true=true'), {[true] = true})
-
-end
-
 function test_duplicate_keys()
   assertEquals(parse('integer=1,integer=2'), {integer = 2})
   assertEquals(parse('integer=1 , integer=2'), {integer = 2})
