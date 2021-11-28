@@ -154,9 +154,14 @@ local function generate_parser(options)
       Pattern('FALSE') +
       Pattern('False'),
 
-    sign = Set('-+'),
+    dimension = (
+      Variable('sign')^0 * white_space^0 *
+      Variable('tex_number') * white_space^0 *
+      Variable('unit')
+    ) / capture_dimension,
 
-    integer = Range('09')^1,
+    number =
+      white_space^0 * (Variable('lua_number') / tonumber) * white_space^0,
 
     tex_number =
       (Variable('integer')^1 * (Pattern('.') * Variable('integer')^1)^0) +
@@ -179,24 +184,19 @@ local function generate_parser(options)
       Pattern('pt') + Pattern('PT') +
       Pattern('sp') + Pattern('SP'),
 
-    dimension = (Variable('sign')^0 * white_space^0 * Variable('tex_number') * white_space^0 * Variable('unit')) / capture_dimension,
-
-    number =
-      white_space^0 * (Variable('lua_number') / tonumber) * white_space^0,
-
     lua_number =
       Variable('int') *
       Variable('frac')^-1 *
       Variable('exp')^-1,
 
     int = Variable('sign')^-1 * (
-      Range('19') * Variable('digits') + Variable('digit')
+      Range('19') * Variable('integer') + Variable('integer')
     ),
 
-    digit = Range('09'),
-    digits = Variable('digit') * Variable('digits') + Variable('digit'),
-    frac = Pattern('.') * Variable('digits'),
-    exp = Set('eE') * Variable('sign')^-1 * Variable('digits'),
+    frac = Pattern('.') * Variable('integer'),
+    exp = Set('eE') * Variable('sign')^-1 * Variable('integer'),
+    sign = Set('-+'),
+    integer = Range('09')^1,
 
     -- '"' ('\"' / !'"')* '"'
     string_quoted =

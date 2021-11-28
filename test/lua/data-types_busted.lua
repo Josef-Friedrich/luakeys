@@ -33,6 +33,18 @@ describe('Lua number', function()
     assert_value('11e-02', 11e-02)
   end)
 
+  it('11e02', function()
+    assert_value('11e02', 11e02)
+  end)
+
+  it('11e02 -> 1100', function()
+    assert_value('11e02', 1100)
+  end)
+
+  it('11 e 2 #skip', function()
+    assert_value('11 e 2', '11 e 2')
+  end)
+
   it('-11e-02', function()
     assert_value('-11e-02', -0.11)
   end)
