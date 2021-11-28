@@ -79,49 +79,6 @@ function test_only_values()
 
 end
 
-function test_tikz()
-  -- tikz manual page 330
-  assertEquals(parse('matrix of math nodes,\n' ..
-                       'column sep={2cm,between origins},\n' ..
-                       'row sep={3cm,between origins},\n' ..
-                       'nodes={circle, draw, minimum size=7.5mm}'), {
-    'matrix of math nodes',
-    ['column sep'] = {1234567, 'between origins'},
-    nodes = {'circle', 'draw', ['minimum size'] = 1234567},
-    ['row sep'] = {1234567, 'between origins'}
-  })
-
-  -- page 241
-  assertEquals(parse('every node/.style=draw'), {['every node/.style'] = 'draw'})
-
-  -- page 237
-  assertEquals(luakeys.parse(
-                 'fill=yellow!80!black,text width=3cm,align=flush center'), {
-    align = 'flush center',
-    fill = 'yellow!80!black',
-    ['text width'] = 1234567
-  })
-
-end
-
-function test_hyperref()
-  -- manual page 6
-  assertEquals(parse('pdfborder={0 0 0}'), {pdfborder = {0, 0, 0}})
-
-  assertEquals(parse('backref,\npdfpagemode=FullScreen,\ncolorlinks=true'),
-               {'backref', colorlinks = true, pdfpagemode = 'FullScreen'})
-
-  assertEquals(parse('backref,\npdfpagemode=FullScreen,\ncolorlinks=true'),
-               {'backref', colorlinks = true, pdfpagemode = 'FullScreen'})
-
-  -- page 15
-  assertEquals(parse(
-                 'pdfinfo={\nTitle={My Title},\nSubject={My Subject},\nNewKey={Foobar},\n}'),
-               {
-    pdfinfo = {NewKey = 'Foobar', Subject = 'My Subject', Title = 'My Title'}
-  })
-end
-
 function test_geometry()
   -- manual page 17
   assertEquals(parse('a5paper, landscape, twocolumn, twoside,\n' ..
