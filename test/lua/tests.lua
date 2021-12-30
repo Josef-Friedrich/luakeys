@@ -113,51 +113,6 @@ function test_geometry()
 
 end
 
-function test_fontspec()
-  -- manual page 11
-  assertEquals(parse('Extension = .ttf ,\n' .. 'UprightFont = CharisSILR,\n' ..
-                       'BoldFont = CharisSILB,\n' ..
-                       'ItalicFont = CharisSILI,\n' ..
-                       'BoldItalicFont = CharisSILBI,\n' ..
-                       '% <any other desired options>\n'), {
-    '% <any other desired options>', -- ???
-    BoldFont = 'CharisSILB',
-    BoldItalicFont = 'CharisSILBI',
-    Extension = '.ttf',
-    ItalicFont = 'CharisSILI',
-    UprightFont = 'CharisSILR'
-  })
-
-  -- 17
-  assertEquals(parse('Extension = .otf ,\n' .. 'UprightFont = *-Light ,\n' ..
-                       'BoldFont = *-Regular ,\n' .. 'FontFace = {*-Black} ,'),
-               {
-    Extension = '.otf',
-    UprightFont = '*-Light',
-    BoldFont = '*-Regular',
-    FontFace = '*-Black' -- ???
-  })
-
-  --   {
-  --     "n",
-  --     "*-Black",
-  --     BoldFont="*-Regular",
-  --     Extension=".otf",
-  --     FontFace="k",
-  --     UprightFont="*-Light"
-  -- }
-
-  -- {BoldFont="*-Regular", Extension=".otf", FontFace="k", UprightFont="*-Light"}
-
-  -- 18
-  assertEquals(parse('lots and lots ,\n' .. 'and more and more ,\n' ..
-                       'an excessive number really ,\n' ..
-                       'of font features could go here\n'), {
-    'lots and lots', 'and more and more', 'an excessive number really',
-    'of font features could go here'
-  })
-end
-
 function test_function_stringify()
   luakeys.print(luakeys.parse(example))
 end
