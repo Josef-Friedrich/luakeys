@@ -329,13 +329,21 @@ local function stringify(input, for_tex)
       table.insert(output, string.rep(indent, depth) .. text)
     end
 
+    local function format_key(key)
+      if (type(key) == 'number') then
+        return string.format('[%s]', key);
+      else
+        return string.format('[\'%s\']', key);
+      end
+    end
+
     if type(input) ~= 'table' then
       return tostring(input)
     end
 
     for key, value in pairs(input) do
       if (key and type(key) == 'number' or type(key) == 'string') then
-        key = string.format('[\'%s\']', key);
+        key = format_key(key)
 
         if (type(value) == 'table') then
           if (next(value)) then
