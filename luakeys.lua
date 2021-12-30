@@ -211,7 +211,7 @@ local function generate_parser(options)
         (Set(' \t')^1 * Variable('word_unquoted')^1)^0) *
       white_space^0,
 
-    word_unquoted = (1 - white_space - Set('{},='))^1;
+    word_unquoted = (1 - white_space - Set('{},='))^1
   })
 end
 
@@ -323,7 +323,7 @@ local function stringify(input, for_tex)
 
   local function stringify_inner(input, depth)
     local output = {}
-    depth = depth or 0;
+    depth = depth or 0
 
     local function add(depth, text)
       table.insert(output, string.rep(indent, depth) .. text)
@@ -331,9 +331,9 @@ local function stringify(input, for_tex)
 
     local function format_key(key)
       if (type(key) == 'number') then
-        return string.format('[%s]', key);
+        return string.format('[%s]', key)
       else
-        return string.format('[\'%s\']', key);
+        return string.format('[\'%s\']', key)
       end
     end
 
@@ -347,20 +347,20 @@ local function stringify(input, for_tex)
 
         if (type(value) == 'table') then
           if (next(value)) then
-            add(depth, key .. ' = ' .. start_bracket);
-            add(0, stringify_inner(value, depth + 1, for_tex));
+            add(depth, key .. ' = ' .. start_bracket)
+            add(0, stringify_inner(value, depth + 1))
             add(depth, end_bracket .. ',');
           else
-            add(depth, key .. ' = ' .. start_bracket .. end_bracket .. ',');
+            add(depth, key .. ' = ' .. start_bracket .. end_bracket .. ',')
           end
         else
           if (type(value) == 'string') then
-            value = string.format('\'%s\'', value);
+            value = string.format('\'%s\'', value)
           else
-            value = tostring(value);
+            value = tostring(value)
           end
 
-          add(depth, key .. ' = ' .. value .. ',');
+          add(depth, key .. ' = ' .. value .. ',')
         end
       end
     end
@@ -485,14 +485,14 @@ return {
         if (key and type(key) == 'string') then
           if (type(value) == 'table') then
             if (next(value)) then
-              add(key .. '={');
-              add(render_inner(value));
-              add('},');
+              add(key .. '={')
+              add(render_inner(value))
+              add('},')
             else
-              add(key .. '={},');
+              add(key .. '={},')
             end
           else
-            add(key .. '=' .. tostring(value) .. ',');
+            add(key .. '=' .. tostring(value) .. ',')
           end
         else
           add(tostring(value) .. ',')
