@@ -120,10 +120,11 @@ local function generate_parser(options)
         Variable('value')
       ) * ws(',')^-1,
 
-    -- value '=' (list_container / value)
+    -- key '=' (list_container / value)
     key_value_pair =
       (Variable('key') * ws('=')) * (Variable('list_container') + Variable('value')),
 
+    -- number / string_quoted / string_unquoted
     key =
       Variable('number') +
       Variable('string_quoted') +
