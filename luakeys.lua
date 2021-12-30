@@ -129,12 +129,13 @@ local function generate_parser(options)
       Variable('string_quoted') +
       Variable('string_unquoted'),
 
-    -- boolean / dimension / number / string_quoted / string_unquoted
+    -- boolean !value / dimension !value / number !value / string_quoted !value / string_unquoted
+    -- !value -> Not-predicate -> * -Variable('value')
     value =
-      Variable('boolean') +
-      Variable('dimension') +
-      Variable('number') +
-      Variable('string_quoted') +
+      Variable('boolean') * -Variable('value') +
+      Variable('dimension') * -Variable('value') +
+      Variable('number') * -Variable('value')  +
+      Variable('string_quoted') * -Variable('value') +
       Variable('string_unquoted'),
 
     -- boolean_true / boolean_false
@@ -142,7 +143,7 @@ local function generate_parser(options)
       (
         Variable('boolean_true') * CaptureConstant(true) +
         Variable('boolean_false') * CaptureConstant(false)
-      ) * -Variable('string_unquoted'),
+      ),
 
     boolean_true =
       Pattern('true') +
@@ -161,7 +162,7 @@ local function generate_parser(options)
     ) / capture_dimension,
 
     number =
-      white_space^0 * (Variable('lua_number') / tonumber) * white_space^0,
+      (white_space^0 * (Variable('lua_number') / tonumber) * white_space^0) ,
 
     tex_number =
       (Variable('integer')^1 * (Pattern('.') * Variable('integer')^1)^0) +

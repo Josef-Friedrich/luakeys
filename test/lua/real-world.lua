@@ -11,7 +11,7 @@ end
 describe('Real world examples', function()
   describe('hyperref', function()
     it('Manual page 6: pdfborder={0 0 0}', function()
-      assert_deep_equals('pdfborder={0 0 0}', {pdfborder = {0, 0, 0}})
+      assert_deep_equals('pdfborder={0 0 0}', {pdfborder = '0 0 0'})
     end)
 
     it('Manual page 6: backref...', function()
@@ -103,7 +103,7 @@ describe('Real world examples', function()
   end)
 
   describe('geometry', function()
-    it('Manual page 16 #skip', function()
+    it('Manual page 16', function()
       assert_deep_equals(
         'hdivide={*,0.9\\paperwidth,*}, vdivide={*,0.9\\paperheight,*}', {
           hdivide = {'*', '0.9\\paperwidth', '*'}, -- < ?
@@ -111,7 +111,7 @@ describe('Real world examples', function()
         })
     end)
 
-    it('Manual page 17 #skip', function()
+    it('Manual page 17', function()
       assert_deep_equals('a5paper, landscape, twocolumn, twoside,\n' ..
                            'left=2cm, hmarginratio=2:1, includemp, marginparwidth=43pt,\n' ..
                            'bottom=1cm, foot=.7cm, includefoot, textheight=11cm, heightrounded,\n' ..
@@ -134,7 +134,5 @@ describe('Real world examples', function()
         'verbose'
       })
     end)
-
   end)
-
 end)
