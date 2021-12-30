@@ -102,4 +102,39 @@ describe('Real world examples', function()
 
   end)
 
+  describe('geometry', function()
+    it('Manual page 16 #skip', function()
+      assert_deep_equals(
+        'hdivide={*,0.9\\paperwidth,*}, vdivide={*,0.9\\paperheight,*}', {
+          hdivide = {'*', '0.9\\paperwidth', '*'}, -- < ?
+          vdivide = {'*', '0.9\\paperheight', '*'} -- < ?
+        })
+    end)
+
+    it('Manual page 17 #skip', function()
+      assert_deep_equals('a5paper, landscape, twocolumn, twoside,\n' ..
+                           'left=2cm, hmarginratio=2:1, includemp, marginparwidth=43pt,\n' ..
+                           'bottom=1cm, foot=.7cm, includefoot, textheight=11cm, heightrounded,\n' ..
+                           'columnsep=1cm, dvips, verbose', {
+        'a5paper',
+        'landscape',
+        'twocolumn',
+        'twoside',
+        left = 1234567,
+        hmarginratio = '2:1', -- < ?
+        'includemp',
+        marginparwidth = 1234567,
+        bottom = 1234567,
+        foot = 1234567,
+        'includefoot',
+        textheight = 1234567,
+        'heightrounded',
+        columnsep = 1234567,
+        'dvips',
+        'verbose'
+      })
+    end)
+
+  end)
+
 end)
