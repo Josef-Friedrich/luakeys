@@ -41,8 +41,8 @@ make install
 ### Testing
 
 ```
-luarocks install luaunit
-lua test/tests.lua
+luarocks install busted
+busted --exclude-tags=skip test/lua/*.lua
 ```
 
 or
