@@ -371,8 +371,11 @@ local function stringify(input, for_tex)
   return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
 end
 
---- For the LaTeX version of the macro
+--- All option keys can be written with underscores or with spaces as
+-- separators.
+-- For the LaTeX version of the macro
 --  `\luakeysdebug[options]{kv-string}`.
+-- TODO Make the function more generic, adaptable for more options
 --
 -- @tparam table options_raw Options in a raw format. The table may be
 -- empty or some keys are not set.
@@ -384,12 +387,20 @@ local function normalize_parse_options (options_raw)
   end
   local options = {}
 
-  if options_raw['unpack single array values'] ~= nil then
+  if options_raw['unpack single array values'] ~= nil and options_raw['unpack_single_array_values'] == nil then
     options['unpack_single_array_values'] = options_raw['unpack single array values']
   end
 
-  if options_raw['convert dimensions'] ~= nil then
+  if options_raw['unpack_single_array_values'] ~= nil and options_raw['unpack single array values'] == nil then
+    options['unpack_single_array_values'] = options_raw['unpack_single_array_values']
+  end
+
+  if options_raw['convert dimensions'] ~= nil and options_raw['convert_dimensions'] == nil  then
     options['convert_dimensions'] = options_raw['convert dimensions']
+  end
+
+  if options_raw['convert_dimensions'] ~= nil and options_raw['convert dimensions'] == nil  then
+    options['convert_dimensions'] = options_raw['convert_dimensions']
   end
 
   if options.convert_dimensions == nil then

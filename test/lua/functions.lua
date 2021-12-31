@@ -57,6 +57,17 @@ describe('Function parse()', function()
   end
 
   describe('Options', function()
+
+    it('with spaces', function ()
+      assert.are.same({'1cm'},
+      luakeys.parse('1cm', {['convert dimensions'] = false}))
+    end)
+
+    it('with underscores', function ()
+      assert.are.same({'1cm'},
+      luakeys.parse('1cm', {['convert_dimensions'] = false}))
+    end)
+
     describe('convert dimensions', function()
       it('true', function()
         assert.are.same({1234567},
