@@ -69,7 +69,7 @@ local function generate_parser(options)
     if options.convert_dimensions then
       return tex.sp(input)
     else
-      return CaptureSimple(input)
+      return input
     end
   end
 

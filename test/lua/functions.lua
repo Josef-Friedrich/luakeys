@@ -56,6 +56,20 @@ describe('Function parse()', function()
     assert.are.same(expected, luakeys.parse(input))
   end
 
+  describe('Options', function()
+    describe('convert dimensions', function()
+      it('true', function()
+        assert.are.same({1234567},
+                        luakeys.parse('1cm', {['convert dimensions'] = true}))
+      end)
+
+      it('false', function()
+        assert.are.same({'1cm'},
+                        luakeys.parse('1cm', {['convert dimensions'] = false}))
+      end)
+    end)
+  end)
+
   describe('Whitespaces', function()
     it('No whitepsaces', function()
       assert_parse('integer=1', {integer = 1})
