@@ -720,6 +720,12 @@ An example of how to use the command in \LaTeX:
 * Add a plain LuaTeX wrapper “luakeys.tex”
 * Rename the previous documentation file “luakeys.tex” to luakeys-doc.tex”
 }
+\changes{v0.4}{2021/12/31}{
+* Parser: Add support for nested tables (for example {{'a', 'b'}})
+* Parser: Allow only strings and numbers as keys
+* Parser: Remove support from Lua numbers with exponents (for example '5e+20')
+* Switch the Lua testing framework to busted
+}
 \pagebreak
 \PrintChanges
 \pagebreak
