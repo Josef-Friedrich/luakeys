@@ -14,7 +14,7 @@ mechanism should be pretty robust.
 
 ## License
 
-Copyright 2021 Josef Friedrich
+Copyright 2021-2022 Josef Friedrich
 
 This work may be distributed and/or modified under the
 conditions of the LaTeX Project Public License, either version 1.3c
@@ -53,6 +53,12 @@ make test
 
 ### Release a new version
 
+Update version in:
+
+* luakeys-doc.tex
+* luakeys-debug.sty
+* luakeys.sty
+
 Update copyright in:
 
 * LICENSE
@@ -62,12 +68,6 @@ Update copyright in:
 * luakeys.sty
 * luakeys.tex
 * README.md
-
-Update version in:
-
-* luakeys-doc.tex
-* luakeys-debug.sty
-* luakeys.sty
 
 Summarize the changes in the luakeys-doc.tex as changes.
 
