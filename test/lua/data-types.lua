@@ -28,34 +28,6 @@ describe('Lua number', function()
   it('Floating point number with a plus sign: +1.1', function()
     assert_value('+1.1', 1.1)
   end)
-
-  it('11e-02', function()
-    assert_value('11e-02', 11e-02)
-  end)
-
-  it('11e02', function()
-    assert_value('11e02', 11e02)
-  end)
-
-  it('11e02 -> 1100', function()
-    assert_value('11e02', 1100)
-  end)
-
-  it('11 e 2', function()
-    assert_value('11 e 2', '11 e 2')
-  end)
-
-  it('-11e-02', function()
-    assert_value('-11e-02', -0.11)
-  end)
-
-  it('+11e-02', function()
-    assert_value('+11e-02', 0.11)
-  end)
-
-  it('+ 11e-02', function()
-    assert_value('+11e-02', 0.11)
-  end)
 end)
 
 describe('Boolean', function()

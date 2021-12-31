@@ -36,11 +36,11 @@
 
 \vfill
 
-%\luakeysdebug{level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}}
+%level1={level2={level3={dim=1cm,bool=true,num=-0.001,str=lua}}}
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
-local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-1e-03,str=lua}}}')
+local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-0.001,str=lua}}}')
 luakeys.print(kv)
 \end{minted}
 
@@ -306,20 +306,14 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 \luakeysdebug{
   num1 = 4,
   num2 = -4,
-  num3 = 0.4,
-  num4 = 4.57e-3,
-  num5 = 0.3e12,
-  num6 = 5e+20
+  num3 = 0.4
 }
 \end{minted}
 \begin{minted}{lua}
 {
   ['num1'] = 4,
   ['num2'] = -4,
-  ['num3'] = 0.4,
-  ['num4'] = 0.00457,
-  ['num5'] = 300000000000.0,
-  ['num6'] = 5e+20
+  ['num3'] = 0.4
 }
 \end{minted}
 \end{multicols}

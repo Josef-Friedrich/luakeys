@@ -188,15 +188,13 @@ local function generate_parser(options)
 
     lua_number =
       Variable('int') *
-      Variable('frac')^-1 *
-      Variable('exp')^-1,
+      Variable('frac')^-1,
 
     int = Variable('sign')^-1 * (
       Range('19') * Variable('integer') + Variable('integer')
     ),
 
     frac = Pattern('.') * Variable('integer'),
-    exp = Set('eE') * Variable('sign')^-1 * Variable('integer'),
     sign = Set('-+'),
     integer = Range('09')^1,
 
