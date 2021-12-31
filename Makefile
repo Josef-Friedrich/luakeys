@@ -14,8 +14,17 @@ install:
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
-test: install
+test: install test_lua test_tex
+
+test_lua:
 	busted --exclude-tags=skip test/lua/*.lua
+
+test_tex: test_tex_plain test_tex_latex
+
+test_tex_plain:
+	find test/tex/plain -iname "*.tex" -exec luatex --output-dir=test/tex/plain {} \;
+test_tex_latex:
+	find test/tex/latex -iname "*.tex" -exec lualatex --output-dir=test/tex/latex {} \;
 
 doc: doc_pdf doc_lua
 
@@ -53,4 +62,4 @@ ctan: doc_pdf
 clean:
 	git clean -fdx
 
-.PHONY: all doc_lua doc_lua_open test
+.PHONY: all doc_lua doc_lua_open test test_lua test_tex test_tex_plain test_text_latex
