@@ -2,7 +2,7 @@ require 'busted.runner'()
 
 local luakeys = require('luakeys')
 
-describe('Function stringify', function()
+describe('Function “stringify()”', function()
   local function assert_equals(input, expected)
     assert.are.equal(expected, luakeys.stringify(input))
   end
@@ -25,7 +25,7 @@ describe('Function stringify', function()
   end)
 end)
 
-describe('Function render', function()
+describe('Function “render()”', function()
   local function assert_render(input, expected)
     assert.are.equal(expected, luakeys.render(luakeys.parse(input)))
   end
@@ -51,21 +51,21 @@ describe('Function render', function()
   end)
 end)
 
-describe('Function parse()', function()
+describe('Function “parse()”', function()
   local function assert_parse(input, expected)
     assert.are.same(expected, luakeys.parse(input))
   end
 
   describe('Options', function()
 
-    it('with spaces', function ()
+    it('with spaces', function()
       assert.are.same({'1cm'},
-      luakeys.parse('1cm', {['convert dimensions'] = false}))
+                      luakeys.parse('1cm', {['convert dimensions'] = false}))
     end)
 
-    it('with underscores', function ()
+    it('with underscores', function()
       assert.are.same({'1cm'},
-      luakeys.parse('1cm', {['convert_dimensions'] = false}))
+                      luakeys.parse('1cm', {['convert_dimensions'] = false}))
     end)
 
     describe('convert dimensions', function()
@@ -210,5 +210,18 @@ describe('Function parse()', function()
     it('Only string values', function()
       assert_parse('one,two,three', {'one', 'two', 'three'})
     end)
+  end)
+end)
+
+describe('Functions “save()” and “get()”', function()
+  it('Save and get with an existent identifier', function()
+    luakeys.save('test123', 'Some value')
+    assert.is.equal(luakeys.get('test123'), 'Some value')
+  end)
+
+  it('Throws error', function()
+    assert.has_error(function()
+      luakeys.get('xxx')
+    end, 'No stored result was found for the identifier \'xxx\'')
   end)
 end)

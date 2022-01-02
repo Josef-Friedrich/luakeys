@@ -53,6 +53,14 @@ end
 --- A table to store parsed key-value results.
 local result_store = {}
 
+local function throw_error(message)
+  if type(tex.error) == 'function' then
+    tex.error(message)
+  else
+    error(message)
+  end
+end
+
 --- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser.
@@ -414,7 +422,7 @@ local function normalize_parse_options (options_raw)
   return options
 end
 
-return {
+local export = {
   stringify = stringify,
 
   --- Parse a LaTeX/TeX style key-value string into a Lua table. With
@@ -546,7 +554,18 @@ return {
   -- @tparam string identifier The identifier under which the result was
   --   saved.
   get = function(identifier)
+    if result_store[identifier] == nil then
+      throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
+    end
     return result_store[identifier]
   end,
 
 }
+
+-- http://olivinelabs.com/busted/#private
+if _TEST then
+  export.normalize_parse_options = normalize_parse_options
+  export.unpack_single_valued_array_table = unpack_single_valued_array_table
+end
+
+return export

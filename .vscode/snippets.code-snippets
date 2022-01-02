@@ -1,0 +1,20 @@
+{
+	"busted describe()": {
+		"scope": "lua",
+		"prefix": "describe",
+		"body": [
+			"describe('$1', function () ",
+			"  $2",
+			"end)"
+		]
+	},
+	"busted it()": {
+		"scope": "lua",
+		"prefix": "it",
+		"body": [
+			"it('$1', function () ",
+			"  $2",
+			"end)"
+		]
+	}
+}
