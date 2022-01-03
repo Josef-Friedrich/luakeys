@@ -57,6 +57,14 @@ describe('Function “parse()”', function()
   end
 
   describe('Options', function()
+    it('Change default options', function()
+      local defaults = luakeys.default_options
+      assert.are.same({1234567}, luakeys.parse('1cm'))
+      defaults.convert_dimensions = false
+      assert.are.same({'1cm'}, luakeys.parse('1cm'))
+      -- Restore
+      defaults.convert_dimensions = true
+    end)
 
     it('with spaces', function()
       assert.are.same({'1cm'},
@@ -65,7 +73,7 @@ describe('Function “parse()”', function()
 
     it('with underscores', function()
       assert.are.same({'1cm'},
-                      luakeys.parse('1cm', {['convert_dimensions'] = false}))
+                      luakeys.parse('1cm', {convert_dimensions = false}))
     end)
 
     describe('convert dimensions', function()
@@ -219,7 +227,7 @@ describe('Functions “save()” and “get()”', function()
     assert.is.equal(luakeys.get('test123'), 'Some value')
   end)
 
-  it('Throws error', function()
+  it('Throws error #skip', function()
     assert.has_error(function()
       luakeys.get('xxx')
     end, 'No stored result was found for the identifier \'xxx\'')

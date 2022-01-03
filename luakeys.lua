@@ -53,6 +53,21 @@ end
 --- A table to store parsed key-value results.
 local result_store = {}
 
+--- Option handling
+-- @section
+
+--- The default options.
+local default_options = {
+  convert_dimensions = true,
+  unpack_single_array_values = true,
+}
+
+--- This table stores all allowed option keys.
+local option_keys = {
+  'convert_dimensions',
+  'unpack_single_array_values',
+}
+
 local function throw_error(message)
   if type(tex.error) == 'function' then
     tex.error(message)
@@ -60,6 +75,63 @@ local function throw_error(message)
     error(message)
   end
 end
+
+--- Convert a key so that it can be written as a table field without
+-- quotes and square brackets (for example `one 2 -> `one_2`). The key
+-- can then reference values from a table using dot notation.
+-- (`table["one 2"]` -> `table.one_2`).
+--
+-- @tparam string key The key to be converted.
+--
+-- @treturn string The converted key.
+local function luafy_key(key)
+  return key:gsub('[^%w]+', '_')
+end
+
+--- Convert all keys in a table to strings containig only alphanumeric
+-- characters and underscores.
+--
+-- @param raw_options Some raw options.
+--
+-- @treturn table Returns always a table. If the input value is not a
+-- an empty table is returned.
+local function luafy_options(raw_options)
+  if type(raw_options) ~= 'table' then
+    raw_options = {}
+  end
+  local options = {}
+  for key, value in pairs(raw_options) do
+    options[luafy_key(key)] = value
+  end
+  return options
+end
+
+--- All option keys can be written with underscores or with spaces as
+-- separators.
+-- For the LaTeX version of the macro
+--  `\luakeysdebug[options]{kv-string}`.
+--
+-- @tparam table options_raw Options in a raw format. The table may be
+-- empty or some keys are not set.
+--
+-- @treturn table
+local function normalize_parse_options (options_raw)
+  options_raw = luafy_options(options_raw)
+  local options = {}
+
+  for _, option_name in ipairs(option_keys) do
+    if options_raw[option_name] ~= nil then
+      options[option_name] = options_raw[option_name]
+    else
+      options[option_name] = default_options[option_name]
+    end
+  end
+
+  return options
+end
+
+--- Parser / Lpeg related
+-- @section
 
 --- Generate the PEG parser using Lpeg.
 --
@@ -379,50 +451,8 @@ local function stringify(input, for_tex)
   return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
 end
 
---- All option keys can be written with underscores or with spaces as
--- separators.
--- For the LaTeX version of the macro
---  `\luakeysdebug[options]{kv-string}`.
--- TODO Make the function more generic, adaptable for more options
---
--- @tparam table options_raw Options in a raw format. The table may be
--- empty or some keys are not set.
---
--- @treturn table
-local function normalize_parse_options (options_raw)
-  if options_raw == nil then
-    options_raw = {}
-  end
-  local options = {}
-
-  if options_raw['unpack single array values'] ~= nil and options_raw['unpack_single_array_values'] == nil then
-    options['unpack_single_array_values'] = options_raw['unpack single array values']
-  end
-
-  if options_raw['unpack_single_array_values'] ~= nil and options_raw['unpack single array values'] == nil then
-    options['unpack_single_array_values'] = options_raw['unpack_single_array_values']
-  end
-
-  if options_raw['convert dimensions'] ~= nil and options_raw['convert_dimensions'] == nil  then
-    options['convert_dimensions'] = options_raw['convert dimensions']
-  end
-
-  if options_raw['convert_dimensions'] ~= nil and options_raw['convert dimensions'] == nil  then
-    options['convert_dimensions'] = options_raw['convert_dimensions']
-  end
-
-  if options.convert_dimensions == nil then
-    options.convert_dimensions = true
-  end
-
-  if options.unpack_single_array_values == nil then
-    options.unpack_single_array_values = true
-  end
-
-  return options
-end
-
 local export = {
+  default_options = default_options,
   stringify = stringify,
 
   --- Parse a LaTeX/TeX style key-value string into a Lua table. With
@@ -554,9 +584,9 @@ local export = {
   -- @tparam string identifier The identifier under which the result was
   --   saved.
   get = function(identifier)
-    if result_store[identifier] == nil then
-      throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
-    end
+    -- if result_store[identifier] == nil then
+    --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
+    -- end
     return result_store[identifier]
   end,
 
@@ -564,6 +594,8 @@ local export = {
 
 -- http://olivinelabs.com/busted/#private
 if _TEST then
+  export.luafy_key = luafy_key
+  export.luafy_options = luafy_options
   export.normalize_parse_options = normalize_parse_options
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
 end

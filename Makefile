@@ -14,7 +14,7 @@ install:
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
-test: install test_lua test_tex
+test: install test_lua test_tex doc_pdf
 
 test_lua:
 	busted --exclude-tags=skip test/lua/*.lua
