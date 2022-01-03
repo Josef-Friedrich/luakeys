@@ -29,9 +29,11 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Tables">Tables</a></li>
 <li><a href="#Option_handling">Option handling </a></li>
 <li><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></li>
+<li><a href="#Convert_back_to_strings">Convert back to strings </a></li>
+<li><a href="#Store_results">Store results </a></li>
+<li><a href="#Exports">Exports </a></li>
 </ul>
 
 
@@ -59,13 +61,6 @@
 </p>
 
 
-<h2><a href="#Tables">Tables</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#result_store">result_store</a></td>
-	<td class="summary">A table to store parsed key-value results.</td>
-	</tr>
-</table>
 <h2><a href="#Option_handling">Option handling </a></h2>
 <table class="function_list">
 	<tr>
@@ -79,7 +74,7 @@
 	<tr>
 	<td class="name" nowrap><a href="#luafy_key">luafy_key (key)</a></td>
 	<td class="summary">Convert a key so that it can be written as a table field without
- quotes and square brackets (for example <code>one 2 -&gt; </code>one_2`).</td>
+  quotes and square brackets (for example <code>one 2</code> becomes <code>one_2</code>).</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#luafy_options">luafy_options (raw_options)</a></td>
@@ -135,23 +130,33 @@
 </td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#stringify">stringify (input, for_tex)</a></td>
-	<td class="summary">The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
-   printable string.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#parse">parse (kv_string, options)</a></td>
 	<td class="summary">Parse a LaTeX/TeX style key-value string into a Lua table.</td>
 	</tr>
+</table>
+<h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#render">render (tbl)</a></td>
 	<td class="summary">The function <code>render(tbl)</code> reverses the function
   <code>parse(kv_string)</code>.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#print">print (tbl)</a></td>
-	<td class="summary">The function <code>print(tbl)</code> pretty prints a Lua table to standard
+	<td class="name" nowrap><a href="#stringify">stringify (input, for_tex)</a></td>
+	<td class="summary">The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
+   printable string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pretty_print">pretty_print (tbl)</a></td>
+	<td class="summary">The function <code>pretty_print(tbl)</code> pretty prints a Lua table to standard
    output (stdout).</td>
+	</tr>
+</table>
+<h2><a href="#Store_results">Store results </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#result_store">result_store</a></td>
+	<td class="summary">A table to store parsed key-value results.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#save">save (identifier, result)</a></td>
@@ -164,29 +169,42 @@
   from the result store.</td>
 	</tr>
 </table>
+<h2><a href="#Exports">Exports </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#default_options">default_options</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#stringify">stringify</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#parse">parse</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#render">render</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#print">print</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#save">save</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get">get</a></td>
+	<td class="summary"></td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
-    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "result_store"></a>
-    <strong>result_store</strong>
-    </dt>
-    <dd>
-    A table to store parsed key-value results.
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="Option_handling"></a>Option handling </h2>
 
     <dl class="function">
@@ -242,9 +260,9 @@
     </dt>
     <dd>
     Convert a key so that it can be written as a table field without
- quotes and square brackets (for example <code>one 2 -&gt; </code>one_2<code>).  The key
- can then reference values from a table using dot notation.
- (</code>table[&ldquo;one 2&rdquo;]<code> -&gt; </code>table.one_2`).
+  quotes and square brackets (for example <code>one 2</code> becomes <code>one_2</code>).
+  The key can then reference values from a table using dot notation.
+  (<code>table[&quot;one 2&quot;]</code> becomes <code>table.one_2</code>).
 
 
     <h3>Parameters:</h3>
@@ -546,41 +564,6 @@
 
 </dd>
     <dt>
-    <a name = "stringify"></a>
-    <strong>stringify (input, for_tex)</strong>
-    </dt>
-    <dd>
-    The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
-   printable string.  Stringify a table means to convert the table into
-   a string. This function is used to realize the <a href="index.html#print">print</a> function.
-   <code>stringify(tbl, true)</code> (<code>for_tex = true</code>) generates a string which
-   can be embeded into TeX documents. The macro <code>\luakeysdebug{}</code> uses
-   this option. <code>stringify(tbl, false)</code> or <code>stringify(tbl)</code> generate a
-   string suitable for the terminal.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">input</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table to stringify.
-        </li>
-        <li><span class="parameter">for_tex</span>
-            <span class="types"><span class="type">boolean</span></span>
-         Stringify the table into a text string that
-   can be embeded inside a TeX document via tex.print(). Curly braces
-   and whites spaces are escaped.</p>
-
-<p> https://stackoverflow.com/a/54593224/10193818
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "parse"></a>
     <strong>parse (kv_string, options)</strong>
     </dt>
@@ -654,6 +637,10 @@
 
 
 </dd>
+</dl>
+    <h2 class="section-header "><a name="Convert_back_to_strings"></a>Convert back to strings </h2>
+
+    <dl class="function">
     <dt>
     <a name = "render"></a>
     <strong>render (tbl)</strong>
@@ -688,11 +675,46 @@
 
 </dd>
     <dt>
-    <a name = "print"></a>
-    <strong>print (tbl)</strong>
+    <a name = "stringify"></a>
+    <strong>stringify (input, for_tex)</strong>
     </dt>
     <dd>
-    The function <code>print(tbl)</code> pretty prints a Lua table to standard
+    The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
+   printable string.  Stringify a table means to convert the table into
+   a string. This function is used to realize the <a href="index.html#print">print</a> function.
+   <code>stringify(tbl, true)</code> (<code>for_tex = true</code>) generates a string which
+   can be embeded into TeX documents. The macro <code>\luakeysdebug{}</code> uses
+   this option. <code>stringify(tbl, false)</code> or <code>stringify(tbl)</code> generate a
+   string suitable for the terminal.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">input</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table to stringify.
+        </li>
+        <li><span class="parameter">for_tex</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Stringify the table into a text string that
+   can be embeded inside a TeX document via tex.print(). Curly braces
+   and whites spaces are escaped.</p>
+
+<p> https://stackoverflow.com/a/54593224/10193818
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pretty_print"></a>
+    <strong>pretty_print (tbl)</strong>
+    </dt>
+    <dd>
+    The function <code>pretty_print(tbl)</code> pretty prints a Lua table to standard
    output (stdout).  It is a utility function that can be used to
    debug and inspect the resulting Lua table of the function
    <a href="index.html#parse">parse</a>. You have to compile your TeX document in a console to
@@ -707,6 +729,24 @@
  debugging purposes.
         </li>
     </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Store_results"></a>Store results </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "result_store"></a>
+    <strong>result_store</strong>
+    </dt>
+    <dd>
+    A table to store parsed key-value results.
+
+
 
 
 
@@ -767,13 +807,143 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Exports"></a>Exports </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "default_options"></a>
+    <strong>default_options</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#default_options">default_options</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "stringify"></a>
+    <strong>stringify</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#stringify">stringify</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "parse"></a>
+    <strong>parse</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#parse">parse</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "render"></a>
+    <strong>render</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#render">render</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "print"></a>
+    <strong>print</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#pretty_print">pretty_print</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "save"></a>
+    <strong>save</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#save">save</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "get"></a>
+    <strong>get</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#get">get</a>
+    </ul>
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-01-03 09:51:32 </i>
+<i style="float:right;">Last updated 2022-01-03 11:07:48 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

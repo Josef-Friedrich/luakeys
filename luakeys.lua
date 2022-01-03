@@ -50,9 +50,6 @@ if not tex then
   end
 end
 
---- A table to store parsed key-value results.
-local result_store = {}
-
 --- Option handling
 -- @section
 
@@ -77,9 +74,9 @@ local function throw_error(message)
 end
 
 --- Convert a key so that it can be written as a table field without
--- quotes and square brackets (for example `one 2 -> `one_2`). The key
--- can then reference values from a table using dot notation.
--- (`table["one 2"]` -> `table.one_2`).
+--  quotes and square brackets (for example `one 2` becomes `one_2`).
+--  The key can then reference values from a table using dot notation.
+--  (`table["one 2"]` becomes `table.one_2`).
 --
 -- @tparam string key The key to be converted.
 --
@@ -371,6 +368,106 @@ local function normalize(raw, options)
   return normalize_recursive(raw, {}, options)
 end
 
+--- Parse a LaTeX/TeX style key-value string into a Lua table. With
+-- this function you should be able to parse key-value strings like
+-- this example:
+--
+--     show,
+--     hide,
+--     key with spaces = String without quotes,
+--     string="String with double quotes: ,{}=",
+--     dimension = 1cm,
+--     number = -1.2,
+--     list = {one,two,three},
+--     key value list = {one=one,two=two,three=three},
+--     nested key = {
+--       nested key 2= {
+--         key = value,
+--       },
+--     },
+--
+-- The string above results in this Lua table:
+--
+--     {
+--       'show',
+--       'hide',
+--       ['key with spaces'] = 'String without quotes',
+--       string = 'String with double quotes: ,{}=',
+--       dimension = 1864679,
+--       number = -1.2,
+--       list = {'one', 'two', 'three'},
+--       key value list = {
+--         one = 'one',
+--         three = 'three',
+--         two = 'two'
+--       },
+--       ['nested key'] = {
+--         ['nested key 2'] = {
+--           key = 'value'
+--         }
+--       },
+--     }
+--
+-- @tparam string kv_string A string in the TeX/LaTeX style key-value
+--   format as described above.
+--
+-- @tparam table options A table containing
+-- settings: `convert_dimensions` `unpack_single_array_values`
+--
+-- @treturn table A hopefully properly parsed table you can do
+-- something useful with.
+local function parse (kv_string, options)
+  if kv_string == nil then
+    return {}
+  end
+  options = normalize_parse_options(options)
+
+  local parser = generate_parser(options)
+  return normalize(parser:match(kv_string), options)
+end
+
+--- Convert back to strings
+-- @section
+
+--- The function `render(tbl)` reverses the function
+--  `parse(kv_string)`. It takes a Lua table and converts this table
+--  into a key-value string. The resulting string usually has a
+--  different order as the input table. In Lua only tables with
+--  1-based consecutive integer keys (a.k.a. array tables) can be
+--  parsed in order.
+--
+-- @tparam table tbl A table to be converted into a key-value string.
+--
+-- @treturn string A key-value string that can be passed to a TeX
+-- macro.
+local function render (tbl)
+  local function render_inner(tbl)
+    local output = {}
+    local function add(text)
+      table.insert(output, text)
+    end
+    for key, value in pairs(tbl) do
+      if (key and type(key) == 'string') then
+        if (type(value) == 'table') then
+          if (next(value)) then
+            add(key .. '={')
+            add(render_inner(value))
+            add('},')
+          else
+            add(key .. '={},')
+          end
+        else
+          add(key .. '=' .. tostring(value) .. ',')
+        end
+      else
+        add(tostring(value) .. ',')
+      end
+    end
+    return table.concat(output)
+  end
+  return render_inner(tbl)
+end
+
 --- The function `stringify(tbl, for_tex)` converts a Lua table into a
 --   printable string. Stringify a table means to convert the table into
 --   a string. This function is used to realize the `print` function.
@@ -451,145 +548,74 @@ local function stringify(input, for_tex)
   return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
 end
 
+--- The function `pretty_print(tbl)` pretty prints a Lua table to standard
+--   output (stdout). It is a utility function that can be used to
+--   debug and inspect the resulting Lua table of the function
+--   `parse`. You have to compile your TeX document in a console to
+--   see the terminal output.
+--
+-- @tparam table tbl A table to be printed to standard output for
+-- debugging purposes.
+local function pretty_print(tbl)
+  print(stringify(tbl, false))
+end
+
+--- Store results
+-- @section
+
+--- A table to store parsed key-value results.
+local result_store = {}
+
+--- The function `save(identifier, result): void` saves a result (a
+--  table from a previous run of `parse`) under an identifier.
+--  Therefore, it is not necessary to pollute the global namespace to
+--  store results for the later usage.
+--
+-- @tparam string identifier The identifier under which the result is
+--   saved.
+--
+-- @tparam table result A result to be stored and that was created by
+--   the key-value parser.
+local function save(identifier, result)
+  result_store[identifier] = result
+end
+
+--- The function `get(identifier): table` retrieves a saved result
+--  from the result store.
+--
+-- @tparam string identifier The identifier under which the result was
+--   saved.
+local function get(identifier)
+  -- if result_store[identifier] == nil then
+  --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
+  -- end
+  return result_store[identifier]
+end
+
+--- Exports
+-- @section
+
 local export = {
+  --- @see default_options
   default_options = default_options,
+
+  --- @see stringify
   stringify = stringify,
 
-  --- Parse a LaTeX/TeX style key-value string into a Lua table. With
-  -- this function you should be able to parse key-value strings like
-  -- this example:
-  --
-  --     show,
-  --     hide,
-  --     key with spaces = String without quotes,
-  --     string="String with double quotes: ,{}=",
-  --     dimension = 1cm,
-  --     number = -1.2,
-  --     list = {one,two,three},
-  --     key value list = {one=one,two=two,three=three},
-  --     nested key = {
-  --       nested key 2= {
-  --         key = value,
-  --       },
-  --     },
-  --
-  -- The string above results in this Lua table:
-  --
-  --     {
-  --       'show',
-  --       'hide',
-  --       ['key with spaces'] = 'String without quotes',
-  --       string = 'String with double quotes: ,{}=',
-  --       dimension = 1864679,
-  --       number = -1.2,
-  --       list = {'one', 'two', 'three'},
-  --       key value list = {
-  --         one = 'one',
-  --         three = 'three',
-  --         two = 'two'
-  --       },
-  --       ['nested key'] = {
-  --         ['nested key 2'] = {
-  --           key = 'value'
-  --         }
-  --       },
-  --     }
-  --
-  -- @tparam string kv_string A string in the TeX/LaTeX style key-value
-  --   format as described above.
-  --
-  -- @tparam table options A table containing
-  -- settings: `convert_dimensions` `unpack_single_array_values`
-  --
-  -- @treturn table A hopefully properly parsed table you can do
-  -- something useful with.
-  parse = function (kv_string, options)
-    if kv_string == nil then
-      return {}
-    end
-    options = normalize_parse_options(options)
+  --- @see parse
+  parse = parse,
 
-    local parser = generate_parser(options)
-    return normalize(parser:match(kv_string), options)
-  end,
+  --- @see render
+  render = render,
 
-  --- The function `render(tbl)` reverses the function
-  --  `parse(kv_string)`. It takes a Lua table and converts this table
-  --  into a key-value string. The resulting string usually has a
-  --  different order as the input table. In Lua only tables with
-  --  1-based consecutive integer keys (a.k.a. array tables) can be
-  --  parsed in order.
-  --
-  -- @tparam table tbl A table to be converted into a key-value string.
-  --
-  -- @treturn string A key-value string that can be passed to a TeX
-  -- macro.
-  render = function (tbl)
-    local function render_inner(tbl)
-      local output = {}
-      local function add(text)
-        table.insert(output, text)
-      end
-      for key, value in pairs(tbl) do
-        if (key and type(key) == 'string') then
-          if (type(value) == 'table') then
-            if (next(value)) then
-              add(key .. '={')
-              add(render_inner(value))
-              add('},')
-            else
-              add(key .. '={},')
-            end
-          else
-            add(key .. '=' .. tostring(value) .. ',')
-          end
-        else
-          add(tostring(value) .. ',')
-        end
-      end
-      return table.concat(output)
-    end
-    return render_inner(tbl)
-  end,
+  --- @see pretty_print
+  print = pretty_print,
 
-  --- The function `print(tbl)` pretty prints a Lua table to standard
-  --   output (stdout). It is a utility function that can be used to
-  --   debug and inspect the resulting Lua table of the function
-  --   `parse`. You have to compile your TeX document in a console to
-  --   see the terminal output.
-  --
-  -- @tparam table tbl A table to be printed to standard output for
-  -- debugging purposes.
-  print = function(tbl)
-    print(stringify(tbl, false))
-  end,
+  --- @see save
+  save = save,
 
-  --- The function `save(identifier, result): void` saves a result (a
-  --  table from a previous run of `parse`) under an identifier.
-  --  Therefore, it is not necessary to pollute the global namespace to
-  --  store results for the later usage.
-  --
-  -- @tparam string identifier The identifier under which the result is
-  --   saved.
-  --
-  -- @tparam table result A result to be stored and that was created by
-  --   the key-value parser.
-  save = function(identifier, result)
-    result_store[identifier] = result
-  end,
-
-  --- The function `get(identifier): table` retrieves a saved result
-  --  from the result store.
-  --
-  -- @tparam string identifier The identifier under which the result was
-  --   saved.
-  get = function(identifier)
-    -- if result_store[identifier] == nil then
-    --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
-    -- end
-    return result_store[identifier]
-  end,
-
+  --- @see get
+  get = get,
 }
 
 -- http://olivinelabs.com/busted/#private
