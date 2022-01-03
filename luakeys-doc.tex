@@ -526,14 +526,27 @@ In plain \TeX:
 \end{minted}
 
 \noindent
-The function can be called with a options table. This two options are
-supported.
+The function can be called with an options table. This options are
+supported:
 
 \begin{minted}{lua}
 local result = parse('one,two,three', {
   convert_dimensions = false,
   unpack_single_array_value = false
 })
+\end{minted}
+
+\noindent
+The options can also be set globally using the exported table
+|default_options|:
+
+\begin{minted}{lua}
+luakeys.parse('dim=1cm') -- {dim = 1864679}
+luakeys.default_options.convert_dimensions = false
+-- or:
+-- local defaults = luakeys.default_options
+-- defaults.convert_dimensions = false
+luakeys.parse('dim=1cm') -- {dim = '1cm'}
 \end{minted}
 
 %%
@@ -745,6 +758,9 @@ An example of how to use the command in \LaTeX:
 * Parser: Allow only strings and numbers as keys
 * Parser: Remove support from Lua numbers with exponents (for example '5e+20')
 * Switch the Lua testing framework to busted
+}
+\changes{v0.5}{}{
+* Change options globally
 }
 \pagebreak
 \PrintChanges
