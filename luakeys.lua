@@ -53,16 +53,18 @@ end
 --- Option handling
 -- @section
 
---- The default options.
-local default_options = {
-  convert_dimensions = true,
-  unpack_single_array_values = true,
-}
-
 --- This table stores all allowed option keys.
 local option_keys = {
   'convert_dimensions',
   'unpack_single_array_values',
+  'standalone_as_true',
+}
+
+--- The default options.
+local default_options = {
+  convert_dimensions = true,
+  unpack_single_array_values = true,
+  standalone_as_true = false,
 }
 
 local function throw_error(message)
@@ -321,27 +323,31 @@ local function get_table_size(value)
 end
 
 --- Unpack a single valued array table like `{ 'one' }` into `one` or
--- `{ 1 }` into `into`.
+-- `{ 1 }` into `1`.
 --
 -- @treturn If the value is a array like table with one non table typed
 -- value in it, the unpacked value, else the unchanged input.
-local function unpack_single_valued_array_table(value)
+local function unpack_single_valued_array_table(value, options)
   if
     type(value) == 'table' and
     get_array_size(value) == 1 and
     get_table_size(value) == 1 and
     type(value[1]) ~= 'table'
   then
-    return value[1]
+    if type(value[1]) == 'string' and options.standalone_as_true then
+      return value
+    else
+      return value[1]
+    end
   end
   return value
 end
 
---- This normalization tasks are performed on the raw input table coming
---  directly from the PEG parser:
+--- Normalize the result tables of the LPeg parser. This normalization
+--  tasks are performed on the raw input table coming directly from the
+--  PEG parser:
 --
--- 1. Trim all strings: ` text \n` into `text`
--- 2. Unpack all single valued array like tables: `{ 'text' }` into
+-- * Unpack all single valued array like tables: `{ 'text' }` into
 --    `text`
 --
 -- @tparam table raw The raw input table coming directly from the PEG
@@ -355,10 +361,12 @@ local function normalize(raw, options)
   local function normalize_recursive(raw, result, options)
     for key, value in pairs(raw) do
       if options.unpack_single_array_values then
-        value = unpack_single_valued_array_table(value)
+        value = unpack_single_valued_array_table(value, options)
       end
       if type(value) == 'table' then
         result[key] = normalize_recursive(value, {}, options)
+      elseif type(key) == 'number' and type(value) == 'string' and options.standalone_as_true then
+        result[value] = true
       else
         result[key] = value
       end
@@ -622,6 +630,7 @@ local export = {
 if _TEST then
   export.luafy_key = luafy_key
   export.luafy_options = luafy_options
+  export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
 end

@@ -532,7 +532,8 @@ supported:
 \begin{minted}{lua}
 local result = parse('one,two,three', {
   convert_dimensions = false,
-  unpack_single_array_value = false
+  unpack_single_array_value = false,
+  standalone_as_true = false,
 })
 \end{minted}
 
@@ -760,7 +761,8 @@ An example of how to use the command in \LaTeX:
 * Switch the Lua testing framework to busted
 }
 \changes{v0.5}{}{
-* Change options globally
+* Add possibility to change options globally
+* New option: standalone\_as\_true
 }
 \pagebreak
 \PrintChanges

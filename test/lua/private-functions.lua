@@ -12,6 +12,10 @@ describe("Test private functions", function()
     _G._TEST = nil
   end)
 
+  local get_options = function(options)
+    return luakeys.normalize_parse_options(options)
+  end
+
   describe('Function “luafy_key()”', function()
     local luafy = luakeys.luafy_key
     it('Whitespaces', function()
@@ -44,29 +48,64 @@ describe("Test private functions", function()
     end)
   end)
 
+  describe('Function “normalize()”', function()
+    local normalize = luakeys.normalize
+
+    it('Unchanged', function()
+      assert.are
+        .same(normalize({one = ' one '}, get_options()), {one = ' one '})
+    end)
+
+    describe('Option standalone_as_true', function()
+      it('true', function()
+        assert.are.same(normalize({'standalone'},
+                                  get_options({standalone_as_true = true})),
+                        {standalone = true})
+      end)
+
+      it('true recursive', function()
+        assert.are.same(normalize({level_1 = {level_2 = {'standalone'}}},
+                                  get_options(
+                                    {
+            standalone_as_true = true
+          })), {level_1 = {level_2 = {standalone = true}}})
+      end)
+
+      it('false', function()
+        assert.are.same(normalize({'standalone'},
+                                  get_options({standalone_as_true = false})),
+                        {'standalone'})
+      end)
+    end)
+
+  end)
+
   describe('Function “normalize_parse_options()”', function()
-    it('No options', function ()
+    it('No options', function()
       assert.is.same(luakeys.normalize_parse_options(), {
         convert_dimensions = true,
-        unpack_single_array_values = true
+        unpack_single_array_values = true,
+        standalone_as_true = false
       })
     end)
 
-    it('One option', function ()
+    it('One option', function()
       assert.is.same(luakeys.normalize_parse_options({
-        convert_dimensions = false,
+        convert_dimensions = false
       }), {
         convert_dimensions = false,
-        unpack_single_array_values = true
+        unpack_single_array_values = true,
+        standalone_as_true = false
       })
     end)
 
-    it('White spaces', function ()
+    it('White spaces', function()
       assert.is.same(luakeys.normalize_parse_options({
-        ['convert dimensions'] = false,
+        ['convert dimensions'] = false
       }), {
         convert_dimensions = false,
-        unpack_single_array_values = true
+        unpack_single_array_values = true,
+        standalone_as_true = false
       })
     end)
   end)
@@ -75,15 +114,19 @@ describe("Test private functions", function()
     local unpack = luakeys.unpack_single_valued_array_table
 
     it('unpacked: single string', function()
-      assert.is.equal(unpack({'one'}), 'one')
+      assert.is.equal(unpack({'one'}, get_options()), 'one')
+    end)
+
+    it('unpacked: single string', function()
+      assert.is.equal(unpack({1}, get_options()), 1)
     end)
 
     it('Not unpacked: two values', function()
-      assert.is.same(unpack({'one', 'two'}), {'one', 'two'})
+      assert.is.same(unpack({'one', 'two'}, get_options()), {'one', 'two'})
     end)
 
     it('Not unpacked: nested table', function()
-      assert.is.same(unpack({{'one'}}), {{'one'}})
+      assert.is.same(unpack({{'one'}}, get_options()), {{'one'}})
     end)
   end)
 end)
