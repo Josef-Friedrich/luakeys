@@ -534,6 +534,9 @@ local result = parse('one,two,three', {
   convert_dimensions = false,
   unpack_single_array_value = false,
   standalone_as_true = false,
+  converter = function(key, value, depth, source_table, root_source_table)
+    return key, value
+  end
 })
 \end{minted}
 
@@ -763,6 +766,7 @@ An example of how to use the command in \LaTeX:
 \changes{v0.5}{}{
 * Add possibility to change options globally
 * New option: standalone\_as\_true
+* Add a recursive converter callback / hook to process the parse tree
 }
 \pagebreak
 \PrintChanges

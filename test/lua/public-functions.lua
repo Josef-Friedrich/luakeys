@@ -57,6 +57,20 @@ describe('Function “parse()”', function()
   end
 
   describe('Options', function()
+    describe('Option converter', function()
+      it('standalone string values as keys', function()
+        local function converter(key, value, depth, current_table, root_table)
+          if type(key) == 'number' and type(value) == 'string' then
+            return value, true
+          end
+          return key, value
+        end
+
+        assert.are.same(luakeys.parse('one,two,three', {converter = converter}),
+                        {one = true, two = true, three = true})
+      end)
+    end)
+
     it('Change default options', function()
       local defaults = luakeys.default_options
       assert.are.same({1234567}, luakeys.parse('1cm'))

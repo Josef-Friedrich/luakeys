@@ -58,6 +58,7 @@ local option_keys = {
   'convert_dimensions',
   'unpack_single_array_values',
   'standalone_as_true',
+  'converter',
 }
 
 --- The default options.
@@ -376,6 +377,30 @@ local function normalize(raw, options)
   return normalize_recursive(raw, {}, options)
 end
 
+local function visit_parse_tree(parse_tree, callback_func)
+  if type(parse_tree) ~= 'table' then
+    throw_error('Parse tree has to be a table')
+  end
+  local function visit_parse_tree_recursive(root_table, current_table, result, depth, callback_func)
+    for key, value in pairs(current_table) do
+      if type(value) == 'table' then
+        value = visit_parse_tree_recursive(root_table, value, {}, depth + 1, callback_func)
+      end
+
+      key, value = callback_func(key, value, depth, current_table, root_table)
+
+      if key ~= nil and value ~= nil then
+        result[key] = value
+      end
+    end
+    if next(result) ~= nil then
+      return result
+    end
+  end
+
+  return visit_parse_tree_recursive(parse_tree, parse_tree, {}, 1, callback_func)
+end
+
 --- Parse a LaTeX/TeX style key-value string into a Lua table. With
 -- this function you should be able to parse key-value strings like
 -- this example:
@@ -420,7 +445,7 @@ end
 --   format as described above.
 --
 -- @tparam table options A table containing
--- settings: `convert_dimensions` `unpack_single_array_values`
+-- settings: `convert_dimensions`, `unpack_single_array_values`, `standalone_as_true`, `converter`
 --
 -- @treturn table A hopefully properly parsed table you can do
 -- something useful with.
@@ -431,7 +456,12 @@ local function parse (kv_string, options)
   options = normalize_parse_options(options)
 
   local parser = generate_parser(options)
-  return normalize(parser:match(kv_string), options)
+  local parse_tree = parser:match(kv_string)
+
+  if options.converter ~= nil and type(options.converter) == 'function' then
+    parse_tree = visit_parse_tree(parse_tree, options.converter)
+  end
+  return normalize(parse_tree, options)
 end
 
 --- Convert back to strings
@@ -633,6 +663,7 @@ if _TEST then
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
+  export.visit_parse_tree = visit_parse_tree
 end
 
 return export
