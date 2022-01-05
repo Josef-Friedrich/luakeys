@@ -66,8 +66,8 @@ describe('Function “parse()”', function()
           return key, value
         end
 
-        assert.are.same(luakeys.parse('one,two,three', {converter = converter}),
-                        {one = true, two = true, three = true})
+        assert.are.same(luakeys.parse('one,two,three={four}', {converter = converter}),
+                        {one = true, two = true, three = {four = true}})
       end)
     end)
 
