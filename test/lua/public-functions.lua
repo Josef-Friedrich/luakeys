@@ -101,6 +101,18 @@ describe('Function “parse()”', function()
                         luakeys.parse('1cm', {['convert dimensions'] = false}))
       end)
     end)
+
+    describe('standalone as true', function()
+      it('true', function()
+        assert.are.same({one = true},
+                        luakeys.parse('one', {standalone_as_true = true}))
+      end)
+
+      it('false', function()
+        assert.are.same({ 'one' },
+                        luakeys.parse('one', {standalone_as_true = false}))
+      end)
+    end)
   end)
 
   describe('Whitespaces', function()
