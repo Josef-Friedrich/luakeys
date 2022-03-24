@@ -69,6 +69,18 @@ describe('Function “parse()”', function()
         assert.are.same(luakeys.parse('one,two,three={four}', {converter = converter}),
                         {one = true, two = true, three = {four = true}})
       end)
+
+      it('case insensitive keys', function()
+        local function converter(key, value, depth, current_table, root_table)
+          if type(key) == 'string' then
+            return key:lower(), value
+          end
+          return key, value
+        end
+
+        assert.are.same(luakeys.parse('TEST=test', {converter = converter}),
+                        {test = 'test'})
+      end)
     end)
 
     it('Change default options', function()
