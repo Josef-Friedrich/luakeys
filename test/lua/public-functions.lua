@@ -59,7 +59,7 @@ describe('Function “parse()”', function()
   describe('Options', function()
     describe('Option converter', function()
       it('standalone string values as keys', function()
-        local function converter(key, value, depth, current_table, root_table)
+        local function converter(key, value)
           if type(key) == 'number' and type(value) == 'string' then
             return value, true
           end
@@ -71,7 +71,7 @@ describe('Function “parse()”', function()
       end)
 
       it('case insensitive keys', function()
-        local function converter(key, value, depth, current_table, root_table)
+        local function converter(key, value)
           if type(key) == 'string' then
             return key:lower(), value
           end

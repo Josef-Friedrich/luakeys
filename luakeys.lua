@@ -344,39 +344,6 @@ local function unpack_single_valued_array_table(value, options)
   return value
 end
 
---- Normalize the result tables of the LPeg parser. This normalization
---  tasks are performed on the raw input table coming directly from the
---  PEG parser:
---
--- * Unpack all single valued array like tables: `{ 'text' }` into
---    `text`
---
--- @tparam table raw The raw input table coming directly from the PEG
---   parser
---
--- @tparam table options Some options. A table with the key
---   `unpack_single_array_values`
---
--- @treturn table A normalized table ready for the outside world.
-local function normalize(raw, options)
-  local function normalize_recursive(raw, result, options)
-    for key, value in pairs(raw) do
-      if options.unpack_single_array_values then
-        value = unpack_single_valued_array_table(value, options)
-      end
-      if type(value) == 'table' then
-        result[key] = normalize_recursive(value, {}, options)
-      elseif type(key) == 'number' and type(value) == 'string' and options.standalone_as_true then
-        result[value] = true
-      else
-        result[key] = value
-      end
-    end
-    return result
-  end
-  return normalize_recursive(raw, {}, options)
-end
-
 local function visit_parse_tree(parse_tree, callback_func)
   if type(parse_tree) ~= 'table' then
     throw_error('Parse tree has to be a table')
@@ -399,6 +366,48 @@ local function visit_parse_tree(parse_tree, callback_func)
   end
 
   return visit_parse_tree_recursive(parse_tree, parse_tree, {}, 1, callback_func)
+end
+
+--- Normalize the result tables of the LPeg parser. This normalization
+--  tasks are performed on the raw input table coming directly from the
+--  PEG parser:
+--
+-- * Unpack all single valued array like tables: `{ 'text' }` into
+--    `text`
+--
+-- @tparam table raw The raw input table coming directly from the PEG
+--   parser
+--
+-- @tparam table options Some options. A table with the key
+--   `unpack_single_array_values`
+--
+-- @treturn table A normalized table ready for the outside world.
+local function normalize(raw, options)
+  local function normalize_recursive(raw, result, options)
+    for key, value in pairs(raw) do
+      if options.unpack_single_array_values then
+        value = unpack_single_valued_array_table(value, options)
+      end
+      if type(value) == 'table' then
+        result[key] = normalize_recursive(value, {}, options)
+      else
+        result[key] = value
+      end
+    end
+    return result
+  end
+  raw = normalize_recursive(raw, {}, options)
+
+  if options.standalone_as_true then
+    raw = visit_parse_tree(raw, function (key, value)
+      if type(key) == 'number' and type(value) == 'string' then
+        return value, true
+      end
+      return key, value
+    end)
+  end
+
+  return raw
 end
 
 --- Parse a LaTeX/TeX style key-value string into a Lua table. With
