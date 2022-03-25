@@ -57,7 +57,26 @@ describe('Function “parse()”', function()
   end
 
   describe('Options', function()
-    describe('Option converter', function()
+    it('Change default options', function()
+      local defaults = luakeys.default_options
+      assert.are.same({1234567}, luakeys.parse('1cm'))
+      defaults.convert_dimensions = false
+      assert.are.same({'1cm'}, luakeys.parse('1cm'))
+      -- Restore
+      defaults.convert_dimensions = true
+    end)
+
+    it('with spaces', function()
+      assert.are.same({'1cm'},
+                      luakeys.parse('1cm', {['convert dimensions'] = false}))
+    end)
+
+    it('with underscores', function()
+      assert.are.same({'1cm'},
+                      luakeys.parse('1cm', {convert_dimensions = false}))
+    end)
+
+    describe('Option “converter”', function()
       it('standalone string values as keys', function()
         local function converter(key, value)
           if type(key) == 'number' and type(value) == 'string' then
@@ -83,26 +102,7 @@ describe('Function “parse()”', function()
       end)
     end)
 
-    it('Change default options', function()
-      local defaults = luakeys.default_options
-      assert.are.same({1234567}, luakeys.parse('1cm'))
-      defaults.convert_dimensions = false
-      assert.are.same({'1cm'}, luakeys.parse('1cm'))
-      -- Restore
-      defaults.convert_dimensions = true
-    end)
-
-    it('with spaces', function()
-      assert.are.same({'1cm'},
-                      luakeys.parse('1cm', {['convert dimensions'] = false}))
-    end)
-
-    it('with underscores', function()
-      assert.are.same({'1cm'},
-                      luakeys.parse('1cm', {convert_dimensions = false}))
-    end)
-
-    describe('convert dimensions', function()
+    describe('Option “convert_dimensions”', function()
       it('true', function()
         assert.are.same({1234567},
                         luakeys.parse('1cm', {['convert dimensions'] = true}))
@@ -114,7 +114,12 @@ describe('Function “parse()”', function()
       end)
     end)
 
-    describe('standalone as true', function()
+    describe('Options “standalone_as_true”', function()
+      it('default', function()
+        assert.are.same({ 'one' },
+                        luakeys.parse('one'))
+      end)
+
       it('true', function()
         assert.are.same({one = true},
                         luakeys.parse('one', {standalone_as_true = true}))
@@ -125,6 +130,29 @@ describe('Function “parse()”', function()
                         luakeys.parse('one', {standalone_as_true = false}))
       end)
     end)
+
+    describe('Option “case_insensitive_keys”', function()
+      it('default', function()
+        assert.are.same({TEST = 'Test'},
+                        luakeys.parse('TEST=Test'))
+      end)
+
+      it('true', function()
+        assert.are.same({test = 'Test'},
+                        luakeys.parse('TEST=Test', {case_insensitive_keys = true}))
+      end)
+
+      it('recursive', function()
+        assert.are.same({test1 = {test2 = 'Test'}},
+                        luakeys.parse('TEST1={TEST2={Test}}', {case_insensitive_keys = true}))
+      end)
+
+      it('false', function()
+        assert.are.same({TEST = 'Test'},
+                        luakeys.parse('TEST=Test', {case_insensitive_keys = false}))
+      end)
+    end)
+
   end)
 
   describe('Whitespaces', function()

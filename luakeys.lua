@@ -59,6 +59,7 @@ local option_keys = {
   'unpack_single_array_values',
   'standalone_as_true',
   'converter',
+  'case_insensitive_keys'
 }
 
 --- The default options.
@@ -402,6 +403,15 @@ local function normalize(raw, options)
     raw = visit_parse_tree(raw, function (key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, true
+      end
+      return key, value
+    end)
+  end
+
+  if options.case_insensitive_keys then
+    raw = visit_parse_tree(raw, function (key, value)
+      if type(key) == 'string' then
+        return key:lower(), value
       end
       return key, value
     end)

@@ -534,9 +534,10 @@ local result = parse('one,two,three', {
   convert_dimensions = false,
   unpack_single_array_value = false,
   standalone_as_true = false,
-  converter = function(key, value, depth, source_table, root_source_table)
+  converter = function(key, value, depth, current_table, root_table)
     return key, value
-  end
+  end,
+  case_insensitive_keys = false,
 })
 \end{minted}
 
