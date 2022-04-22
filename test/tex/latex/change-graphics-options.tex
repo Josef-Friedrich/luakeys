@@ -1,0 +1,38 @@
+\documentclass{article}
+\usepackage{luakeys}
+\usepackage{graphicx}
+
+\begin{document}
+
+\def\image{/usr/share/icons/Yaru/256x256@2x/apps/documents-app.png}
+
+\section{No tex.print}
+
+\includegraphics[scale=0.3]{\image}
+
+\section{tex.print value}
+
+\includegraphics[scale=\directlua{tex.print('0.5')}]{\image}
+
+\section{tex.print key and value: Error}
+
+% Package keyval: scale=0.5 undefined.
+% \includegraphics[\directlua{tex.print('scale=0.5')}]{\image}
+
+\section{tex.print complete macro}
+
+\directlua{tex.print('\\includegraphics[scale=0.7]{\\image}')}
+
+\section{User definied macro}
+
+\newcommand{\mygraphics}[2][]{
+  \directlua{
+    local keys = luakeys.parse('#1')
+    keys['scale'] = 3 * keys['scale']
+    tex.print(luakeys.render(keys))
+    tex.print('\\includegraphics[' .. luakeys.render(keys) .. ']{#2}')
+  }
+}
+
+\mygraphics[scale=0.2]{\image}
+\end{document}
