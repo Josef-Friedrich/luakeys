@@ -82,8 +82,9 @@ describe("Test private functions", function()
     it('No options', function()
       assert.is.same(luakeys.normalize_parse_options(), {
         convert_dimensions = true,
+        debug = false,
+        standalone_as_true = false,
         unpack_single_array_values = true,
-        standalone_as_true = false
       })
     end)
 
@@ -92,6 +93,7 @@ describe("Test private functions", function()
         convert_dimensions = false
       }), {
         convert_dimensions = false,
+        debug = false,
         unpack_single_array_values = true,
         standalone_as_true = false
       })
@@ -102,6 +104,7 @@ describe("Test private functions", function()
         ['convert dimensions'] = false
       }), {
         convert_dimensions = false,
+        debug = false,
         unpack_single_array_values = true,
         standalone_as_true = false
       })

@@ -30,8 +30,8 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Option_handling">Option handling </a></li>
-<li><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></li>
 <li><a href="#Convert_back_to_strings">Convert back to strings </a></li>
+<li><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></li>
 <li><a href="#Store_results">Store results </a></li>
 <li><a href="#Exports">Exports </a></li>
 </ul>
@@ -87,6 +87,24 @@
  separators.</td>
 	</tr>
 </table>
+<h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#render">render (tbl)</a></td>
+	<td class="summary">The function <code>render(tbl)</code> reverses the function
+  <code>parse(kv_string)</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#stringify">stringify (input, for_tex)</a></td>
+	<td class="summary">The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
+   printable string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pretty_print">pretty_print (tbl)</a></td>
+	<td class="summary">The function <code>pretty_print(tbl)</code> pretty prints a Lua table to standard
+   output (stdout).</td>
+	</tr>
+</table>
 <h2><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></h2>
 <table class="function_list">
 	<tr>
@@ -126,24 +144,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#parse">parse (kv_string, options)</a></td>
 	<td class="summary">Parse a LaTeX/TeX style key-value string into a Lua table.</td>
-	</tr>
-</table>
-<h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#render">render (tbl)</a></td>
-	<td class="summary">The function <code>render(tbl)</code> reverses the function
-  <code>parse(kv_string)</code>.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#stringify">stringify (input, for_tex)</a></td>
-	<td class="summary">The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
-   printable string.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#pretty_print">pretty_print (tbl)</a></td>
-	<td class="summary">The function <code>pretty_print(tbl)</code> pretty prints a Lua table to standard
-   output (stdout).</td>
 	</tr>
 </table>
 <h2><a href="#Store_results">Store results </a></h2>
@@ -227,6 +227,9 @@
         <li><span class="parameter">case_insensitive_keys</span>
 
         </li>
+        <li><span class="parameter">debug</span>
+
+        </li>
     </ul>
 
 
@@ -251,6 +254,9 @@
 
         </li>
         <li><span class="parameter">standalone_as_true</span>
+
+        </li>
+        <li><span class="parameter">debug</span>
 
         </li>
     </ul>
@@ -344,6 +350,104 @@
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
 
     </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Convert_back_to_strings"></a>Convert back to strings </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "render"></a>
+    <strong>render (tbl)</strong>
+    </dt>
+    <dd>
+    The function <code>render(tbl)</code> reverses the function
+  <code>parse(kv_string)</code>.  It takes a Lua table and converts this table
+  into a key-value string. The resulting string usually has a
+  different order as the input table. In Lua only tables with
+  1-based consecutive integer keys (a.k.a. array tables) can be
+  parsed in order.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table to be converted into a key-value string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+        A key-value string that can be passed to a TeX
+ macro.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "stringify"></a>
+    <strong>stringify (input, for_tex)</strong>
+    </dt>
+    <dd>
+    The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
+   printable string.  Stringify a table means to convert the table into
+   a string. This function is used to realize the <a href="index.html#print">print</a> function.
+   <code>stringify(tbl, true)</code> (<code>for_tex = true</code>) generates a string which
+   can be embeded into TeX documents. The macro <code>\luakeysdebug{}</code> uses
+   this option. <code>stringify(tbl, false)</code> or <code>stringify(tbl)</code> generate a
+   string suitable for the terminal.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">input</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table to stringify.
+        </li>
+        <li><span class="parameter">for_tex</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Stringify the table into a text string that
+   can be embeded inside a TeX document via tex.print(). Curly braces
+   and whites spaces are escaped.</p>
+
+<p> https://stackoverflow.com/a/54593224/10193818
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pretty_print"></a>
+    <strong>pretty_print (tbl)</strong>
+    </dt>
+    <dd>
+    The function <code>pretty_print(tbl)</code> pretty prints a Lua table to standard
+   output (stdout).  It is a utility function that can be used to
+   debug and inspect the resulting Lua table of the function
+   <a href="index.html#parse">parse</a>. You have to compile your TeX document in a console to
+   see the terminal output.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table to be printed to standard output for
+ debugging purposes.
+        </li>
+    </ul>
+
 
 
 
@@ -647,104 +751,6 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Convert_back_to_strings"></a>Convert back to strings </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "render"></a>
-    <strong>render (tbl)</strong>
-    </dt>
-    <dd>
-    The function <code>render(tbl)</code> reverses the function
-  <code>parse(kv_string)</code>.  It takes a Lua table and converts this table
-  into a key-value string. The resulting string usually has a
-  different order as the input table. In Lua only tables with
-  1-based consecutive integer keys (a.k.a. array tables) can be
-  parsed in order.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table to be converted into a key-value string.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
-        A key-value string that can be passed to a TeX
- macro.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "stringify"></a>
-    <strong>stringify (input, for_tex)</strong>
-    </dt>
-    <dd>
-    The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
-   printable string.  Stringify a table means to convert the table into
-   a string. This function is used to realize the <a href="index.html#print">print</a> function.
-   <code>stringify(tbl, true)</code> (<code>for_tex = true</code>) generates a string which
-   can be embeded into TeX documents. The macro <code>\luakeysdebug{}</code> uses
-   this option. <code>stringify(tbl, false)</code> or <code>stringify(tbl)</code> generate a
-   string suitable for the terminal.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">input</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table to stringify.
-        </li>
-        <li><span class="parameter">for_tex</span>
-            <span class="types"><span class="type">boolean</span></span>
-         Stringify the table into a text string that
-   can be embeded inside a TeX document via tex.print(). Curly braces
-   and whites spaces are escaped.</p>
-
-<p> https://stackoverflow.com/a/54593224/10193818
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "pretty_print"></a>
-    <strong>pretty_print (tbl)</strong>
-    </dt>
-    <dd>
-    The function <code>pretty_print(tbl)</code> pretty prints a Lua table to standard
-   output (stdout).  It is a utility function that can be used to
-   debug and inspect the resulting Lua table of the function
-   <a href="index.html#parse">parse</a>. You have to compile your TeX document in a console to
-   see the terminal output.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table to be printed to standard output for
- debugging purposes.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="Store_results"></a>Store results </h2>
 
     <dl class="function">
@@ -952,7 +958,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-04-22 11:02:42 </i>
+<i style="float:right;">Last updated 2022-04-22 17:20:35 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

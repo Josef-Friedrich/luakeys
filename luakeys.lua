@@ -59,7 +59,8 @@ local option_keys = {
   'unpack_single_array_values',
   'standalone_as_true',
   'converter',
-  'case_insensitive_keys'
+  'case_insensitive_keys',
+  'debug',
 }
 
 --- The default options.
@@ -67,6 +68,7 @@ local default_options = {
   convert_dimensions = true,
   unpack_single_array_values = true,
   standalone_as_true = false,
+  debug = false,
 }
 
 local function throw_error(message)
@@ -129,6 +131,140 @@ local function normalize_parse_options (options_raw)
   end
 
   return options
+end
+
+--- Convert back to strings
+-- @section
+
+--- The function `render(tbl)` reverses the function
+--  `parse(kv_string)`. It takes a Lua table and converts this table
+--  into a key-value string. The resulting string usually has a
+--  different order as the input table. In Lua only tables with
+--  1-based consecutive integer keys (a.k.a. array tables) can be
+--  parsed in order.
+--
+-- @tparam table tbl A table to be converted into a key-value string.
+--
+-- @treturn string A key-value string that can be passed to a TeX
+-- macro.
+local function render (tbl)
+  local function render_inner(tbl)
+    local output = {}
+    local function add(text)
+      table.insert(output, text)
+    end
+    for key, value in pairs(tbl) do
+      if (key and type(key) == 'string') then
+        if (type(value) == 'table') then
+          if (next(value)) then
+            add(key .. '={')
+            add(render_inner(value))
+            add('},')
+          else
+            add(key .. '={},')
+          end
+        else
+          add(key .. '=' .. tostring(value) .. ',')
+        end
+      else
+        add(tostring(value) .. ',')
+      end
+    end
+    return table.concat(output)
+  end
+  return render_inner(tbl)
+end
+
+--- The function `stringify(tbl, for_tex)` converts a Lua table into a
+--   printable string. Stringify a table means to convert the table into
+--   a string. This function is used to realize the `print` function.
+--   `stringify(tbl, true)` (`for_tex = true`) generates a string which
+--   can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
+--   this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
+--   string suitable for the terminal.
+--
+-- @tparam table input A table to stringify.
+--
+-- @tparam boolean for_tex Stringify the table into a text string that
+--   can be embeded inside a TeX document via tex.print(). Curly braces
+--   and whites spaces are escaped.
+--
+-- https://stackoverflow.com/a/54593224/10193818
+local function stringify(input, for_tex)
+  local line_break, start_bracket, end_bracket, indent
+
+  if for_tex then
+    line_break = '\\par'
+    start_bracket = '$\\{$'
+    end_bracket = '$\\}$'
+    indent = '\\ \\ '
+  else
+    line_break = '\n'
+    start_bracket = '{'
+    end_bracket = '}'
+    indent = '  '
+  end
+
+  local function stringify_inner(input, depth)
+    local output = {}
+    depth = depth or 0
+
+    local function add(depth, text)
+      table.insert(output, string.rep(indent, depth) .. text)
+    end
+
+    local function format_key(key)
+      if (type(key) == 'number') then
+        return string.format('[%s]', key)
+      else
+        return string.format('[\'%s\']', key)
+      end
+    end
+
+    if type(input) ~= 'table' then
+      return tostring(input)
+    end
+
+    for key, value in pairs(input) do
+      if (key and type(key) == 'number' or type(key) == 'string') then
+        key = format_key(key)
+
+        if (type(value) == 'table') then
+          if (next(value)) then
+            add(depth, key .. ' = ' .. start_bracket)
+            add(0, stringify_inner(value, depth + 1))
+            add(depth, end_bracket .. ',');
+          else
+            add(depth, key .. ' = ' .. start_bracket .. end_bracket .. ',')
+          end
+        else
+          if (type(value) == 'string') then
+            value = string.format('\'%s\'', value)
+          else
+            value = tostring(value)
+          end
+
+          add(depth, key .. ' = ' .. value .. ',')
+        end
+      end
+    end
+
+    return table.concat(output, line_break)
+  end
+
+  return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
+end
+
+--- The function `pretty_print(tbl)` pretty prints a Lua table to standard
+--   output (stdout). It is a utility function that can be used to
+--   debug and inspect the resulting Lua table of the function
+--   `parse`. You have to compile your TeX document in a console to
+--   see the terminal output.
+--
+-- @tparam table tbl A table to be printed to standard output for
+-- debugging purposes.
+local function pretty_print(tbl)
+  print(stringify(tbl, false))
 end
 
 --- Parser / Lpeg related
@@ -464,7 +600,7 @@ end
 --   format as described above.
 --
 -- @tparam table options A table containing
--- settings: `convert_dimensions`, `unpack_single_array_values`, `standalone_as_true`, `converter`
+-- settings: `convert_dimensions`, `unpack_single_array_values`, `standalone_as_true`, `converter`, `debug`
 --
 -- @treturn table A hopefully properly parsed table you can do
 -- something useful with.
@@ -480,141 +616,11 @@ local function parse (kv_string, options)
   if options.converter ~= nil and type(options.converter) == 'function' then
     parse_tree = visit_parse_tree(parse_tree, options.converter)
   end
-  return normalize(parse_tree, options)
-end
-
---- Convert back to strings
--- @section
-
---- The function `render(tbl)` reverses the function
---  `parse(kv_string)`. It takes a Lua table and converts this table
---  into a key-value string. The resulting string usually has a
---  different order as the input table. In Lua only tables with
---  1-based consecutive integer keys (a.k.a. array tables) can be
---  parsed in order.
---
--- @tparam table tbl A table to be converted into a key-value string.
---
--- @treturn string A key-value string that can be passed to a TeX
--- macro.
-local function render (tbl)
-  local function render_inner(tbl)
-    local output = {}
-    local function add(text)
-      table.insert(output, text)
-    end
-    for key, value in pairs(tbl) do
-      if (key and type(key) == 'string') then
-        if (type(value) == 'table') then
-          if (next(value)) then
-            add(key .. '={')
-            add(render_inner(value))
-            add('},')
-          else
-            add(key .. '={},')
-          end
-        else
-          add(key .. '=' .. tostring(value) .. ',')
-        end
-      else
-        add(tostring(value) .. ',')
-      end
-    end
-    return table.concat(output)
+  local result= normalize(parse_tree, options)
+  if options.debug then
+    pretty_print(result)
   end
-  return render_inner(tbl)
-end
-
---- The function `stringify(tbl, for_tex)` converts a Lua table into a
---   printable string. Stringify a table means to convert the table into
---   a string. This function is used to realize the `print` function.
---   `stringify(tbl, true)` (`for_tex = true`) generates a string which
---   can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
---   this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
---   string suitable for the terminal.
---
--- @tparam table input A table to stringify.
---
--- @tparam boolean for_tex Stringify the table into a text string that
---   can be embeded inside a TeX document via tex.print(). Curly braces
---   and whites spaces are escaped.
---
--- https://stackoverflow.com/a/54593224/10193818
-local function stringify(input, for_tex)
-  local line_break, start_bracket, end_bracket, indent
-
-  if for_tex then
-    line_break = '\\par'
-    start_bracket = '$\\{$'
-    end_bracket = '$\\}$'
-    indent = '\\ \\ '
-  else
-    line_break = '\n'
-    start_bracket = '{'
-    end_bracket = '}'
-    indent = '  '
-  end
-
-  local function stringify_inner(input, depth)
-    local output = {}
-    depth = depth or 0
-
-    local function add(depth, text)
-      table.insert(output, string.rep(indent, depth) .. text)
-    end
-
-    local function format_key(key)
-      if (type(key) == 'number') then
-        return string.format('[%s]', key)
-      else
-        return string.format('[\'%s\']', key)
-      end
-    end
-
-    if type(input) ~= 'table' then
-      return tostring(input)
-    end
-
-    for key, value in pairs(input) do
-      if (key and type(key) == 'number' or type(key) == 'string') then
-        key = format_key(key)
-
-        if (type(value) == 'table') then
-          if (next(value)) then
-            add(depth, key .. ' = ' .. start_bracket)
-            add(0, stringify_inner(value, depth + 1))
-            add(depth, end_bracket .. ',');
-          else
-            add(depth, key .. ' = ' .. start_bracket .. end_bracket .. ',')
-          end
-        else
-          if (type(value) == 'string') then
-            value = string.format('\'%s\'', value)
-          else
-            value = tostring(value)
-          end
-
-          add(depth, key .. ' = ' .. value .. ',')
-        end
-      end
-    end
-
-    return table.concat(output, line_break)
-  end
-
-  return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
-end
-
---- The function `pretty_print(tbl)` pretty prints a Lua table to standard
---   output (stdout). It is a utility function that can be used to
---   debug and inspect the resulting Lua table of the function
---   `parse`. You have to compile your TeX document in a console to
---   see the terminal output.
---
--- @tparam table tbl A table to be printed to standard output for
--- debugging purposes.
-local function pretty_print(tbl)
-  print(stringify(tbl, false))
+  return result
 end
 
 --- Store results

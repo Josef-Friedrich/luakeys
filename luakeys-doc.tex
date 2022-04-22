@@ -531,13 +531,14 @@ supported:
 
 \begin{minted}{lua}
 local result = parse('one,two,three', {
-  convert_dimensions = false,
-  unpack_single_array_value = false,
-  standalone_as_true = false,
+  case_insensitive_keys = false,
   converter = function(key, value, depth, current_table, root_table)
     return key, value
   end,
-  case_insensitive_keys = false,
+  convert_dimensions = false,
+  debug = false,
+  standalone_as_true = false,
+  unpack_single_array_value = false,
 })
 \end{minted}
 
