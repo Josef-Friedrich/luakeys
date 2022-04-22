@@ -556,54 +556,17 @@ local function normalize(raw, options)
   return raw
 end
 
---- Parse a LaTeX/TeX style key-value string into a Lua table. With
--- this function you should be able to parse key-value strings like
--- this example:
---
---     show,
---     hide,
---     key with spaces = String without quotes,
---     string="String with double quotes: ,{}=",
---     dimension = 1cm,
---     number = -1.2,
---     list = {one,two,three},
---     key value list = {one=one,two=two,three=three},
---     nested key = {
---       nested key 2= {
---         key = value,
---       },
---     },
---
--- The string above results in this Lua table:
---
---     {
---       'show',
---       'hide',
---       ['key with spaces'] = 'String without quotes',
---       string = 'String with double quotes: ,{}=',
---       dimension = 1864679,
---       number = -1.2,
---       list = {'one', 'two', 'three'},
---       key value list = {
---         one = 'one',
---         three = 'three',
---         two = 'two'
---       },
---       ['nested key'] = {
---         ['nested key 2'] = {
---           key = 'value'
---         }
---       },
---     }
+--- Parse a LaTeX/TeX style key-value string into a Lua table.
 --
 -- @tparam string kv_string A string in the TeX/LaTeX style key-value
 --   format as described above.
 --
--- @tparam table options A table containing
--- settings: `convert_dimensions`, `unpack_single_array_values`, `standalone_as_true`, `converter`, `debug`
+-- @tparam table options A table containing the settings:
+-- `convert_dimensions`, `unpack_single_array_values`,
+-- `standalone_as_true`, `converter`, `debug`.
 --
--- @treturn table A hopefully properly parsed table you can do
--- something useful with.
+-- @treturn table A hopefully properly parsed table you can do something
+-- useful with.
 local function parse (kv_string, options)
   if kv_string == nil then
     return {}
