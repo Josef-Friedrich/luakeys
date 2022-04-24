@@ -586,6 +586,30 @@ local function parse (kv_string, options)
   return result
 end
 
+local function apply_definitions(defs, input, output)
+  for _, def in ipairs(defs) do
+    local value = input[def.name]
+
+    if value == nil then
+      break
+    end
+
+    if def.sub_keys ~= nil and type(value) == 'table' then
+      output[def.name] = {}
+      apply_definitions(def.sub_keys, value, output[def.name])
+      break
+    end
+
+    if value ~= nil then
+      output[def.name] = value
+    end
+  end
+end
+
+local function define(defs)
+
+end
+
 --- Store results
 -- @section
 
@@ -652,6 +676,7 @@ if _TEST then
   export.normalize_parse_options = normalize_parse_options
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
   export.visit_parse_tree = visit_parse_tree
+  export.apply_definitions = apply_definitions
 end
 
 return export

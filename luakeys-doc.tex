@@ -559,6 +559,64 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 %
 %%
 
+\subsection{\texttt{define()}}
+
+\subsubsection{Sub keys}
+
+\begin{minted}{lua}
+local keys = {
+  {
+    name = 'key_level_1',
+    sub_keys = {
+      {
+        name = 'key_level_2'
+      }
+    }
+  }
+}
+\end{minted}
+
+\subsubsection{Boolean names}
+
+\begin{minted}{lua}
+local keys = {
+  {
+    name = 'boolean_names',
+    boolean_names = {
+      true = 'show',
+      false = 'hide'
+    }
+  }
+}
+\end{minted}
+
+\subsubsection{Alias}
+
+\begin{minted}{lua}
+local keys = {
+  {
+    name = 'key',
+    alias = 'k',
+    -- alias = {'k', 'ke'},
+  }
+}
+\end{minted}
+
+\subsubsection{From value}
+
+\begin{minted}{lua}
+local keys = {
+  {
+    name = 'key',
+    from_value = true,
+  }
+}
+\end{minted}
+
+%%
+%
+%%
+
 \subsection{\texttt{render(tbl)}: string}
 
 The function \lua{render(tbl)} reverses the function
