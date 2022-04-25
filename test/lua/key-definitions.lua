@@ -43,5 +43,22 @@ describe(
       end
     )
 
+    describe(
+      'Function “define()”', function()
+        local define = luakeys.define
+
+        it(
+          'Return values: result and leftover', function()
+            local parse = define({ { name = 'key1' } })
+
+            local result, leftover = parse('key1=value1')
+            assert.are.same(result, { key1 = 'value1' })
+            assert.are.same(leftover, { })
+          end
+        )
+
+      end
+    )
+
   end
 )

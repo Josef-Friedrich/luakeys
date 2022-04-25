@@ -594,20 +594,28 @@ local function apply_definitions(defs, input, output)
       break
     end
 
+    local key = def.name
+
     if def.sub_keys ~= nil and type(value) == 'table' then
-      output[def.name] = {}
-      apply_definitions(def.sub_keys, value, output[def.name])
+      output[key] = {}
+      apply_definitions(def.sub_keys, value, output[key])
       break
     end
 
     if value ~= nil then
-      output[def.name] = value
+      output[key] = value
+      input[key] = nil
     end
   end
 end
 
-local function define(defs)
-
+local function define(defs, options)
+  return function (kv_string)
+    local leftover = parse(kv_string, options)
+    local result = {}
+    apply_definitions(defs, leftover,  result)
+    return result, leftover
+  end
 end
 
 --- Store results
@@ -654,6 +662,9 @@ local export = {
 
   --- @see parse
   parse = parse,
+
+  --- @see define
+  define = define,
 
   --- @see render
   render = render,
