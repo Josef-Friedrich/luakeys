@@ -30,6 +30,15 @@ describe(
         )
 
         it(
+          'Key names specified as table keys', function()
+            local defs = { key1 = { alias = 'k1' }, key2 = { alias = 'k2' } }
+            local output = {}
+            apply_defintions(defs, { key1 = 'value1', key2 = 'value2' }, output)
+            assert.are.same(output, { key1 = 'value1', key2 = 'value2' })
+          end
+        )
+
+        it(
           'Sub keys', function()
             local defs = {
               { name = 'level1', sub_keys = { { name = 'level2' } } },
@@ -53,7 +62,7 @@ describe(
 
             local result, leftover = parse('key1=value1')
             assert.are.same(result, { key1 = 'value1' })
-            assert.are.same(leftover, { })
+            assert.are.same(leftover, {})
           end
         )
 

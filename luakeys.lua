@@ -587,14 +587,19 @@ local function parse (kv_string, options)
 end
 
 local function apply_definitions(defs, input, output)
-  for _, def in ipairs(defs) do
-    local value = input[def.name]
+  for index, def in pairs(defs) do
+    local key
+    if def.name == nil then
+      key = index
+    else
+      key = def.name
+    end
+
+    local value = input[key]
 
     if value == nil then
       break
     end
-
-    local key = def.name
 
     if def.sub_keys ~= nil and type(value) == 'table' then
       output[key] = {}
