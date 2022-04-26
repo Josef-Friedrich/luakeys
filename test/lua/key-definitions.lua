@@ -49,6 +49,20 @@ describe(
             assert.are.same(output, { level1 = { level2 = 'value' } })
           end
         )
+
+        it(
+          'Opposite values', function()
+            local defs = {
+              visibility = {
+                opposite_values = { [true] = 'show', [false] = 'hide' },
+              },
+            }
+            local input = { 'show' }
+            local output = {}
+            apply_defintions(defs, input, output)
+            assert.are.same(output, { visibility = true })
+          end
+        )
       end
     )
 

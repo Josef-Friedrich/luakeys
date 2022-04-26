@@ -481,6 +481,15 @@ local function unpack_single_valued_array_table(value, options)
   return value
 end
 
+local function remove_from_array(array, element)
+  for index, value in pairs(array) do
+    if element == value then
+      array[index] = nil
+      return value
+    end
+  end
+end
+
 local function visit_parse_tree(parse_tree, callback_func)
   if type(parse_tree) ~= 'table' then
     throw_error('Parse tree has to be a table')
@@ -595,12 +604,27 @@ local function apply_definitions(defs, input, output)
       key = def.name
     end
 
+    -- opposite_values
+    if def.opposite_values ~= nil then
+      local true_value = def.opposite_values[true]
+      local false_value = def.opposite_values[false]
+      if true_value == nil or false_value == nil then
+        throw_error('Usage opposite_values = { [true] = "...", [false] = "..." }')
+      end
+      if remove_from_array(input, true_value) ~= nil then
+        output[key] = true
+      elseif remove_from_array(input, false_value) ~= nil then
+        output[key] = false
+      end
+    end
+
     local value = input[key]
 
     if value == nil then
       break
     end
 
+    -- sub_keys
     if def.sub_keys ~= nil and type(value) == 'table' then
       output[key] = {}
       apply_definitions(def.sub_keys, value, output[key])
