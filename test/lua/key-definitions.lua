@@ -21,20 +21,28 @@ describe(
       'Function “apply_defintions()”', function()
         local apply_defintions = luakeys.apply_definitions
 
-        it(
-          'Simple example', function()
-            local output = {}
-            apply_defintions({ { name = 'key1' } }, { key1 = 'value1' }, output)
-            assert.are.same(output, { key1 = 'value1' })
-          end
-        )
+        describe(
+          'Name of the keys', function()
+            it(
+              'should be specified by the “name” option.', function()
+                local output = {}
+                apply_defintions(
+                  { { name = 'key1' } }, { key1 = 'value1' }, output
+                )
+                assert.are.same(output, { key1 = 'value1' })
+              end
+            )
 
-        it(
-          'Key names specified as table keys', function()
-            local defs = { key1 = { alias = 'k1' }, key2 = { alias = 'k2' } }
-            local output = {}
-            apply_defintions(defs, { key1 = 'value1', key2 = 'value2' }, output)
-            assert.are.same(output, { key1 = 'value1', key2 = 'value2' })
+            it(
+              'should be specified as table keys', function()
+                local defs = { key1 = { alias = 'k1' }, key2 = { alias = 'k2' } }
+                local output = {}
+                apply_defintions(
+                  defs, { key1 = 'value1', key2 = 'value2' }, output
+                )
+                assert.are.same(output, { key1 = 'value1', key2 = 'value2' })
+              end
+            )
           end
         )
 
@@ -51,14 +59,15 @@ describe(
         )
 
         describe(
-          'Opposite values', function()
+          'Option “opposite_values”', function()
             local defs = {
               visibility = {
                 opposite_values = { [true] = 'show', [false] = 'hide' },
               },
             }
+
             it(
-              'true', function()
+              'should return true', function()
                 local output = {}
                 apply_defintions(defs, { 'show' }, output)
                 assert.are.same(output, { visibility = true })
@@ -66,7 +75,7 @@ describe(
             )
 
             it(
-              'false', function()
+              'should return false', function()
                 local output = {}
                 apply_defintions(defs, { 'hide' }, output)
                 assert.are.same(output, { visibility = false })
@@ -80,6 +89,54 @@ describe(
                 assert.are.same(output, {})
               end
             )
+          end
+        )
+
+        describe(
+          'Option “default”', function()
+            local defs = { key = { default = 42 } }
+
+            it(
+              'should be used if the key is not present.', function()
+                local output = {}
+                apply_defintions(defs, { 'unkown' }, output)
+                assert.are.same(output, { key = 42 })
+              end
+            )
+
+            it(
+              'should not be used if the key with its associated value is present.',
+              function()
+                local output = {}
+                apply_defintions(defs, { key = 23 }, output)
+                assert.are.same(output, { key = 23 })
+              end
+            )
+
+            describe(
+              'nested (recursive) definition', function()
+                local mested_defs = {
+                  level1 = { sub_keys = { level2 = { default = 42 } } },
+                }
+
+                it(
+                  'should be used if the key is not present.', function()
+                    local output = {}
+                    apply_defintions(mested_defs, { level1 = { 'unknown' } }, output)
+                    assert.are.same(output, { level1 = { level2 = 42 } })
+                  end
+                )
+
+                it(
+                  'should not be used if the key with its associated value is present.', function()
+                    local output = {}
+                    apply_defintions(mested_defs, { level1 = { level2 = 23 } }, output)
+                    assert.are.same(output, { level1 = { level2 = 23 } })
+                  end
+                )
+              end
+            )
+
           end
         )
       end

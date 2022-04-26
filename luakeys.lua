@@ -605,7 +605,7 @@ end
 local function apply_definitions(defs, input, output)
   for index, def in pairs(defs) do
     local key
-    if def.name == nil then
+    if type(def) == 'table' and def.name == nil then
       key = index
     else
       key = def.name
@@ -628,6 +628,11 @@ local function apply_definitions(defs, input, output)
     end
 
     local value = input[key]
+
+    -- default
+    if def.default ~= nil and value == nil then
+      value = def.default
+    end
 
     -- macro
     if def.macro ~= nil then
