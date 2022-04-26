@@ -150,6 +150,7 @@
     "describe",
     "it",
     "setup",
-    "teardown"
+    "teardown",
+    ""
   ]
 }

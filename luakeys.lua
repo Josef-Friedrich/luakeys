@@ -50,6 +50,13 @@ if not tex then
   end
 end
 
+if not token then
+  token = {}
+  token['set_macro'] = function (csname, content, global)
+
+  end
+end
+
 --- Option handling
 -- @section
 
@@ -604,6 +611,8 @@ local function apply_definitions(defs, input, output)
       key = def.name
     end
 
+    --- standalone value: values with integer keys
+
     -- opposite_values
     if def.opposite_values ~= nil then
       local true_value = def.opposite_values[true]
@@ -620,9 +629,16 @@ local function apply_definitions(defs, input, output)
 
     local value = input[key]
 
+    -- macro
+    if def.macro ~= nil then
+      token.set_macro(def.macro, value, 'global')
+    end
+
     if value == nil then
       break
     end
+
+    --- values indexed by key name
 
     -- sub_keys
     if def.sub_keys ~= nil and type(value) == 'table' then

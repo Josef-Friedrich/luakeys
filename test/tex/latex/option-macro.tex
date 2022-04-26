@@ -1,0 +1,68 @@
+\documentclass{article}
+\usepackage{luakeys}
+
+\begin{document}
+
+\section{A macro name consists of letters only}
+
+\directlua{
+  local parser = luakeys.define({key = { macro = 'MyMacro' }})
+  local result = parser('key=The content of a macro with a name containing only letters.')
+}
+
+\MyMacro
+
+\section{A macro name with an @ character}
+
+\directlua{
+  local parser = luakeys.define({key = { macro = 'My@Macro' }})
+  local result = parser('key=The content of a macro with an “at” symbol in it.')
+}
+
+\makeatletter
+\My@Macro
+\makeatother
+
+\section{A macro that expands to numbers}
+
+\directlua{
+  local parser = luakeys.define({key = { macro = 'MyNumberMacro' }})
+  local result = parser('key=123')
+  tex.print(type(result.key))
+}
+
+\MyNumberMacro
+
+\def\TestDifferentValueTypes#1{
+\bigskip
+Value: #1 \par Lua datatye:
+\directlua{
+  local parser = luakeys.define({key = { macro = 'MyMacro' }})
+  local result = parser('key=#1')
+  tex.print(type(result.key))
+}
+
+expands to: “\MyMacro”
+}
+
+\meaning\MyMacro
+
+\TestDifferentValueTypes{1.23}
+
+\TestDifferentValueTypes{A string}
+
+\TestDifferentValueTypes{true}
+
+\TestDifferentValueTypes{False}
+
+\section{non-existent key}
+
+\directlua{
+  local parser = luakeys.define({key = { macro = 'MyMacro' }})
+  local result = parser('unkown=value')
+}
+
+a non-existent key produces a macro that has no content:
+“\MyMacro”
+
+\end{document}

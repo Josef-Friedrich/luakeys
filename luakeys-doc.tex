@@ -561,7 +561,7 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 
 \subsection{\texttt{define()}}
 
-\subsubsection{Sub keys}
+\subsubsection{Sub keys: \texttt{sub\_keys}}
 
 \begin{minted}{lua}
 local keys = {
@@ -576,7 +576,7 @@ local keys = {
 }
 \end{minted}
 
-\subsubsection{Opposite values}
+\subsubsection{Opposite values: \texttt{opposite\_values}}
 
 \begin{minted}{lua}
 local keys = {
@@ -589,7 +589,24 @@ local keys = {
 }
 \end{minted}
 
-\subsubsection{Alias}
+\subsubsection{\texttt{macro}: Store values in a \TeX macro}
+
+The option \texttt{macro} stores the value in a macro.
+
+\begin{minted}{lua}
+local parse = luakeys.define({
+  key = {
+    macro = 'MyMacro'
+  }
+})
+parse('key=value')
+\end{minted}
+
+\begin{minted}{latex}
+\MyMacro % expands to “value”
+\end{minted}
+
+\subsubsection{Alias: \texttt{alias}}
 
 \begin{minted}{lua}
 local keys = {
