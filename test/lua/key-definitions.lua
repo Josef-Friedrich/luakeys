@@ -50,17 +50,36 @@ describe(
           end
         )
 
-        it(
+        describe(
           'Opposite values', function()
             local defs = {
               visibility = {
                 opposite_values = { [true] = 'show', [false] = 'hide' },
               },
             }
-            local input = { 'show' }
-            local output = {}
-            apply_defintions(defs, input, output)
-            assert.are.same(output, { visibility = true })
+            it(
+              'true', function()
+                local output = {}
+                apply_defintions(defs, { 'show' }, output)
+                assert.are.same(output, { visibility = true })
+              end
+            )
+
+            it(
+              'false', function()
+                local output = {}
+                apply_defintions(defs, { 'hide' }, output)
+                assert.are.same(output, { visibility = false })
+              end
+            )
+
+            it(
+              'unknown value', function()
+                local output = {}
+                apply_defintions(defs, { 'unknown' }, output)
+                assert.are.same(output, {})
+              end
+            )
           end
         )
       end
