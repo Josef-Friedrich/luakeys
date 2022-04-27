@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage{luakeys}
+
+\begin{document}
+
+\directlua{
+  local parser = luakeys.define({ key = { l3_tl_set = 'my_var' }})
+  local result = parser('key=The content of a token list variable.')
+}
+
+\ExplSyntaxOn
+\g_my_var_tl
+\ExplSyntaxOff
+
+\end{document}

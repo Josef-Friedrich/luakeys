@@ -86,6 +86,12 @@ local function throw_error(message)
   end
 end
 
+local l3_code_cctab = 10
+
+local function set_l3_code_cctab (cctab_id)
+  l3_code_cctab = cctab_id
+end
+
 --- Convert a key so that it can be written as a table field without
 --  quotes and square brackets (for example `one 2` becomes `one_2`).
 --  The key can then reference values from a table using dot notation.
@@ -649,6 +655,13 @@ local function apply_definitions(defs, input, output)
     if def.sub_keys ~= nil and type(value) == 'table' then
       output[key] = {}
       apply_definitions(def.sub_keys, value, output[key])
+      break
+    end
+
+    -- l3_tl_set
+    if def.l3_tl_set ~= nil then
+      tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
+      tex.print('{' .. value .. '}')
       break
     end
 
