@@ -610,14 +610,34 @@ end
 
 local function apply_definitions(defs, input, output)
   for index, def in pairs(defs) do
+    --- Find key and def
     local key
-    if type(def) == 'table' and def.name == nil then
+    if type(def) == 'table' and def.name == nil and type(index) == 'string' then
       key = index
-    else
+    elseif type(def) == 'table' and def.name ~= nil then
       key = def.name
+    elseif type(index) == 'number' and type(def) == 'string' then
+      key = def
+      def = { default = true }
     end
 
+    if key == nil then
+      throw_error('key name couldn’t be detected!')
+    end
+
+    if type(def) ~= 'table' then
+      throw_error('Key definition must be a table')
+    end
+
+    -- find value
+    local value
+    if input[key] ~= nil then
+      value = input[key]
+      input[key] = nil
     --- standalone value: values with integer keys
+    elseif remove_from_array(input, key) ~= nil then
+      value = def.default
+    end
 
     -- opposite_values
     if def.opposite_values ~= nil then
@@ -633,10 +653,9 @@ local function apply_definitions(defs, input, output)
       end
     end
 
-    local value = input[key]
-
+    -- always_present
     -- default
-    if def.default ~= nil and value == nil then
+    if def.default ~= nil and value == nil and def.always_present then
       value = def.default
     end
 
@@ -667,7 +686,6 @@ local function apply_definitions(defs, input, output)
 
     if value ~= nil then
       output[key] = value
-      input[key] = nil
     end
   end
 end
