@@ -52,52 +52,84 @@ describe(
           end
         )
 
-        it(
-          'Sub keys', function()
-            local defs = {
-              { name = 'level1', sub_keys = { { name = 'level2' } } },
-            }
-            local input = { level1 = { level2 = 'value' } }
-            local output = {}
-            apply_defintions(defs, input, output)
-            assert.are.same(output, { level1 = { level2 = 'value' } })
-          end
-        )
-
         describe(
-          'Option “opposite_values”', function()
-            local defs = {
-              visibility = {
-                opposite_values = { [true] = 'show', [false] = 'hide' },
-              },
-            }
-
+          'Options', function()
             it(
-              'should return true', function()
+              'Option “sub_keys”', function()
+                local defs = {
+                  { name = 'level1', sub_keys = { { name = 'level2' } } },
+                }
+                local input = { level1 = { level2 = 'value' } }
                 local output = {}
-                apply_defintions(defs, { 'show' }, output)
-                assert.are.same(output, { visibility = true })
+                apply_defintions(defs, input, output)
+                assert.are.same(output, { level1 = { level2 = 'value' } })
               end
             )
 
-            it(
-              'should return false', function()
-                local output = {}
-                apply_defintions(defs, { 'hide' }, output)
-                assert.are.same(output, { visibility = false })
+            describe(
+              'Option “alias”', function()
+                local defs = {
+                  key1 = { alias = 'k1' },
+                  key2 = { alias = { 'k2', 'my_key2' } },
+                }
+
+                it(
+                  'should find a value if the “alias” option is specified as a string and store it under the original key name.',
+                  function()
+                    local output = {}
+                    apply_defintions(defs, { k1 = 42 }, output)
+                    assert.are.same(output, { key1 = 42 })
+                  end
+                )
+
+                it(
+                  'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
+                  function()
+                    local output = {}
+                    apply_defintions(defs, { my_key2 = 42 }, output)
+                    assert.are.same(output, { key2 = 42 })
+                  end
+                )
               end
             )
 
-            it(
-              'unknown value', function()
-                local output = {}
-                apply_defintions(defs, { 'unknown' }, output)
-                assert.are.same(output, {})
+            describe(
+              'Option “opposite_values”', function()
+                local defs = {
+                  visibility = {
+                    opposite_values = { [true] = 'show', [false] = 'hide' },
+                  },
+                }
+
+                it(
+                  'should return true if a truthy string value is given.',
+                  function()
+                    local output = {}
+                    apply_defintions(defs, { 'show' }, output)
+                    assert.are.same(output, { visibility = true })
+                  end
+                )
+
+                it(
+                  'should return false if a falsy string is given.', function()
+                    local output = {}
+                    apply_defintions(defs, { 'hide' }, output)
+                    assert.are.same(output, { visibility = false })
+                  end
+                )
+
+                it(
+                  'should return an empty table if a unknown string value is given.',
+                  function()
+                    local output = {}
+                    apply_defintions(defs, { 'unknown' }, output)
+                    assert.are.same(output, {})
+                  end
+                )
               end
             )
           end
         )
-
       end
     )
 
@@ -114,7 +146,6 @@ describe(
             assert.are.same(leftover, {})
           end
         )
-
       end
     )
 

@@ -621,22 +621,39 @@ local function apply_definitions(defs, input, output)
       def = { default = true }
     end
 
-    if key == nil then
-      throw_error('key name couldn’t be detected!')
-    end
-
     if type(def) ~= 'table' then
       throw_error('Key definition must be a table')
     end
 
+    if key == nil then
+      throw_error('key name couldn’t be detected!')
+    end
+
+    local function find_value(search_key)
+      if input[search_key] ~= nil then
+        local value = input[search_key]
+        input[search_key] = nil
+        return value
+      --- standalone value: values with integer keys
+      elseif remove_from_array(input, search_key) ~= nil then
+        return def.default
+      end
+    end
+
     -- find value
-    local value
-    if input[key] ~= nil then
-      value = input[key]
-      input[key] = nil
-    --- standalone value: values with integer keys
-    elseif remove_from_array(input, key) ~= nil then
-      value = def.default
+    local value = find_value(key)
+
+    -- def.alias
+    if value == nil and def.alias ~= nil then
+      if type(def.alias) == 'string' then
+        def.alias = { def.alias }
+      end
+      for _, alias in ipairs(def.alias) do
+        value = find_value(alias)
+        if value ~= nil then
+          break
+        end
+      end
     end
 
     -- opposite_values
