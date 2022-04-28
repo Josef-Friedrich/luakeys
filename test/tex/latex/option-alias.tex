@@ -1,0 +1,18 @@
+\documentclass{article}
+\usepackage{luakeys}
+
+\begin{document}
+
+\directlua{
+  local parser = luakeys.define({ key = { alias = 'k' }})
+  local result = parser('k=value')
+  tex.print(result.key)
+}
+
+\directlua{
+  local parser = luakeys.define({ key = { alias = {'k', 'ke'} }})
+  local result = parser('ke=value')
+  tex.print(result.key)
+}
+
+\end{document}
