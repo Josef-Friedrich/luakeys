@@ -21,7 +21,7 @@ install_quick:
 test: install test_lua test_tex doc_pdf
 
 test_lua:
-	busted --exclude-tags=skip test/lua/*.lua
+	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip test/lua/*.lua
 
 test_tex: test_tex_plain test_tex_latex
 
