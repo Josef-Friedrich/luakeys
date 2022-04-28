@@ -5,8 +5,12 @@ installdir = $(texmftex)/$(jobname)
 
 all: install doc_lua
 
-install:
+install: uninstall_texlive install_quick
+
+uninstall_texlive:
 	-tlmgr uninstall --force luakeys
+
+install_quick:
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
 	cp -f $(jobname).sty $(installdir)

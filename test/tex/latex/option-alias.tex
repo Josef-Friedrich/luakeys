@@ -3,16 +3,32 @@
 
 \begin{document}
 
+Should be “value1”:
+
 \directlua{
   local parser = luakeys.define({ key = { alias = 'k' }})
-  local result = parser('k=value')
+  local result = parser('k=value1')
   tex.print(result.key)
 }
 
+Should be “value2”:
+
 \directlua{
   local parser = luakeys.define({ key = { alias = {'k', 'ke'} }})
-  local result = parser('ke=value')
+  local result = parser('ke=value2')
   tex.print(result.key)
+}
+
+Should be “value3”:
+
+\directlua{
+  local defs = {
+    key1 = { alias = 'k1' },
+    key2 = { alias = { 'k2', 'my_key2' } },
+  }
+  local parser = luakeys.define(defs)
+  local result = parser('my_key2=value3')
+  tex.print(result.key2)
 }
 
 \end{document}

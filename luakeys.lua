@@ -705,6 +705,7 @@ local function apply_definitions(defs, input, output)
       output[key] = value
     end
   end
+  return output
 end
 
 local function define(defs, options)

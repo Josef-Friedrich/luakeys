@@ -70,14 +70,13 @@ describe(
               'Option “alias”', function()
                 local defs = {
                   key1 = { alias = 'k1' },
-                  key2 = { alias = { 'k2', 'my_key2' } },
+                  key2 = { alias = { 'k2', 'mykey2' } },
                 }
 
                 it(
                   'should find a value if the “alias” option is specified as a string and store it under the original key name.',
                   function()
-                    local output = {}
-                    apply_defintions(defs, { k1 = 42 }, output)
+                    local output = apply_defintions(defs, { k1 = 42 }, {})
                     assert.are.same(output, { key1 = 42 })
                   end
                 )
@@ -86,7 +85,7 @@ describe(
                   'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
                   function()
                     local output = {}
-                    apply_defintions(defs, { my_key2 = 42 }, output)
+                    apply_defintions(defs, { ['my_key2'] = 42 }, output)
                     assert.are.same(output, { key2 = 42 })
                   end
                 )
