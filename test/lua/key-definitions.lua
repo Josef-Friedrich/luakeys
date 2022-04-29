@@ -145,6 +145,22 @@ describe(
             assert.are.same(leftover, {})
           end
         )
+
+        it(
+          'should merge inner default options', function()
+            local parse = define({ 'key1', 'key2' })
+            local result = parse('key1=value1', {}, { key2 = 'value2' })
+            assert.are.same(result, { key1 = 'value1', key2 = 'value2' })
+          end
+        )
+
+        it(
+          'should merge outer default options', function()
+            local parse = define({ 'key1', 'key2' }, nil, { key2 = 'value2' })
+            local result = parse('key1=value1')
+            assert.are.same(result, { key1 = 'value1', key2 = 'value2' })
+          end
+        )
       end
     )
 

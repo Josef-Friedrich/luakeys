@@ -131,7 +131,7 @@ end
 -- empty or some keys are not set.
 --
 -- @treturn table
-local function normalize_parse_options (options_raw)
+local function normalize_parse_options(options_raw)
   options_raw = luafy_options(options_raw)
   local options = {}
 
@@ -144,6 +144,22 @@ local function normalize_parse_options (options_raw)
   end
 
   return options
+end
+
+--- https://stackoverflow.com/a/1283608/10193818
+local function merge_tables(target, t2)
+  for k, v in pairs(t2) do
+    if type(v) == "table" then
+      if type(target[k] or false) == "table" then
+        merge_tables(target[k] or {}, t2[k] or {})
+      elseif target[k] == nil then
+        target[k] = v
+      end
+    elseif target[k] == nil then
+      target[k] = v
+    end
+  end
+  return target
 end
 
 --- Convert back to strings
@@ -589,19 +605,22 @@ end
 --
 -- @treturn table A hopefully properly parsed table you can do something
 -- useful with.
-local function parse (kv_string, options)
+local function parse (kv_string, options, defaults)
   if kv_string == nil then
     return {}
   end
   options = normalize_parse_options(options)
 
   local parser = generate_parser('list', options)
-  local parse_tree = parser:match(kv_string)
+  local result = parser:match(kv_string)
 
   if options.converter ~= nil and type(options.converter) == 'function' then
-    parse_tree = visit_parse_tree(parse_tree, options.converter)
+    result = visit_parse_tree(result, options.converter)
   end
-  local result= normalize(parse_tree, options)
+  if defaults ~= nil and type(defaults) == 'table' then
+    merge_tables(result, defaults)
+  end
+  result = normalize(result, options)
   if options.debug then
     pretty_print(result)
   end
@@ -719,11 +738,15 @@ local function apply_definitions(defs, input, output)
   return output
 end
 
-local function define(defs, options)
-  return function (kv_string)
-    local leftover = parse(kv_string, options)
+local function define(defs, parse_options, defaults)
+  return function (kv_string, inner_parse_options, inner_defaults)
+    local leftover = parse(
+      kv_string,
+      inner_parse_options or parse_options,
+      inner_defaults or defaults
+    )
     local result = {}
-    apply_definitions(defs, leftover,  result)
+    apply_definitions(defs, leftover, result)
     return result, leftover
   end
 end
@@ -800,6 +823,7 @@ if _TEST then
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
   export.visit_parse_tree = visit_parse_tree
   export.apply_definitions = apply_definitions
+  export.merge_tables = merge_tables
 end
 
 return export

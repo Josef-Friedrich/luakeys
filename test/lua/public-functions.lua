@@ -56,6 +56,11 @@ describe('Function “parse()”', function()
     assert.are.same(expected, luakeys.parse(input))
   end
 
+  it('Merge defaults', function ()
+    local result = luakeys.parse('key1=value1', nil, {key2 = 'value2'})
+    assert.are.same(result, {key1 = 'value1', key2 = 'value2'})
+  end)
+
   describe('Options', function()
     it('Change default options', function()
       local defaults = luakeys.default_options
