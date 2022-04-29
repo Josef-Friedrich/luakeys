@@ -299,3 +299,23 @@ describe('Functions “save()” and “get()”', function()
     end, 'No stored result was found for the identifier \'xxx\'')
   end)
 end)
+
+describe('Function is.dimension', function ()
+  it('should return false', function()
+    assert.is.equal(luakeys.is.dimension('xxx'), false)
+  end)
+
+  it('should return true', function()
+    assert.is.equal(luakeys.is.dimension('1 cm'), true)
+  end)
+end)
+
+describe('Function is.integer', function ()
+  it('should return false', function()
+    assert.is.equal(luakeys.is.integer('1.1'), false)
+  end)
+
+  it('should return true', function()
+    assert.is.equal(luakeys.is.integer('134'), true)
+  end)
+end)

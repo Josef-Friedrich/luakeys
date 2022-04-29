@@ -286,7 +286,7 @@ end
 --- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser.
-local function generate_parser(options)
+local function generate_parser(initial_rule, options)
   -- Optional whitespace
   local white_space = Set(' \t\n\r')
 
@@ -330,7 +330,7 @@ local function generate_parser(options)
   end
 
   return Pattern({
-    'list',
+    [1] = initial_rule,
 
     -- list_item*
     list = CaptureFolding(
@@ -595,7 +595,7 @@ local function parse (kv_string, options)
   end
   options = normalize_parse_options(options)
 
-  local parser = generate_parser(options)
+  local parser = generate_parser('list', options)
   local parse_tree = parser:match(kv_string)
 
   if options.converter ~= nil and type(options.converter) == 'function' then
@@ -607,6 +607,19 @@ local function parse (kv_string, options)
   end
   return result
 end
+
+local is = {
+  dimension = function (str)
+    local parser = generate_parser('dimension', {convert_dimensions = false})
+    local result = parser:match(str)
+    return result ~= nil
+  end,
+
+  integer = function (str)
+    local n = tonumber(str)
+    return n == math.floor(n)
+  end,
+}
 
 local function apply_definitions(defs, input, output)
   for index, def in pairs(defs) do
@@ -776,6 +789,8 @@ local export = {
 
   --- @see get
   get = get,
+
+  is = is,
 }
 
 -- http://olivinelabs.com/busted/#private
