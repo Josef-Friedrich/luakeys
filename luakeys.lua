@@ -610,6 +610,7 @@ end
 
 local is = {
   dimension = function (str)
+    if str == nil then return false end
     local parser = generate_parser('dimension', {convert_dimensions = false})
     local result = parser:match(str)
     return result ~= nil

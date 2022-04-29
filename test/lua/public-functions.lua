@@ -305,6 +305,10 @@ describe('Function is.dimension', function ()
     assert.is.equal(luakeys.is.dimension('xxx'), false)
   end)
 
+  it('should return false if the input is nil', function()
+    assert.is.equal(luakeys.is.dimension(), false)
+  end)
+
   it('should return true', function()
     assert.is.equal(luakeys.is.dimension('1 cm'), true)
   end)
