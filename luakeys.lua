@@ -617,6 +617,7 @@ local is = {
 
   integer = function (str)
     local n = tonumber(str)
+    if n == nil then return false end
     return n == math.floor(n)
   end,
 }

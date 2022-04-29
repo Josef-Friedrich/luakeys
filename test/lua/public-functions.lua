@@ -315,6 +315,14 @@ describe('Function is.integer', function ()
     assert.is.equal(luakeys.is.integer('1.1'), false)
   end)
 
+  it('should return false if input is a string', function()
+    assert.is.equal(luakeys.is.integer('xxx'), false)
+  end)
+
+  it('should return false if input is a integer', function()
+    assert.is.equal(luakeys.is.integer(1), true)
+  end)
+
   it('should return true', function()
     assert.is.equal(luakeys.is.integer('134'), true)
   end)
