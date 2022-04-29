@@ -696,10 +696,6 @@ local function apply_definitions(defs, input, output)
       token.set_macro(def.macro, value, 'global')
     end
 
-    if value == nil then
-      break
-    end
-
     --- values indexed by key name
 
     -- sub_keys

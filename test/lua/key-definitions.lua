@@ -70,7 +70,7 @@ describe(
               'Option “alias”', function()
                 local defs = {
                   key1 = { alias = 'k1' },
-                  key2 = { alias = { 'k2', 'mykey2' } },
+                  key2 = { alias = { 'k2', 'my_key2' } },
                 }
 
                 it(
