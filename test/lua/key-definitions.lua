@@ -127,6 +127,54 @@ describe(
                 )
               end
             )
+
+            describe(
+              'Option “exclusive_group”', function()
+                local defs = {
+                  k1 = { exclusive_group = 'group1' },
+                  k2 = { exclusive_group = 'group1' },
+                  k3 = { exclusive_group = 'group3' },
+                  k4 = { default = 'value' },
+                }
+
+                it(
+                  'should pass if only one key of the mutually exclusive group is present.',
+                  function()
+                    assert.are.same(
+                      apply_defintions(defs, { k1 = 'value' }, {}),
+                      { k1 = 'value' }
+                    )
+                  end
+                )
+
+                it(
+                  'should throw an error if only two keys of the mutually exclusive group are present.',
+                  function()
+                    assert.has_error(
+                      function()
+                        apply_defintions(
+                          defs, { k1 = 'value', k2 = 'value' }, {}
+                        )
+                      end
+                    )
+                  end
+                )
+
+                it('should let other keys untouched.', function ()
+                  assert.are.same(
+                    apply_defintions(defs, { 'k4' }, {}),
+                    { k4 = 'value' }
+                  )
+                end)
+
+                it('two keys of two different exclusive groups should pass.', function ()
+                  assert.are.same(
+                    apply_defintions(defs, { k1 = 'value', k3 = 'value' }, {}),
+                    { k1 = 'value', k3 = 'value' }
+                  )
+                end)
+              end
+            )
           end
         )
       end

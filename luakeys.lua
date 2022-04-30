@@ -53,7 +53,6 @@ end
 if not token then
   token = {}
   token['set_macro'] = function (csname, content, global)
-
   end
 end
 
@@ -643,6 +642,7 @@ local is = {
 }
 
 local function apply_definitions(defs, input, output)
+  local exclusive_groups = {}
   for index, def in pairs(defs) do
     --- Find key and def
     local key
@@ -690,7 +690,7 @@ local function apply_definitions(defs, input, output)
       end
     end
 
-    -- opposite_values
+    -- def.opposite_values
     if def.opposite_values ~= nil then
       local true_value = def.opposite_values[true]
       local false_value = def.opposite_values[false]
@@ -704,27 +704,39 @@ local function apply_definitions(defs, input, output)
       end
     end
 
-    -- always_present
-    -- default
+    -- def.always_present
+    -- def.default
     if def.default ~= nil and value == nil and def.always_present then
       value = def.default
     end
 
-    -- macro
+    -- def.exclusive_group
+    if def.exclusive_group ~= nil and value ~= nil then
+      if exclusive_groups[def.exclusive_group] ~= nil then
+        throw_error('The key “' .. key ..
+          '” belongs to a mutually exclusive group and the key “' ..
+          exclusive_groups[def.exclusive_group] .. '” is already present!'
+        )
+      else
+        exclusive_groups[def.exclusive_group] = key
+      end
+    end
+
+    -- def.macro
     if def.macro ~= nil then
       token.set_macro(def.macro, value, 'global')
     end
 
     --- values indexed by key name
 
-    -- sub_keys
+    -- def.sub_keys
     if def.sub_keys ~= nil and type(value) == 'table' then
       output[key] = {}
       apply_definitions(def.sub_keys, value, output[key])
       break
     end
 
-    -- l3_tl_set
+    -- def.l3_tl_set
     if def.l3_tl_set ~= nil then
       tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
       tex.print('{' .. value .. '}')
