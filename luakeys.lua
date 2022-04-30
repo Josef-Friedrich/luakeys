@@ -67,6 +67,8 @@ local option_keys = {
   'converter',
   'case_insensitive_keys',
   'debug',
+  'preprocess',
+  'postprocess',
 }
 
 --- The default options.
@@ -600,7 +602,7 @@ end
 --
 -- @tparam table options A table containing the settings:
 -- `convert_dimensions`, `unpack_single_array_values`,
--- `standalone_as_true`, `converter`, `debug`.
+-- `standalone_as_true`, `converter`, `debug`, `preprocess`, `postprocess`.
 --
 -- @treturn table A hopefully properly parsed table you can do something
 -- useful with.
@@ -613,6 +615,18 @@ local function parse (kv_string, options, defaults)
   local parser = generate_parser('list', options)
   local result = parser:match(kv_string)
 
+  local function apply_processor(name)
+    if options[name] ~= nil and type(options[name]) == 'function' then
+      options[name](result, kv_string)
+      if options.debug then
+        print('After execution of the function: ' .. name)
+        pretty_print(result)
+      end
+    end
+  end
+
+  apply_processor('preprocess')
+
   if options.converter ~= nil and type(options.converter) == 'function' then
     result = visit_parse_tree(result, options.converter)
   end
@@ -620,6 +634,9 @@ local function parse (kv_string, options, defaults)
     merge_tables(result, defaults)
   end
   result = normalize(result, options)
+
+  apply_processor('postprocess')
+
   if options.debug then
     pretty_print(result)
   end

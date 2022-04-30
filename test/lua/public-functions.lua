@@ -2,337 +2,560 @@ require 'busted.runner'()
 
 local luakeys = require('luakeys')
 
-describe('Function “stringify()”', function()
-  local function assert_equals(input, expected)
-    assert.are.equal(expected, luakeys.stringify(input))
+describe(
+  'Function “stringify()”', function()
+    local function assert_equals(input, expected)
+      assert.are.equal(expected, luakeys.stringify(input))
+    end
+
+    it(
+      'integer indexes', function()
+        assert_equals({ 'one' }, '{\n  [1] = \'one\',\n}')
+      end
+    )
+
+    it(
+      'string indexes', function()
+        assert_equals({ ['one'] = 1 }, '{\n  [\'one\'] = 1,\n}')
+      end
+    )
+
+    it(
+      'nested', function()
+        assert_equals({ { 1 } }, '{\n  [1] = {\n    [1] = 1,\n  },\n}')
+      end
+    )
+
+    it(
+      'option for_tex = true', function()
+        assert.are.equal(
+          '$\\{$\\par\\ \\ [1] = \'one\',\\par$\\}$',
+          luakeys.stringify({ 'one' }, true)
+        )
+      end
+    )
   end
+)
 
-  it('integer indexes', function()
-    assert_equals({'one'}, '{\n  [1] = \'one\',\n}')
-  end)
+describe(
+  'Function “render()”', function()
+    local function assert_render(input, expected)
+      assert.are.equal(expected, luakeys.render(luakeys.parse(input)))
+    end
 
-  it('string indexes', function()
-    assert_equals({['one'] = 1}, '{\n  [\'one\'] = 1,\n}')
-  end)
+    it(
+      'standalone value as a string', function()
+        assert_render('key', 'key,')
+      end
+    )
 
-  it('nested', function()
-    assert_equals({{1}}, '{\n  [1] = {\n    [1] = 1,\n  },\n}')
-  end)
+    it(
+      'standalone value as a number', function()
+        assert_render('1', '1,')
+      end
+    )
 
-  it('option for_tex = true', function()
-    assert.are.equal('$\\{$\\par\\ \\ [1] = \'one\',\\par$\\}$',
-                     luakeys.stringify({'one'}, true))
-  end)
-end)
+    it(
+      'standalone value as a dimension', function()
+        assert_render('1cm', '1234567,')
+      end
+    )
 
-describe('Function “render()”', function()
-  local function assert_render(input, expected)
-    assert.are.equal(expected, luakeys.render(luakeys.parse(input)))
+    it(
+      'standalone value as a boolean', function()
+        assert_render('TRUE', 'true,')
+      end
+    )
+
+    it(
+      'A list of standalone values', function()
+        assert_render('one,two,three', 'one,two,three,')
+      end
+    )
   end
+)
 
-  it('standalone value as a string', function()
-    assert_render('key', 'key,')
-  end)
+describe(
+  'Function “parse()”', function()
+    local function assert_parse(input, expected)
+      assert.are.same(expected, luakeys.parse(input))
+    end
 
-  it('standalone value as a number', function()
-    assert_render('1', '1,')
-  end)
+    it(
+      'Merge defaults', function()
+        local result = luakeys.parse('key1=value1', nil, { key2 = 'value2' })
+        assert.are.same(result, { key1 = 'value1', key2 = 'value2' })
+      end
+    )
 
-  it('standalone value as a dimension', function()
-    assert_render('1cm', '1234567,')
-  end)
-
-  it('standalone value as a boolean', function()
-    assert_render('TRUE', 'true,')
-  end)
-
-  it('A list of standalone values', function()
-    assert_render('one,two,three', 'one,two,three,')
-  end)
-end)
-
-describe('Function “parse()”', function()
-  local function assert_parse(input, expected)
-    assert.are.same(expected, luakeys.parse(input))
-  end
-
-  it('Merge defaults', function ()
-    local result = luakeys.parse('key1=value1', nil, {key2 = 'value2'})
-    assert.are.same(result, {key1 = 'value1', key2 = 'value2'})
-  end)
-
-  describe('Options', function()
-    it('Change default options', function()
-      local defaults = luakeys.default_options
-      assert.are.same({1234567}, luakeys.parse('1cm'))
-      defaults.convert_dimensions = false
-      assert.are.same({'1cm'}, luakeys.parse('1cm'))
-      -- Restore
-      defaults.convert_dimensions = true
-    end)
-
-    it('with spaces', function()
-      assert.are.same({'1cm'},
-                      luakeys.parse('1cm', {['convert dimensions'] = false}))
-    end)
-
-    it('with underscores', function()
-      assert.are.same({'1cm'},
-                      luakeys.parse('1cm', {convert_dimensions = false}))
-    end)
-
-    describe('Option “converter”', function()
-      it('standalone string values as keys', function()
-        local function converter(key, value)
-          if type(key) == 'number' and type(value) == 'string' then
-            return value, true
+    describe(
+      'Options', function()
+        it(
+          'Change default options', function()
+            local defaults = luakeys.default_options
+            assert.are.same({ 1234567 }, luakeys.parse('1cm'))
+            defaults.convert_dimensions = false
+            assert.are.same({ '1cm' }, luakeys.parse('1cm'))
+            -- Restore
+            defaults.convert_dimensions = true
           end
-          return key, value
-        end
+        )
 
-        assert.are.same(luakeys.parse('one,two,three={four}', {converter = converter}),
-                        {one = true, two = true, three = {four = true}})
-      end)
-
-      it('case insensitive keys', function()
-        local function converter(key, value)
-          if type(key) == 'string' then
-            return key:lower(), value
+        it(
+          'with spaces', function()
+            assert.are.same(
+              { '1cm' },
+              luakeys.parse('1cm', { ['convert dimensions'] = false })
+            )
           end
-          return key, value
-        end
+        )
 
-        assert.are.same(luakeys.parse('TEST=test', {converter = converter}),
-                        {test = 'test'})
-      end)
-    end)
+        it(
+          'with underscores', function()
+            assert.are.same(
+              { '1cm' }, luakeys.parse('1cm', { convert_dimensions = false })
+            )
+          end
+        )
 
-    describe('Option “convert_dimensions”', function()
-      it('true', function()
-        assert.are.same({1234567},
-                        luakeys.parse('1cm', {['convert dimensions'] = true}))
-      end)
+        describe(
+          'Option “converter”', function()
+            it(
+              'standalone string values as keys', function()
+                local function converter(key, value)
+                  if type(key) == 'number' and type(value) == 'string' then
+                    return value, true
+                  end
+                  return key, value
+                end
 
-      it('false', function()
-        assert.are.same({'1cm'},
-                        luakeys.parse('1cm', {['convert dimensions'] = false}))
-      end)
-    end)
+                assert.are.same(
+                  luakeys.parse(
+                    'one,two,three={four}', { converter = converter }
+                  ), { one = true, two = true, three = { four = true } }
+                )
+              end
+            )
 
-    describe('Options “standalone_as_true”', function()
-      it('default', function()
-        assert.are.same({ 'one' },
-                        luakeys.parse('one'))
-      end)
+            it(
+              'case insensitive keys', function()
+                local function converter(key, value)
+                  if type(key) == 'string' then
+                    return key:lower(), value
+                  end
+                  return key, value
+                end
 
-      it('true', function()
-        assert.are.same({one = true},
-                        luakeys.parse('one', {standalone_as_true = true}))
-      end)
+                assert.are.same(
+                  luakeys.parse('TEST=test', { converter = converter }),
+                  { test = 'test' }
+                )
+              end
+            )
+          end
+        )
 
-      it('false', function()
-        assert.are.same({ 'one' },
-                        luakeys.parse('one', {standalone_as_true = false}))
-      end)
-    end)
+        describe(
+          'Option “preprocess”', function()
+            it(
+              'should add keys.', function()
+                local result = luakeys.parse(
+                                 'key=value', {
+                    preprocess = function(result, kv_string)
+                      print('looo')
+                      result['additional_key'] = 'value'
+                      result['kv_string'] = kv_string
+                    end,
+                  }
+                               )
 
-    describe('Option “case_insensitive_keys”', function()
-      it('default', function()
-        assert.are.same({TEST = 'Test'},
-                        luakeys.parse('TEST=Test'))
-      end)
+                assert.are.same(
+                  result, {
+                    additional_key = 'value',
+                    key = 'value',
+                    kv_string = 'key=value',
+                  }
+                )
+              end
+            )
+          end
+        )
 
-      it('true', function()
-        assert.are.same({test = 'Test'},
-                        luakeys.parse('TEST=Test', {case_insensitive_keys = true}))
-      end)
+        describe(
+          'Option “convert_dimensions”', function()
+            it(
+              'true', function()
+                assert.are.same(
+                  { 1234567 },
+                  luakeys.parse('1cm', { ['convert dimensions'] = true })
+                )
+              end
+            )
 
-      it('recursive', function()
-        assert.are.same({test1 = {test2 = 'Test'}},
-                        luakeys.parse('TEST1={TEST2={Test}}', {case_insensitive_keys = true}))
-      end)
+            it(
+              'false', function()
+                assert.are.same(
+                  { '1cm' },
+                  luakeys.parse('1cm', { ['convert dimensions'] = false })
+                )
+              end
+            )
+          end
+        )
 
-      it('false', function()
-        assert.are.same({TEST = 'Test'},
-                        luakeys.parse('TEST=Test', {case_insensitive_keys = false}))
-      end)
-    end)
+        describe(
+          'Options “standalone_as_true”', function()
+            it(
+              'default', function()
+                assert.are.same({ 'one' }, luakeys.parse('one'))
+              end
+            )
 
-  end)
+            it(
+              'true', function()
+                assert.are.same(
+                  { one = true },
+                  luakeys.parse('one', { standalone_as_true = true })
+                )
+              end
+            )
 
-  describe('Whitespaces', function()
-    it('No whitepsaces', function()
-      assert_parse('integer=1', {integer = 1})
-    end)
+            it(
+              'false', function()
+                assert.are.same(
+                  { 'one' },
+                  luakeys.parse('one', { standalone_as_true = false })
+                )
+              end
+            )
+          end
+        )
 
-    it('With whitespaces', function()
-      assert_parse('integer = 2', {integer = 2})
-    end)
+        describe(
+          'Option “case_insensitive_keys”', function()
+            it(
+              'default', function()
+                assert.are.same({ TEST = 'Test' }, luakeys.parse('TEST=Test'))
+              end
+            )
 
-    it('With tabs', function()
-      assert_parse('integer\t=\t3', {integer = 3})
-    end)
+            it(
+              'true', function()
+                assert.are.same(
+                  { test = 'Test' },
+                  luakeys.parse('TEST=Test', { case_insensitive_keys = true })
+                )
+              end
+            )
 
-    it('With newlines', function()
-      assert_parse('integer\n=\n4', {integer = 4})
-    end)
+            it(
+              'recursive', function()
+                assert.are.same(
+                  { test1 = { test2 = 'Test' } }, luakeys.parse(
+                    'TEST1={TEST2={Test}}', { case_insensitive_keys = true }
+                  )
+                )
+              end
+            )
 
-    it('With whitespaces, tabs and newlines', function()
-      assert_parse('integer \t\n= \t\n5 , boolean=false',
-                   {integer = 5, boolean = false})
-    end)
+            it(
+              'false', function()
+                assert.are.same(
+                  { TEST = 'Test' },
+                  luakeys.parse('TEST=Test', { case_insensitive_keys = false })
+                )
+              end
+            )
+          end
+        )
 
-    it('Two keys with whitespaces', function()
-      assert_parse('integer=1 , boolean=false', {integer = 1, boolean = false})
-    end)
+      end
+    )
 
-    it('Two keys with whitespaces, tabs, newlines', function()
-      assert_parse('integer \t\n= \t\n1 \t\n, \t\nboolean \t\n= \t\nfalse',
-                   {integer = 1, boolean = false})
-    end)
-  end)
+    describe(
+      'Whitespaces', function()
+        it(
+          'No whitepsaces', function()
+            assert_parse('integer=1', { integer = 1 })
+          end
+        )
 
-  describe('Multiple keys', function()
-    assert_parse('integer=1,boolean=false', {integer = 1, boolean = false})
-    assert_parse('integer=1 , boolean=false', {integer = 1, boolean = false})
-  end)
+        it(
+          'With whitespaces', function()
+            assert_parse('integer = 2', { integer = 2 })
+          end
+        )
 
-  describe('Edge cases', function()
-    it('Empty string', function()
-      assert_parse('', {})
-    end)
+        it(
+          'With tabs', function()
+            assert_parse('integer\t=\t3', { integer = 3 })
+          end
+        )
 
-    it('Only commas', function()
-      assert_parse(',,', {})
-    end)
+        it(
+          'With newlines', function()
+            assert_parse('integer\n=\n4', { integer = 4 })
+          end
+        )
 
-    it('More commas', function()
-      assert_parse(',,,', {})
-    end)
+        it(
+          'With whitespaces, tabs and newlines', function()
+            assert_parse(
+              'integer \t\n= \t\n5 , boolean=false',
+              { integer = 5, boolean = false }
+            )
+          end
+        )
 
-    it('Commas with whitespaces', function()
-      assert_parse(', , ,', {})
-    end)
+        it(
+          'Two keys with whitespaces', function()
+            assert_parse(
+              'integer=1 , boolean=false', { integer = 1, boolean = false }
+            )
+          end
+        )
 
-    it('Whitespace, comma', function()
-      assert_parse(' ,', {})
-    end)
+        it(
+          'Two keys with whitespaces, tabs, newlines', function()
+            assert_parse(
+              'integer \t\n= \t\n1 \t\n, \t\nboolean \t\n= \t\nfalse',
+              { integer = 1, boolean = false }
+            )
+          end
+        )
+      end
+    )
 
-    it('Comma, whitespace', function()
-      assert_parse(', ', {})
-    end)
-  end)
+    describe(
+      'Multiple keys', function()
+        assert_parse('integer=1,boolean=false', { integer = 1, boolean = false })
+        assert_parse(
+          'integer=1 , boolean=false', { integer = 1, boolean = false }
+        )
+      end
+    )
 
-  describe('Duplicate keys', function()
-    it('Without whitespaces', function()
-      assert_parse('integer=1,integer=2', {integer = 2})
-    end)
+    describe(
+      'Edge cases', function()
+        it(
+          'Empty string', function()
+            assert_parse('', {})
+          end
+        )
 
-    it('With whitespaces', function()
-      assert_parse('integer=1 , integer=2', {integer = 2})
-    end)
-  end)
+        it(
+          'Only commas', function()
+            assert_parse(',,', {})
+          end
+        )
 
-  describe('All features', function()
-    it('List of standalone strings', function()
-      assert_parse('one,two,three', {'one', 'two', 'three'})
-    end)
+        it(
+          'More commas', function()
+            assert_parse(',,,', {})
+          end
+        )
 
-    it('List of standalone integers', function()
-      assert_parse('1,2,3', {1, 2, 3})
-    end)
+        it(
+          'Commas with whitespaces', function()
+            assert_parse(', , ,', {})
+          end
+        )
 
-    it('Nested tables', function()
-      assert_parse('level1={level2={level3=level3}}',
-                   {level1 = {level2 = {level3 = 'level3'}}})
-    end)
+        it(
+          'Whitespace, comma', function()
+            assert_parse(' ,', {})
+          end
+        )
 
-    it('String without quotes', function()
-      assert_parse('string = without \'quotes\'',
-                   {string = "without \'quotes\'"})
-    end)
+        it(
+          'Comma, whitespace', function()
+            assert_parse(', ', {})
+          end
+        )
+      end
+    )
 
-    it('String with quotes', function()
-      assert_parse('string = "with quotes: ,={}"',
-                   {string = 'with quotes: ,={}'})
-    end)
+    describe(
+      'Duplicate keys', function()
+        it(
+          'Without whitespaces', function()
+            assert_parse('integer=1,integer=2', { integer = 2 })
+          end
+        )
 
-    it('Negative number', function()
-      assert_parse('number = -0.123', {number = -0.123})
-    end)
-  end)
+        it(
+          'With whitespaces', function()
+            assert_parse('integer=1 , integer=2', { integer = 2 })
+          end
+        )
+      end
+    )
 
-  describe('Array', function()
-    it('Key with nested tables', function()
-      assert_parse('t={a,b},z={{a,b},{c,d}}',
-                   {t = {'a', 'b'}, z = {{'a', 'b'}, {'c', 'd'}}})
-    end)
+    describe(
+      'All features', function()
+        it(
+          'List of standalone strings', function()
+            assert_parse('one,two,three', { 'one', 'two', 'three' })
+          end
+        )
 
-    it('Nested list of strings', function()
-      assert_parse('{one,two,tree}', {{'one', 'two', 'tree'}})
-    end)
+        it(
+          'List of standalone integers', function()
+            assert_parse('1,2,3', { 1, 2, 3 })
+          end
+        )
 
-    it('standalone and key value pair', function()
-      assert_parse('{one,two,tree={four}}', {{'one', 'two', tree = 'four'}})
-    end)
+        it(
+          'Nested tables', function()
+            assert_parse(
+              'level1={level2={level3=level3}}',
+              { level1 = { level2 = { level3 = 'level3' } } }
+            )
+          end
+        )
 
-    it('Deeply nested string value', function()
-      assert_parse('{{{one}}}', {{{'one'}}})
-    end)
-  end)
+        it(
+          'String without quotes', function()
+            assert_parse(
+              'string = without \'quotes\'', { string = 'without \'quotes\'' }
+            )
+          end
+        )
 
-  describe('Only values', function()
-    it('List of mixed values', function()
-      assert_parse('-1.1,text,-1cm,True', {-1.1, 'text', 1234567, true})
-    end)
+        it(
+          'String with quotes', function()
+            assert_parse(
+              'string = "with quotes: ,={}"', { string = 'with quotes: ,={}' }
+            )
+          end
+        )
 
-    it('Only string values', function()
-      assert_parse('one,two,three', {'one', 'two', 'three'})
-    end)
-  end)
-end)
+        it(
+          'Negative number', function()
+            assert_parse('number = -0.123', { number = -0.123 })
+          end
+        )
+      end
+    )
 
-describe('Functions “save()” and “get()”', function()
-  it('Save and get with an existent identifier', function()
-    luakeys.save('test123', 'Some value')
-    assert.is.equal(luakeys.get('test123'), 'Some value')
-  end)
+    describe(
+      'Array', function()
+        it(
+          'Key with nested tables', function()
+            assert_parse(
+              't={a,b},z={{a,b},{c,d}}',
+              { t = { 'a', 'b' }, z = { { 'a', 'b' }, { 'c', 'd' } } }
+            )
+          end
+        )
 
-  it('Throws error #skip', function()
-    assert.has_error(function()
-      luakeys.get('xxx')
-    end, 'No stored result was found for the identifier \'xxx\'')
-  end)
-end)
+        it(
+          'Nested list of strings', function()
+            assert_parse('{one,two,tree}', { { 'one', 'two', 'tree' } })
+          end
+        )
 
-describe('Function is.dimension', function ()
-  it('should return false', function()
-    assert.is.equal(luakeys.is.dimension('xxx'), false)
-  end)
+        it(
+          'standalone and key value pair', function()
+            assert_parse(
+              '{one,two,tree={four}}', { { 'one', 'two', tree = 'four' } }
+            )
+          end
+        )
 
-  it('should return false if the input is nil', function()
-    assert.is.equal(luakeys.is.dimension(), false)
-  end)
+        it(
+          'Deeply nested string value', function()
+            assert_parse('{{{one}}}', { { { 'one' } } })
+          end
+        )
+      end
+    )
 
-  it('should return true', function()
-    assert.is.equal(luakeys.is.dimension('1 cm'), true)
-  end)
-end)
+    describe(
+      'Only values', function()
+        it(
+          'List of mixed values', function()
+            assert_parse('-1.1,text,-1cm,True', { -1.1, 'text', 1234567, true })
+          end
+        )
 
-describe('Function is.integer', function ()
-  it('should return false', function()
-    assert.is.equal(luakeys.is.integer('1.1'), false)
-  end)
+        it(
+          'Only string values', function()
+            assert_parse('one,two,three', { 'one', 'two', 'three' })
+          end
+        )
+      end
+    )
+  end
+)
 
-  it('should return false if input is a string', function()
-    assert.is.equal(luakeys.is.integer('xxx'), false)
-  end)
+describe(
+  'Functions “save()” and “get()”', function()
+    it(
+      'Save and get with an existent identifier', function()
+        luakeys.save('test123', 'Some value')
+        assert.is.equal(luakeys.get('test123'), 'Some value')
+      end
+    )
 
-  it('should return false if input is a integer', function()
-    assert.is.equal(luakeys.is.integer(1), true)
-  end)
+    it(
+      'Throws error #skip', function()
+        assert.has_error(
+          function()
+            luakeys.get('xxx')
+          end, 'No stored result was found for the identifier \'xxx\''
+        )
+      end
+    )
+  end
+)
 
-  it('should return true', function()
-    assert.is.equal(luakeys.is.integer('134'), true)
-  end)
-end)
+describe(
+  'Function is.dimension', function()
+    it(
+      'should return false', function()
+        assert.is.equal(luakeys.is.dimension('xxx'), false)
+      end
+    )
+
+    it(
+      'should return false if the input is nil', function()
+        assert.is.equal(luakeys.is.dimension(), false)
+      end
+    )
+
+    it(
+      'should return true', function()
+        assert.is.equal(luakeys.is.dimension('1 cm'), true)
+      end
+    )
+  end
+)
+
+describe(
+  'Function is.integer', function()
+    it(
+      'should return false', function()
+        assert.is.equal(luakeys.is.integer('1.1'), false)
+      end
+    )
+
+    it(
+      'should return false if input is a string', function()
+        assert.is.equal(luakeys.is.integer('xxx'), false)
+      end
+    )
+
+    it(
+      'should return false if input is a integer', function()
+        assert.is.equal(luakeys.is.integer(1), true)
+      end
+    )
+
+    it(
+      'should return true', function()
+        assert.is.equal(luakeys.is.integer('134'), true)
+      end
+    )
+  end
+)
