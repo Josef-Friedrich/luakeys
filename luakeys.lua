@@ -730,8 +730,6 @@ local function apply_definitions(defs, input, output)
       token.set_macro(def.macro, value, 'global')
     end
 
-    --- values indexed by key name
-
     -- def.sub_keys
     if def.sub_keys ~= nil and type(value) == 'table' then
       output[key] = {}
