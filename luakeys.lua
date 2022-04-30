@@ -742,11 +742,17 @@ local function define(defs, parse_options, defaults)
   return function (kv_string, inner_parse_options, inner_defaults)
     local leftover = parse(
       kv_string,
-      inner_parse_options or parse_options,
-      inner_defaults or defaults
+      inner_parse_options or parse_options
     )
     local result = {}
     apply_definitions(defs, leftover, result)
+
+    local d = inner_defaults or defaults
+
+    if d ~= nil then
+      merge_tables(result, d)
+    end
+
     return result, leftover
   end
 end
