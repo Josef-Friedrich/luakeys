@@ -642,6 +642,9 @@ local is = {
 }
 
 local function apply_definitions(defs, input, output)
+  if output == nil then
+    output = {}
+  end
   local exclusive_groups = {}
   for index, def in pairs(defs) do
     --- Find key and def
