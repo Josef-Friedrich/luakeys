@@ -731,6 +731,20 @@ local function apply_definitions(defs, input, output)
       value = def.default
     end
 
+    -- def.choices
+    if def.choices ~= nil and type(def.choices) == 'table' then
+      local is_in_choices = false
+      for _, choice in ipairs(def.choices) do
+        if value == choice then is_in_choices = true end
+      end
+      if not is_in_choices then
+        throw_error(
+          'The value “' .. value .. '” does not exist in the choices: ' ..
+          table.concat(def.choices, ', ')
+        )
+      end
+    end
+
     -- def.exclusive_group
     if def.exclusive_group ~= nil and value ~= nil then
       if exclusive_groups[def.exclusive_group] ~= nil then

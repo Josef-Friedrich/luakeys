@@ -97,6 +97,31 @@ describe(
             )
 
             describe(
+              'Option “choices”', function()
+                local defs = { key = { choices = { 'one', 'two', 'three' } } }
+                it(
+                  'should throw no exception', function()
+                    assert.are.same(
+                      apply_defintions(defs, { key = 'one' }), { key = 'one' }
+                    )
+                  end
+                )
+
+                it(
+                  'should throw an exception if no choice was found.',
+                  function()
+                    assert.has_error(
+                      function()
+                        apply_defintions(defs, { key = 'unknown' })
+                      end,
+                      'The value “unknown” does not exist in the choices: one, two, three'
+                    )
+                  end
+                )
+              end
+            )
+
+            describe(
               'Option “opposite_values”', function()
                 local defs = {
                   visibility = {
