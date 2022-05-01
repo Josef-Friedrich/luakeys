@@ -747,17 +747,17 @@ local function apply_definitions(defs, input, output)
       token.set_macro(def.macro, value, 'global')
     end
 
-    -- def.sub_keys
-    if def.sub_keys ~= nil and type(value) == 'table' then
-      output[key] = {}
-      apply_definitions(def.sub_keys, value, output[key])
-      break
-    end
-
     -- def.l3_tl_set
     if def.l3_tl_set ~= nil then
       tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
       tex.print('{' .. value .. '}')
+      break
+    end
+
+    -- def.sub_keys
+    if def.sub_keys ~= nil and type(value) == 'table' then
+      output[key] = {}
+      apply_definitions(def.sub_keys, value, output[key])
       break
     end
 
