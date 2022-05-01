@@ -732,7 +732,7 @@ local function apply_definitions(defs, input, output)
     end
 
     -- def.data_type
-    if def.data_type ~= nil then
+    if def.data_type ~= nil and value ~= nil then
       local converted
       if def.data_type == 'string' then
         converted = tostring(value)
@@ -765,7 +765,7 @@ local function apply_definitions(defs, input, output)
     end
 
     -- def.choices
-    if def.choices ~= nil and type(def.choices) == 'table' then
+    if def.choices ~= nil and value ~= nil and type(def.choices) == 'table' then
       local is_in_choices = false
       for _, choice in ipairs(def.choices) do
         if value == choice then is_in_choices = true end
@@ -779,7 +779,7 @@ local function apply_definitions(defs, input, output)
     end
 
     -- def.match
-    if def.match ~= nil then
+    if def.match ~= nil and value ~= nil then
       if type(def.match) ~= 'string' then
         throw_error('def.match has to be a string')
       end
