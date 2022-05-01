@@ -181,6 +181,26 @@ describe(
                 )
               end
             )
+
+            it(
+              'Option “process”', function()
+                assert.are.same(
+                  apply_defintions(
+                    {
+                      width = {
+                        process = function(value)
+                          if type(value) == 'number' and value >= 0 and value <=
+                            1 then
+                            return tostring(value) .. '\\linewidth'
+                          end
+                          return value
+                        end,
+                      },
+                    }, { width = 0.5 }
+                  ), { width = '0.5\\linewidth' }
+                )
+              end
+            )
           end
         )
       end

@@ -754,6 +754,11 @@ local function apply_definitions(defs, input, output)
       break
     end
 
+    -- def.process
+    if def.process ~= nil and type(def.process) == 'function' then
+      value = def.process(value, output, input)
+    end
+
     -- def.sub_keys
     if def.sub_keys ~= nil and type(value) == 'table' then
       output[key] = {}
