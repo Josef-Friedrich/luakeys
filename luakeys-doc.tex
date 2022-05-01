@@ -559,7 +559,35 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 %
 %%
 
-\subsection{\texttt{define()}}
+\subsection{\texttt{define(defs, parse_options, defaults)}}
+
+\begin{minted}{lua}
+local defs = {
+  key = {
+    alias = { 'k', 'ke' }, -- or a single string: alias = 'k'
+    always_present = false,
+    choices = { 'one', 'two', 'three' },
+    data_type = 'string', -- or boolean, integer,
+    default = 'value',
+    exclusive_group = 'name',
+    l3_tl_set = 'my_token_list', --> \g_my_token_list_tl
+    macro = 'MacroName', -- \MacroName
+    name = 'key', -- name of the key, can be omitted
+    opposite_values = {
+      [true] = 'show',
+      [false] = 'hide'
+    },
+    process = function (value, result, leftover)
+      return value
+    end,
+    sub_keys = {
+      key_level_2 = {
+        ...
+      }
+    },
+  }
+}
+\end{minted}
 
 \subsubsection{Sub keys: \texttt{sub\_keys}}
 
@@ -582,8 +610,8 @@ local keys = {
 local keys = {
   visibility = {
     opposite_values = {
-      true = 'show',
-      false = 'hide'
+      [true] = 'show',
+      [false] = 'hide'
     }
   }
 }
@@ -614,17 +642,6 @@ local keys = {
     name = 'key',
     alias = 'k',
     -- alias = {'k', 'ke'},
-  }
-}
-\end{minted}
-
-\subsubsection{From value}
-
-\begin{minted}{lua}
-local keys = {
-  {
-    name = 'key',
-    from_value = true,
   }
 }
 \end{minted}
