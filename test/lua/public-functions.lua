@@ -162,7 +162,6 @@ describe(
                 local result = luakeys.parse(
                                  'key=value', {
                     preprocess = function(result, kv_string)
-                      print('looo')
                       result['additional_key'] = 'value'
                       result['kv_string'] = kv_string
                     end,
