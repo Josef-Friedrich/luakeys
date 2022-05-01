@@ -731,104 +731,104 @@ local function apply_definitions(defs, input, output)
       value = def.default
     end
 
-    -- def.data_type
-    if def.data_type ~= nil and value ~= nil then
-      local converted
-      if def.data_type == 'string' then
-        converted = tostring(value)
-      elseif def.data_type == 'dimension' then
-        if is.dimension(value) then
-          converted = value
-        end
-      elseif def.data_type == 'boolean' then
-        if value == 0 or value == '' or not value then
-          converted = false
-        else
-          converted = true
-        end
-      elseif def.data_type == 'integer' then
-        if is.integer(value) then
-          converted = tonumber(value)
-        end
-      else
-        throw_error('Unknown data type: ' .. def.data_type)
-      end
-      if converted == nil then
-        throw_error(
-          'The value “' .. value .. '” of the key “' .. key ..
-          '” could not be converted into the data type “' ..
-          def.data_type .. '”!'
-        )
-      else
-        value = converted
-      end
-    end
-
-    -- def.choices
-    if def.choices ~= nil and value ~= nil and type(def.choices) == 'table' then
-      local is_in_choices = false
-      for _, choice in ipairs(def.choices) do
-        if value == choice then is_in_choices = true end
-      end
-      if not is_in_choices then
-        throw_error(
-          'The value “' .. value .. '” does not exist in the choices: ' ..
-          table.concat(def.choices, ', ')
-        )
-      end
-    end
-
-    -- def.match
-    if def.match ~= nil and value ~= nil then
-      if type(def.match) ~= 'string' then
-        throw_error('def.match has to be a string')
-      end
-      local match = string.match(value, def.match)
-      if match == nil then
-        throw_error('The value “' .. value .. '” of the key “' .. key ..
-        '” does not match “' .. def.match .. '”!')
-      else
-        value = match
-      end
-    end
-
-    -- def.exclusive_group
-    if def.exclusive_group ~= nil and value ~= nil then
-      if exclusive_groups[def.exclusive_group] ~= nil then
-        throw_error('The key “' .. key ..
-          '” belongs to a mutually exclusive group and the key “' ..
-          exclusive_groups[def.exclusive_group] .. '” is already present!'
-        )
-      else
-        exclusive_groups[def.exclusive_group] = key
-      end
-    end
-
-    -- def.macro
-    if def.macro ~= nil then
-      token.set_macro(def.macro, value, 'global')
-    end
-
-    -- def.l3_tl_set
-    if def.l3_tl_set ~= nil then
-      tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
-      tex.print('{' .. value .. '}')
-      break
-    end
-
-    -- def.process
-    if def.process ~= nil and type(def.process) == 'function' then
-      value = def.process(value, output, input)
-    end
-
-    -- def.sub_keys
-    if def.sub_keys ~= nil and type(value) == 'table' then
-      output[key] = {}
-      apply_definitions(def.sub_keys, value, output[key])
-      break
-    end
-
     if value ~= nil then
+
+      -- def.data_type
+      if def.data_type ~= nil then
+        local converted
+        if def.data_type == 'string' then
+          converted = tostring(value)
+        elseif def.data_type == 'dimension' then
+          if is.dimension(value) then
+            converted = value
+          end
+        elseif def.data_type == 'boolean' then
+          if value == 0 or value == '' or not value then
+            converted = false
+          else
+            converted = true
+          end
+        elseif def.data_type == 'integer' then
+          if is.integer(value) then
+            converted = tonumber(value)
+          end
+        else
+          throw_error('Unknown data type: ' .. def.data_type)
+        end
+        if converted == nil then
+          throw_error(
+            'The value “' .. value .. '” of the key “' .. key ..
+            '” could not be converted into the data type “' ..
+            def.data_type .. '”!'
+          )
+        else
+          value = converted
+        end
+      end
+
+      -- def.choices
+      if def.choices ~= nil and type(def.choices) == 'table' then
+        local is_in_choices = false
+        for _, choice in ipairs(def.choices) do
+          if value == choice then is_in_choices = true end
+        end
+        if not is_in_choices then
+          throw_error(
+            'The value “' .. value .. '” does not exist in the choices: ' ..
+            table.concat(def.choices, ', ')
+          )
+        end
+      end
+
+      -- def.match
+      if def.match ~= nil then
+        if type(def.match) ~= 'string' then
+          throw_error('def.match has to be a string')
+        end
+        local match = string.match(value, def.match)
+        if match == nil then
+          throw_error('The value “' .. value .. '” of the key “' .. key ..
+          '” does not match “' .. def.match .. '”!')
+        else
+          value = match
+        end
+      end
+
+      -- def.exclusive_group
+      if def.exclusive_group ~= nil then
+        if exclusive_groups[def.exclusive_group] ~= nil then
+          throw_error('The key “' .. key ..
+            '” belongs to a mutually exclusive group and the key “' ..
+            exclusive_groups[def.exclusive_group] .. '” is already present!'
+          )
+        else
+          exclusive_groups[def.exclusive_group] = key
+        end
+      end
+
+      -- def.macro
+      if def.macro ~= nil then
+        token.set_macro(def.macro, value, 'global')
+      end
+
+      -- def.l3_tl_set
+      if def.l3_tl_set ~= nil then
+        tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
+        tex.print('{' .. value .. '}')
+        break
+      end
+
+      -- def.process
+      if def.process ~= nil and type(def.process) == 'function' then
+        value = def.process(value, output, input)
+      end
+
+      -- def.sub_keys
+      if def.sub_keys ~= nil and type(value) == 'table' then
+        output[key] = {}
+        apply_definitions(def.sub_keys, value, output[key])
+        break
+      end
       output[key] = value
     end
   end

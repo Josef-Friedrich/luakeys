@@ -139,7 +139,6 @@ describe(
                     assert_type('string', 'test', 'test')
                     assert_type('string', 0, '0')
                     assert_type('string', false, 'false')
-                    assert_type('string', nil, 'nil')
                   end
                 )
 
@@ -151,7 +150,6 @@ describe(
                     assert_type('boolean', false, false)
                     assert_type('boolean', '', false)
                     assert_type('boolean', 0, false)
-                    assert_type('boolean', nil, false)
                     assert_type('boolean', 1, true)
                     assert_type('boolean', {}, true)
                   end
