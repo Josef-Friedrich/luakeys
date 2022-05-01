@@ -731,6 +731,39 @@ local function apply_definitions(defs, input, output)
       value = def.default
     end
 
+    -- def.data_type
+    if def.data_type ~= nil then
+      local converted
+      if def.data_type == 'string' then
+        converted = tostring(value)
+      elseif def.data_type == 'dimension' then
+        if is.dimension(value) then
+          converted = value
+        end
+      elseif def.data_type == 'boolean' then
+        if value == 0 or value == '' or not value then
+          converted = false
+        else
+          converted = true
+        end
+      elseif def.data_type == 'integer' then
+        if is.integer(value) then
+          converted = tonumber(value)
+        end
+      else
+        throw_error('Unknown data type: ' .. def.data_type)
+      end
+      if converted == nil then
+        throw_error(
+          'The value “' .. value .. '” of the key “' .. key ..
+          '” could not be converted into the data type “' ..
+          def.data_type .. '”!'
+        )
+      else
+        value = converted
+      end
+    end
+
     -- def.choices
     if def.choices ~= nil and type(def.choices) == 'table' then
       local is_in_choices = false

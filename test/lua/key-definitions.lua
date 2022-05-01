@@ -122,6 +122,59 @@ describe(
             )
 
             describe(
+              'Option “data_type”', function()
+                local function assert_type(data_type,
+                                           input_value,
+                                           expected_value)
+                  assert.are.same(
+                    apply_defintions(
+                      { key = { data_type = data_type } }, { key = input_value }
+                    ), { key = expected_value }
+                  )
+                end
+
+                it(
+                  'should convert different input values into strings',
+                  function()
+                    assert_type('string', 'test', 'test')
+                    assert_type('string', 0, '0')
+                    assert_type('string', false, 'false')
+                    assert_type('string', nil, 'nil')
+                  end
+                )
+
+                it(
+                  'should convert different input values into boolean',
+                  function()
+                    assert_type('boolean', 'test', true)
+                    assert_type('boolean', true, true)
+                    assert_type('boolean', false, false)
+                    assert_type('boolean', '', false)
+                    assert_type('boolean', 0, false)
+                    assert_type('boolean', nil, false)
+                    assert_type('boolean', 1, true)
+                    assert_type('boolean', {}, true)
+                  end
+                )
+
+                it(
+                  'should check input values if they are dimensions', function()
+                    assert_type('dimension', '1cm', '1cm')
+                    assert_type('dimension', '12 pt', '12 pt')
+                    -- assert_type('dimension', 'xxx', '12 pt')
+                  end
+                )
+
+                it(
+                  'should check input values if they are integer', function()
+                    assert_type('integer', '1', 1)
+                    assert_type('integer', 123, 123)
+                  end
+                )
+              end
+            )
+
+            describe(
               'Option “opposite_values”', function()
                 local defs = {
                   visibility = {
