@@ -15,7 +15,6 @@
 --
 -- This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
 -- luakeys-debug.sty and luakeys-debug.tex.
-
 --- A key-value parser written with Lpeg.
 --
 -- Explanations of some LPeg notation forms:
@@ -29,7 +28,6 @@
 -- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf)
 --
 -- @module luakeys
-
 local lpeg = require('lpeg')
 local Variable = lpeg.V
 local Pattern = lpeg.P
@@ -45,14 +43,14 @@ if not tex then
   tex = {}
 
   -- Dummy function for the tests.
-  tex['sp'] = function (input)
+  tex['sp'] = function(input)
     return 1234567
   end
 end
 
 if not token then
   token = {}
-  token['set_macro'] = function (csname, content, global)
+  token['set_macro'] = function(csname, content, global)
   end
 end
 
@@ -89,7 +87,7 @@ end
 
 local l3_code_cctab = 10
 
-local function set_l3_code_cctab (cctab_id)
+local function set_l3_code_cctab(cctab_id)
   l3_code_cctab = cctab_id
 end
 
@@ -150,8 +148,8 @@ end
 --- https://stackoverflow.com/a/1283608/10193818
 local function merge_tables(target, t2)
   for k, v in pairs(t2) do
-    if type(v) == "table" then
-      if type(target[k] or false) == "table" then
+    if type(v) == 'table' then
+      if type(target[k] or false) == 'table' then
         merge_tables(target[k] or {}, t2[k] or {})
       elseif target[k] == nil then
         target[k] = v
@@ -177,7 +175,7 @@ end
 --
 -- @treturn string A key-value string that can be passed to a TeX
 -- macro.
-local function render (tbl)
+local function render(tbl)
   local function render_inner(tbl)
     local output = {}
     local function add(text)
@@ -282,7 +280,9 @@ local function stringify(input, for_tex)
     return table.concat(output, line_break)
   end
 
-  return start_bracket .. line_break .. stringify_inner(input, 1) .. line_break .. end_bracket
+  return
+    start_bracket .. line_break .. stringify_inner(input, 1) .. line_break ..
+      end_bracket
 end
 
 --- The function `pretty_print(tbl)` pretty prints a Lua table to standard
@@ -309,10 +309,10 @@ local function generate_parser(initial_rule, options)
 
   --- Match literal string surrounded by whitespace
   local ws = function(match)
-    return white_space^0 * Pattern(match) * white_space^0
+    return white_space ^ 0 * Pattern(match) * white_space ^ 0
   end
 
-  local capture_dimension = function (input)
+  local capture_dimension = function(input)
     if options.convert_dimensions then
       return tex.sp(input)
     else
@@ -346,6 +346,7 @@ local function generate_parser(initial_rule, options)
     end
   end
 
+  -- LuaFormatter off
   return Pattern({
     [1] = initial_rule,
 
@@ -460,6 +461,7 @@ local function generate_parser(initial_rule, options)
 
     word_unquoted = (1 - white_space - Set('{},='))^1
   })
+-- LuaFormatter on
 end
 
 --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
@@ -471,7 +473,9 @@ end
 local function get_array_size(value)
   local count = 0
   if type(value) == 'table' then
-    for _ in ipairs(value) do count = count + 1 end
+    for _ in ipairs(value) do
+      count = count + 1
+    end
   end
   return count
 end
@@ -485,7 +489,9 @@ end
 local function get_table_size(value)
   local count = 0
   if type(value) == 'table' then
-    for _ in pairs(value) do count = count + 1 end
+    for _ in pairs(value) do
+      count = count + 1
+    end
   end
   return count
 end
@@ -496,12 +502,8 @@ end
 -- @treturn If the value is a array like table with one non table typed
 -- value in it, the unpacked value, else the unchanged input.
 local function unpack_single_valued_array_table(value, options)
-  if
-    type(value) == 'table' and
-    get_array_size(value) == 1 and
-    get_table_size(value) == 1 and
-    type(value[1]) ~= 'table'
-  then
+  if type(value) == 'table' and get_array_size(value) == 1 and
+    get_table_size(value) == 1 and type(value[1]) ~= 'table' then
     if type(value[1]) == 'string' and options.standalone_as_true then
       return value
     else
@@ -524,10 +526,15 @@ local function visit_parse_tree(parse_tree, callback_func)
   if type(parse_tree) ~= 'table' then
     throw_error('Parse tree has to be a table')
   end
-  local function visit_parse_tree_recursive(root_table, current_table, result, depth, callback_func)
+  local function visit_parse_tree_recursive(root_table,
+    current_table,
+    result,
+    depth,
+    callback_func)
     for key, value in pairs(current_table) do
       if type(value) == 'table' then
-        value = visit_parse_tree_recursive(root_table, value, {}, depth + 1, callback_func)
+        value = visit_parse_tree_recursive(root_table, value, {}, depth + 1,
+          callback_func)
       end
 
       key, value = callback_func(key, value, depth, current_table, root_table)
@@ -541,7 +548,8 @@ local function visit_parse_tree(parse_tree, callback_func)
     end
   end
 
-  return visit_parse_tree_recursive(parse_tree, parse_tree, {}, 1, callback_func)
+  return
+    visit_parse_tree_recursive(parse_tree, parse_tree, {}, 1, callback_func)
 end
 
 --- Normalize the result tables of the LPeg parser. This normalization
@@ -575,7 +583,7 @@ local function normalize(raw, options)
   raw = normalize_recursive(raw, {}, options)
 
   if options.standalone_as_true then
-    raw = visit_parse_tree(raw, function (key, value)
+    raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, true
       end
@@ -584,7 +592,7 @@ local function normalize(raw, options)
   end
 
   if options.case_insensitive_keys then
-    raw = visit_parse_tree(raw, function (key, value)
+    raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'string' then
         return key:lower(), value
       end
@@ -606,7 +614,7 @@ end
 --
 -- @treturn table A hopefully properly parsed table you can do something
 -- useful with.
-local function parse (kv_string, options, defaults)
+local function parse(kv_string, options, defaults)
   if kv_string == nil then
     return {}
   end
@@ -644,16 +652,20 @@ local function parse (kv_string, options, defaults)
 end
 
 local is = {
-  dimension = function (str)
-    if str == nil then return false end
-    local parser = generate_parser('dimension', {convert_dimensions = false})
+  dimension = function(str)
+    if str == nil then
+      return false
+    end
+    local parser = generate_parser('dimension', { convert_dimensions = false })
     local result = parser:match(str)
     return result ~= nil
   end,
 
-  integer = function (str)
+  integer = function(str)
     local n = tonumber(str)
-    if n == nil then return false end
+    if n == nil then
+      return false
+    end
     return n == math.floor(n)
   end,
 }
@@ -689,7 +701,7 @@ local function apply_definitions(defs, input, output)
         local value = input[search_key]
         input[search_key] = nil
         return value
-      --- standalone value: values with integer keys
+        --- standalone value: values with integer keys
       elseif remove_from_array(input, search_key) ~= nil then
         return def.default
       end
@@ -715,7 +727,8 @@ local function apply_definitions(defs, input, output)
       local true_value = def.opposite_values[true]
       local false_value = def.opposite_values[false]
       if true_value == nil or false_value == nil then
-        throw_error('Usage opposite_values = { [true] = "...", [false] = "..." }')
+        throw_error(
+          'Usage opposite_values = { [true] = "...", [false] = "..." }')
       end
       if remove_from_array(input, true_value) ~= nil then
         output[key] = true
@@ -731,7 +744,8 @@ local function apply_definitions(defs, input, output)
     end
 
     if def.required ~= nil and def.required and value == nil then
-      throw_error(string.format('Missing required value for key “%s” or missing key!', key))
+      throw_error(string.format(
+        'Missing required value for key “%s” or missing key!', key))
     end
 
     if value ~= nil then
@@ -759,11 +773,9 @@ local function apply_definitions(defs, input, output)
           throw_error('Unknown data type: ' .. def.data_type)
         end
         if converted == nil then
-          throw_error(
-            'The value “' .. value .. '” of the key “' .. key ..
-            '” could not be converted into the data type “' ..
-            def.data_type .. '”!'
-          )
+          throw_error('The value “' .. value .. '” of the key “' .. key ..
+                        '” could not be converted into the data type “' ..
+                        def.data_type .. '”!')
         else
           value = converted
         end
@@ -773,13 +785,14 @@ local function apply_definitions(defs, input, output)
       if def.choices ~= nil and type(def.choices) == 'table' then
         local is_in_choices = false
         for _, choice in ipairs(def.choices) do
-          if value == choice then is_in_choices = true end
+          if value == choice then
+            is_in_choices = true
+          end
         end
         if not is_in_choices then
-          throw_error(
-            'The value “' .. value .. '” does not exist in the choices: ' ..
-            table.concat(def.choices, ', ')
-          )
+          throw_error('The value “' .. value ..
+                        '” does not exist in the choices: ' ..
+                        table.concat(def.choices, ', '))
         end
       end
 
@@ -791,7 +804,7 @@ local function apply_definitions(defs, input, output)
         local match = string.match(value, def.match)
         if match == nil then
           throw_error('The value “' .. value .. '” of the key “' .. key ..
-          '” does not match “' .. def.match .. '”!')
+                        '” does not match “' .. def.match .. '”!')
         else
           value = match
         end
@@ -801,9 +814,9 @@ local function apply_definitions(defs, input, output)
       if def.exclusive_group ~= nil then
         if exclusive_groups[def.exclusive_group] ~= nil then
           throw_error('The key “' .. key ..
-            '” belongs to a mutually exclusive group and the key “' ..
-            exclusive_groups[def.exclusive_group] .. '” is already present!'
-          )
+                        '” belongs to a mutually exclusive group and the key “' ..
+                        exclusive_groups[def.exclusive_group] ..
+                        '” is already present!')
         else
           exclusive_groups[def.exclusive_group] = key
         end
@@ -839,11 +852,8 @@ local function apply_definitions(defs, input, output)
 end
 
 local function define(defs, parse_options, defaults)
-  return function (kv_string, inner_parse_options, inner_defaults)
-    local leftover = parse(
-      kv_string,
-      inner_parse_options or parse_options
-    )
+  return function(kv_string, inner_parse_options, inner_defaults)
+    local leftover = parse(kv_string, inner_parse_options or parse_options)
     local result = {}
     apply_definitions(defs, leftover, result)
 
