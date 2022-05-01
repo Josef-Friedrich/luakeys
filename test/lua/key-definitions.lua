@@ -261,6 +261,17 @@ describe(
             )
 
             it(
+              'Option “match”', function()
+                assert.are.same(
+                  apply_defintions(
+                    { date = { match = '^%d%d%d%d%-%d%d%-%d%d$' } },
+                    { date = '1978-12-03' }
+                  ), { date = '1978-12-03' }
+                )
+              end
+            )
+
+            it(
               'Option “process”', function()
                 assert.are.same(
                   apply_defintions(

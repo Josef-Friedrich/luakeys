@@ -778,6 +778,20 @@ local function apply_definitions(defs, input, output)
       end
     end
 
+    -- def.match
+    if def.match ~= nil then
+      if type(def.match) ~= 'string' then
+        throw_error('def.match has to be a string')
+      end
+      local match = string.match(value, def.match)
+      if match == nil then
+        throw_error('The value “' .. value .. '” of the key “' .. key ..
+        '” does not match “' .. def.match .. '”!')
+      else
+        value = match
+      end
+    end
+
     -- def.exclusive_group
     if def.exclusive_group ~= nil and value ~= nil then
       if exclusive_groups[def.exclusive_group] ~= nil then
