@@ -695,7 +695,6 @@ local function apply_definitions(defs, input, output)
       end
     end
 
-    -- find value
     local value = find_value(key)
 
     -- def.alias
@@ -729,6 +728,10 @@ local function apply_definitions(defs, input, output)
     -- def.default
     if def.default ~= nil and value == nil and def.always_present then
       value = def.default
+    end
+
+    if def.required ~= nil and def.required and value == nil then
+      throw_error(string.format('Missing required value for key “%s” or missing key!', key))
     end
 
     if value ~= nil then

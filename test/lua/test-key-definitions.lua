@@ -56,18 +56,6 @@ describe(
 
         describe(
           'Options', function()
-            it(
-              'Option “sub_keys”', function()
-                local defs = {
-                  { name = 'level1', sub_keys = { { name = 'level2' } } },
-                }
-                local input = { level1 = { level2 = 'value' } }
-                assert.are.same(
-                  apply_defintions(defs, input),
-                  { level1 = { level2 = 'value' } }
-                )
-              end
-            )
 
             describe(
               'Option “alias”', function()
@@ -173,42 +161,6 @@ describe(
             )
 
             describe(
-              'Option “opposite_values”', function()
-                local defs = {
-                  visibility = {
-                    opposite_values = { [true] = 'show', [false] = 'hide' },
-                  },
-                }
-
-                it(
-                  'should return true if a truthy string value is given.',
-                  function()
-                    assert.are.same(
-                      apply_defintions(defs, { 'show' }), { visibility = true }
-                    )
-                  end
-                )
-
-                it(
-                  'should return false if a falsy string is given.', function()
-                    assert.are.same(
-                      apply_defintions(defs, { 'hide' }), { visibility = false }
-                    )
-                  end
-                )
-
-                it(
-                  'should return an empty table if a unknown string value is given.',
-                  function()
-                    local output = {}
-                    apply_defintions(defs, { 'unknown' }, output)
-                    assert.are.same(output, {})
-                  end
-                )
-              end
-            )
-
-            describe(
               'Option “exclusive_group”', function()
                 local defs = {
                   k1 = { exclusive_group = 'group1' },
@@ -269,6 +221,42 @@ describe(
               end
             )
 
+            describe(
+              'Option “opposite_values”', function()
+                local defs = {
+                  visibility = {
+                    opposite_values = { [true] = 'show', [false] = 'hide' },
+                  },
+                }
+
+                it(
+                  'should return true if a truthy string value is given.',
+                  function()
+                    assert.are.same(
+                      apply_defintions(defs, { 'show' }), { visibility = true }
+                    )
+                  end
+                )
+
+                it(
+                  'should return false if a falsy string is given.', function()
+                    assert.are.same(
+                      apply_defintions(defs, { 'hide' }), { visibility = false }
+                    )
+                  end
+                )
+
+                it(
+                  'should return an empty table if a unknown string value is given.',
+                  function()
+                    local output = {}
+                    apply_defintions(defs, { 'unknown' }, output)
+                    assert.are.same(output, {})
+                  end
+                )
+              end
+            )
+
             it(
               'Option “process”', function()
                 assert.are.same(
@@ -285,6 +273,45 @@ describe(
                       },
                     }, { width = 0.5 }
                   ), { width = '0.5\\linewidth' }
+                )
+              end
+            )
+
+            describe(
+              'Option “required”', function()
+                it(
+                  'should pass if a value is provided', function()
+                    assert.are.same(
+                      apply_defintions(
+                        { key = { required = true } }, { key = 'value' }
+                      ), { key = 'value' }
+                    )
+                  end
+                )
+
+                it(
+                  'should throw an error if the key is missing', function()
+                    assert.has_error(
+                      function()
+                        apply_defintions(
+                          { key = { required = true } }, { unknown = 'value' }
+                        )
+                      end
+                    )
+                  end
+                )
+              end
+            )
+
+            it(
+              'Option “sub_keys”', function()
+                local defs = {
+                  { name = 'level1', sub_keys = { { name = 'level2' } } },
+                }
+                local input = { level1 = { level2 = 'value' } }
+                assert.are.same(
+                  apply_defintions(defs, input),
+                  { level1 = { level2 = 'value' } }
                 )
               end
             )
