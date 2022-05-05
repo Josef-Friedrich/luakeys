@@ -567,6 +567,34 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 
 \subsection{\texttt{define(defs, parse_options, defaults)}}
 
+The name of a key can be specified in three ways:
+
+\begin{enumerate}
+\item as stand-alone values also known as an array of strings.
+\item as keys in a Lua table. The definition of the key-value pair is
+then under these keys.
+\item by the “name” option.
+\end{enumerate}
+
+\begin{minted}{lua}
+-- stand-alone values
+local defs = { 'key' }
+
+-- keys in a Lua table
+local defs = { key = { some_def = 'etc' } }
+
+-- by the “name” option
+local defs = { { name = 'key' } }
+
+local parse = luakeys.define(defs)
+local result, leftover = parse('key=value,unknown=unknown')
+luakeys.print(result) -- { key = 'value' }
+luakeys.print(leftover) -- { unknown = 'unknown' }
+\end{minted}
+
+The code example below lists all the options that can be used to define
+key-value pairs.
+
 \begin{minted}{lua}
 local defs = {
   key = {

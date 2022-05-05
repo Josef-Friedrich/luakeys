@@ -234,6 +234,14 @@ describe('Key defintions', function()
         assert.are.same(result, { key = 'value' })
         assert.are.same(leftover, { unknown = 'unknown' })
       end)
+
+      it('can be specified in a nested example.', function()
+        local result, leftover = define_parse({
+          level1 = { sub_keys = { level2 = { sub_keys = { key = {} } } } },
+        }, 'level1={level2={key=value,unknown=unknown}}')
+        assert.are.same(result, { level1 = { level2 = { key = 'value' } } })
+        assert.are.same(leftover, { level1 = { level2 = { unknown = 'unknown' } } })
+      end)
     end)
 
     it('Return values: result and leftover', function()
