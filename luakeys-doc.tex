@@ -502,9 +502,10 @@ local get = luakeys.get
 %
 %%
 
-\subsection{\texttt{parse(kv\_string, options)}: table}
+\subsection{\texttt{parse(kv\_string, options, defaults)}: table}
+\label{parse}
 
-The function \lua{parse(input_string, options)} is the main method of
+The function \lua{parse(kv_string, options)} is the main method of
 this module. It parses a key-value string into a Lua table.
 
 \begin{minted}{latex}
@@ -566,6 +567,9 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 %%
 
 \subsection{\texttt{define(defs, parse_options, defaults)}}
+
+The \lua{define} function returns a \lua{parse} function (see
+\ref{parse}).
 
 The name of a key can be specified in three ways:
 
