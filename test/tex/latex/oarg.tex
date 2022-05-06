@@ -1,0 +1,28 @@
+\documentclass{article}
+\usepackage{luakeys}
+
+\begin{document}
+
+\newcommand{\cmdoarg}[2][]{
+  \directlua{
+    kv_string = '#1'
+    local result = luakeys.parse('#1')
+  }
+  oarg: \directlua{tex.print(kv_string)}
+  marg: #2
+}
+
+\cmdoarg[oar]g]{marg}
+
+\NewDocumentCommand{ \cmdoargLthree } { O{} m } {
+  \directlua{
+    kv_string = '#1'
+    local result = luakeys.parse('#1')
+  }
+  oarg: \directlua{tex.print(kv_string)}
+  marg: #2
+}
+
+\cmdoargLthree[oar]g]{marg}
+
+\end{document}
