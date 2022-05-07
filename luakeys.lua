@@ -717,7 +717,11 @@ local function apply_definitions(defs, input, output, leftover, key_path)
         return value
         --- standalone value: values with integer keys
       elseif remove_from_array(input, search_key) ~= nil then
-        return def.default
+        if def.default ~= nil then
+          return def.default
+        else
+          return true
+        end
       end
     end
 

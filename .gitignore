@@ -280,3 +280,5 @@ TSWLatexianTemp*
 __latexindent_temp.tex
 
 *.tar.gz
+
+debug.lua
