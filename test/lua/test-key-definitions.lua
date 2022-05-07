@@ -56,6 +56,21 @@ describe('Key defintions', function()
             assert.are.same(apply_defintions(defs, { ['my_key2'] = 42 }),
               { key2 = 42 })
           end)
+
+        it('should find a alias standalone values as key names', function()
+          assert.are.same(apply_defintions({ key = { alias = { 'k', 'ke' } } },
+            { 'ke' }), { key = true })
+        end)
+
+        it('should find a value in a nested definition', function()
+          assert.are.same(apply_defintions({
+            level1 = {
+              alias = 'l1',
+              sub_keys = { level2 = { alias = { 'l2', 'level_2' } } },
+            },
+          }, { l1 = { l2 = 'value' } }), { level1 = { level2 = 'value' } })
+        end)
+
       end)
 
       describe('Option “choices”', function()
@@ -240,7 +255,8 @@ describe('Key defintions', function()
           level1 = { sub_keys = { level2 = { sub_keys = { key = {} } } } },
         }, 'level1={level2={key=value,unknown=unknown}}')
         assert.are.same(result, { level1 = { level2 = { key = 'value' } } })
-        assert.are.same(leftover, { level1 = { level2 = { unknown = 'unknown' } } })
+        assert.are.same(leftover,
+          { level1 = { level2 = { unknown = 'unknown' } } })
       end)
     end)
 

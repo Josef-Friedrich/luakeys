@@ -608,7 +608,7 @@ luakeys.print(result) -- { level1 = { level2 = { key = 'value' } } })
 luakeys.print(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
 \end{minted}
 
-The code example below lists all the options that can be used to define
+The code example below lists all the settings that can be used to define
 key-value pairs.
 
 \begin{minted}{lua}
@@ -638,6 +638,23 @@ local defs = {
     },
   }
 }
+\end{minted}
+
+\subsubsection{\texttt{alias}}
+
+With the help of the \lua{alias} option, other key names can be used.
+The value is always stored under the original key name. A single alias
+name can be specified by a string, multiple aliases by a list of
+strings.
+
+\begin{minted}{lua}
+-- a single alias
+local defs = { key = { alias = 'k' } }
+-- multiple aliases
+local defs = { key = { alias = { 'k', 'ke' } } }
+local parse = luakeys.define(defs)
+local result, leftover = parse('k=value')
+luakeys.print(result) -- { key = 'value' }
 \end{minted}
 
 \subsubsection{Sub keys: \texttt{sub\_keys}}
@@ -683,18 +700,6 @@ parse('key=value')
 
 \begin{minted}{latex}
 \MyMacro % expands to “value”
-\end{minted}
-
-\subsubsection{Alias: \texttt{alias}}
-
-\begin{minted}{lua}
-local keys = {
-  {
-    name = 'key',
-    alias = 'k',
-    -- alias = {'k', 'ke'},
-  }
-}
 \end{minted}
 
 %%
