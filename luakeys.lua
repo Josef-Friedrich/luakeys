@@ -670,10 +670,24 @@ local is = {
   end,
 }
 
---
-local function apply_definitions(defs, input, output)
+--- Apply the key-value-pair definitions (defs) on an input table in a
+--- recursive fashion.
+---
+---@param defs table A table containing all definitions.
+---@param input table The current input table.
+---@param output table The current output table.
+---@param leftover table Always the root leftover table.
+---@param key_path table An array of key names leading to the current
+---  input and output table.
+local function apply_definitions(defs, input, output, leftover, key_path)
   if output == nil then
     output = {}
+  end
+  if leftover == nil then
+    leftover = {}
+  end
+  if key_path == nil then
+    key_path = {}
   end
   local exclusive_groups = {}
   for index, def in pairs(defs) do
@@ -842,20 +856,37 @@ local function apply_definitions(defs, input, output)
       -- def.sub_keys
       if def.sub_keys ~= nil and type(value) == 'table' then
         output[key] = {}
-        apply_definitions(def.sub_keys, value, output[key])
+        table.insert(key_path, key)
+        apply_definitions(def.sub_keys, value, output[key], leftover, key_path)
         break
       end
       output[key] = value
     end
   end
-  return output
+
+  -- Move to the current leftover table.
+  local current_leftover = leftover
+  for _, key in ipairs(key_path) do
+    if current_leftover[key] == nil then
+      current_leftover[key] = {}
+    end
+    current_leftover = current_leftover[key]
+  end
+
+  -- Copy all leftover key-value-pairs to the current leftover table.
+  for key, value in pairs(input) do
+    current_leftover[key] = value
+  end
+
+  return output, leftover
 end
 
 local function define(defs, parse_options, defaults)
   return function(kv_string, inner_parse_options, inner_defaults)
-    local leftover = parse(kv_string, inner_parse_options or parse_options)
+    local input = parse(kv_string, inner_parse_options or parse_options)
     local result = {}
-    apply_definitions(defs, leftover, result)
+    local leftover
+    result, leftover = apply_definitions(defs, input, result, {}, {})
 
     local d = inner_defaults or defaults
 

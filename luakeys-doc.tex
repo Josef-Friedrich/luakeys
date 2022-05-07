@@ -570,30 +570,42 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 
 The \lua{define} function returns a \lua{parse} function (see
 \ref{parse}).
-
 The name of a key can be specified in three ways:
 
 \begin{enumerate}
-\item as stand-alone values also known as an array of strings.
-\item as keys in a Lua table. The definition of the key-value pair is
-then under these keys.
+\item as standalone string values also known as an array of strings.
+\item as keys in a Lua table. The definition of the corresponding
+key-value pair is then stored under these keys.
 \item by the “name” option.
 \end{enumerate}
 
 \begin{minted}{lua}
--- stand-alone values
+-- standalone string values
 local defs = { 'key' }
 
 -- keys in a Lua table
 local defs = { key = { some_def = 'etc' } }
 
 -- by the “name” option
-local defs = { { name = 'key' } }
+local defs = { { name = 'key', some_def = 'etc' } }
 
 local parse = luakeys.define(defs)
 local result, leftover = parse('key=value,unknown=unknown')
 luakeys.print(result) -- { key = 'value' }
 luakeys.print(leftover) -- { unknown = 'unknown' }
+\end{minted}
+
+\noindent
+For nested definitions, only the last two ways of specifying the key
+names can be used.
+
+\begin{minted}{lua}
+local parse = luakeys.define({
+  level1 = { sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } } },
+})
+local result, leftover = parse('level1={level2={key=value,unknown=unknown}}')
+luakeys.print(result) -- { level1 = { level2 = { key = 'value' } } })
+luakeys.print(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
 \end{minted}
 
 The code example below lists all the options that can be used to define
