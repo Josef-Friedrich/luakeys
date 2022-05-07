@@ -71,6 +71,23 @@ describe('Key defintions', function()
           }, { l1 = { l2 = 'value' } }), { level1 = { level2 = 'value' } })
         end)
 
+        describe('Error messages', function()
+          it('should throw an error if two aliases are present', function()
+            assert.has_error(function()
+              apply_defintions({ key = { alias = { 'k', 'ke' } } },
+                { k = 'value', ke = 'value' })
+            end, 'Duplicate aliases “k” and “ke” for key “key”!')
+          end)
+
+          it('should throw an error if the key and an alias are present',
+            function()
+              assert.has_error(function()
+                apply_defintions({ key = { alias = { 'k', 'ke' } } },
+                  { key = 'value', k = 'value' })
+              end, 'Duplicate aliases “key” and “k” for key “key”!')
+            end)
+        end)
+
       end)
 
       describe('Option “choices”', function()

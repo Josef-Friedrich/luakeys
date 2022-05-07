@@ -728,15 +728,31 @@ local function apply_definitions(defs, input, output, leftover, key_path)
     local value = find_value(key)
 
     -- def.alias
-    if value == nil and def.alias ~= nil then
+    if def.alias ~= nil then
       if type(def.alias) == 'string' then
         def.alias = { def.alias }
       end
+      local alias_value
+      local used_alias_key
+      -- To get an error if the key and an alias is present
+      if value ~= nil then
+        alias_value = value
+        used_alias_key = key
+      end
       for _, alias in ipairs(def.alias) do
-        value = find_value(alias)
-        if value ~= nil then
-          break
+        local v = find_value(alias)
+        if v ~= nil then
+          if alias_value ~= nil then
+            throw_error(string.format(
+              'Duplicate aliases “%s” and “%s” for key “%s”!',
+              used_alias_key, alias, key))
+          end
+          used_alias_key = alias
+          alias_value = v
         end
+      end
+      if alias_value ~= nil then
+        value = alias_value
       end
     end
 
