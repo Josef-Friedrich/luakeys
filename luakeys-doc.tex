@@ -196,6 +196,333 @@ It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 \bye
 \end{minted}
 
+\section{Exported functions of the Lua module \texttt{luakeys.lua}}
+
+To learn more about the individual functions (local functions), please
+read the \href{https://josef-friedrich.github.io/luakeys/}{source code
+documentation}, which was created with
+\href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
+this functions:
+
+\begin{minted}{lua}
+local luakeys = require('luakeys')
+local parse = luakeys.parse
+local render = luakeys.render
+--local print = luakeys.print -- That would overwrite the built-in Lua function
+local save = luakeys.save
+local get = luakeys.get
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{parse(kv\_string, options, defaults)}: table}
+\label{parse}
+
+The function \lua{parse(kv_string, options)} parses a key-value string
+into a Lua table.
+
+\begin{minted}{latex}
+\newcommand{\mykeyvalcmd}[1][]{
+  \directlua{
+    result = luakeys.parse('#1')
+    luakeys.print(result)
+  }
+  #2
+}
+\mykeyvalcmd[one=1]{test}
+\end{minted}
+
+\noindent
+In plain \TeX:
+
+\begin{minted}{latex}
+\def\mykeyvalcommand#1{
+  \directlua{
+    result = luakeys.parse('#1')
+    luakeys.print(result)
+  }
+}
+\mykeyvalcmd{one=1}
+\end{minted}
+
+\noindent
+The function can be called with an options table. This options are
+supported:
+
+\begin{minted}{lua}
+local result = parse('one,two,three', {
+  case_insensitive_keys = false,
+  converter = function(key, value, depth, current_table, root_table)
+    return key, value
+  end,
+  convert_dimensions = false,
+  debug = false,
+  standalone_as_true = false,
+  unpack_single_array_value = false,
+})
+\end{minted}
+
+\noindent
+The options can also be set globally using the exported table
+|default_options|:
+
+\begin{minted}{lua}
+luakeys.parse('dim=1cm') -- {dim = 1864679}
+luakeys.default_options.convert_dimensions = false
+-- or:
+-- local defaults = luakeys.default_options
+-- defaults.convert_dimensions = false
+luakeys.parse('dim=1cm') -- {dim = '1cm'}
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{define(defs, parse_options, defaults)}}
+
+The \lua{define} function returns a \lua{parse} function (see
+\ref{parse}).
+The name of a key can be specified in three ways:
+
+\begin{enumerate}
+\item as standalone string values also known as an array of strings.
+\item as keys in a Lua table. The definition of the corresponding
+key-value pair is then stored under these keys.
+\item by the “name” option.
+\end{enumerate}
+
+\begin{minted}{lua}
+-- standalone string values
+local defs = { 'key' }
+
+-- keys in a Lua table
+local defs = { key = { some_def = 'etc' } }
+
+-- by the “name” option
+local defs = { { name = 'key', some_def = 'etc' } }
+
+local parse = luakeys.define(defs)
+local result, leftover = parse('key=value,unknown=unknown')
+luakeys.print(result) -- { key = 'value' }
+luakeys.print(leftover) -- { unknown = 'unknown' }
+\end{minted}
+
+\noindent
+For nested definitions, only the last two ways of specifying the key
+names can be used.
+
+\begin{minted}{lua}
+local parse = luakeys.define({
+  level1 = { sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } } },
+})
+local result, leftover = parse('level1={level2={key=value,unknown=unknown}}')
+luakeys.print(result) -- { level1 = { level2 = { key = 'value' } } })
+luakeys.print(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
+\end{minted}
+
+The code example below lists all the settings that can be used to define
+key-value pairs.
+
+\begin{minted}{lua}
+local defs = {
+  key = {
+    alias = { 'k', 'ke' }, -- or a single string: alias = 'k'
+    always_present = false,
+    choices = { 'one', 'two', 'three' },
+    data_type = 'string', -- or boolean, integer,
+    default = 'value',
+    exclusive_group = 'name',
+    l3_tl_set = 'my_token_list', --> \g_my_token_list_tl
+    macro = 'MacroName', --> \MacroName
+    match = '^%d%d%d%d%-%d%d%-%d%d$', -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
+    name = 'key', -- name of the key, can be omitted
+    opposite_values = {
+      [true] = 'show',
+      [false] = 'hide'
+    },
+    process = function (value, result, leftover)
+      return value
+    end,
+    required = true,
+    sub_keys = {
+      key_level_2 = {
+        ...
+      }
+    },
+  }
+}
+\end{minted}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{alias}}
+
+With the help of the \lua{alias} option, other key names can be used.
+The value is always stored under the original key name. A single alias
+name can be specified by a string, multiple aliases by a list of
+strings.
+
+\begin{minted}{lua}
+-- a single alias
+local defs = { key = { alias = 'k' } }
+-- multiple aliases
+local defs = { key = { alias = { 'k', 'ke' } } }
+local parse = luakeys.define(defs)
+local result, leftover = parse('k=value')
+luakeys.print(result) -- { key = 'value' }
+\end{minted}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{always\_present}}
+
+\begin{minted}{lua}
+local parse = luakeys.define({ key = { always_present = true })
+local result, leftover = parse('')
+luakeys.print(result) -- { key =  true }
+\end{minted}
+
+\subsubsection{\texttt{opposite\_values}}
+
+\begin{minted}{lua}
+local keys = {
+  visibility = {
+    opposite_values = {
+      [true] = 'show',
+      [false] = 'hide'
+    }
+  }
+}
+\end{minted}
+
+\subsubsection{\texttt{macro}}
+
+The option \texttt{macro} stores the value in a \TeX macro.
+
+\begin{minted}{lua}
+local parse = luakeys.define({
+  key = {
+    macro = 'MyMacro'
+  }
+})
+parse('key=value')
+\end{minted}
+
+\begin{minted}{latex}
+\MyMacro % expands to “value”
+\end{minted}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{sub\_keys}}
+
+\begin{minted}{lua}
+local keys = {
+  {
+    name = 'key_level_1',
+    sub_keys = {
+      {
+        name = 'key_level_2'
+      }
+    }
+  }
+}
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{render(tbl)}: string}
+
+The function \lua{render(tbl)} reverses the function
+\lua{parse(kv_string)}. It takes a Lua table and converts this table
+into a key-value string. The resulting string usually has a different
+order as the input table.
+
+\begin{minted}{lua}
+result = luakeys.parse('one=1,two=2,tree=3,')
+print(luakeys.render(result))
+--- one=1,two=2,tree=3,
+--- or:
+--- two=2,one=1,tree=3,
+--- or:
+--- ...
+\end{minted}
+
+\noindent
+In Lua only tables with 1-based consecutive integer keys (a.k.a. array
+tables) can be parsed in order.
+
+\begin{minted}{lua}
+result = luakeys.parse('one,two,three')
+print(luakeys.render(result))
+--- one,two,three, (always)
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{print(tbl): void}}
+
+The function \lua{print(tbl)} pretty prints a Lua table to standard
+output (stdout). It is a utility function that can be used to debug and
+inspect the resulting Lua table of the function \lua{parse}. You have to
+compile your \TeX{} document in a console to see the terminal output.
+
+%\luakeysdebug{level1={level2={key=value}}}
+
+\begin{minted}{lua}
+result = luakeys.parse('level1={level2={key=value}}')
+luakeys.print(result)
+\end{minted}
+
+\noindent
+The output should look like this:
+
+\begin{minted}{md}
+{
+  ['level1'] = {
+    ['level2'] = {
+      ['key'] = 'value',
+  },
+}
+\end{minted}
+
+%%
+%
+%%
+
+\subsection{\texttt{save(identifier, result): void}}
+
+The function \lua{save(identifier, result)} saves a result (a
+table from a previous run of \lua{parse}) under an identifier.
+Therefore, it is not necessary to pollute the global namespace to
+store results for the later usage.
+
+%%
+%
+%%
+
+\subsection{\texttt{get(identifier): table}}
+
+The function \lua{get(identifier)} retrieves a saved result from the
+result store.
+
+%-----------------------------------------------------------------------
+%
+%-----------------------------------------------------------------------
+
 \section{Syntax of the recognized key-value format}
 
 %%
@@ -480,308 +807,6 @@ All recognized data types can be used as standalone values.
 \begin{minted}{latex}
 \directlua{luakeys.parse('\@classoptionslist')}
 \end{minted}
-
-\section{Exported functions of the Lua module \texttt{luakeys.lua}}
-
-To learn more about the individual functions (local functions), please
-read the \href{https://josef-friedrich.github.io/luakeys/}{source code
-documentation}, which was created with
-\href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
-this functions:
-
-\begin{minted}{lua}
-local luakeys = require('luakeys')
-local parse = luakeys.parse
-local render = luakeys.render
---local print = luakeys.print -- That would overwrite the built-in Lua function
-local save = luakeys.save
-local get = luakeys.get
-\end{minted}
-
-%%
-%
-%%
-
-\subsection{\texttt{parse(kv\_string, options, defaults)}: table}
-\label{parse}
-
-The function \lua{parse(kv_string, options)} is the main method of
-this module. It parses a key-value string into a Lua table.
-
-\begin{minted}{latex}
-\newcommand{\mykeyvalcmd}[1][]{
-  \directlua{
-    result = luakeys.parse('#1')
-    luakeys.print(result)
-  }
-  #2
-}
-\mykeyvalcmd[one=1]{test}
-\end{minted}
-
-\noindent
-In plain \TeX:
-
-\begin{minted}{latex}
-\def\mykeyvalcommand#1{
-  \directlua{
-    result = luakeys.parse('#1')
-    luakeys.print(result)
-  }
-}
-\mykeyvalcmd{one=1}
-\end{minted}
-
-\noindent
-The function can be called with an options table. This options are
-supported:
-
-\begin{minted}{lua}
-local result = parse('one,two,three', {
-  case_insensitive_keys = false,
-  converter = function(key, value, depth, current_table, root_table)
-    return key, value
-  end,
-  convert_dimensions = false,
-  debug = false,
-  standalone_as_true = false,
-  unpack_single_array_value = false,
-})
-\end{minted}
-
-\noindent
-The options can also be set globally using the exported table
-|default_options|:
-
-\begin{minted}{lua}
-luakeys.parse('dim=1cm') -- {dim = 1864679}
-luakeys.default_options.convert_dimensions = false
--- or:
--- local defaults = luakeys.default_options
--- defaults.convert_dimensions = false
-luakeys.parse('dim=1cm') -- {dim = '1cm'}
-\end{minted}
-
-%%
-%
-%%
-
-\subsection{\texttt{define(defs, parse_options, defaults)}}
-
-The \lua{define} function returns a \lua{parse} function (see
-\ref{parse}).
-The name of a key can be specified in three ways:
-
-\begin{enumerate}
-\item as standalone string values also known as an array of strings.
-\item as keys in a Lua table. The definition of the corresponding
-key-value pair is then stored under these keys.
-\item by the “name” option.
-\end{enumerate}
-
-\begin{minted}{lua}
--- standalone string values
-local defs = { 'key' }
-
--- keys in a Lua table
-local defs = { key = { some_def = 'etc' } }
-
--- by the “name” option
-local defs = { { name = 'key', some_def = 'etc' } }
-
-local parse = luakeys.define(defs)
-local result, leftover = parse('key=value,unknown=unknown')
-luakeys.print(result) -- { key = 'value' }
-luakeys.print(leftover) -- { unknown = 'unknown' }
-\end{minted}
-
-\noindent
-For nested definitions, only the last two ways of specifying the key
-names can be used.
-
-\begin{minted}{lua}
-local parse = luakeys.define({
-  level1 = { sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } } },
-})
-local result, leftover = parse('level1={level2={key=value,unknown=unknown}}')
-luakeys.print(result) -- { level1 = { level2 = { key = 'value' } } })
-luakeys.print(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
-\end{minted}
-
-The code example below lists all the settings that can be used to define
-key-value pairs.
-
-\begin{minted}{lua}
-local defs = {
-  key = {
-    alias = { 'k', 'ke' }, -- or a single string: alias = 'k'
-    always_present = false,
-    choices = { 'one', 'two', 'three' },
-    data_type = 'string', -- or boolean, integer,
-    default = 'value',
-    exclusive_group = 'name',
-    l3_tl_set = 'my_token_list', --> \g_my_token_list_tl
-    macro = 'MacroName', --> \MacroName
-    match = '^%d%d%d%d%-%d%d%-%d%d$', -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
-    name = 'key', -- name of the key, can be omitted
-    opposite_values = {
-      [true] = 'show',
-      [false] = 'hide'
-    },
-    process = function (value, result, leftover)
-      return value
-    end,
-    sub_keys = {
-      key_level_2 = {
-        ...
-      }
-    },
-  }
-}
-\end{minted}
-
-\subsubsection{\texttt{alias}}
-
-With the help of the \lua{alias} option, other key names can be used.
-The value is always stored under the original key name. A single alias
-name can be specified by a string, multiple aliases by a list of
-strings.
-
-\begin{minted}{lua}
--- a single alias
-local defs = { key = { alias = 'k' } }
--- multiple aliases
-local defs = { key = { alias = { 'k', 'ke' } } }
-local parse = luakeys.define(defs)
-local result, leftover = parse('k=value')
-luakeys.print(result) -- { key = 'value' }
-\end{minted}
-
-\subsubsection{Sub keys: \texttt{sub\_keys}}
-
-\begin{minted}{lua}
-local keys = {
-  {
-    name = 'key_level_1',
-    sub_keys = {
-      {
-        name = 'key_level_2'
-      }
-    }
-  }
-}
-\end{minted}
-
-\subsubsection{Opposite values: \texttt{opposite\_values}}
-
-\begin{minted}{lua}
-local keys = {
-  visibility = {
-    opposite_values = {
-      [true] = 'show',
-      [false] = 'hide'
-    }
-  }
-}
-\end{minted}
-
-\subsubsection{\texttt{macro}: Store values in a \TeX macro}
-
-The option \texttt{macro} stores the value in a macro.
-
-\begin{minted}{lua}
-local parse = luakeys.define({
-  key = {
-    macro = 'MyMacro'
-  }
-})
-parse('key=value')
-\end{minted}
-
-\begin{minted}{latex}
-\MyMacro % expands to “value”
-\end{minted}
-
-%%
-%
-%%
-
-\subsection{\texttt{render(tbl)}: string}
-
-The function \lua{render(tbl)} reverses the function
-\lua{parse(kv_string)}. It takes a Lua table and converts this table
-into a key-value string. The resulting string usually has a different
-order as the input table.
-
-\begin{minted}{lua}
-result = luakeys.parse('one=1,two=2,tree=3,')
-print(luakeys.render(result))
---- one=1,two=2,tree=3,
---- or:
---- two=2,one=1,tree=3,
---- or:
---- ...
-\end{minted}
-
-\noindent
-In Lua only tables with 1-based consecutive integer keys (a.k.a. array
-tables) can be parsed in order.
-
-\begin{minted}{lua}
-result = luakeys.parse('one,two,three')
-print(luakeys.render(result))
---- one,two,three, (always)
-\end{minted}
-
-%%
-%
-%%
-
-\subsection{\texttt{print(tbl): void}}
-
-The function \lua{print(tbl)} pretty prints a Lua table to standard
-output (stdout). It is a utility function that can be used to debug and
-inspect the resulting Lua table of the function \lua{parse}. You have to
-compile your \TeX{} document in a console to see the terminal output.
-
-%\luakeysdebug{level1={level2={key=value}}}
-
-\begin{minted}{lua}
-result = luakeys.parse('level1={level2={key=value}}')
-luakeys.print(result)
-\end{minted}
-
-\noindent
-The output should look like this:
-
-\begin{minted}{md}
-{
-  ['level1'] = {
-    ['level2'] = {
-      ['key'] = 'value',
-  },
-}
-\end{minted}
-
-%%
-%
-%%
-
-\subsection{\texttt{save(identifier, result): void}}
-
-The function \lua{save(identifier, result)} saves a result (a
-table from a previous run of \lua{parse}) under an identifier.
-Therefore, it is not necessary to pollute the global namespace to
-store results for the later usage.
-
-%%
-%
-%%
-
-\subsection{\texttt{get(identifier): table}}
-
-The function \lua{get(identifier)} retrieves a saved result from the
-result store.
 
 %-----------------------------------------------------------------------
 %

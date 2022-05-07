@@ -90,6 +90,27 @@ describe('Key defintions', function()
 
       end)
 
+      describe('Option “always_present”', function()
+        it('should pass an value to the key if the input is empty', function()
+          assert.are.same(apply_defintions({ key = { always_present = true } },
+            {}), { key = true })
+        end)
+
+        it('should use the default value', function()
+          assert.are.same(apply_defintions({
+            key = { always_present = true, default = 'value' },
+          }, {}), { key = 'value' })
+        end)
+
+        it('should work in an nested definition #skip', function()
+          assert.are.same(apply_defintions({
+            level1 = {
+              sub_keys = { key = { always_present = true, default = 'value' } },
+            },
+          }, {}), { level1 = { key = 'value' } })
+        end)
+      end)
+
       describe('Option “choices”', function()
         local defs = { key = { choices = { 'one', 'two', 'three' } } }
         it('should throw no exception', function()

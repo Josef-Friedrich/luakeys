@@ -772,9 +772,12 @@ local function apply_definitions(defs, input, output, leftover, key_path)
     end
 
     -- def.always_present
-    -- def.default
-    if def.default ~= nil and value == nil and def.always_present then
-      value = def.default
+    if value == nil and def.always_present then
+      if def.default ~= nil then
+        value = def.default
+      else
+        value = true
+      end
     end
 
     if def.required ~= nil and def.required and value == nil then
