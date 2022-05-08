@@ -102,7 +102,7 @@ describe('Key defintions', function()
           }, {}), { key = 'value' })
         end)
 
-        it('should work in an nested definition #skip', function()
+        it('should work in an nested definition', function()
           assert.are.same(apply_defintions({
             level1 = {
               sub_keys = { key = { always_present = true, default = 'value' } },

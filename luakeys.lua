@@ -765,9 +765,9 @@ local function apply_definitions(defs, input, output, leftover, key_path)
           'Usage opposite_values = { [true] = "...", [false] = "..." }')
       end
       if remove_from_array(input, true_value) ~= nil then
-        output[key] = true
+        value = true
       elseif remove_from_array(input, false_value) ~= nil then
-        output[key] = false
+        value = false
       end
     end
 
@@ -875,16 +875,27 @@ local function apply_definitions(defs, input, output, leftover, key_path)
       if def.process ~= nil and type(def.process) == 'function' then
         value = def.process(value, output, input)
       end
-
-      -- def.sub_keys
-      if def.sub_keys ~= nil and type(value) == 'table' then
-        output[key] = {}
-        table.insert(key_path, key)
-        apply_definitions(def.sub_keys, value, output[key], leftover, key_path)
-        break
-      end
-      output[key] = value
     end
+
+    -- def.sub_keys
+    if def.sub_keys ~= nil then
+      local v
+      -- To get keys defined with always_present
+      if value == nil then
+        v = {}
+      elseif type(value) == 'string' then
+        v = { value }
+      elseif type(value) == 'table' then
+        v = value
+      end
+      table.insert(key_path, key)
+      v = apply_definitions(def.sub_keys, v, output[key], leftover, key_path)
+      if get_table_size(v) > 0 then
+        value = v
+      end
+    end
+
+    output[key] = value
   end
 
   -- Move to the current leftover table.
