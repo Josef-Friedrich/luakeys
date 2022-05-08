@@ -257,6 +257,41 @@ describe('Key defintions', function()
           { level1 = { level2 = 'value' } })
       end)
     end)
+
+    describe('Return values', function()
+      describe('leftover', function()
+        it('should be an empty table if all keys are defined', function()
+          local result, leftover =
+            apply_defintions({ 'key' }, { key = 'value' })
+          assert.are.same(leftover, {})
+        end)
+
+        it('should be an non-empty table if all keys are defined', function()
+          local result, leftover = apply_defintions({ 'key' }, {
+            key = 'value',
+            unknown = 'unknown',
+          })
+          assert.are.same(leftover, { unknown = 'unknown' })
+        end)
+
+        it('should be an non-empty table if all keys are defined', function()
+          local result, leftover = apply_defintions({
+            key1 = { sub_keys = { 'known1' } },
+            key2 = { sub_keys = { 'known2' } },
+          }, {
+            key1 = { known1 = 1, unknown1 = 1 },
+            key2 = { known2 = 1, unknown2 = 1, unknown3 = 1 },
+            unknown = 'unknown',
+          })
+          assert.are.same(leftover, {
+            key1 = { unknown1 = 1 },
+            key2 = { unknown2 = 1, unknown3 = 1 },
+            unknown = 'unknown',
+          })
+        end)
+      end)
+
+    end)
   end)
 
   describe('Function “define()”', function()

@@ -690,6 +690,18 @@ local function apply_definitions(defs, input, output, leftover, key_path)
     key_path = {}
   end
   local exclusive_groups = {}
+
+  local function add_to_key_path(key_path, key)
+    local new_key_path = {}
+
+    for index, value in ipairs(key_path) do
+      new_key_path[index] = value
+    end
+
+    table.insert(new_key_path, key)
+    return new_key_path
+  end
+
   for index, def in pairs(defs) do
     --- Find key and def
     local key
@@ -888,8 +900,8 @@ local function apply_definitions(defs, input, output, leftover, key_path)
       elseif type(value) == 'table' then
         v = value
       end
-      table.insert(key_path, key)
-      v = apply_definitions(def.sub_keys, v, output[key], leftover, key_path)
+      v = apply_definitions(def.sub_keys, v, output[key], leftover,
+        add_to_key_path(key_path, key))
       if get_table_size(v) > 0 then
         value = v
       end
