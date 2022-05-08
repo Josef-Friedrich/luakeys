@@ -402,6 +402,10 @@ local keys = {
 }
 \end{minted}
 
+%%
+%
+%%
+
 \subsubsection{\texttt{macro}}
 
 The option \texttt{macro} stores the value in a \TeX macro.
@@ -422,6 +426,38 @@ parse('key=value')
 %%
 %
 %%
+
+\subsubsection{\texttt{process}}
+
+The “process” option can be used to define a function whose return value
+is passed to the key. Three parameters are passed when the function is
+called:
+
+\begin{enumerate}
+\item \lua{value}: The current value
+\item \lua{result}: The table in which the final result will be saved.
+% Da Lua keine feste Reihenfolge hat, wie die Schlüssel in einer Tabelle
+% aufgerufen werden, kann diese Tabelle von Aufruf zu Aufruf jeweils
+% ganz anderes aufgebaut sein.
+Since Lua has no fixed order in which the keys in a table are called,
+this table can be structured quite differently from call to call.
+\item \lua{leftover}: The table in which the leftover key-value pairs
+are stored.
+\end{enumerate}
+
+%%
+%
+%%
+
+\begin{minted}{lua}
+local defs = {
+  key = {
+    process = function (value, result, leftover)
+      return value
+    end
+  }
+}
+\end{minted}
 
 \subsubsection{\texttt{sub\_keys}}
 
