@@ -891,7 +891,7 @@ local function apply_definitions(defs, input, output, leftover, key_path)
 
       -- def.process
       if def.process ~= nil and type(def.process) == 'function' then
-        value = def.process(value, output, input)
+        value = def.process(value, output, leftover)
       end
     end
 
