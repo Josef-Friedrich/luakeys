@@ -496,6 +496,12 @@ local function get_table_size(value)
   return count
 end
 
+local function warn_unknown_keys(unknown)
+  if not unknown or type(unknown) == 'table' and get_table_size(unknown) > 0 then
+    throw_error('Unknown keys: ' .. render(unknown))
+  end
+end
+
 --- Unpack a single valued array table like `{ 'one' }` into `one` or
 -- `{ 1 }` into `1`.
 --
@@ -1009,14 +1015,15 @@ local export = {
 
 -- http://olivinelabs.com/busted/#private
 if _TEST then
+  export.apply_definitions = apply_definitions
   export.luafy_key = luafy_key
   export.luafy_options = luafy_options
+  export.merge_tables = merge_tables
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
   export.visit_parse_tree = visit_parse_tree
-  export.apply_definitions = apply_definitions
-  export.merge_tables = merge_tables
+  export.warn_unknown_keys = warn_unknown_keys
 end
 
 return export
