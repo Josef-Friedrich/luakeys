@@ -163,6 +163,22 @@ local function merge_tables(target, t2)
   return target
 end
 
+--- http://lua-users.org/wiki/CopyTable
+local function clone_table(orig)
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for orig_key, orig_value in next, orig, nil do
+      copy[clone_table(orig_key)] = clone_table(orig_value)
+    end
+    setmetatable(copy, clone_table(getmetatable(orig)))
+  else -- number, string, boolean, etc
+    copy = orig
+  end
+  return copy
+end
+
 --- Convert back to strings
 -- @section
 
@@ -640,6 +656,10 @@ local is = {
 ---@param key_path table An array of key names leading to the current
 ---  input and output table.
 local function apply_definitions(defs, input, output, leftover, key_path)
+  --- standalone values are removed.
+  -- For some callbacks and the third return value of parse, we
+  -- need an unchanged raw result from the parse function.
+  input = clone_table(input)
   if output == nil then
     output = {}
   end
@@ -935,7 +955,7 @@ local function parse(kv_string, options)
   local result_unknown = nil
   if options.definitions ~= nil then
     result_def = {}
-    result_parse, result_unknown = apply_definitions(options.definitions,
+    result_def, result_unknown = apply_definitions(options.definitions,
       result_parse, result_def, {}, {})
   end
 
