@@ -145,12 +145,35 @@ describe('Function “parse()”', function()
       end)
     end)
 
-    it('Option “definitions”', function()
-      local result, result_unknown, result_parse =
-        luakeys.parse('key', { definitions = { key = { default = 'value' } } })
-      assert.are.same(result, { key = 'value' })
-      assert.are.same(result_unknown, {})
-      assert.are.same(result_parse, { 'key' })
+    describe('Option “definitions”', function()
+      it('should return three return tables', function()
+        local result, result_unknown, result_parse =
+          luakeys.parse('key', { definitions = { key = { default = 'value' } } })
+        assert.are.same(result, { key = 'value' })
+        assert.are.same(result_unknown, {})
+        assert.are.same(result_parse, { 'key' })
+      end)
+
+      it('all arguments of process callback', function()
+        local result, result_unknown, result_parse = luakeys.parse(
+          'key=value,unknown=unknown', {
+            definitions = {
+              key = {
+                process = function(value, pre_def, result, unknown)
+                  assert.are.same(pre_def,
+                    { key = 'value', unknown = 'unknown' })
+                  result.new_key = 'result'
+                  unknown.new_unknown = 'unknown'
+                  return value
+                end,
+              },
+            },
+          })
+        assert.are.same(result, { key = 'value', new_key = 'result' })
+        assert.are.same(result_unknown,
+          { unknown = 'unknown', new_unknown = 'unknown' })
+        assert.are.same(result_parse, { key = 'value', unknown = 'unknown' })
+      end)
     end)
 
     describe('Option “preprocess”', function()

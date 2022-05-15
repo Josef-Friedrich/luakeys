@@ -30,7 +30,16 @@ local def = {
   -- name of the key, can be omitted
   name = 'key',
   opposite_values = { [true] = 'show', [false] = 'hide' },
-  process = function(value, result, leftover)
+
+  --- A callback function
+  ---@tparam any value The current value of key.
+  ---@tparam table pre_def The result table before processing the key-value pair definitions.
+  ---@tparam table result The current and not yet finalized result table.
+  ---@tparam table unknown The current and not yet finalized unknown keys table.
+  process = function(value,
+    pre_def,
+    result,
+    unknown)
     return value
   end,
   required = true,

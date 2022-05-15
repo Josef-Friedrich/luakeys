@@ -654,8 +654,14 @@ local is = {
 ---@param output table The current output table.
 ---@param leftover table Always the root leftover table.
 ---@param key_path table An array of key names leading to the current
+---@param input_root table The root input table
 ---  input and output table.
-local function apply_definitions(defs, input, output, leftover, key_path)
+local function apply_definitions(defs,
+  input,
+  output,
+  leftover,
+  key_path,
+  input_root)
   --- standalone values are removed.
   -- For some callbacks and the third return value of parse, we
   -- need an unchanged raw result from the parse function.
@@ -772,6 +778,7 @@ local function apply_definitions(defs, input, output, leftover, key_path)
       end
     end
 
+    -- required
     if def.required ~= nil and def.required and value == nil then
       throw_error(string.format(
         'Missing required value for key “%s” or missing key!', key))
@@ -865,7 +872,7 @@ local function apply_definitions(defs, input, output, leftover, key_path)
 
       -- def.process
       if def.process ~= nil and type(def.process) == 'function' then
-        value = def.process(value, output, leftover)
+        value = def.process(value, input_root, output, leftover)
       end
     end
 
@@ -881,7 +888,7 @@ local function apply_definitions(defs, input, output, leftover, key_path)
         v = value
       end
       v = apply_definitions(def.sub_keys, v, output[key], leftover,
-        add_to_key_path(key_path, key))
+        add_to_key_path(key_path, key), input_root)
       if get_table_size(v) > 0 then
         value = v
       end
@@ -956,7 +963,7 @@ local function parse(kv_string, options)
   if options.definitions ~= nil then
     result_def = {}
     result_def, result_unknown = apply_definitions(options.definitions,
-      result_parse, result_def, {}, {})
+      result_parse, result_def, {}, {}, clone_table(result_parse))
   end
 
   if options.debug then
