@@ -217,10 +217,10 @@ local get = luakeys.get
 %
 %%
 
-\subsection{\texttt{parse(kv\_string, options, defaults)}: table}
+\subsection{\texttt{parse(kv\_string, opts)}: table}
 \label{parse}
 
-The function \lua{parse(kv_string, options)} parses a key-value string
+The function \lua{parse(kv_string, opts)} parses a key-value string
 into a Lua table.
 
 \begin{minted}{latex}
@@ -252,16 +252,40 @@ The function can be called with an options table. This options are
 supported:
 
 \begin{minted}{lua}
-local result = parse('one,two,three', {
+local opts = {
+  -- { KEY = 'Value' } -> { key = 'value' }
   case_insensitive_keys = false,
-  converter = function(key, value, depth, current_table, root_table)
+
+  -- Visit all key-value pairs in the recursive parse tree.
+  converter = function(key, value, depth, current_tree, root_tree)
     return key, value
   end,
+
+  -- Automatically convert dimensions into scaled points (1cm -> 1864679).
+  -- default: true
   convert_dimensions = false,
-  debug = false,
-  standalone_as_true = false,
+
+  -- Output the results table to the console.
+  -- default: false
+  debug = true,
+
+  -- A table with some default values. The result table is merged with
+  -- this table.
+  defaults = { key = 'value' },
+
+  -- Key-value pair defintions.
+  definitions = defs,
+
+  -- Standalone values aka values with numeric keys are converted to
+  -- keys holding the value true:
+  -- { 'one', 'two', 'three' } -> { one = true, two = true, three = true }
+  -- default: false
+  standalone_as_true = true,
+
+  -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,
-})
+}
+local result = luakeys.parse('one,two,three', opts)
 \end{minted}
 
 \noindent
@@ -281,7 +305,7 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 %
 %%
 
-\subsection{\texttt{define(defs, parse_options, defaults)}}
+\subsection{\texttt{define(defs, opts)}}
 
 The \lua{define} function returns a \lua{parse} function (see
 \ref{parse}).
@@ -329,29 +353,39 @@ key-value pairs.
 \begin{minted}{lua}
 local defs = {
   key = {
-    alias = { 'k', 'ke' }, -- or a single string: alias = 'k'
+    -- Allow different key names.
+    -- or a single string: alias = 'k'
+    alias = { 'k', 'ke' },
+
+    -- The key is always included in the result. If no default value is
+    -- definied, true is taken as the value.
     always_present = false,
+
+    -- Only values listed in the array table are allowed.
     choices = { 'one', 'two', 'three' },
     data_type = 'string', -- or boolean, integer,
     default = 'value',
+
+    --
     exclusive_group = 'name',
-    l3_tl_set = 'my_token_list', --> \g_my_token_list_tl
-    macro = 'MacroName', --> \MacroName
-    match = '^%d%d%d%d%-%d%d%-%d%d$', -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
-    name = 'key', -- name of the key, can be omitted
-    opposite_values = {
-      [true] = 'show',
-      [false] = 'hide'
-    },
-    process = function (value, result, leftover)
+
+    -- > \g_my_token_list_tl
+    l3_tl_set = 'my_token_list',
+
+    -- > \MacroName
+    macro = 'MacroName', -- > \MacroName
+
+    -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
+    match = '^%d%d%d%d%-%d%d%-%d%d$',
+
+    -- name of the key, can be omitted
+    name = 'key',
+    opposite_values = { [true] = 'show', [false] = 'hide' },
+    process = function(value, result, leftover)
       return value
     end,
     required = true,
-    sub_keys = {
-      key_level_2 = {
-        ...
-      }
-    },
+    sub_keys = { key_level_2 = { ... } },
   }
 }
 \end{minted}
@@ -382,6 +416,9 @@ luakeys.print(result) -- { key = 'value' }
 %%
 
 \subsubsection{\texttt{always\_present}}
+
+The key is always included in the result. If no default value is
+definied, true is taken as the value.
 
 \begin{minted}{lua}
 local parse = luakeys.define({ key = { always_present = true })

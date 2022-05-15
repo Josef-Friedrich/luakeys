@@ -63,10 +63,11 @@ local option_keys = {
   'convert_dimensions',
   'converter',
   'debug',
+  'defaults',
+  'definitions',
   'postprocess',
   'preprocess',
   'standalone_as_true',
-  'defaults',
   'unpack_single_array_values',
 }
 
@@ -610,54 +611,6 @@ local function normalize(raw, options)
   return raw
 end
 
---- Parse a LaTeX/TeX style key-value string into a Lua table.
---
--- @tparam string kv_string A string in the TeX/LaTeX style key-value
---   format as described above.
---
--- @tparam table options A table containing the settings:
--- `convert_dimensions`, `unpack_single_array_values`,
--- `standalone_as_true`, `converter`, `debug`, `preprocess`, `postprocess`.
---
--- @treturn table A hopefully properly parsed table you can do something
--- useful with.
-local function parse(kv_string, options, defaults)
-  if kv_string == nil then
-    return {}
-  end
-  options = normalize_parse_options(options)
-
-  local parser = generate_parser('list', options)
-  local result = parser:match(kv_string)
-
-  local function apply_processor(name)
-    if options[name] ~= nil and type(options[name]) == 'function' then
-      options[name](result, kv_string)
-      if options.debug then
-        print('After execution of the function: ' .. name)
-        pretty_print(result)
-      end
-    end
-  end
-
-  apply_processor('preprocess')
-
-  if options.converter ~= nil and type(options.converter) == 'function' then
-    result = visit_parse_tree(result, options.converter)
-  end
-  if options.defaults ~= nil and type(options.defaults) == 'table' then
-    merge_tables(result, options.defaults)
-  end
-  result = normalize(result, options)
-
-  apply_processor('postprocess')
-
-  if options.debug then
-    pretty_print(result)
-  end
-  return result
-end
-
 local is = {
   dimension = function(str)
     if str == nil then
@@ -934,13 +887,86 @@ local function apply_definitions(defs, input, output, leftover, key_path)
   return output, leftover
 end
 
+--- Parse a LaTeX/TeX style key-value string into a Lua table.
+--
+-- @tparam string kv_string A string in the TeX/LaTeX style key-value
+--   format as described above.
+--
+-- @tparam table options A table containing the settings:
+-- `convert_dimensions`, `unpack_single_array_values`,
+-- `standalone_as_true`, `converter`, `debug`, `preprocess`, `postprocess`.
+--
+-- @treturn table A hopefully properly parsed table you can do something
+-- useful with.
+local function parse(kv_string, options)
+  if kv_string == nil then
+    return {}
+  end
+  options = normalize_parse_options(options)
+
+  local parser = generate_parser('list', options)
+  local result_parse = parser:match(kv_string)
+
+  local function apply_processor(name)
+    if options[name] ~= nil and type(options[name]) == 'function' then
+      options[name](result_parse, kv_string)
+      if options.debug then
+        print('After execution of the function: ' .. name)
+        pretty_print(result_parse)
+      end
+    end
+  end
+
+  apply_processor('preprocess')
+
+  if options.converter ~= nil and type(options.converter) == 'function' then
+    result_parse = visit_parse_tree(result_parse, options.converter)
+  end
+  if options.defaults ~= nil and type(options.defaults) == 'table' then
+    merge_tables(result_parse, options.defaults)
+  end
+  result_parse = normalize(result_parse, options)
+
+  apply_processor('postprocess')
+
+  -- The result after applying the defintions.
+  local result_def = nil
+  -- In this table are all unknown keys stored
+  local result_unknown = nil
+  if options.definitions ~= nil then
+    result_def = {}
+    result_parse, result_unknown = apply_definitions(options.definitions,
+      result_parse, result_def, {}, {})
+  end
+
+  if options.debug then
+    pretty_print(result_parse)
+  end
+  local result
+  if result_def == nil then
+    result = result_parse
+  else
+    result = result_def
+  end
+  return result, result_unknown, result_parse
+end
+
 local function define(defs, parse_options)
   return function(kv_string, inner_parse_options)
-    local input = parse(kv_string, inner_parse_options or parse_options)
-    local result = {}
-    local leftover
-    result, leftover = apply_definitions(defs, input, result, {}, {})
-    return result, leftover
+    local opts
+    if inner_parse_options ~= nil then
+      opts = inner_parse_options
+    elseif parse_options ~= nil then
+      opts = parse_options
+    end
+
+    if opts == nil then
+      opts = {}
+    end
+
+    opts.definitions = defs
+
+    return parse(kv_string, opts)
   end
 end
 
