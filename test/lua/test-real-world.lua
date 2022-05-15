@@ -11,14 +11,14 @@ end
 describe('Real world examples', function()
   describe('hyperref', function()
     it('Manual page 6: pdfborder={0 0 0}', function()
-      assert_deep_equals('pdfborder={0 0 0}', {pdfborder = '0 0 0'})
+      assert_deep_equals('pdfborder={0 0 0}', { pdfborder = '0 0 0' })
     end)
 
     it('Manual page 6: backref...', function()
       assert_deep_equals('backref,\npdfpagemode=FullScreen,\ncolorlinks=true', {
         'backref',
         colorlinks = true,
-        pdfpagemode = 'FullScreen'
+        pdfpagemode = 'FullScreen',
       })
     end)
 
@@ -29,8 +29,8 @@ describe('Real world examples', function()
           pdfinfo = {
             NewKey = 'Foobar',
             Subject = 'My Subject',
-            Title = 'My Title'
-          }
+            Title = 'My Title',
+          },
         })
     end)
   end)
@@ -42,15 +42,15 @@ describe('Real world examples', function()
                            'row sep={3cm,between origins},\n' ..
                            'nodes={circle, draw, minimum size=7.5mm}', {
         'matrix of math nodes',
-        ['column sep'] = {1234567, 'between origins'},
-        nodes = {'circle', 'draw', ['minimum size'] = 1234567},
-        ['row sep'] = {1234567, 'between origins'}
+        ['column sep'] = { 1234567, 'between origins' },
+        nodes = { 'circle', 'draw', ['minimum size'] = 1234567 },
+        ['row sep'] = { 1234567, 'between origins' },
       })
     end)
 
     it('Manual page 241', function()
       assert_deep_equals('every node/.style=draw',
-                         {['every node/.style'] = 'draw'})
+        { ['every node/.style'] = 'draw' })
     end)
 
     it('Manual page 237', function()
@@ -58,7 +58,7 @@ describe('Real world examples', function()
         'fill=yellow!80!black,text width=3cm,align=flush center', {
           align = 'flush center',
           fill = 'yellow!80!black',
-          ['text width'] = 1234567
+          ['text width'] = 1234567,
         })
     end)
 
@@ -76,7 +76,7 @@ describe('Real world examples', function()
           BoldItalicFont = 'CharisSILBI',
           Extension = '.ttf',
           ItalicFont = 'CharisSILI',
-          UprightFont = 'CharisSILR'
+          UprightFont = 'CharisSILR',
         })
     end)
 
@@ -87,7 +87,7 @@ describe('Real world examples', function()
           Extension = '.otf',
           UprightFont = '*-Light',
           BoldFont = '*-Regular',
-          FontFace = '{k}{n}{*-Black}' -- < !
+          FontFace = '{k}{n}{*-Black}', -- < !
         })
     end)
 
@@ -95,8 +95,10 @@ describe('Real world examples', function()
       assert_deep_equals('lots and lots ,\n' .. 'and more and more ,\n' ..
                            'an excessive number really ,\n' ..
                            'of font features could go here\n', {
-        'lots and lots', 'and more and more', 'an excessive number really',
-        'of font features could go here'
+        'lots and lots',
+        'and more and more',
+        'an excessive number really',
+        'of font features could go here',
       })
     end)
 
@@ -106,8 +108,8 @@ describe('Real world examples', function()
     it('Manual page 16', function()
       assert_deep_equals(
         'hdivide={*,0.9\\paperwidth,*}, vdivide={*,0.9\\paperheight,*}', {
-          hdivide = {'*', '0.9\\paperwidth', '*'}, -- < ?
-          vdivide = {'*', '0.9\\paperheight', '*'} -- < ?
+          hdivide = { '*', '0.9\\paperwidth', '*' }, -- < ?
+          vdivide = { '*', '0.9\\paperheight', '*' }, -- < ?
         })
     end)
 
@@ -131,7 +133,7 @@ describe('Real world examples', function()
         'heightrounded',
         columnsep = 1234567,
         'dvips',
-        'verbose'
+        'verbose',
       })
     end)
   end)

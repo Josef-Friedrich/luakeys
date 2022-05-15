@@ -59,14 +59,15 @@ end
 
 --- This table stores all allowed option keys.
 local option_keys = {
-  'convert_dimensions',
-  'unpack_single_array_values',
-  'standalone_as_true',
-  'converter',
   'case_insensitive_keys',
+  'convert_dimensions',
+  'converter',
   'debug',
-  'preprocess',
   'postprocess',
+  'preprocess',
+  'standalone_as_true',
+  'defaults',
+  'unpack_single_array_values',
 }
 
 --- The default options.
@@ -644,8 +645,8 @@ local function parse(kv_string, options, defaults)
   if options.converter ~= nil and type(options.converter) == 'function' then
     result = visit_parse_tree(result, options.converter)
   end
-  if defaults ~= nil and type(defaults) == 'table' then
-    merge_tables(result, defaults)
+  if options.defaults ~= nil and type(options.defaults) == 'table' then
+    merge_tables(result, options.defaults)
   end
   result = normalize(result, options)
 
@@ -933,19 +934,12 @@ local function apply_definitions(defs, input, output, leftover, key_path)
   return output, leftover
 end
 
-local function define(defs, parse_options, defaults)
-  return function(kv_string, inner_parse_options, inner_defaults)
+local function define(defs, parse_options)
+  return function(kv_string, inner_parse_options)
     local input = parse(kv_string, inner_parse_options or parse_options)
     local result = {}
     local leftover
     result, leftover = apply_definitions(defs, input, result, {}, {})
-
-    local d = inner_defaults or defaults
-
-    if d ~= nil then
-      merge_tables(result, d)
-    end
-
     return result, leftover
   end
 end

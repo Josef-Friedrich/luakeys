@@ -205,9 +205,9 @@ describe('Type', function()
     end)
 
     it('Whitespace und Number followed by a string is a string: “ 1 test”',
-       function()
-      assert_type(' 1 test ', 'string')
-    end)
+      function()
+        assert_type(' 1 test ', 'string')
+      end)
 
     it('Number followed by a string is a string: “ 1 test”', function()
       assert_type('1 test', 'string')
