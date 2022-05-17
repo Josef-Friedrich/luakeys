@@ -209,6 +209,36 @@ describe('Function “parse()”', function()
       end)
     end)
 
+    describe('Option “unpack_single_valued_array”', function()
+      local opts_true = { unpack_single_array_value = true }
+      local opts_false = { unpack_single_array_value = false }
+
+      it('unpacked: single string', function()
+        assert.is.same({ key = 'string' },
+          luakeys.parse('key={string}', opts_true))
+        assert.is.same({ key = { 'string' } },
+          luakeys.parse('key={string}', opts_false))
+
+      end)
+
+      it('unpacked: single number', function()
+        assert.are.same({ key = 1 }, luakeys.parse('key={1}', opts_true))
+        assert.are.same({ key = { 1 } }, luakeys.parse('key={1}', opts_false))
+      end)
+
+      it('Not unpacked: two values', function()
+        assert.is.same({ key = { 'one', 'two' } },
+          luakeys.parse('key={one,two}', opts_true))
+        assert.is.same({ key = { 'one', 'two' } },
+          luakeys.parse('key={one,two}', opts_false))
+      end)
+
+      it('Not unpacked: nested table', function()
+        assert.is.same({ 'one' }, luakeys.parse('{{one}}', opts_true))
+        assert.is.same({ { 'one' } }, luakeys.parse('{{one}}', opts_false))
+      end)
+    end)
+
   end)
 
   describe('Whitespaces', function()
