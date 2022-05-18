@@ -331,7 +331,7 @@ local function generate_parser(initial_rule, options)
   end
 
   local capture_dimension = function(input)
-    if options.convert_dimensions then
+    if options ~= nil and options.convert_dimensions then
       return tex.sp(input)
     else
       return input
@@ -914,6 +914,11 @@ local function apply_definitions(defs,
   return output, leftover
 end
 
+local function parse_kv_string(kv_string, options)
+  local parser = generate_parser('list', options)
+  return parser:match(kv_string)
+end
+
 --- Parse a LaTeX/TeX style key-value string into a Lua table.
 --
 -- @tparam string kv_string A string in the TeX/LaTeX style key-value
@@ -930,9 +935,7 @@ local function parse(kv_string, options)
     return {}
   end
   options = normalize_parse_options(options)
-
-  local parser = generate_parser('list', options)
-  local result_parse = parser:match(kv_string)
+  local result_parse = parse_kv_string(kv_string, options)
 
   local function apply_processor(name)
     if options[name] ~= nil and type(options[name]) == 'function' then
@@ -1068,6 +1071,7 @@ if _TEST then
   export.merge_tables = merge_tables
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
+  export.parse_kv_string = parse_kv_string
   export.unpack_single_valued_array_table = unpack_single_valued_array_table
   export.visit_parse_tree = visit_parse_tree
   export.warn_unknown_keys = warn_unknown_keys
