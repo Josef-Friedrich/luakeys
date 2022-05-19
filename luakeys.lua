@@ -520,23 +520,6 @@ local function warn_unknown_keys(unknown)
   end
 end
 
---- Unpack a single valued array table like `{ 'one' }` into `one` or
--- `{ 1 }` into `1`.
---
--- @treturn If the value is a array like table with one non table typed
--- value in it, the unpacked value, else the unchanged input.
-local function unpack_single_valued_array_table(value, options)
-  if type(value) == 'table' and get_array_size(value) == 1 and
-    get_table_size(value) == 1 and type(value[1]) ~= 'table' then
-    if type(value[1]) == 'string' and options.standalone_as_true then
-      return value
-    else
-      return value[1]
-    end
-  end
-  return value
-end
-
 local function remove_from_array(array, element)
   for index, value in pairs(array) do
     if element == value then
@@ -591,21 +574,6 @@ end
 --
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, options)
-  local function normalize_recursive(raw, result, options)
-    for key, value in pairs(raw) do
-      if options.unpack_single_array_values then
-        value = unpack_single_valued_array_table(value, options)
-      end
-      if type(value) == 'table' then
-        result[key] = normalize_recursive(value, {}, options)
-      else
-        result[key] = value
-      end
-    end
-    return result
-  end
-  raw = normalize_recursive(raw, {}, options)
-
   if options.standalone_as_true then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
@@ -613,6 +581,20 @@ local function normalize(raw, options)
       end
       return key, value
     end)
+  end
+
+  if options.unpack_single_array_values then
+    raw = visit_parse_tree(raw, function(key, value)
+      if type(value) == 'table' and get_array_size(value) == 1 and
+        get_table_size(value) == 1 and type(value[1]) ~= 'table' then
+        return key, value[1]
+      end
+      return key, value
+    end)
+
+    if raw == nil then
+      raw = {}
+    end
   end
 
   if options.case_insensitive_keys then
@@ -1072,7 +1054,6 @@ if _TEST then
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.parse_kv_string = parse_kv_string
-  export.unpack_single_valued_array_table = unpack_single_valued_array_table
   export.visit_parse_tree = visit_parse_tree
   export.warn_unknown_keys = warn_unknown_keys
 end

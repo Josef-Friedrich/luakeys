@@ -109,26 +109,6 @@ describe('Test private functions', function()
     end)
   end)
 
-  describe('Function “unpack_single_valued_array_table()”', function()
-    local unpack = luakeys.unpack_single_valued_array_table
-
-    it('unpacked: single string', function()
-      assert.is.equal(unpack({ 'one' }, get_options()), 'one')
-    end)
-
-    it('unpacked: single string', function()
-      assert.is.equal(unpack({ 1 }, get_options()), 1)
-    end)
-
-    it('Not unpacked: two values', function()
-      assert.is.same(unpack({ 'one', 'two' }, get_options()), { 'one', 'two' })
-    end)
-
-    it('Not unpacked: nested table', function()
-      assert.is.same(unpack({ { 'one' } }, get_options()), { { 'one' } })
-    end)
-  end)
-
   describe('Function “visit_parse_tree()”', function()
     local visit = luakeys.visit_parse_tree
 
