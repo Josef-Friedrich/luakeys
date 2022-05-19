@@ -29,29 +29,21 @@
 --
 -- @module luakeys
 local lpeg = require('lpeg')
-local Variable = lpeg.V
-local Pattern = lpeg.P
-local Set = lpeg.S
-local Range = lpeg.R
-local CaptureGroup = lpeg.Cg
-local CaptureFolding = lpeg.Cf
-local CaptureTable = lpeg.Ct
-local CaptureConstant = lpeg.Cc
-local CaptureSimple = lpeg.C
 
 if not tex then
-  tex = {}
-
-  -- Dummy function for the tests.
-  tex['sp'] = function(input)
-    return 1234567
-  end
+  tex = {
+    -- Dummy function for the tests.
+    sp = function(input)
+      return 1234567
+    end,
+  }
 end
 
 if not token then
-  token = {}
-  token['set_macro'] = function(csname, content, global)
-  end
+  token = {
+    set_macro = function(csname, content, global)
+    end,
+  }
 end
 
 --- Option handling
@@ -322,6 +314,16 @@ end
 --
 -- @treturn userdata The parser.
 local function generate_parser(initial_rule, options)
+  local Variable = lpeg.V
+  local Pattern = lpeg.P
+  local Set = lpeg.S
+  local Range = lpeg.R
+  local CaptureGroup = lpeg.Cg
+  local CaptureFolding = lpeg.Cf
+  local CaptureTable = lpeg.Ct
+  local CaptureConstant = lpeg.Cc
+  local CaptureSimple = lpeg.C
+
   -- Optional whitespace
   local white_space = Set(' \t\n\r')
 
