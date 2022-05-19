@@ -52,8 +52,8 @@ describe('Function “render()”', function()
 end)
 
 describe('Function “parse()”', function()
-  local function assert_parse(input, expected)
-    assert.are.same(expected, luakeys.parse(input))
+  local function assert_parse(input, expected, opts)
+    assert.are.same(expected, luakeys.parse(input, opts))
   end
 
   it('Merge defaults', function()
@@ -210,8 +210,8 @@ describe('Function “parse()”', function()
     end)
 
     describe('Option “unpack_single_valued_array”', function()
-      local opts_true = { unpack_single_array_value = true }
-      local opts_false = { unpack_single_array_value = false }
+      local opts_true = { unpack_single_array_values = true }
+      local opts_false = { unpack_single_array_values = false }
 
       it('unpacked: single string', function()
         assert.is.same({ key = 'string' },
@@ -235,7 +235,7 @@ describe('Function “parse()”', function()
 
       it('Not unpacked: nested table', function()
         assert.is.same({ 'one' }, luakeys.parse('{{one}}', opts_true))
-        assert.is.same({ { 'one' } }, luakeys.parse('{{one}}', opts_false))
+        assert.is.same({ { { 'one' } } }, luakeys.parse('{{one}}', opts_false))
       end)
     end)
 
@@ -358,7 +358,8 @@ describe('Function “parse()”', function()
     end)
 
     it('Deeply nested string value', function()
-      assert_parse('{{{one}}}', { { { 'one' } } })
+      assert_parse('{{{one}}}', { { { { 'one' } } } },
+        { unpack_single_array_values = false })
     end)
   end)
 
