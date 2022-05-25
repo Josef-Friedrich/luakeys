@@ -224,7 +224,7 @@ The function \lua{parse(kv_string, opts)} parses a key-value string
 into a Lua table.
 
 \begin{minted}{latex}
-\newcommand{\mykeyvalcmd}[1][]{
+\newcommand{\mykeyvalcmd}[2][]{
   \directlua{
     result = luakeys.parse('#1')
     luakeys.print(result)
