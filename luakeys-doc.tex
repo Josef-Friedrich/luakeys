@@ -19,7 +19,7 @@
   fontsize=\footnotesize,
 }
 \def\lua#1{\mintinline{lua}|#1|}
-
+\def\latex#1{\mintinline{latex}|#1|}
 \begin{document}
 
 \providecommand*{\url}{\texttt}
@@ -875,7 +875,55 @@ All recognized data types can be used as standalone values.
 
 \clearpage
 
-\section{Process document class options}
+\section{Examples}
+
+\subsection{Extend and modify keys of existing macros}
+
+Extend the includegraphics macro with a new key named \latex{caption}
+and change the accepted values of the \latex{width} key. A number
+between 0 and 1 is allowed and converted into
+\latex{width=0.5\linewidth}
+
+\begin{minted}{lua}
+parse = luakeys.define(
+  {
+    caption = { alias = 'title' },
+    width = {
+      process = function(value)
+        if type(value) == 'number' and value >= 0 and value <= 1 then
+          return tostring(value) .. '\\linewidth'
+        end
+        return value
+      end,
+    },
+  }
+)
+\end{minted}
+
+\begin{minted}{lua}
+function print_image_macro(image_path, kv_string)
+  local caption = ''
+  local options = ''
+    local keys, leftover = parse(kv_string)
+    if keys['caption'] ~= nil then
+      caption = '\\ImageCaption{' .. keys['caption'] .. '}'
+    end
+    if keys['width'] ~= nil then
+      leftover['width'] = keys['width']
+    end
+    options = luakeys.render(leftover)
+  end
+  tex.print('\\includegraphics[' .. options .. ']{' .. image_path .. '}' .. caption)
+end
+\end{minted}
+
+\begin{minted}{latex}
+\newcommand{\myincludegrahics}[2][]{
+  \directlua{print_image_macro('#2', '#1')}
+}
+\end{minted}
+
+\subsection{Process document class options}
 
 \begin{minted}{latex}
 \directlua{luakeys.parse('\@classoptionslist')}
