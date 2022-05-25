@@ -83,7 +83,7 @@ Result:
 \href{https://www.ctan.org/pkg/kvoptions}{kvoptions},
 \href{https://www.ctan.org/pkg/xkeyval}{xkeyval},
 \href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc. do. |luakeys|,
-however, accompilshes this task entirely, by using the Lua language and
+however, accomplishes this task entirely, by using the Lua language and
 doesn’t rely on \TeX{}. Therefore this package can only be used with the
 \TeX{} engine Lua\TeX{}. Since |luakeys| uses
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
@@ -97,7 +97,7 @@ available key-value packages.
 
 This package would not be possible without the article
 \href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
-{Parsing complex data formats in LuaTEX with LPEG (Volume 40 (2019), No. 2)}.
+{“Parsing complex data formats in LuaTEX with LPEG” (Volume 40 (2019), No. 2)}.
 
 %-----------------------------------------------------------------------
 %
@@ -602,7 +602,7 @@ result store.
 %
 %%
 
-\subsection{A attempt to put the syntax into words}
+\subsection{An attempt to put the syntax into words}
 
 A key-value pair is definied by an equal sign (\texttt{key=value}).
 Several key-value pairs or values without keys are lined up with commas
@@ -729,7 +729,7 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 |luakeys| detects \TeX{} dimensions and automatically converts the
 dimensions into scaled points using the function \lua{tex.sp(dim)}. Use
 the option \lua{convert_dimensions} of the function
-\lua{parse(kv_string, options)} to disalbe the automatic conversion.
+\lua{parse(kv_string, options)} to disable the automatic conversion.
 
 \begin{minted}{lua}
 local result = parse('dim=1cm', {
