@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{graphicx}
+\begin{document}
+\newcommand{\ImageCaption}[1]{%
+  \par\textit{#1}%
+}
+
+\newcommand{\myincludegrahics}[2][]{
+  \directlua{
+    print_image_macro = require('extend-keys.lua')
+    print_image_macro('#2', '#1')
+  }
+}
+
+\myincludegrahics{test.png}
+
+\myincludegrahics[width=0.5]{test.png}
+
+\myincludegrahics[caption=A caption]{test.png}
+\end{document}

@@ -20,6 +20,15 @@
 }
 \def\lua#1{\mintinline{lua}|#1|}
 \def\latex#1{\mintinline{latex}|#1|}
+
+\def\InputLatexExample#1{
+  \inputminted[linenos=true]{latex}{examples/#1}
+}
+
+\def\InputLuaExample#1{
+  \inputminted[linenos=true]{lua}{examples/#1}
+}
+
 \begin{document}
 
 \providecommand*{\url}{\texttt}
@@ -884,49 +893,23 @@ and change the accepted values of the \latex{width} key. A number
 between 0 and 1 is allowed and converted into
 \latex{width=0.5\linewidth}
 
-\begin{minted}{lua}
-parse = luakeys.define(
-  {
-    caption = { alias = 'title' },
-    width = {
-      process = function(value)
-        if type(value) == 'number' and value >= 0 and value <= 1 then
-          return tostring(value) .. '\\linewidth'
-        end
-        return value
-      end,
-    },
-  }
-)
-\end{minted}
-
-\begin{minted}{lua}
-function print_image_macro(image_path, kv_string)
-  local caption = ''
-  local options = ''
-    local keys, leftover = parse(kv_string)
-    if keys['caption'] ~= nil then
-      caption = '\\ImageCaption{' .. keys['caption'] .. '}'
-    end
-    if keys['width'] ~= nil then
-      leftover['width'] = keys['width']
-    end
-    options = luakeys.render(leftover)
-  end
-  tex.print('\\includegraphics[' .. options .. ']{' .. image_path .. '}' .. caption)
-end
-\end{minted}
-
-\begin{minted}{latex}
-\newcommand{\myincludegrahics}[2][]{
-  \directlua{print_image_macro('#2', '#1')}
-}
-\end{minted}
+\InputLuaExample{extend-includegraphics/extend-keys.lua}
+\InputLatexExample{extend-includegraphics/extend-keys.tex}
 
 \subsection{Process document class options}
 
 \begin{minted}{latex}
 \directlua{luakeys.parse('\@classoptionslist')}
+\end{minted}
+
+\InputLatexExample{class-options/test-class.cls}
+\InputLatexExample{class-options/use-test-class.tex}
+
+\begin{minted}{lua}
+{
+  [1] = '12pt',
+  [2] = 'landscape',
+}
 \end{minted}
 
 %-----------------------------------------------------------------------
