@@ -6,4 +6,3 @@ backtick_references=true
 file='luakeys.lua'
 dir='docs'
 all=true
-

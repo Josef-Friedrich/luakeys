@@ -46,9 +46,6 @@ if not token then
   }
 end
 
---- Option handling
--- @section
-
 --- This table stores all allowed option keys.
 local option_keys = {
   'case_insensitive_keys',
