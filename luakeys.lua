@@ -52,12 +52,12 @@ local option_keys = {
   'convert_dimensions',
   'converter',
   'debug',
+  'default',
   'defaults',
   'definitions',
-  'naked_default',
+  'naked_as_value',
   'postprocess',
   'preprocess',
-  'naked_as_value',
   'unpack_single_array_values',
 }
 
@@ -65,7 +65,7 @@ local option_keys = {
 local default_options = {
   convert_dimensions = false,
   debug = false,
-  naked_default = true,
+  default = true,
   naked_as_value = false,
   unpack_single_array_values = true,
 }
@@ -596,7 +596,7 @@ local function normalize(raw, options)
   if not options.naked_as_value and options.definitions == nil then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
-        return value, options.naked_default
+        return value, options.default
       end
       return key, value
     end)

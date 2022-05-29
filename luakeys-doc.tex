@@ -49,7 +49,10 @@
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
-local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-0.001,str=lua}}}')
+local kv = luakeys.parse(
+  'level1={level2={naked,dim=1cm,bool=true,num=-0.001,str=lua}}',
+  { convert_dimensions = true }
+)
 luakeys.debug(kv)
 \end{minted}
 
@@ -61,12 +64,11 @@ Result:
 {
   ['level1'] = {
     ['level2'] = {
-      ['level3'] = {
-        ['dim'] = 1864679,
-        ['bool'] = true,
-        ['num'] = -0.001
-        ['str'] = 'lua',
-      }
+      ['naked'] = true,
+      ['dim'] = 1864679,
+      ['bool'] = true,
+      ['num'] = -0.001
+      ['str'] = 'lua',
     }
   }
 }
@@ -168,7 +170,7 @@ It loads the Lua module into the global variable \texttt{luakeys}.
 
 \begin{document}
   \directlua{
-    local keys = luakeys.parse('one,two,three')
+    local keys = luakeys.parse('one,two,three', { naked_as_value = true })
     tex.print(keys[1])
     tex.print(keys[2])
     tex.print(keys[3])
@@ -197,7 +199,7 @@ It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 \input luakeys.tex
 
 \directlua{
-  local keys = luakeys.parse('one,two,three')
+  local keys = luakeys.parse('one,two,three', { naked_as_value = true })
   tex.print(keys[1])
   tex.print(keys[2])
   tex.print(keys[3])
@@ -262,6 +264,7 @@ In plain \TeX:
 The function can be called with an options table. This options are
 supported:
 
+% Update also in README.md
 \begin{minted}{lua}
 local opts = {
   -- { KEY = 'Value' } -> { key = 'value' }
@@ -276,9 +279,11 @@ local opts = {
   -- default: false
   convert_dimensions = false,
 
-  -- Output the results table to the console.
-  -- default: false
-  debug = true,
+  -- Pretty print the result table to the console.
+  debug = false,
+
+  -- The default value for naked keys (keys without a value).
+  default = true
 
   -- A table with some default values. The result table is merged with
   -- this table.
@@ -287,10 +292,8 @@ local opts = {
   -- Key-value pair defintions.
   definitions = defs,
 
-  -- Standalone values aka values with numeric keys are converted to
-  -- keys holding the value true:
-  -- { 'one', 'two', 'three' } -> { one = true, two = true, three = true }
-  -- default: false
+  -- If true, naked keys are converted to values:
+  -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
   naked_as_value = false,
 
   -- { key = { 'value' } } -> { key = 'value' }
@@ -354,7 +357,7 @@ local result = luakeys.parse('naked')
 luakeys.debug(result) -- { naked = true }
 
 local result = luakeys.parse('naked', {
-  naked_default = 1,
+  default = 1,
 })
 luakeys.debug(result) -- { naked = 1 }
 \end{minted}

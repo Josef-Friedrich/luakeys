@@ -88,9 +88,11 @@ local opts = {
   -- default: false
   convert_dimensions = false,
 
-  -- Output the results table to the console.
-  -- default: false
-  debug = true,
+  -- Pretty print the result table to the console.
+  debug = false,
+
+  -- The default value for naked keys (keys without a value).
+  default = true
 
   -- A table with some default values. The result table is merged with
   -- this table.
@@ -99,11 +101,9 @@ local opts = {
   -- Key-value pair defintions.
   definitions = defs,
 
-  -- Standalone values aka values with numeric keys are converted to
-  -- keys holding the value true:
-  -- { 'one', 'two', 'three' } -> { one = true, two = true, three = true }
-  -- default: false
-  naked_as_value = true,
+  -- If true, naked keys are converted to values:
+  -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
+  naked_as_value = false,
 
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,
