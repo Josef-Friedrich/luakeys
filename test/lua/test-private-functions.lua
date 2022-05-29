@@ -56,21 +56,21 @@ describe('Test private functions', function()
         { one = ' one ' })
     end)
 
-    describe('Option standalone_as_true', function()
+    describe('Option naked_as_value', function()
       it('true', function()
         assert.are.same(normalize({ 'standalone' },
-          get_options({ standalone_as_true = true })), { standalone = true })
+          get_options({ naked_as_value = true })), { standalone = true })
       end)
 
       it('true recursive', function()
         assert.are.same(normalize({ level_1 = { level_2 = { 'standalone' } } },
-          get_options({ standalone_as_true = true })),
+          get_options({ naked_as_value = true })),
           { level_1 = { level_2 = { standalone = true } } })
       end)
 
       it('false', function()
         assert.are.same(normalize({ 'standalone' },
-          get_options({ standalone_as_true = false })), { 'standalone' })
+          get_options({ naked_as_value = false })), { 'standalone' })
       end)
     end)
 
@@ -82,7 +82,7 @@ describe('Test private functions', function()
         convert_dimensions = false,
         debug = false,
         naked_default = true,
-        standalone_as_true = false,
+        naked_as_value = false,
         unpack_single_array_values = true,
       })
     end)
@@ -94,7 +94,7 @@ describe('Test private functions', function()
         convert_dimensions = false,
         debug = false,
         naked_default = true,
-        standalone_as_true = false,
+        naked_as_value = false,
         unpack_single_array_values = true,
       })
     end)
@@ -107,7 +107,7 @@ describe('Test private functions', function()
         debug = false,
         naked_default = true,
         unpack_single_array_values = true,
-        standalone_as_true = false,
+        naked_as_value = false,
       })
     end)
   end)

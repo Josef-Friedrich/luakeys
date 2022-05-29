@@ -181,13 +181,13 @@ describe('Function “parse()”', function()
     describe('Option “naked_default”', function()
       it('should be true if no option is specifed', function()
         assert.are.same({ naked = true },
-          luakeys.parse('naked', { standalone_as_true = true }))
+          luakeys.parse('naked', { naked_as_value = true }))
       end)
 
       it('should be the same as  if no option is specifed', function()
         assert.are.same({ naked = 1 }, luakeys.parse('naked', {
           naked_default = 1,
-          standalone_as_true = true,
+          naked_as_value = true,
         }))
       end)
     end)
@@ -209,19 +209,19 @@ describe('Function “parse()”', function()
       end)
     end)
 
-    describe('Option “standalone_as_true”', function()
+    describe('Option “naked_as_value”', function()
       it('default', function()
         assert.are.same({ 'one' }, luakeys.parse('one'))
       end)
 
       it('true', function()
         assert.are.same({ one = true },
-          luakeys.parse('one', { standalone_as_true = true }))
+          luakeys.parse('one', { naked_as_value = true }))
       end)
 
       it('false', function()
         assert.are.same({ 'one' },
-          luakeys.parse('one', { standalone_as_true = false }))
+          luakeys.parse('one', { naked_as_value = false }))
       end)
     end)
 

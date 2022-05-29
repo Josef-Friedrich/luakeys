@@ -76,7 +76,7 @@ local opts = {
   -- keys holding the value true:
   -- { 'one', 'two', 'three' } -> { one = true, two = true, three = true }
   -- default: false
-  standalone_as_true = true,
+  naked_as_value = true,
 
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,

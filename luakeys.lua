@@ -57,7 +57,7 @@ local option_keys = {
   'naked_default',
   'postprocess',
   'preprocess',
-  'standalone_as_true',
+  'naked_as_value',
   'unpack_single_array_values',
 }
 
@@ -66,7 +66,7 @@ local default_options = {
   convert_dimensions = false,
   debug = false,
   naked_default = true,
-  standalone_as_true = false,
+  naked_as_value = false,
   unpack_single_array_values = true,
 }
 
@@ -579,7 +579,7 @@ end
 --
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, options)
-  if options.standalone_as_true then
+  if not options.naked_as_value and options.definitions == nil then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, options.naked_default
@@ -913,7 +913,7 @@ end
 --
 -- @tparam table options A table containing the settings:
 -- `convert_dimensions`, `unpack_single_array_values`,
--- `standalone_as_true`, `converter`, `debug`, `preprocess`, `postprocess`.
+-- `naked_as_value`, `converter`, `debug`, `preprocess`, `postprocess`.
 --
 -- @treturn table A hopefully properly parsed table you can do something
 -- useful with.
