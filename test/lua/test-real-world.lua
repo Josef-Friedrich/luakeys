@@ -42,9 +42,9 @@ describe('Real world examples', function()
                            'row sep={3cm,between origins},\n' ..
                            'nodes={circle, draw, minimum size=7.5mm}', {
         'matrix of math nodes',
-        ['column sep'] = { 1234567, 'between origins' },
-        nodes = { 'circle', 'draw', ['minimum size'] = 1234567 },
-        ['row sep'] = { 1234567, 'between origins' },
+        ['column sep'] = { '2cm', 'between origins' },
+        nodes = { 'circle', 'draw', ['minimum size'] = '7.5mm' },
+        ['row sep'] = { '3cm', 'between origins' },
       })
     end)
 
@@ -58,7 +58,7 @@ describe('Real world examples', function()
         'fill=yellow!80!black,text width=3cm,align=flush center', {
           align = 'flush center',
           fill = 'yellow!80!black',
-          ['text width'] = 1234567,
+          ['text width'] = '3cm',
         })
     end)
 
@@ -122,16 +122,16 @@ describe('Real world examples', function()
         'landscape',
         'twocolumn',
         'twoside',
-        left = 1234567,
+        left = '2cm',
         hmarginratio = '2:1', -- < ?
         'includemp',
-        marginparwidth = 1234567,
-        bottom = 1234567,
-        foot = 1234567,
+        marginparwidth = '43pt',
+        bottom = '1cm',
+        foot = '.7cm',
         'includefoot',
-        textheight = 1234567,
+        textheight = '11cm',
         'heightrounded',
-        columnsep = 1234567,
+        columnsep = '1cm',
         'dvips',
         'verbose',
       })

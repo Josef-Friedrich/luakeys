@@ -79,7 +79,7 @@ describe('Test private functions', function()
   describe('Function “normalize_parse_options()”', function()
     it('No options', function()
       assert.is.same(luakeys.normalize_parse_options(), {
-        convert_dimensions = true,
+        convert_dimensions = false,
         debug = false,
         standalone_as_true = false,
         unpack_single_array_values = true,

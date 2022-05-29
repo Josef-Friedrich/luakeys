@@ -62,7 +62,7 @@ local option_keys = {
 
 --- The default options.
 local default_options = {
-  convert_dimensions = true,
+  convert_dimensions = false,
   unpack_single_array_values = true,
   standalone_as_true = false,
   debug = false,
@@ -310,7 +310,11 @@ end
 --- Generate the PEG parser using Lpeg.
 --
 -- @treturn userdata The parser.
-local function generate_parser(initial_rule, options)
+local function generate_parser(initial_rule, convert_dimensions)
+  if convert_dimensions == nil then
+    convert_dimensions = false
+  end
+
   local Variable = lpeg.V
   local Pattern = lpeg.P
   local Set = lpeg.S
@@ -330,7 +334,7 @@ local function generate_parser(initial_rule, options)
   end
 
   local capture_dimension = function(input)
-    if options ~= nil and options.convert_dimensions then
+    if convert_dimensions then
       return tex.sp(input)
     else
       return input
@@ -613,7 +617,7 @@ local is = {
     if str == nil then
       return false
     end
-    local parser = generate_parser('dimension', { convert_dimensions = false })
+    local parser = generate_parser('dimension', false)
     local result = parser:match(str)
     return result ~= nil
   end,
@@ -895,8 +899,8 @@ local function apply_definitions(defs,
   return output, leftover
 end
 
-local function parse_kv_string(kv_string, options)
-  local parser = generate_parser('list', options)
+local function parse_kv_string(kv_string, convert_dimensions)
+  local parser = generate_parser('list', convert_dimensions)
   return parser:match(kv_string)
 end
 
@@ -916,7 +920,7 @@ local function parse(kv_string, options)
     return {}
   end
   options = normalize_parse_options(options)
-  local result_parse = parse_kv_string(kv_string, options)
+  local result_parse = parse_kv_string(kv_string, options.convert_dimensions)
 
   local function apply_processor(name)
     if options[name] ~= nil and type(options[name]) == 'function' then

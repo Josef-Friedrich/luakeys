@@ -39,7 +39,7 @@ describe('Function “render()”', function()
   end)
 
   it('standalone value as a dimension', function()
-    assert_render('1cm', '1234567,')
+    assert_render('1cm', '1cm,')
   end)
 
   it('standalone value as a boolean', function()
@@ -65,11 +65,13 @@ describe('Function “parse()”', function()
   describe('Options', function()
     it('Change default options', function()
       local defaults = luakeys.default_options
+      local old = defaults.convert_dimensions
+      defaults.convert_dimensions = true
       assert.are.same({ 1234567 }, luakeys.parse('1cm'))
       defaults.convert_dimensions = false
       assert.are.same({ '1cm' }, luakeys.parse('1cm'))
       -- Restore
-      defaults.convert_dimensions = true
+      defaults.convert_dimensions = old
     end)
 
     it('with spaces', function()
@@ -365,7 +367,7 @@ describe('Function “parse()”', function()
 
   describe('Only values', function()
     it('List of mixed values', function()
-      assert_parse('-1.1,text,-1cm,True', { -1.1, 'text', 1234567, true })
+      assert_parse('-1.1,text,-1cm,True', { -1.1, 'text', '-1cm', true })
     end)
 
     it('Only string values', function()
