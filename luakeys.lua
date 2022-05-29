@@ -536,7 +536,7 @@ end
 
 local function visit_parse_tree(parse_tree, callback_func)
   if type(parse_tree) ~= 'table' then
-    throw_error('Parse tree has to be a table')
+    throw_error('Parse tree has to be a table got: ' .. tostring(parse_tree))
   end
   local function visit_parse_tree_recursive(root_table,
     current_table,
@@ -579,20 +579,24 @@ end
 --
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, options)
-  if not options.naked_as_value and options.definitions == nil then
-    raw = visit_parse_tree(raw, function(key, value)
-      if type(key) == 'number' and type(value) == 'string' then
-        return value, options.naked_default
-      end
-      return key, value
-    end)
-  end
-
   if options.unpack_single_array_values then
     raw = visit_parse_tree(raw, function(key, value)
       if type(value) == 'table' and get_array_size(value) == 1 and
         get_table_size(value) == 1 and type(value[1]) ~= 'table' then
         return key, value[1]
+      end
+      return key, value
+    end)
+
+    if raw == nil then
+      raw = {}
+    end
+  end
+
+  if not options.naked_as_value and options.definitions == nil then
+    raw = visit_parse_tree(raw, function(key, value)
+      if type(key) == 'number' and type(value) == 'string' then
+        return value, options.naked_default
       end
       return key, value
     end)

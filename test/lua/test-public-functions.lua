@@ -27,7 +27,8 @@ end)
 
 describe('Function “render()”', function()
   local function assert_render(input, expected)
-    assert.are.equal(expected, luakeys.render(luakeys.parse(input)))
+    assert.are.equal(expected, luakeys.render(
+      luakeys.parse(input, { naked_as_value = true })))
   end
 
   it('standalone value as a string', function()
@@ -67,21 +68,27 @@ describe('Function “parse()”', function()
       local defaults = luakeys.default_options
       local old = defaults.convert_dimensions
       defaults.convert_dimensions = true
-      assert.are.same({ 1234567 }, luakeys.parse('1cm'))
+      assert.are.same({ 1234567 },
+        luakeys.parse('1cm', { naked_as_value = true }))
       defaults.convert_dimensions = false
-      assert.are.same({ '1cm' }, luakeys.parse('1cm'))
+      assert.are
+        .same({ '1cm' }, luakeys.parse('1cm', { naked_as_value = true }))
       -- Restore
       defaults.convert_dimensions = old
     end)
 
     it('with spaces', function()
-      assert.are.same({ '1cm' },
-        luakeys.parse('1cm', { ['convert dimensions'] = false }))
+      assert.are.same({ '1cm' }, luakeys.parse('1cm', {
+        ['convert dimensions'] = false,
+        naked_as_value = true,
+      }))
     end)
 
     it('with underscores', function()
-      assert.are.same({ '1cm' },
-        luakeys.parse('1cm', { convert_dimensions = false }))
+      assert.are.same({ '1cm' }, luakeys.parse('1cm', {
+        convert_dimensions = false,
+        naked_as_value = true,
+      }))
     end)
 
     describe('Option “case_insensitive_keys”', function()
@@ -180,15 +187,12 @@ describe('Function “parse()”', function()
 
     describe('Option “naked_default”', function()
       it('should be true if no option is specifed', function()
-        assert.are.same({ naked = true },
-          luakeys.parse('naked', { naked_as_value = true }))
+        assert.are.same({ naked = true }, luakeys.parse('naked'))
       end)
 
       it('should be the same as  if no option is specifed', function()
-        assert.are.same({ naked = 1 }, luakeys.parse('naked', {
-          naked_default = 1,
-          naked_as_value = true,
-        }))
+        assert.are.same({ naked = 1 },
+          luakeys.parse('naked', { naked_default = 1 }))
       end)
     end)
 
@@ -211,17 +215,17 @@ describe('Function “parse()”', function()
 
     describe('Option “naked_as_value”', function()
       it('default', function()
-        assert.are.same({ 'one' }, luakeys.parse('one'))
+        assert.are.same({ one = true }, luakeys.parse('one'))
       end)
 
       it('true', function()
         assert.are.same({ one = true },
-          luakeys.parse('one', { naked_as_value = true }))
+          luakeys.parse('one', { naked_as_value = false }))
       end)
 
       it('false', function()
         assert.are.same({ 'one' },
-          luakeys.parse('one', { naked_as_value = false }))
+          luakeys.parse('one', { naked_as_value = true }))
       end)
     end)
 
@@ -232,7 +236,7 @@ describe('Function “parse()”', function()
       it('unpacked: single string', function()
         assert.is.same({ key = 'string' },
           luakeys.parse('key={string}', opts_true))
-        assert.is.same({ key = { 'string' } },
+        assert.is.same({ key = { string = true } },
           luakeys.parse('key={string}', opts_false))
 
       end)
@@ -243,15 +247,16 @@ describe('Function “parse()”', function()
       end)
 
       it('Not unpacked: two values', function()
-        assert.is.same({ key = { 'one', 'two' } },
+        assert.is.same({ key = { one = true, two = true } },
           luakeys.parse('key={one,two}', opts_true))
-        assert.is.same({ key = { 'one', 'two' } },
+        assert.is.same({ key = { one = true, two = true } },
           luakeys.parse('key={one,two}', opts_false))
       end)
 
       it('Not unpacked: nested table', function()
-        assert.is.same({ 'one' }, luakeys.parse('{{one}}', opts_true))
-        assert.is.same({ { { 'one' } } }, luakeys.parse('{{one}}', opts_false))
+        assert.is.same({ one = true }, luakeys.parse('{{one}}', opts_true))
+        assert.is.same({ { { one = true } } },
+          luakeys.parse('{{one}}', opts_false))
       end)
     end)
 
@@ -332,7 +337,8 @@ describe('Function “parse()”', function()
 
   describe('All features', function()
     it('List of standalone strings', function()
-      assert_parse('one,two,three', { 'one', 'two', 'three' })
+      assert_parse('one,two,three', { 'one', 'two', 'three' },
+        { naked_as_value = true })
     end)
 
     it('List of standalone integers', function()
@@ -362,30 +368,37 @@ describe('Function “parse()”', function()
   describe('Array', function()
     it('Key with nested tables', function()
       assert_parse('t={a,b},z={{a,b},{c,d}}',
-        { t = { 'a', 'b' }, z = { { 'a', 'b' }, { 'c', 'd' } } })
+        { t = { 'a', 'b' }, z = { { 'a', 'b' }, { 'c', 'd' } } },
+        { naked_as_value = true })
     end)
 
     it('Nested list of strings', function()
-      assert_parse('{one,two,tree}', { { 'one', 'two', 'tree' } })
+      assert_parse('{one,two,tree}', { { 'one', 'two', 'tree' } },
+        { naked_as_value = true })
     end)
 
     it('standalone and key value pair', function()
-      assert_parse('{one,two,tree={four}}', { { 'one', 'two', tree = 'four' } })
+      assert_parse('{one,two,tree={four}}', { { 'one', 'two', tree = 'four' } },
+        { naked_as_value = true })
     end)
 
     it('Deeply nested string value', function()
-      assert_parse('{{{one}}}', { { { { 'one' } } } },
-        { unpack_single_array_values = false })
+      assert_parse('{{{one}}}', { { { { 'one' } } } }, {
+        unpack_single_array_values = false,
+        naked_as_value = true,
+      })
     end)
   end)
 
   describe('Only values', function()
     it('List of mixed values', function()
-      assert_parse('-1.1,text,-1cm,True', { -1.1, 'text', '-1cm', true })
+      assert_parse('-1.1,text,-1cm,True', { -1.1, 'text', '-1cm', true },
+        { naked_as_value = true })
     end)
 
     it('Only string values', function()
-      assert_parse('one,two,three', { 'one', 'two', 'three' })
+      assert_parse('one,two,three', { 'one', 'two', 'three' },
+        { naked_as_value = true })
     end)
   end)
 end)

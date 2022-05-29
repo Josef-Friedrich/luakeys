@@ -59,18 +59,21 @@ describe('Test private functions', function()
     describe('Option naked_as_value', function()
       it('true', function()
         assert.are.same(normalize({ 'standalone' },
-          get_options({ naked_as_value = true })), { standalone = true })
+          get_options({ naked_as_value = false })), { standalone = true })
       end)
 
       it('true recursive', function()
         assert.are.same(normalize({ level_1 = { level_2 = { 'standalone' } } },
-          get_options({ naked_as_value = true })),
-          { level_1 = { level_2 = { standalone = true } } })
+          get_options({ naked_as_value = false, unpack_single_array_values = false })), {
+          level_1 = {
+            level_2 = { standalone = true },
+          },
+        })
       end)
 
       it('false', function()
         assert.are.same(normalize({ 'standalone' },
-          get_options({ naked_as_value = false })), { 'standalone' })
+          get_options({ naked_as_value = true })), { 'standalone' })
       end)
     end)
 

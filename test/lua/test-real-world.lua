@@ -4,8 +4,8 @@ local luakeys = require('luakeys')
 
 local parse = luakeys.parse
 
-local function assert_deep_equals(actual, expected)
-  assert.are.same(expected, parse(actual))
+local function assert_deep_equals(actual, expected, opts)
+  assert.are.same(expected, parse(actual, opts))
 end
 
 describe('Real world examples', function()
@@ -16,7 +16,7 @@ describe('Real world examples', function()
 
     it('Manual page 6: backref...', function()
       assert_deep_equals('backref,\npdfpagemode=FullScreen,\ncolorlinks=true', {
-        'backref',
+        backref = true,
         colorlinks = true,
         pdfpagemode = 'FullScreen',
       })
@@ -31,7 +31,7 @@ describe('Real world examples', function()
             Subject = 'My Subject',
             Title = 'My Title',
           },
-        })
+        }, { naked_as_value = true })
     end)
   end)
 
@@ -45,7 +45,7 @@ describe('Real world examples', function()
         ['column sep'] = { '2cm', 'between origins' },
         nodes = { 'circle', 'draw', ['minimum size'] = '7.5mm' },
         ['row sep'] = { '3cm', 'between origins' },
-      })
+      }, { naked_as_value = true })
     end)
 
     it('Manual page 241', function()
@@ -69,9 +69,7 @@ describe('Real world examples', function()
       assert_deep_equals(
         'Extension = .ttf ,\n' .. 'UprightFont = CharisSILR,\n' ..
           'BoldFont = CharisSILB,\n' .. 'ItalicFont = CharisSILI,\n' ..
-          'BoldItalicFont = CharisSILBI,\n' .. '% <any other desired options>\n',
-        {
-          '% <any other desired options>', -- ???
+          'BoldItalicFont = CharisSILBI,\n', {
           BoldFont = 'CharisSILB',
           BoldItalicFont = 'CharisSILBI',
           Extension = '.ttf',
@@ -99,7 +97,7 @@ describe('Real world examples', function()
         'and more and more',
         'an excessive number really',
         'of font features could go here',
-      })
+      }, { naked_as_value = true })
     end)
 
   end)
@@ -110,7 +108,7 @@ describe('Real world examples', function()
         'hdivide={*,0.9\\paperwidth,*}, vdivide={*,0.9\\paperheight,*}', {
           hdivide = { '*', '0.9\\paperwidth', '*' }, -- < ?
           vdivide = { '*', '0.9\\paperheight', '*' }, -- < ?
-        })
+        }, { naked_as_value = true })
     end)
 
     it('Manual page 17', function()
@@ -118,22 +116,22 @@ describe('Real world examples', function()
                            'left=2cm, hmarginratio=2:1, includemp, marginparwidth=43pt,\n' ..
                            'bottom=1cm, foot=.7cm, includefoot, textheight=11cm, heightrounded,\n' ..
                            'columnsep=1cm, dvips, verbose', {
-        'a5paper',
-        'landscape',
-        'twocolumn',
-        'twoside',
+        a5paper = true,
+        landscape = true,
+        twocolumn = true,
+        twoside = true,
         left = '2cm',
         hmarginratio = '2:1', -- < ?
-        'includemp',
+        includemp = true,
         marginparwidth = '43pt',
         bottom = '1cm',
         foot = '.7cm',
-        'includefoot',
+        includefoot = true,
         textheight = '11cm',
-        'heightrounded',
+        heightrounded = true,
         columnsep = '1cm',
-        'dvips',
-        'verbose',
+        dvips = true,
+        verbose = true,
       })
     end)
   end)
