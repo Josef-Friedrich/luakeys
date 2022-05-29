@@ -376,6 +376,10 @@ describe('Function “parse()”', function()
   end)
 end)
 
+it('Function “debug()”', function ()
+  luakeys.debug({ key = 'value' })
+end)
+
 describe('Functions “save()” and “get()”', function()
   it('Save and get with an existent identifier', function()
     luakeys.save('test123', 'Some value')

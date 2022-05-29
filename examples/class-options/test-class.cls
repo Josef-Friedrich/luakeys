@@ -5,6 +5,6 @@
 \directlua{
   luakeys = require('luakeys')
   local kv = luakeys.parse('\@classoptionslist', { convert_dimensions = false })
-  luakeys.print(kv)
+  luakeys.debug(kv)
 }
 \LoadClass{article}

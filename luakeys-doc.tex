@@ -50,7 +50,7 @@
 \begin{minted}{lua}
 local luakeys = require('luakeys')
 local kv = luakeys.parse('level1={level2={level3={dim=1cm,bool=true,num=-0.001,str=lua}}}')
-luakeys.print(kv)
+luakeys.debug(kv)
 \end{minted}
 
 \noindent
@@ -135,7 +135,7 @@ use \texttt{luakeys} without using the wrapper \TeX{} files
 \newcommand{\helloworld}[2][]{
   \directlua{
     local keys = luakeys.parse('\luaescapestring{\unexpanded{#1}}')
-    luakeys.print(keys)
+    luakeys.debug(keys)
     local marg = '#2'
     tex.print(keys.greeting .. ', ' .. marg .. keys.punctuation)
   }
@@ -215,11 +215,13 @@ this functions:
 
 \begin{minted}{lua}
 local luakeys = require('luakeys')
+local stringify = luakeys.stringify
 local parse = luakeys.parse
 local render = luakeys.render
---local print = luakeys.print -- That would overwrite the built-in Lua function
+local debug = luakeys.debug
 local save = luakeys.save
 local get = luakeys.get
+local is = luakeys.is
 \end{minted}
 
 %%
@@ -236,7 +238,7 @@ into a Lua table.
 \newcommand{\mykeyvalcmd}[2][]{
   \directlua{
     result = luakeys.parse('#1')
-    luakeys.print(result)
+    luakeys.debug(result)
   }
   #2
 }
@@ -250,7 +252,7 @@ In plain \TeX:
 \def\mykeyvalcommand#1{
   \directlua{
     result = luakeys.parse('#1')
-    luakeys.print(result)
+    luakeys.debug(result)
   }
 }
 \mykeyvalcmd{one=1}
@@ -370,8 +372,8 @@ local defs = { { name = 'key', some_def = 'etc' } }
 
 local parse = luakeys.define(defs)
 local result, leftover = parse('key=value,unknown=unknown')
-luakeys.print(result) -- { key = 'value' }
-luakeys.print(leftover) -- { unknown = 'unknown' }
+luakeys.debug(result) -- { key = 'value' }
+luakeys.debug(leftover) -- { unknown = 'unknown' }
 \end{minted}
 
 \noindent
@@ -383,8 +385,8 @@ local parse = luakeys.define({
   level1 = { sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } } },
 })
 local result, leftover = parse('level1={level2={key=value,unknown=unknown}}')
-luakeys.print(result) -- { level1 = { level2 = { key = 'value' } } })
-luakeys.print(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
+luakeys.debug(result) -- { level1 = { level2 = { key = 'value' } } })
+luakeys.debug(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
 \end{minted}
 
 The code example below lists all the settings that can be used to define
@@ -448,7 +450,7 @@ local defs = { key = { alias = 'k' } }
 local defs = { key = { alias = { 'k', 'ke' } } }
 local parse = luakeys.define(defs)
 local result, leftover = parse('k=value')
-luakeys.print(result) -- { key = 'value' }
+luakeys.debug(result) -- { key = 'value' }
 \end{minted}
 
 %%
@@ -463,7 +465,7 @@ definied, true is taken as the value.
 \begin{minted}{lua}
 local parse = luakeys.define({ key = { always_present = true })
 local result, leftover = parse('')
-luakeys.print(result) -- { key =  true }
+luakeys.debug(result) -- { key =  true }
 \end{minted}
 
 \subsubsection{\texttt{opposite\_values}}
@@ -586,9 +588,9 @@ print(luakeys.render(result))
 %
 %%
 
-\subsection{\texttt{print(tbl): void}}
+\subsection{\texttt{debug(tbl): void}}
 
-The function \lua{print(tbl)} pretty prints a Lua table to standard
+The function \lua{debug(tbl)} pretty prints a Lua table to standard
 output (stdout). It is a utility function that can be used to debug and
 inspect the resulting Lua table of the function \lua{parse}. You have to
 compile your \TeX{} document in a console to see the terminal output.
@@ -597,7 +599,7 @@ compile your \TeX{} document in a console to see the terminal output.
 
 \begin{minted}{lua}
 result = luakeys.parse('level1={level2={key=value}}')
-luakeys.print(result)
+luakeys.debug(result)
 \end{minted}
 
 \noindent
@@ -1058,6 +1060,7 @@ An example of how to use the command in \LaTeX:
 }
 \changes{v0.6}{2022/05/29}{
 * The default value of the option convert\_dimension is now false.
+* The function “print” is now called “debug”.
 }
 \pagebreak
 \PrintChanges

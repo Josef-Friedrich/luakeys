@@ -47,7 +47,7 @@
     \directlua{
       local result = luakeys.parse('\luaescapestring{\unexpanded{#1}}', luakeys.get('debug_options'))
       tex.print(luakeys.stringify(result, true))
-      luakeys.print(result)
+      luakeys.debug(result)
     }
   }
 }%

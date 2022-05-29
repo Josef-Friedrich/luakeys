@@ -292,7 +292,7 @@ local function stringify(input, for_tex)
       end_bracket
 end
 
---- The function `pretty_print(tbl)` pretty prints a Lua table to standard
+--- The function `debug(tbl)` pretty prints a Lua table to standard
 --   output (stdout). It is a utility function that can be used to
 --   debug and inspect the resulting Lua table of the function
 --   `parse`. You have to compile your TeX document in a console to
@@ -300,7 +300,7 @@ end
 --
 -- @tparam table tbl A table to be printed to standard output for
 -- debugging purposes.
-local function pretty_print(tbl)
+local function debug(tbl)
   print(stringify(tbl, false))
 end
 
@@ -927,7 +927,7 @@ local function parse(kv_string, options)
       options[name](result_parse, kv_string)
       if options.debug then
         print('After execution of the function: ' .. name)
-        pretty_print(result_parse)
+        debug(result_parse)
       end
     end
   end
@@ -955,7 +955,7 @@ local function parse(kv_string, options)
   end
 
   if options.debug then
-    pretty_print(result_parse)
+    debug(result_parse)
   end
   local result
   if result_def == nil then
@@ -1036,8 +1036,8 @@ local export = {
   --- @see render
   render = render,
 
-  --- @see pretty_print
-  print = pretty_print,
+  --- @see debug
+  debug = debug,
 
   --- @see save
   save = save,
