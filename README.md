@@ -85,7 +85,7 @@ local opts = {
   end,
 
   -- Automatically convert dimensions into scaled points (1cm -> 1864679).
-  -- default: true
+  -- default: false
   convert_dimensions = false,
 
   -- Output the results table to the console.

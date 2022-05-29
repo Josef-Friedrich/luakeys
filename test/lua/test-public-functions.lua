@@ -109,13 +109,13 @@ describe('Function “parse()”', function()
 
     describe('Option “convert_dimensions”', function()
       it('true', function()
-        assert.are.same({ 1234567 },
-          luakeys.parse('1cm', { ['convert dimensions'] = true }))
+        assert.are.same({ dim = 1234567 },
+          luakeys.parse('dim=1cm', { convert_dimensions = true }))
       end)
 
       it('false', function()
-        assert.are.same({ '1cm' }, luakeys.parse('1cm', {
-          ['convert dimensions'] = false,
+        assert.are.same({ dim = '1cm' }, luakeys.parse('dim=1cm', {
+          convert_dimensions = false,
         }))
       end)
     end)

@@ -271,7 +271,7 @@ local opts = {
   end,
 
   -- Automatically convert dimensions into scaled points (1cm -> 1864679).
-  -- default: true
+  -- default: false
   convert_dimensions = false,
 
   -- Output the results table to the console.
@@ -308,6 +308,37 @@ luakeys.default_options.convert_dimensions = false
 -- local defaults = luakeys.default_options
 -- defaults.convert_dimensions = false
 luakeys.parse('dim=1cm') -- {dim = '1cm'}
+\end{minted}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{convert\_dimensions}}
+
+If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
+detects the \TeX{} dimensions and converts them into scaled points
+using the function \lua{tex.sp(dim)}.
+
+\begin{minted}{lua}
+local result = luakeys.parse('dim=1cm', {
+  convert_dimensions = true,
+})
+-- result = { dim = 1864679 }
+
+local result = luakeys.parse('dim=1cm', {
+  convert_dimensions = false,
+})
+-- result = { dim = '1cm' }
+\end{minted}
+
+\noindent
+If you want to convert a scale point into a unit string you can use the module
+\href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
+
+\begin{minted}{lua}
+require('lualibs')
+tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 \end{minted}
 
 %%
@@ -735,28 +766,6 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 
 \subsubsection{dimension}
 
-|luakeys| detects \TeX{} dimensions and automatically converts the
-dimensions into scaled points using the function \lua{tex.sp(dim)}. Use
-the option \lua{convert_dimensions} of the function
-\lua{parse(kv_string, options)} to disable the automatic conversion.
-
-\begin{minted}{lua}
-local result = parse('dim=1cm', {
-  convert_dimensions = false,
-})
-\end{minted}
-
-\noindent
-If you want to convert a scale point into a unit string you can use the module
-\href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
-
-\begin{minted}{latex}
-\begin{luacode}
-require('lualibs')
-tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
-\end{luacode}
-\end{minted}
-
 \begin{center}
 \begin{tabular}{rl}
 \textbf{Unit name} & \textbf{Description} \\\hline
@@ -1046,6 +1055,9 @@ An example of how to use the command in \LaTeX:
 * New option: standalone\_as\_true
 * Add a recursive converter callback / hook to process the parse tree
 * New option: case\_insensitive\_keys
+}
+\changes{v0.6}{2022/05/29}{
+* The default value of the option convert\_dimension is now false.
 }
 \pagebreak
 \PrintChanges
