@@ -54,6 +54,7 @@ local option_keys = {
   'debug',
   'defaults',
   'definitions',
+  'naked_default',
   'postprocess',
   'preprocess',
   'standalone_as_true',
@@ -63,9 +64,10 @@ local option_keys = {
 --- The default options.
 local default_options = {
   convert_dimensions = false,
-  unpack_single_array_values = true,
-  standalone_as_true = false,
   debug = false,
+  naked_default = true,
+  standalone_as_true = false,
+  unpack_single_array_values = true,
 }
 
 local function throw_error(message)
@@ -580,7 +582,7 @@ local function normalize(raw, options)
   if options.standalone_as_true then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
-        return value, true
+        return value, options.naked_default
       end
       return key, value
     end)

@@ -178,6 +178,20 @@ describe('Function “parse()”', function()
       end)
     end)
 
+    describe('Option “naked_default”', function()
+      it('should be true if no option is specifed', function()
+        assert.are.same({ naked = true },
+          luakeys.parse('naked', { standalone_as_true = true }))
+      end)
+
+      it('should be the same as  if no option is specifed', function()
+        assert.are.same({ naked = 1 }, luakeys.parse('naked', {
+          naked_default = 1,
+          standalone_as_true = true,
+        }))
+      end)
+    end)
+
     describe('Option “preprocess”', function()
       it('should add keys.', function()
         local result = luakeys.parse('key=value', {
@@ -376,7 +390,7 @@ describe('Function “parse()”', function()
   end)
 end)
 
-it('Function “debug()”', function ()
+it('Function “debug()”', function()
   luakeys.debug({ key = 'value' })
 end)
 

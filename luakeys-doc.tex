@@ -347,6 +347,22 @@ tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 %
 %%
 
+\subsubsection{\texttt{naked\_default}}
+
+\begin{minted}{lua}
+local result = luakeys.parse('naked')
+luakeys.debug(result) -- { naked = true }
+
+local result = luakeys.parse('naked', {
+  naked_default = 1,
+})
+luakeys.debug(result) -- { naked = 1 }
+\end{minted}
+
+%%
+%
+%%
+
 \subsection{\texttt{define(defs, opts)}}
 
 The \lua{define} function returns a \lua{parse} function (see

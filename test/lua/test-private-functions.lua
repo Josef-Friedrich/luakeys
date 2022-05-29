@@ -81,6 +81,7 @@ describe('Test private functions', function()
       assert.is.same(luakeys.normalize_parse_options(), {
         convert_dimensions = false,
         debug = false,
+        naked_default = true,
         standalone_as_true = false,
         unpack_single_array_values = true,
       })
@@ -92,8 +93,9 @@ describe('Test private functions', function()
       }), {
         convert_dimensions = false,
         debug = false,
-        unpack_single_array_values = true,
+        naked_default = true,
         standalone_as_true = false,
+        unpack_single_array_values = true,
       })
     end)
 
@@ -103,6 +105,7 @@ describe('Test private functions', function()
       }), {
         convert_dimensions = false,
         debug = false,
+        naked_default = true,
         unpack_single_array_values = true,
         standalone_as_true = false,
       })
