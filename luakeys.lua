@@ -704,7 +704,7 @@ local function apply_definitions(defs,
         local value = input[search_key]
         input[search_key] = nil
         return value
-        --- standalone value: values with integer keys
+        --- naked keys: values with integer keys
       elseif remove_from_array(input, search_key) ~= nil then
         if def.default ~= nil then
           return def.default
@@ -769,7 +769,7 @@ local function apply_definitions(defs,
       end
     end
 
-    -- required
+    -- def.required
     if def.required ~= nil and def.required and value == nil then
       throw_error(string.format(
         'Missing required value for key “%s” or missing key!', key))

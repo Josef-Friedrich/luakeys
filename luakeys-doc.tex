@@ -322,18 +322,25 @@ luakeys.parse('dim=1cm') -- {dim = '1cm'}
 \subsubsection{\texttt{convert\_dimensions}}
 
 If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
-detects the \TeX{} dimensions and converts them into scaled points
-using the function \lua{tex.sp(dim)}.
+detects the \TeX{} dimensions and converts them into scaled points using
+the function \lua{tex.sp(dim)}.
 
 \begin{minted}{lua}
 local result = luakeys.parse('dim=1cm', {
   convert_dimensions = true,
 })
 -- result = { dim = 1864679 }
+\end{minted}
 
+\noindent
+By default the dimensions are not converted into scaled points.
+
+\begin{minted}{lua}
 local result = luakeys.parse('dim=1cm', {
   convert_dimensions = false,
 })
+-- or
+result = luakeys.parse('dim=1cm')
 -- result = { dim = '1cm' }
 \end{minted}
 
@@ -350,16 +357,20 @@ tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 %
 %%
 
-\subsubsection{\texttt{naked\_default}}
+\subsubsection{\texttt{default}}
+
+The option \lua{default} can be used to specify which value naked keys
+(keys without a value) get. These option has no influence on keys with
+values. By default, naked keys get the value true.
+
+\begin{minted}{lua}
+local result = luakeys.parse('naked', { default = 1 })
+luakeys.debug(result) -- { naked = 1 }
+\end{minted}
 
 \begin{minted}{lua}
 local result = luakeys.parse('naked')
 luakeys.debug(result) -- { naked = true }
-
-local result = luakeys.parse('naked', {
-  default = 1,
-})
-luakeys.debug(result) -- { naked = 1 }
 \end{minted}
 
 %%

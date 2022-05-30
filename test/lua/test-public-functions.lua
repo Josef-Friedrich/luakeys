@@ -186,14 +186,28 @@ describe('Function “parse()”', function()
     end)
 
     describe('Option “default”', function()
+      it('should give a naked key the value', function()
+        assert.are.same({ naked = 1 }, luakeys.parse('naked', { default = 1 }))
+      end)
+
       it('should be true if no option is specifed', function()
         assert.are.same({ naked = true }, luakeys.parse('naked'))
       end)
 
-      it('should be the same as  if no option is specifed', function()
-        assert.are.same({ naked = 1 },
-          luakeys.parse('naked', { default = 1 }))
+      it('should prefer the default option for the key defintions.', function()
+        assert.are.same({ naked = 2 }, luakeys.parse('naked', {
+          default = 1,
+          definitions = { naked = { default = 2 } },
+        }))
       end)
+
+      it('should be used as the default value if using key defintions.',
+        function()
+          assert.are.same({ naked = 2 }, luakeys.parse('naked', {
+            default = 1,
+            definitions = { naked = {} },
+          }))
+        end)
     end)
 
     describe('Option “preprocess”', function()
