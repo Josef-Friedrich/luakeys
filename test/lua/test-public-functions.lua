@@ -57,12 +57,6 @@ describe('Function “parse()”', function()
     assert.are.same(expected, luakeys.parse(input, opts))
   end
 
-  it('Merge defaults', function()
-    local result = luakeys.parse('key1=value1',
-      { defaults = { key2 = 'value2' } })
-    assert.are.same(result, { key1 = 'value1', key2 = 'value2' })
-  end)
-
   describe('Options', function()
     it('Change default options', function()
       local defaults = luakeys.default_options
@@ -210,6 +204,28 @@ describe('Function “parse()”', function()
         end)
     end)
 
+    describe('Options “defaults”', function()
+      it('Should add a default key.', function()
+        assert.are.same(luakeys.parse('key1=new', {
+          defaults = { key1 = 'default', key2 = 'default' },
+        }), { key1 = 'new', key2 = 'default' })
+      end)
+
+      it('Should not overwrite an existing value', function()
+        assert.are.same(
+          luakeys.parse('key=new', { defaults = { key = 'old' } }),
+          { key = 'new' })
+      end)
+
+      it('Should work in a nested table', function()
+        assert.are.same(luakeys.parse('level1={level2={key1=new}}', {
+          defaults = {
+            level1 = { level2 = { key1 = 'default', key2 = 'default' } },
+          },
+        }), { level1 = { level2 = { key1 = 'new', key2 = 'default' } } })
+      end)
+    end)
+
     describe('Option “preprocess”', function()
       it('should add keys.', function()
         local result = luakeys.parse('key=value', {
@@ -233,13 +249,13 @@ describe('Function “parse()”', function()
       end)
 
       it('true', function()
-        assert.are.same({ one = true },
-          luakeys.parse('one', { naked_as_value = false }))
+        assert.are.same({ one = true, two = true, three = true }, luakeys.parse(
+          'one,two,three', { naked_as_value = false }))
       end)
 
       it('false', function()
-        assert.are.same({ 'one' },
-          luakeys.parse('one', { naked_as_value = true }))
+        assert.are.same({ 'one', 'two', 'three' }, luakeys.parse(
+          'one,two,three', { naked_as_value = true }))
       end)
     end)
 

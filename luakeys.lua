@@ -303,7 +303,7 @@ end
 -- @tparam table tbl A table to be printed to standard output for
 -- debugging purposes.
 local function debug(tbl)
-  print(stringify(tbl, false))
+  print('\n' .. stringify(tbl, false))
 end
 
 --- Parser / Lpeg related

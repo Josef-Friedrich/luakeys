@@ -1,0 +1,8 @@
+\documentclass{article}
+\usepackage{luakeys}
+\begin{document}
+\directlua{
+  luakeys.parse('one,two,three', { debug = true })
+}
+debug
+\end{document}
