@@ -361,7 +361,7 @@ tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 
 The option \lua{default} can be used to specify which value naked keys
 (keys without a value) get. These option has no influence on keys with
-values. By default, naked keys get the value true.
+values. By default, naked keys get the value \lua{true}.
 
 \begin{minted}{lua}
 local result = luakeys.parse('naked', { default = 1 })

@@ -203,7 +203,7 @@ describe('Function “parse()”', function()
 
       it('should be used as the default value if using key defintions.',
         function()
-          assert.are.same({ naked = 2 }, luakeys.parse('naked', {
+          assert.are.same({ naked = 1 }, luakeys.parse('naked', {
             default = 1,
             definitions = { naked = {} },
           }))

@@ -641,6 +641,7 @@ local is = {
 --- recursive fashion.
 ---
 ---@param defs table A table containing all definitions.
+---@param opts table The parse options table.
 ---@param input table The current input table.
 ---@param output table The current output table.
 ---@param leftover table Always the root leftover table.
@@ -648,6 +649,7 @@ local is = {
 ---@param input_root table The root input table
 ---  input and output table.
 local function apply_definitions(defs,
+  opts,
   input,
   output,
   leftover,
@@ -698,6 +700,14 @@ local function apply_definitions(defs,
     if key == nil then
       throw_error('key name couldn’t be detected!')
     end
+    local function set_default_value(def, opts)
+      if def.default ~= nil then
+        return def.default
+      elseif opts ~= nil and opts.default ~= nil then
+        return opts.default
+      end
+      return true
+    end
 
     local function find_value(search_key)
       if input[search_key] ~= nil then
@@ -706,11 +716,7 @@ local function apply_definitions(defs,
         return value
         --- naked keys: values with integer keys
       elseif remove_from_array(input, search_key) ~= nil then
-        if def.default ~= nil then
-          return def.default
-        else
-          return true
-        end
+        return set_default_value(def, opts)
       end
     end
 
@@ -762,11 +768,7 @@ local function apply_definitions(defs,
 
     -- def.always_present
     if value == nil and def.always_present then
-      if def.default ~= nil then
-        value = def.default
-      else
-        value = true
-      end
+      value = set_default_value(def, opts)
     end
 
     -- def.required
@@ -878,7 +880,7 @@ local function apply_definitions(defs,
       elseif type(value) == 'table' then
         v = value
       end
-      v = apply_definitions(def.sub_keys, v, output[key], leftover,
+      v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
         add_to_key_path(key_path, key), input_root)
       if get_table_size(v) > 0 then
         value = v
@@ -956,7 +958,7 @@ local function parse(kv_string, options)
   local result_unknown = nil
   if options.definitions ~= nil then
     result_def = {}
-    result_def, result_unknown = apply_definitions(options.definitions,
+    result_def, result_unknown = apply_definitions(options.definitions, options,
       result_parse, result_def, {}, {}, clone_table(result_parse))
   end
 

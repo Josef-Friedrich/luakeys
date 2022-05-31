@@ -21,17 +21,19 @@ describe('Key defintions', function()
       end
 
       it('can be given as stand-alone values.', function()
-        assert.are.same(apply_defintions({ 'key' }, get_input()),
+        assert.are.same(apply_defintions({ 'key' }, nil, get_input()),
           { key = 'value' })
       end)
 
       it('can be specified as keys in a Lua table.', function()
         local defs = { key = {} }
-        assert.are.same(apply_defintions(defs, get_input()), { key = 'value' })
+        assert.are.same(apply_defintions(defs, nil, get_input()),
+          { key = 'value' })
       end)
 
       it('can be specified by the “name” option.', function()
-        assert.are.same(apply_defintions({ { name = 'key' } }, get_input()),
+        assert.are.same(
+          apply_defintions({ { name = 'key' } }, nil, get_input()),
           { key = 'value' })
       end)
     end)
@@ -47,19 +49,20 @@ describe('Key defintions', function()
         it(
           'should find a value if the “alias” option is specified as a string and store it under the original key name.',
           function()
-            assert.are.same(apply_defintions(defs, { k1 = 42 }), { key1 = 42 })
+            assert.are.same(apply_defintions(defs, nil, { k1 = 42 }),
+              { key1 = 42 })
           end)
 
         it(
           'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
           function()
-            assert.are.same(apply_defintions(defs, { ['my_key2'] = 42 }),
+            assert.are.same(apply_defintions(defs, nil, { ['my_key2'] = 42 }),
               { key2 = 42 })
           end)
 
         it('should find a alias standalone values as key names', function()
           assert.are.same(apply_defintions({ key = { alias = { 'k', 'ke' } } },
-            { 'ke' }), { key = true })
+            nil, { 'ke' }), { key = true })
         end)
 
         it('should find a value in a nested definition', function()
@@ -68,13 +71,13 @@ describe('Key defintions', function()
               alias = 'l1',
               sub_keys = { level2 = { alias = { 'l2', 'level_2' } } },
             },
-          }, { l1 = { l2 = 'value' } }), { level1 = { level2 = 'value' } })
+          }, nil, { l1 = { l2 = 'value' } }), { level1 = { level2 = 'value' } })
         end)
 
         describe('Error messages', function()
           it('should throw an error if two aliases are present', function()
             assert.has_error(function()
-              apply_defintions({ key = { alias = { 'k', 'ke' } } },
+              apply_defintions({ key = { alias = { 'k', 'ke' } } }, nil,
                 { k = 'value', ke = 'value' })
             end, 'Duplicate aliases “k” and “ke” for key “key”!')
           end)
@@ -82,7 +85,7 @@ describe('Key defintions', function()
           it('should throw an error if the key and an alias are present',
             function()
               assert.has_error(function()
-                apply_defintions({ key = { alias = { 'k', 'ke' } } },
+                apply_defintions({ key = { alias = { 'k', 'ke' } } }, nil,
                   { key = 'value', k = 'value' })
               end, 'Duplicate aliases “key” and “k” for key “key”!')
             end)
@@ -93,13 +96,13 @@ describe('Key defintions', function()
       describe('Option “always_present”', function()
         it('should pass an value to the key if the input is empty', function()
           assert.are.same(apply_defintions({ key = { always_present = true } },
-            {}), { key = true })
+            nil, {}), { key = true })
         end)
 
         it('should use the default value', function()
           assert.are.same(apply_defintions({
             key = { always_present = true, default = 'value' },
-          }, {}), { key = 'value' })
+          }, nil, {}), { key = 'value' })
         end)
 
         it('should work in an nested definition', function()
@@ -107,20 +110,20 @@ describe('Key defintions', function()
             level1 = {
               sub_keys = { key = { always_present = true, default = 'value' } },
             },
-          }, {}), { level1 = { key = 'value' } })
+          }, nil, {}), { level1 = { key = 'value' } })
         end)
       end)
 
       describe('Option “choices”', function()
         local defs = { key = { choices = { 'one', 'two', 'three' } } }
         it('should throw no exception', function()
-          assert.are.same(apply_defintions(defs, { key = 'one' }),
+          assert.are.same(apply_defintions(defs, nil, { key = 'one' }),
             { key = 'one' })
         end)
 
         it('should throw an exception if no choice was found.', function()
           assert.has_error(function()
-            apply_defintions(defs, { key = 'unknown' })
+            apply_defintions(defs, nil, { key = 'unknown' })
           end,
             'The value “unknown” does not exist in the choices: one, two, three')
         end)
@@ -129,7 +132,7 @@ describe('Key defintions', function()
       describe('Option “data_type”', function()
         local function assert_type(data_type, input_value, expected_value)
           assert.are.same(apply_defintions({ key = { data_type = data_type } },
-            { key = input_value }), { key = expected_value })
+            nil, { key = input_value }), { key = expected_value })
         end
 
         it('should convert different input values into strings', function()
@@ -171,7 +174,7 @@ describe('Key defintions', function()
         it(
           'should pass if only one key of the mutually exclusive group is present.',
           function()
-            assert.are.same(apply_defintions(defs, { k1 = 'value' }),
+            assert.are.same(apply_defintions(defs, nil, { k1 = 'value' }),
               { k1 = 'value' })
           end)
 
@@ -179,25 +182,25 @@ describe('Key defintions', function()
           'should throw an error if only two keys of the mutually exclusive group are present.',
           function()
             assert.has_error(function()
-              apply_defintions(defs, { k1 = 'value', k2 = 'value' }, {})
+              apply_defintions(defs, nil, { k1 = 'value', k2 = 'value' }, {})
             end)
           end)
 
         it('should let other keys untouched.', function()
-          assert.are.same(apply_defintions(defs, { 'k4' }), { k4 = 'value' })
+          assert.are.same(apply_defintions(defs, nil, { 'k4' }),
+            { k4 = 'value' })
         end)
 
         it('two keys of two different exclusive groups should pass.', function()
-          assert.are.same(
-            apply_defintions(defs, { k1 = 'value', k3 = 'value' }),
-            { k1 = 'value', k3 = 'value' })
+          assert.are.same(apply_defintions(defs, nil,
+            { k1 = 'value', k3 = 'value' }), { k1 = 'value', k3 = 'value' })
         end)
       end)
 
       it('Option “match”', function()
         assert.are.same(apply_defintions({
           date = { match = '^%d%d%d%d%-%d%d%-%d%d$' },
-        }, { date = '1978-12-03' }), { date = '1978-12-03' })
+        }, nil, { date = '1978-12-03' }), { date = '1978-12-03' })
       end)
 
       describe('Option “opposite_values”', function()
@@ -206,19 +209,19 @@ describe('Key defintions', function()
         }
 
         it('should return true if a truthy string value is given.', function()
-          assert.are.same(apply_defintions(defs, { 'show' }),
+          assert.are.same(apply_defintions(defs, nil, { 'show' }),
             { visibility = true })
         end)
 
         it('should return false if a falsy string is given.', function()
-          assert.are.same(apply_defintions(defs, { 'hide' }),
+          assert.are.same(apply_defintions(defs, nil, { 'hide' }),
             { visibility = false })
         end)
 
         it('should return an empty table if a unknown string value is given.',
           function()
             local output = {}
-            apply_defintions(defs, { 'unknown' }, output)
+            apply_defintions(defs, nil, { 'unknown' }, output)
             assert.are.same(output, {})
           end)
       end)
@@ -233,12 +236,12 @@ describe('Key defintions', function()
               return value
             end,
           },
-        }, { width = 0.5 }), { width = '0.5\\linewidth' })
+        }, nil, { width = 0.5 }), { width = '0.5\\linewidth' })
       end)
 
       describe('Option “required”', function()
         it('should pass if a value is provided', function()
-          assert.are.same(apply_defintions({ key = { required = true } },
+          assert.are.same(apply_defintions({ key = { required = true } }, nil,
             { key = 'value' }), { key = 'value' })
         end)
 
@@ -253,7 +256,7 @@ describe('Key defintions', function()
       it('Option “sub_keys”', function()
         local defs = { { name = 'level1', sub_keys = { { name = 'level2' } } } }
         local input = { level1 = { level2 = 'value' } }
-        assert.are.same(apply_defintions(defs, input),
+        assert.are.same(apply_defintions(defs, nil, input),
           { level1 = { level2 = 'value' } })
       end)
     end)
@@ -261,13 +264,13 @@ describe('Key defintions', function()
     describe('Return values', function()
       describe('leftover', function()
         it('should be an empty table if all keys are defined', function()
-          local result, leftover =
-            apply_defintions({ 'key' }, { key = 'value' })
+          local result, leftover = apply_defintions({ 'key' }, nil,
+            { key = 'value' })
           assert.are.same(leftover, {})
         end)
 
         it('should be an non-empty table if all keys are defined', function()
-          local result, leftover = apply_defintions({ 'key' }, {
+          local result, leftover = apply_defintions({ 'key' }, nil, {
             key = 'value',
             unknown = 'unknown',
           })
@@ -278,7 +281,7 @@ describe('Key defintions', function()
           local result, leftover = apply_defintions({
             key1 = { sub_keys = { 'known1' } },
             key2 = { sub_keys = { 'known2' } },
-          }, {
+          }, nil, {
             key1 = { known1 = 1, unknown1 = 1 },
             key2 = { known2 = 1, unknown2 = 1, unknown3 = 1 },
             unknown = 'unknown',
