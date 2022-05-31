@@ -377,6 +377,30 @@ luakeys.debug(result) -- { naked = true }
 %
 %%
 
+\subsubsection{\texttt{naked\_as\_value}}
+
+% Mit Hilfe der Optionen naked_as_value werden nackte Schlüssel nicht
+% mit einem Standardwert versehen, sondern als Werte in die Lua-Tabelle
+% abgelegt.
+With the help of the option \lua{naked_as_value}, naked keys are not
+given a default value, but are stored as values in a Lua table.
+
+\begin{minted}{lua}
+local result = luakeys.parse('one,two,three')
+luakeys.debug(result) -- { one = true, two = true, three = true }
+\end{minted}
+
+\begin{minted}{lua}
+local result = luakeys.parse('one,two,three', { naked_as_value = true })
+luakeys.debug(result)
+-- { [1] = 'one', [2] = 'two', [3] = 'three' }
+-- { 'one', 'two', 'three' }
+\end{minted}
+
+%%
+%
+%%
+
 \subsection{\texttt{define(defs, opts)}}
 
 The \lua{define} function returns a \lua{parse} function (see
