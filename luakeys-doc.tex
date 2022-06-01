@@ -230,10 +230,10 @@ local is = luakeys.is
 %
 %%
 
-\subsection{\texttt{parse(kv\_string, opts)}: table}
+\subsection{\texttt{parse(kv\_string, options)}: table}
 \label{parse}
 
-The function \lua{parse(kv_string, opts)} parses a key-value string
+The function \lua{parse(kv_string, options)} parses a key-value string
 into a Lua table.
 
 \begin{minted}{latex}
@@ -261,12 +261,12 @@ In plain \TeX:
 \end{minted}
 
 \noindent
-The function can be called with an options table. This options are
-supported:
+The \lua{parse} function can be called with an options table. This
+options are supported:
 
 % Update also in README.md
 \begin{minted}{lua}
-local opts = {
+local options = {
   -- { KEY = 'Value' } -> { key = 'value' }
   case_insensitive_keys = false,
 
@@ -290,7 +290,7 @@ local opts = {
   defaults = { key = 'value' },
 
   -- Key-value pair defintions.
-  definitions = defs,
+  definitions = { key = { default = 'value' } },
 
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
@@ -302,7 +302,7 @@ local opts = {
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,
 }
-local result = luakeys.parse('one,two,three', opts)
+local result = luakeys.parse('one,two,three', options)
 \end{minted}
 
 \noindent
@@ -441,6 +441,42 @@ luakeys.debug(result) -- { key1 = 'new', key2 = 'default' }
 %
 %%
 
+\subsubsection{\texttt{definitions}}
+
+% Für mehr Information wie Schlüssel definiert werden, lesen sie das
+% kapitel 3.2
+For more informations on how keys are defined, see section \ref{define}.
+% Wenn sie die Option \lua{definitions} verwenden, können sie auf den
+% Aufruf der Funktion \lua{define} verzichten.
+If you use the \lua{definitions} option, you don't need to call the
+\lua{define} function.
+
+Instead of ...
+
+\begin{minted}{lua}
+local parse = luakeys.define({
+  one = { default = 1 },
+  two = { default = 2 },
+})
+parse('one,two') -- { one = 1, two = 2 }
+\end{minted}
+
+\noindent
+we can write ...
+
+\begin{minted}{lua}
+local result = luakeys.parse('one,two', {
+  defintions = {
+    one = { default = 1 },
+    two = { default = 2 },
+  }
+}) -- { one = 1, two = 2 }
+\end{minted}
+
+%%
+%
+%%
+
 \subsubsection{\texttt{naked\_as\_value}}
 
 % Mit Hilfe der Optionen naked_as_value werden nackte Schlüssel nicht
@@ -469,7 +505,7 @@ luakeys.debug(result)
 %
 %%
 
-\subsubsection{\texttt{no_error}}
+\subsubsection{\texttt{no\_error}}
 
 % Standardmaßig wirft parse-Funktion einen Fehler, wenn es unbekannte
 % Schlüssel gibt.
@@ -491,34 +527,39 @@ luakeys.parse('unknown', { definitions = { 'key' }, no_error = true })
 \end{minted}
 
 %%
-%
+%luakeys.debug(result) -- { key1 = 'new', key2 = 'default' }
+
 %%
 
-\subsection{\texttt{define(defs, opts)}}
+\subsection{\texttt{define(defintions, options)}}
+\label{define}
 
 The \lua{define} function returns a \lua{parse} function (see
 \ref{parse}).
 The name of a key can be specified in three ways:
 
 \begin{enumerate}
-\item as standalone string values also known as an array of strings.
-\item as keys in a Lua table. The definition of the corresponding
-key-value pair is then stored under these keys.
+\item as a string.
+\item as a key in a Lua table. The definition of the corresponding
+key-value pair is then stored under this key.
 \item by the “name” option.
 \end{enumerate}
 
 \begin{minted}{lua}
 -- standalone string values
-local defs = { 'key' }
+local defintions = { 'key' }
 
 -- keys in a Lua table
-local defs = { key = { some_def = 'etc' } }
+local defintions = { key = { ... } }
 
 -- by the “name” option
-local defs = { { name = 'key', some_def = 'etc' } }
+local defintions = { { name = 'key', ... } }
 
-local parse = luakeys.define(defs)
-local result, leftover = parse('key=value,unknown=unknown')
+local parse = luakeys.define(defintions)
+local result, leftover = parse(
+  'key=value,unknown=unknown',
+  { no_error = true }
+)
 luakeys.debug(result) -- { key = 'value' }
 luakeys.debug(leftover) -- { unknown = 'unknown' }
 \end{minted}
@@ -540,7 +581,7 @@ The code example below lists all the settings that can be used to define
 key-value pairs.
 
 \begin{minted}{lua}
-local defs = {
+local defintions = {
   key = {
     -- Allow different key names.
     -- or a single string: alias = 'k'
@@ -592,10 +633,10 @@ strings.
 
 \begin{minted}{lua}
 -- a single alias
-local defs = { key = { alias = 'k' } }
+local defintions = { key = { alias = 'k' } }
 -- multiple aliases
-local defs = { key = { alias = { 'k', 'ke' } } }
-local parse = luakeys.define(defs)
+local defintions = { key = { alias = { 'k', 'ke' } } }
+local parse = luakeys.define(defintions)
 local result, leftover = parse('k=value')
 luakeys.debug(result) -- { key = 'value' }
 \end{minted}
@@ -676,7 +717,7 @@ are stored.
 %%
 
 \begin{minted}{lua}
-local defs = {
+local defintions = {
   key = {
     process = function (value, result, leftover)
       return value

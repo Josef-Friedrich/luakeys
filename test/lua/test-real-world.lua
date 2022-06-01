@@ -4,8 +4,8 @@ local luakeys = require('luakeys')
 
 local parse = luakeys.parse
 
-local function assert_deep_equals(actual, expected, opts)
-  assert.are.same(expected, parse(actual, opts))
+local function assert_deep_equals(actual, expected, options)
+  assert.are.same(expected, parse(actual, options))
 end
 
 describe('Real world examples', function()

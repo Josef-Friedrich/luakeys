@@ -633,19 +633,19 @@ local is = {
   end,
 }
 
---- Apply the key-value-pair definitions (defs) on an input table in a
+--- Apply the key-value-pair definitions (defintions) on an input table in a
 --- recursive fashion.
 ---
----@param defs table A table containing all definitions.
----@param opts table The parse options table.
+---@param defintions table A table containing all definitions.
+---@param options table The parse options table.
 ---@param input table The current input table.
 ---@param output table The current output table.
 ---@param leftover table Always the root leftover table.
 ---@param key_path table An array of key names leading to the current
 ---@param input_root table The root input table
 ---  input and output table.
-local function apply_definitions(defs,
-  opts,
+local function apply_definitions(defintions,
+  options,
   input,
   output,
   leftover,
@@ -677,7 +677,7 @@ local function apply_definitions(defs,
     return new_key_path
   end
 
-  for index, def in pairs(defs) do
+  for index, def in pairs(defintions) do
     --- Find key and def
     local key
     if type(def) == 'table' and def.name == nil and type(index) == 'string' then
@@ -696,11 +696,11 @@ local function apply_definitions(defs,
     if key == nil then
       throw_error('key name couldn’t be detected!')
     end
-    local function set_default_value(def, opts)
+    local function set_default_value(def, options)
       if def.default ~= nil then
         return def.default
-      elseif opts ~= nil and opts.default ~= nil then
-        return opts.default
+      elseif options ~= nil and options.default ~= nil then
+        return options.default
       end
       return true
     end
@@ -712,7 +712,7 @@ local function apply_definitions(defs,
         return value
         --- naked keys: values with integer keys
       elseif remove_from_array(input, search_key) ~= nil then
-        return set_default_value(def, opts)
+        return set_default_value(def, options)
       end
     end
 
@@ -764,7 +764,7 @@ local function apply_definitions(defs,
 
     -- def.always_present
     if value == nil and def.always_present then
-      value = set_default_value(def, opts)
+      value = set_default_value(def, options)
     end
 
     -- def.required
@@ -876,7 +876,7 @@ local function apply_definitions(defs,
       elseif type(value) == 'table' then
         v = value
       end
-      v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
+      v = apply_definitions(def.sub_keys, options, v, output[key], leftover,
         add_to_key_path(key_path, key), input_root)
       if get_table_size(v) > 0 then
         value = v
@@ -975,22 +975,22 @@ local function parse(kv_string, options)
   return result, result_unknown, result_parse
 end
 
-local function define(defs, parse_options)
+local function define(defintions, parse_options)
   return function(kv_string, inner_parse_options)
-    local opts
+    local options
     if inner_parse_options ~= nil then
-      opts = inner_parse_options
+      options = inner_parse_options
     elseif parse_options ~= nil then
-      opts = parse_options
+      options = parse_options
     end
 
-    if opts == nil then
-      opts = {}
+    if options == nil then
+      options = {}
     end
 
-    opts.definitions = defs
+    options.definitions = defintions
 
-    return parse(kv_string, opts)
+    return parse(kv_string, options)
   end
 end
 

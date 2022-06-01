@@ -46,9 +46,9 @@ local def = {
   sub_keys = { key_level_2 = { ... } },
 }
 
-local defs = { key = def }
+local defintions = { key = def }
 
-local opts = {
+local options = {
   -- { KEY = 'Value' } -> { key = 'value' }
   case_insensitive_keys = false,
 
@@ -70,7 +70,7 @@ local opts = {
   defaults = { key = 'value' },
 
   -- Key-value pair defintions.
-  definitions = defs,
+  definitions = defintions,
 
   -- Standalone values aka values with numeric keys are converted to
   -- keys holding the value true:
@@ -81,4 +81,4 @@ local opts = {
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,
 }
-local result = luakeys.parse('one,two,three', opts)
+local result = luakeys.parse('one,two,three', options)

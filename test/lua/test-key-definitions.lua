@@ -26,8 +26,8 @@ describe('Key defintions', function()
       end)
 
       it('can be specified as keys in a Lua table.', function()
-        local defs = { key = {} }
-        assert.are.same(apply_defintions(defs, nil, get_input()),
+        local defintions = { key = {} }
+        assert.are.same(apply_defintions(defintions, nil, get_input()),
           { key = 'value' })
       end)
 
@@ -41,7 +41,7 @@ describe('Key defintions', function()
     describe('Options', function()
 
       describe('Option “alias”', function()
-        local defs = {
+        local defintions = {
           key1 = { alias = 'k1' },
           key2 = { alias = { 'k2', 'my_key2' } },
         }
@@ -49,14 +49,14 @@ describe('Key defintions', function()
         it(
           'should find a value if the “alias” option is specified as a string and store it under the original key name.',
           function()
-            assert.are.same(apply_defintions(defs, nil, { k1 = 42 }),
+            assert.are.same(apply_defintions(defintions, nil, { k1 = 42 }),
               { key1 = 42 })
           end)
 
         it(
           'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
           function()
-            assert.are.same(apply_defintions(defs, nil, { ['my_key2'] = 42 }),
+            assert.are.same(apply_defintions(defintions, nil, { ['my_key2'] = 42 }),
               { key2 = 42 })
           end)
 
@@ -115,15 +115,15 @@ describe('Key defintions', function()
       end)
 
       describe('Option “choices”', function()
-        local defs = { key = { choices = { 'one', 'two', 'three' } } }
+        local defintions = { key = { choices = { 'one', 'two', 'three' } } }
         it('should throw no exception', function()
-          assert.are.same(apply_defintions(defs, nil, { key = 'one' }),
+          assert.are.same(apply_defintions(defintions, nil, { key = 'one' }),
             { key = 'one' })
         end)
 
         it('should throw an exception if no choice was found.', function()
           assert.has_error(function()
-            apply_defintions(defs, nil, { key = 'unknown' })
+            apply_defintions(defintions, nil, { key = 'unknown' })
           end,
             'The value “unknown” does not exist in the choices: one, two, three')
         end)
@@ -164,7 +164,7 @@ describe('Key defintions', function()
       end)
 
       describe('Option “exclusive_group”', function()
-        local defs = {
+        local defintions = {
           k1 = { exclusive_group = 'group1' },
           k2 = { exclusive_group = 'group1' },
           k3 = { exclusive_group = 'group3' },
@@ -174,7 +174,7 @@ describe('Key defintions', function()
         it(
           'should pass if only one key of the mutually exclusive group is present.',
           function()
-            assert.are.same(apply_defintions(defs, nil, { k1 = 'value' }),
+            assert.are.same(apply_defintions(defintions, nil, { k1 = 'value' }),
               { k1 = 'value' })
           end)
 
@@ -182,17 +182,17 @@ describe('Key defintions', function()
           'should throw an error if only two keys of the mutually exclusive group are present.',
           function()
             assert.has_error(function()
-              apply_defintions(defs, nil, { k1 = 'value', k2 = 'value' }, {})
+              apply_defintions(defintions, nil, { k1 = 'value', k2 = 'value' }, {})
             end)
           end)
 
         it('should let other keys untouched.', function()
-          assert.are.same(apply_defintions(defs, nil, { 'k4' }),
+          assert.are.same(apply_defintions(defintions, nil, { 'k4' }),
             { k4 = 'value' })
         end)
 
         it('two keys of two different exclusive groups should pass.', function()
-          assert.are.same(apply_defintions(defs, nil,
+          assert.are.same(apply_defintions(defintions, nil,
             { k1 = 'value', k3 = 'value' }), { k1 = 'value', k3 = 'value' })
         end)
       end)
@@ -204,24 +204,24 @@ describe('Key defintions', function()
       end)
 
       describe('Option “opposite_values”', function()
-        local defs = {
+        local defintions = {
           visibility = { opposite_values = { [true] = 'show', [false] = 'hide' } },
         }
 
         it('should return true if a truthy string value is given.', function()
-          assert.are.same(apply_defintions(defs, nil, { 'show' }),
+          assert.are.same(apply_defintions(defintions, nil, { 'show' }),
             { visibility = true })
         end)
 
         it('should return false if a falsy string is given.', function()
-          assert.are.same(apply_defintions(defs, nil, { 'hide' }),
+          assert.are.same(apply_defintions(defintions, nil, { 'hide' }),
             { visibility = false })
         end)
 
         it('should return an empty table if a unknown string value is given.',
           function()
             local output = {}
-            apply_defintions(defs, nil, { 'unknown' }, output)
+            apply_defintions(defintions, nil, { 'unknown' }, output)
             assert.are.same(output, {})
           end)
       end)
@@ -254,9 +254,9 @@ describe('Key defintions', function()
       end)
 
       it('Option “sub_keys”', function()
-        local defs = { { name = 'level1', sub_keys = { { name = 'level2' } } } }
+        local defintions = { { name = 'level1', sub_keys = { { name = 'level2' } } } }
         local input = { level1 = { level2 = 'value' } }
-        assert.are.same(apply_defintions(defs, nil, input),
+        assert.are.same(apply_defintions(defintions, nil, input),
           { level1 = { level2 = 'value' } })
       end)
     end)
@@ -300,8 +300,8 @@ describe('Key defintions', function()
   describe('Function “define()”', function()
     local define = luakeys.define
 
-    local function define_parse(defs, kv_string)
-      local parse = define(defs)
+    local function define_parse(defintions, kv_string)
+      local parse = define(defintions)
       return parse(kv_string, { no_error = true })
     end
 

@@ -35,7 +35,7 @@ The Current Maintainer of this work is Josef Friedrich.
 ### Key-value pair definition
 
 ```lua
-local def = {
+local definition = {
   -- Allow different key names.
   -- or a single string: alias = 'k'
   alias = { 'k', 'ke' },
@@ -72,10 +72,10 @@ local def = {
 }
 ```
 
-### Parser options (opts)
+### Parser options (options)
 
 ```lua
-local opts = {
+local options = {
   -- { KEY = 'Value' } -> { key = 'value' }
   case_insensitive_keys = false,
 
@@ -99,7 +99,7 @@ local opts = {
   defaults = { key = 'value' },
 
   -- Key-value pair defintions.
-  definitions = defs,
+  definitions = { key = { default = 'value' } },
 
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
@@ -111,7 +111,7 @@ local opts = {
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,
 }
-local result = luakeys.parse('one,two,three', opts)
+local result = luakeys.parse('one,two,three', options)
 ```
 
 ## Tasks

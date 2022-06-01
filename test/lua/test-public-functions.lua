@@ -53,8 +53,8 @@ describe('Function “render()”', function()
 end)
 
 describe('Function “parse()”', function()
-  local function assert_parse(input, expected, opts)
-    assert.are.same(expected, luakeys.parse(input, opts))
+  local function assert_parse(input, expected, options)
+    assert.are.same(expected, luakeys.parse(input, options))
   end
 
   describe('Options', function()
@@ -278,33 +278,33 @@ describe('Function “parse()”', function()
     end)
 
     describe('Option “unpack_single_valued_array”', function()
-      local opts_true = { unpack_single_array_values = true }
-      local opts_false = { unpack_single_array_values = false }
+      local options_true = { unpack_single_array_values = true }
+      local options_false = { unpack_single_array_values = false }
 
       it('unpacked: single string', function()
         assert.is.same({ key = 'string' },
-          luakeys.parse('key={string}', opts_true))
+          luakeys.parse('key={string}', options_true))
         assert.is.same({ key = { string = true } },
-          luakeys.parse('key={string}', opts_false))
+          luakeys.parse('key={string}', options_false))
 
       end)
 
       it('unpacked: single number', function()
-        assert.are.same({ key = 1 }, luakeys.parse('key={1}', opts_true))
-        assert.are.same({ key = { 1 } }, luakeys.parse('key={1}', opts_false))
+        assert.are.same({ key = 1 }, luakeys.parse('key={1}', options_true))
+        assert.are.same({ key = { 1 } }, luakeys.parse('key={1}', options_false))
       end)
 
       it('Not unpacked: two values', function()
         assert.is.same({ key = { one = true, two = true } },
-          luakeys.parse('key={one,two}', opts_true))
+          luakeys.parse('key={one,two}', options_true))
         assert.is.same({ key = { one = true, two = true } },
-          luakeys.parse('key={one,two}', opts_false))
+          luakeys.parse('key={one,two}', options_false))
       end)
 
       it('Not unpacked: nested table', function()
-        assert.is.same({ one = true }, luakeys.parse('{{one}}', opts_true))
+        assert.is.same({ one = true }, luakeys.parse('{{one}}', options_true))
         assert.is.same({ { { one = true } } },
-          luakeys.parse('{{one}}', opts_false))
+          luakeys.parse('{{one}}', options_false))
       end)
     end)
   end)
