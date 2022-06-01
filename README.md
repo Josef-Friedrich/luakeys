@@ -88,7 +88,7 @@ local opts = {
   -- default: false
   convert_dimensions = false,
 
-  -- Pretty print the result table to the console.
+  -- Print the result table to the console.
   debug = false,
 
   -- The default value for naked keys (keys without a value).
@@ -104,6 +104,9 @@ local opts = {
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
   naked_as_value = false,
+
+  -- Throw no error if there are unknown keys.
+  no_error = false,
 
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,

@@ -302,7 +302,7 @@ describe('Key defintions', function()
 
     local function define_parse(defs, kv_string)
       local parse = define(defs)
-      return parse(kv_string)
+      return parse(kv_string, { no_error = true })
     end
 
     describe('Name of the keys', function()

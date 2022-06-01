@@ -56,6 +56,7 @@ local option_keys = {
   'defaults',
   'definitions',
   'naked_as_value',
+  'no_error',
   'postprocess',
   'preprocess',
   'unpack_single_array_values',
@@ -67,6 +68,7 @@ local default_options = {
   debug = false,
   default = true,
   naked_as_value = false,
+  no_error = false,
   unpack_single_array_values = true,
 }
 
@@ -519,12 +521,6 @@ local function get_table_size(value)
   return count
 end
 
-local function warn_unknown_keys(unknown)
-  if not unknown or type(unknown) == 'table' and get_table_size(unknown) > 0 then
-    throw_error('Unknown keys: ' .. render(unknown))
-  end
-end
-
 local function remove_from_array(array, element)
   for index, value in pairs(array) do
     if element == value then
@@ -971,6 +967,11 @@ local function parse(kv_string, options)
   else
     result = result_def
   end
+  -- no_error
+  if not options.no_error and type(result_unknown) == 'table' and
+    get_table_size(result_unknown) > 0 then
+    throw_error('Unknown keys: ' .. render(result_unknown))
+  end
   return result, result_unknown, result_parse
 end
 
@@ -1066,7 +1067,6 @@ if _TEST then
   export.normalize_parse_options = normalize_parse_options
   export.parse_kv_string = parse_kv_string
   export.visit_parse_tree = visit_parse_tree
-  export.warn_unknown_keys = warn_unknown_keys
 end
 
 return export

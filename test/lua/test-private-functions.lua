@@ -86,6 +86,7 @@ describe('Test private functions', function()
         debug = false,
         default = true,
         naked_as_value = false,
+        no_error = false,
         unpack_single_array_values = true,
       })
     end)
@@ -98,6 +99,7 @@ describe('Test private functions', function()
         debug = false,
         default = true,
         naked_as_value = false,
+        no_error = false,
         unpack_single_array_values = true,
       })
     end)
@@ -109,8 +111,9 @@ describe('Test private functions', function()
         convert_dimensions = false,
         debug = false,
         default = true,
-        unpack_single_array_values = true,
         naked_as_value = false,
+        no_error = false,
+        unpack_single_array_values = true,
       })
     end)
   end)
@@ -202,18 +205,5 @@ describe('Test private functions', function()
       assert.is.same(target, { a = 'A', b = { c = 'C', d = 'D' } })
     end)
 
-  end)
-
-  describe('Function “warn_unknown_keys”', function()
-    local warn_unknown_keys = luakeys.warn_unknown_keys
-    it('An empty table should throw no warning.', function()
-      warn_unknown_keys({})
-    end)
-
-    it('An non-empty table should throw a warning.', function()
-      assert.has_error(function()
-        warn_unknown_keys({ 'unknown' })
-      end, 'Unknown keys: unknown,')
-    end)
   end)
 end)

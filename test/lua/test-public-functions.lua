@@ -171,6 +171,7 @@ describe('Function “parse()”', function()
                 end,
               },
             },
+            no_error = true,
           })
         assert.are.same(result, { key = 'value', new_key = 'result' })
         assert.are.same(result_unknown,
@@ -259,6 +260,23 @@ describe('Function “parse()”', function()
       end)
     end)
 
+    describe('Option “no_error”', function()
+      local warn_unknown_keys = luakeys.warn_unknown_keys
+      it('A definied key should throw no error.', function()
+        luakeys.parse('key', { definitions = { 'key' } })
+      end)
+
+      it('An non-empty unkown table should throw an error.', function()
+        assert.has_error(function()
+          luakeys.parse('unknown', { definitions = { 'key' } })
+        end, 'Unknown keys: unknown,')
+      end)
+
+      it('should prevent an error.', function()
+        luakeys.parse('unknown', { definitions = { 'key' }, no_error = true })
+      end)
+    end)
+
     describe('Option “unpack_single_valued_array”', function()
       local opts_true = { unpack_single_array_values = true }
       local opts_false = { unpack_single_array_values = false }
@@ -289,7 +307,6 @@ describe('Function “parse()”', function()
           luakeys.parse('{{one}}', opts_false))
       end)
     end)
-
   end)
 
   describe('Whitespaces', function()

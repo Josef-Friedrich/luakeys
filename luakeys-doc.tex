@@ -296,6 +296,9 @@ local opts = {
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
   naked_as_value = false,
 
+  -- Throw no error if there are unknown keys.
+  no_error = false,
+
   -- { key = { 'value' } } -> { key = 'value' }
   unpack_single_array_value = false,
 }
@@ -375,15 +378,7 @@ debug
 
 \begin{verbatim}
 This is LuaHBTeX, Version 1.15.0 (TeX Live 2022)
- restricted system commands enabled.
-(./debug.tex
-LaTeX2e <2021-11-15> patch level 1
- L3 programming layer <2022-05-30>
-(/usr/local/texlive/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
-(/usr/local/texlive/texmf-dist/tex/latex/base/size10.clo))
-(/home/jf/texmf/tex/luatex/luakeys/luakeys.sty)
-(/usr/local/texlive/texmf-dist/tex/latex/l3backend/l3backend-luatex.def)
+...
 (./debug.aux) (/usr/local/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 {
   ['three'] = true,
@@ -393,12 +388,7 @@ Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
  [1{/usr/
 local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./debug.aux)
 )
- 406 words of node memory still in use:
-   3 hlist, 1 vlist, 1 rule, 2 glue, 3 kern, 1 glyph, 4 attribute, 48 glue_spec
-, 4 attribute_list, 1 write nodes
-   avail lists: 2:23,3:4,4:2,5:22,6:2,7:40,9:18,11:2
-</usr/local/texlive/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf>
-Output written on debug.pdf (1 page, 3193 bytes).
+...
 Transcript written on debug.log.
 \end{verbatim}
 
@@ -465,11 +455,39 @@ local result = luakeys.parse('one,two,three')
 luakeys.debug(result) -- { one = true, two = true, three = true }
 \end{minted}
 
+\noindent
+If we set the option \lua{naked_as_value} to \lua{true}:
+
 \begin{minted}{lua}
 local result = luakeys.parse('one,two,three', { naked_as_value = true })
 luakeys.debug(result)
 -- { [1] = 'one', [2] = 'two', [3] = 'three' }
 -- { 'one', 'two', 'three' }
+\end{minted}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{no_error}}
+
+% Standardmaßig wirft parse-Funktion einen Fehler, wenn es unbekannte
+% Schlüssel gibt.
+By default the parse function throws an error if there are unknown keys.
+% Mit Hilfe der Option \lua{no_error} kann dies unterbunden werden.
+This can be prevented with the help of the \lua{no_error} option.
+
+\begin{minted}{lua}
+luakeys.parse('unknown', { definitions = { 'key' } })
+-- Error message: Unknown keys: unknown,
+\end{minted}
+
+\noindent
+If we set the option \lua{no_error} to \lua{true}:
+
+\begin{minted}{lua}
+luakeys.parse('unknown', { definitions = { 'key' }, no_error = true })
+-- No error message
 \end{minted}
 
 %%
