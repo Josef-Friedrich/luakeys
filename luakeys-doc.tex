@@ -731,20 +731,7 @@ local defintions = {
 The \lua{sub_keys} option can be used to build nested key-value pair
 definitions.
 
-\begin{minted}{lua}
-local result, leftover = luakeys.parse('level1={level2,unknown}', {
-  no_error = true,
-  definitions = {
-    level1 = {
-      sub_keys = {
-        level2 = { default = 42 }
-      }
-    }
-  },
-})
-luakeys.debug(result) -- { level1 = { level2 = 42 } }
-luakeys.debug(leftover) -- { level1 = { 'unknown' } }
-\end{minted}
+\inputminted[firstline=4,lastline=16]{lua}{examples/docs/definitions/options/sub-keys.lua}
 
 %%
 %
@@ -757,15 +744,7 @@ The function \lua{render(tbl)} reverses the function
 into a key-value string. The resulting string usually has a different
 order as the input table.
 
-\begin{minted}{lua}
-result = luakeys.parse('one=1,two=2,tree=3,')
-print(luakeys.render(result))
---- one=1,two=2,tree=3,
---- or:
---- two=2,one=1,tree=3,
---- or:
---- ...
-\end{minted}
+\inputminted[firstline=4,lastline=11]{lua}{examples/docs/functions/render.lua}
 
 \noindent
 In Lua only tables with 1-based consecutive integer keys (a.k.a. array
