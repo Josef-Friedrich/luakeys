@@ -886,18 +886,20 @@ local function apply_definitions(defintions,
     output[key] = value
   end
 
-  -- Move to the current leftover table.
-  local current_leftover = leftover
-  for _, key in ipairs(key_path) do
-    if current_leftover[key] == nil then
-      current_leftover[key] = {}
+  if get_table_size(input) > 0 then
+    -- Move to the current leftover table.
+    local current_leftover = leftover
+    for _, key in ipairs(key_path) do
+      if current_leftover[key] == nil then
+        current_leftover[key] = {}
+      end
+      current_leftover = current_leftover[key]
     end
-    current_leftover = current_leftover[key]
-  end
 
-  -- Copy all leftover key-value-pairs to the current leftover table.
-  for key, value in pairs(input) do
-    current_leftover[key] = value
+    -- Copy all leftover key-value-pairs to the current leftover table.
+    for key, value in pairs(input) do
+      current_leftover[key] = value
+    end
   end
 
   return output, leftover
@@ -958,15 +960,16 @@ local function parse(kv_string, options)
       result_parse, result_def, {}, {}, clone_table(result_parse))
   end
 
-  if options.debug then
-    debug(result_parse)
-  end
   local result
   if result_def == nil then
     result = result_parse
   else
     result = result_def
   end
+  if options.debug then
+    debug(result)
+  end
+
   -- no_error
   if not options.no_error and type(result_unknown) == 'table' and
     get_table_size(result_unknown) > 0 then

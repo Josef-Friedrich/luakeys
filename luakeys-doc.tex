@@ -45,12 +45,10 @@
 
 \vfill
 
-%level1={level2={level3={dim=1cm,bool=true,num=-0.001,str=lua}}}
-
 \begin{minted}{lua}
 local luakeys = require('luakeys')
 local kv = luakeys.parse(
-  'level1={level2={naked,dim=1cm,bool=true,num=-0.001,str=lua}}',
+  'level1={level2={naked,dim=1cm,bool=false,num=-0.001,str="lua,{}"}}',
   { convert_dimensions = true }
 )
 luakeys.debug(kv)
@@ -66,9 +64,9 @@ Result:
     ['level2'] = {
       ['naked'] = true,
       ['dim'] = 1864679,
-      ['bool'] = true,
+      ['bool'] = false,
       ['num'] = -0.001
-      ['str'] = 'lua',
+      ['str'] = 'lua,{}',
     }
   }
 }
@@ -675,7 +673,7 @@ local keys = {
 
 \subsubsection{\texttt{macro}}
 
-The option \texttt{macro} stores the value in a \TeX macro.
+The option \texttt{macro} stores the value in a \TeX{} macro.
 
 \begin{minted}{lua}
 local parse = luakeys.define({
@@ -696,9 +694,9 @@ parse('key=value')
 
 \subsubsection{\texttt{process}}
 
-The “process” option can be used to define a function whose return value
-is passed to the key. Three parameters are passed when the function is
-called:
+The \lua{process} option can be used to define a function whose return
+value is passed to the key. Three parameters are passed when the
+function is called:
 
 \begin{enumerate}
 \item \lua{value}: The current value
@@ -728,17 +726,24 @@ local defintions = {
 
 \subsubsection{\texttt{sub\_keys}}
 
+% Mit der Option \lua{sub_keys} können ineinander verschachtelte
+% Schlüssel-Wert-Paar-Definitionen aufgebaut werden.
+The \lua{sub_keys} option can be used to build nested key-value pair
+definitions.
+
 \begin{minted}{lua}
-local keys = {
-  {
-    name = 'key_level_1',
-    sub_keys = {
-      {
-        name = 'key_level_2'
+local result, leftover = luakeys.parse('level1={level2,unknown}', {
+  no_error = true,
+  definitions = {
+    level1 = {
+      sub_keys = {
+        level2 = { default = 42 }
       }
     }
-  }
-}
+  },
+})
+luakeys.debug(result) -- { level1 = { level2 = 42 } }
+luakeys.debug(leftover) -- { level1 = { 'unknown' } }
 \end{minted}
 
 %%
@@ -767,7 +772,7 @@ In Lua only tables with 1-based consecutive integer keys (a.k.a. array
 tables) can be parsed in order.
 
 \begin{minted}{lua}
-result = luakeys.parse('one,two,three')
+result = luakeys.parse('one,two,three', { naked_as_value = true })
 print(luakeys.render(result))
 --- one,two,three, (always)
 \end{minted}
