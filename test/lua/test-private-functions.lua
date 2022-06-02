@@ -79,45 +79,6 @@ describe('Test private functions', function()
 
   end)
 
-  describe('Function “normalize_parse_options()”', function()
-    it('No options', function()
-      assert.is.same(luakeys.normalize_parse_options(), {
-        convert_dimensions = false,
-        debug = false,
-        default = true,
-        naked_as_value = false,
-        no_error = false,
-        unpack_single_array_values = true,
-      })
-    end)
-
-    it('One option', function()
-      assert.is.same(luakeys.normalize_parse_options({
-        convert_dimensions = false,
-      }), {
-        convert_dimensions = false,
-        debug = false,
-        default = true,
-        naked_as_value = false,
-        no_error = false,
-        unpack_single_array_values = true,
-      })
-    end)
-
-    it('White spaces', function()
-      assert.is.same(luakeys.normalize_parse_options({
-        ['convert dimensions'] = false,
-      }), {
-        convert_dimensions = false,
-        debug = false,
-        default = true,
-        naked_as_value = false,
-        no_error = false,
-        unpack_single_array_values = true,
-      })
-    end)
-  end)
-
   describe('Function “visit_parse_tree()”', function()
     local visit = luakeys.visit_parse_tree
 

@@ -46,31 +46,56 @@ if not token then
   }
 end
 
+--- https://stackoverflow.com/a/1283608/10193818
+local function merge_tables(target, t2)
+  for k, v in pairs(t2) do
+    if type(v) == 'table' then
+      if type(target[k] or false) == 'table' then
+        merge_tables(target[k] or {}, t2[k] or {})
+      elseif target[k] == nil then
+        target[k] = v
+      end
+    elseif target[k] == nil then
+      target[k] = v
+    end
+  end
+  return target
+end
+
+--- http://lua-users.org/wiki/CopyTable
+local function clone_table(orig)
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for orig_key, orig_value in next, orig, nil do
+      copy[clone_table(orig_key)] = clone_table(orig_value)
+    end
+    setmetatable(copy, clone_table(getmetatable(orig)))
+  else -- number, string, boolean, etc
+    copy = orig
+  end
+  return copy
+end
+
 --- This table stores all allowed option keys.
-local option_keys = {
-  'case_insensitive_keys',
-  'convert_dimensions',
-  'converter',
-  'debug',
-  'default',
-  'defaults',
-  'definitions',
-  'naked_as_value',
-  'no_error',
-  'postprocess',
-  'preprocess',
-  'unpack_single_array_values',
+local all_options = {
+  case_insensitive_keys = false,
+  convert_dimensions = false,
+  converter = false,
+  debug = false,
+  default = true,
+  defaults = false,
+  definitions = false,
+  naked_as_value = false,
+  no_error = false,
+  postprocess = false,
+  preprocess = false,
+  unpack_single_array_values = true,
 }
 
 --- The default options.
-local default_options = {
-  convert_dimensions = false,
-  debug = false,
-  default = true,
-  naked_as_value = false,
-  no_error = false,
-  unpack_single_array_values = true,
-}
+local default_options = clone_table(all_options)
 
 local function throw_error(message)
   if type(tex.error) == 'function' then
@@ -127,9 +152,13 @@ end
 -- @treturn table
 local function normalize_parse_options(options_raw)
   options_raw = luafy_options(options_raw)
+  for key, _ in pairs(options_raw) do
+    if all_options[key] == nil then
+      throw_error('Unknown parse option: ' .. key)
+    end
+  end
   local options = {}
-
-  for _, option_name in ipairs(option_keys) do
+  for option_name, _ in pairs(all_options) do
     if options_raw[option_name] ~= nil then
       options[option_name] = options_raw[option_name]
     else
@@ -138,38 +167,6 @@ local function normalize_parse_options(options_raw)
   end
 
   return options
-end
-
---- https://stackoverflow.com/a/1283608/10193818
-local function merge_tables(target, t2)
-  for k, v in pairs(t2) do
-    if type(v) == 'table' then
-      if type(target[k] or false) == 'table' then
-        merge_tables(target[k] or {}, t2[k] or {})
-      elseif target[k] == nil then
-        target[k] = v
-      end
-    elseif target[k] == nil then
-      target[k] = v
-    end
-  end
-  return target
-end
-
---- http://lua-users.org/wiki/CopyTable
-local function clone_table(orig)
-  local orig_type = type(orig)
-  local copy
-  if orig_type == 'table' then
-    copy = {}
-    for orig_key, orig_value in next, orig, nil do
-      copy[clone_table(orig_key)] = clone_table(orig_value)
-    end
-    setmetatable(copy, clone_table(getmetatable(orig)))
-  else -- number, string, boolean, etc
-    copy = orig
-  end
-  return copy
 end
 
 --- Convert back to strings
@@ -589,7 +586,7 @@ local function normalize(raw, options)
     end
   end
 
-  if not options.naked_as_value and options.definitions == nil then
+  if not options.naked_as_value and options.definitions == false then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, options.default
@@ -752,8 +749,7 @@ local function apply_definitions(defintions,
       local true_value = def.opposite_keys[true]
       local false_value = def.opposite_keys[false]
       if true_value == nil or false_value == nil then
-        throw_error(
-          'Usage opposite_keys = { [true] = "...", [false] = "..." }')
+        throw_error('Usage opposite_keys = { [true] = "...", [false] = "..." }')
       end
       if remove_from_array(input, true_value) ~= nil then
         value = true
@@ -769,8 +765,7 @@ local function apply_definitions(defintions,
 
     -- def.required
     if def.required ~= nil and def.required and value == nil then
-      throw_error(string.format(
-        'Missing required key “%s”!', key))
+      throw_error(string.format('Missing required key “%s”!', key))
     end
 
     if value ~= nil then
@@ -954,7 +949,7 @@ local function parse(kv_string, options)
   local result_def = nil
   -- In this table are all unknown keys stored
   local result_unknown = nil
-  if options.definitions ~= nil then
+  if options.definitions ~= nil and type(options.definitions) == 'table' then
     result_def = {}
     result_def, result_unknown = apply_definitions(options.definitions, options,
       result_parse, result_def, {}, {}, clone_table(result_parse))

@@ -78,6 +78,12 @@ describe('Function “parse()”', function()
       }))
     end)
 
+    it('Unknown options should trigger an error message.', function()
+      assert.has_error(function()
+        luakeys.parse('key', { xxx = true })
+      end, 'Unknown parse option: xxx')
+    end)
+
     it('with underscores', function()
       assert.are.same({ '1cm' }, luakeys.parse('1cm', {
         convert_dimensions = false,
@@ -291,7 +297,8 @@ describe('Function “parse()”', function()
 
       it('unpacked: single number', function()
         assert.are.same({ key = 1 }, luakeys.parse('key={1}', options_true))
-        assert.are.same({ key = { 1 } }, luakeys.parse('key={1}', options_false))
+        assert.are
+          .same({ key = { 1 } }, luakeys.parse('key={1}', options_false))
       end)
 
       it('Not unpacked: two values', function()
