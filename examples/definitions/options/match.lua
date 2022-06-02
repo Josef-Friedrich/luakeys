@@ -31,6 +31,6 @@ it('result3', function()
   assert.are.same(result3, { year = '1978' })
 end)
 
-it('result3', function()
+it('string.match with integer', function()
   assert.are.equal(string.match(2000, '%d%d%d%d'), '2000')
 end)
