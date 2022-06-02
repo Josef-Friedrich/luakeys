@@ -753,34 +753,42 @@ the value of the key is also always a string.
 \subsubsection{\texttt{process}}
 
 The \lua{process} option can be used to define a function whose return
-value is passed to the key. Three parameters are passed when the
+value is passed to the key. Four parameters are passed when the
 function is called:
 
 \begin{enumerate}
-\item \lua{value}: The current value
+\item \lua{value}:
+% Der zum schlüssel gehörende aktuelle Wert.
+The current value asssociated with the key.
+\item \lua{input}:
+% Die Ergebnis-Tabelle, die vor dem Zeitpunkt geklont wurde, als mit dem
+% Anwenden der Definitionen begonnen wurde.
+The result table cloned before the time the definitions started to be applied.
 \item \lua{result}: The table in which the final result will be saved.
-% Da Lua keine feste Reihenfolge hat, wie die Schlüssel in einer Tabelle
-% aufgerufen werden, kann diese Tabelle von Aufruf zu Aufruf jeweils
-% ganz anderes aufgebaut sein.
-Since Lua has no fixed order in which the keys in a table are called,
-this table can be structured quite differently from call to call.
-\item \lua{leftover}: The table in which the leftover key-value pairs
+\item \lua{unknown}: The table in which the leftover key-value pairs
 are stored.
 \end{enumerate}
 
-%%
-%
-%%
+% Das folgende Beispiel demonstriert den Parameter \lua{value}.
+\noindent
+The following example demonstrates the \lua{value} parameter:
+\InputLuaExample[firstline=4,lastline=14]{definitions/options/process.lua}
 
-\begin{minted}{lua}
-local defintions = {
-  key = {
-    process = function (value, result, leftover)
-      return value
-    end
-  }
-}
-\end{minted}
+\noindent
+The following example demonstrates the \lua{input} parameter:
+
+\InputLuaExample[firstline=22,lastline=34]{definitions/options/process.lua}
+
+\noindent
+The following example demonstrates the \lua{result} parameter:
+
+\InputLuaExample[firstline=42,lastline=50]{definitions/options/process.lua}
+
+\noindent
+The following example demonstrates the \lua{unknown} parameter:
+
+\InputLuaExample[firstline=58,lastline=65]{definitions/options/process.lua}
+\InputLuaExample[firstline=69,lastline=69]{definitions/options/process.lua}
 
 %%
 %
@@ -859,9 +867,10 @@ The output should look like this:
 \begin{minted}{md}
 {
   ['level1'] = {
-    ['level2'] = {
-      ['key'] = 'value',
-  },
+      ['level2'] = {
+        ['key'] = 'value',
+    },
+  }
 }
 \end{minted}
 
@@ -990,8 +999,6 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 %
 %%
 
-\clearpage
-
 \subsubsection{number}
 
 \begin{multicols}{2}
@@ -1014,8 +1021,6 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 %%
 %
 %%
-
-\clearpage
 
 \subsubsection{dimension}
 
