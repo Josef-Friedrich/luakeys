@@ -63,7 +63,7 @@ local definition = {
 
   -- name of the key, can be omitted
   name = 'key',
-  opposite_values = { [true] = 'show', [false] = 'hide' },
+  opposite_keys = { [true] = 'show', [false] = 'hide' },
   process = function(value, result, leftover)
     return value
   end,

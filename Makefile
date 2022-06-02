@@ -18,14 +18,16 @@ install_quick:
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
-test: install test_lua test_tex doc_pdf
+test: install test_lua test_examples_lua test_tex doc_pdf
 
 test_lua:
 	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip test/lua/test-*.lua
 
-test_lua_examples:
+test_examples_lua:
+	# busted does not recurse in the sub directories
 	# busted -R --lua=/usr/bin/lua5.3 --exclude-tags=skip "examples/*.lua"
-	find examples -iname "*.lua" -exec busted {} \;
+	# find always exists with 0
+	find examples -iname "*.lua" \( -exec busted {} \; -o -quit \)
 
 test_tex: test_tex_plain test_tex_latex
 
@@ -70,4 +72,4 @@ ctan: doc_pdf
 clean:
 	git clean -fdx
 
-.PHONY: all doc_lua doc_lua_open test test_lua test_tex test_tex_plain test_text_latex
+.PHONY: all doc_lua doc_lua_open test test_lua test_tex test_tex_plain test_text_latex test_examples_lua

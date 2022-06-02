@@ -747,13 +747,13 @@ local function apply_definitions(defintions,
       end
     end
 
-    -- def.opposite_values
-    if def.opposite_values ~= nil then
-      local true_value = def.opposite_values[true]
-      local false_value = def.opposite_values[false]
+    -- def.opposite_keys
+    if def.opposite_keys ~= nil then
+      local true_value = def.opposite_keys[true]
+      local false_value = def.opposite_keys[false]
       if true_value == nil or false_value == nil then
         throw_error(
-          'Usage opposite_values = { [true] = "...", [false] = "..." }')
+          'Usage opposite_keys = { [true] = "...", [false] = "..." }')
       end
       if remove_from_array(input, true_value) ~= nil then
         value = true
@@ -770,7 +770,7 @@ local function apply_definitions(defintions,
     -- def.required
     if def.required ~= nil and def.required and value == nil then
       throw_error(string.format(
-        'Missing required value for key “%s” or missing key!', key))
+        'Missing required key “%s”!', key))
     end
 
     if value ~= nil then

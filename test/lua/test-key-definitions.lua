@@ -204,9 +204,9 @@ describe('Key defintions', function()
         }, nil, { date = '1978-12-03' }), { date = '1978-12-03' })
       end)
 
-      describe('Option “opposite_values”', function()
+      describe('Option “opposite_keys”', function()
         local defintions = {
-          visibility = { opposite_values = { [true] = 'show', [false] = 'hide' } },
+          visibility = { opposite_keys = { [true] = 'show', [false] = 'hide' } },
         }
 
         it('should return true if a truthy string value is given.', function()

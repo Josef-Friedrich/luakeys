@@ -591,7 +591,7 @@ local defintions = {
 
     -- name of the key, can be omitted
     name = 'key',
-    opposite_values = { [true] = 'show', [false] = 'hide' },
+    opposite_keys = { [true] = 'show', [false] = 'hide' },
     process = function(value, result, leftover)
       return value
     end,
@@ -609,18 +609,14 @@ local defintions = {
 
 With the help of the \lua{alias} option, other key names can be used.
 The value is always stored under the original key name. A single alias
-name can be specified by a string, multiple aliases by a list of
-strings.
+name can be specified by a string ...
 
-\begin{minted}{lua}
--- a single alias
-local defintions = { key = { alias = 'k' } }
--- multiple aliases
-local defintions = { key = { alias = { 'k', 'ke' } } }
-local parse = luakeys.define(defintions)
-local result, leftover = parse('k=value')
-luakeys.debug(result) -- { key = 'value' }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=7]{definitions/options/alias.lua}
+
+\noindent
+multiple aliases by a list of strings.
+
+\InputLuaExample[firstline=13,lastline=16]{definitions/options/alias.lua}
 
 %%
 %
@@ -628,27 +624,60 @@ luakeys.debug(result) -- { key = 'value' }
 
 \subsubsection{\texttt{always\_present}}
 
-The key is always included in the result. If no default value is
-definied, true is taken as the value.
+% Die Option \lua{default} wird nur bei nackten Schlüsseln verwendet.
+The \lua{default} option is used only for naked keys.
 
-\begin{minted}{lua}
-local parse = luakeys.define({ key = { always_present = true })
-local result, leftover = parse('')
-luakeys.debug(result) -- { key =  true }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=5]{definitions/options/always-present.lua}
 
-\subsubsection{\texttt{opposite\_values}}
+\noindent
+% Wird die Option \lua{always_present} auf wahr gesetzt, wird der
+% Schlüssel immer ins Ergebnis mit übernommen.
+If the option \lua{always_present} is set to true, the key is always
+included in the result. If no default value is definied, true is taken
+as the value.
 
-\begin{minted}{lua}
-local keys = {
-  visibility = {
-    opposite_values = {
-      [true] = 'show',
-      [false] = 'hide'
-    }
-  }
-}
-\end{minted}
+\InputLuaExample[firstline=11,lastline=12]{definitions/options/always-present.lua}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{opposite\_keys}}
+
+% Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
+% Schlüssel in Wahrheitswerte umzuwandeln und diesen Wahrheitswert unter
+% einem Zielschlüssel zu speichern.
+The \lua{opposite_keys} option allows to convert opposite (naked) keys
+into a boolean value and store this boolean under a target key.
+%
+% Lua erlaubt es in Tabellen Wahrheitswerte als Schlüssel zu verwenden.
+% Es müssen jedoch eckige Klammern verwendet werden.
+Lua allows boolean values to be used as keys in tables.
+%
+% Die Wahrheitswerte müssen jedoch in eckige Klammern geschrieben werden.
+However, the boolean values must be written in square brackets, e. g.
+\lua{{ opposite_keys = { [true] = 'show', [false] = 'hide' } }}.
+%
+% Beispiele für gegensätzliche Schlüssel sind:
+Examples of opposing keys are: \lua{show} and \lua{hide}, \lua{dark} and
+\lua{light}, \lua{question} and \lua{solution}.
+%
+% Das untenstehende Beispiel verwendet als gegensätzliches Schlüsselpaar
+% die Schlüssel \lua{show} und \lua{hide}.
+The example below uses the \lua{show} and \lua{hide} keys as the
+opposite key pair.
+% Wird der Schlüssel \lua{show} von der Funktion \lua{parse} gelesen,
+% dann erhält der Zielschlüssel \lua{visibility} den Wert \lua{true}.
+If the key \lua{show} is parsed by the \lua{parse} function, then the
+target key \lua{visibility} receives the value \lua{true}.
+
+\InputLuaExample[firstline=4,lastline=7]{definitions/options/opposite-keys.lua}
+
+% Wird der Schlüssel \lua{hide} gelesen, dann \lua{falsch}.
+\noindent
+If the key \lua{hide} is parsed, then \lua{false}.
+
+\InputLuaExample[firstline=13,lastline=13]{definitions/options/opposite-keys.lua}
 
 %%
 %
@@ -670,6 +699,52 @@ parse('key=value')
 \begin{minted}{latex}
 \MyMacro % expands to “value”
 \end{minted}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{match}}
+
+% Der Wert des Schlüssel wird der Lua Funktion übergeben
+The value of the key is passed to the Lua function
+\lua{string.match(value, match)} ((\url{http://www.lua.org/manual/5.3/manual.html#pdf-string.match})).
+% Werfe einen Blick in das Lua-Handbuch, wie man Patterns schreibt.
+Take a look at the Lua manual on how to write patterns
+(\url{http://www.lua.org/manual/5.3/manual.html#6.4.1})
+
+\InputLuaExample[firstline=4,lastline=6]{definitions/options/match.lua}
+
+\noindent
+% Kann das Pattern im Wert nicht gefunden werden, wird eine
+% Fehlermeldung ausgegeben.
+If the pattern cannot be found in the value, an error message is issued.
+
+\InputLuaExample[firstline=14,lastline=17]{definitions/options/match.lua}
+
+\noindent
+% Der Schlüssel erhält das Ergebnis der Funktion \lua{string.match(value,
+% match)}, dass bedeutet, dass der ursprüngliche Wert unter
+% Umständen nicht vollständig in den Schlüssel gespeichert wird.
+The key receives the result of the function \lua{string.match(value,
+match)}, which means that the original value may not be stored
+completely in the key.
+
+\InputLuaExample[firstline=22,lastline=23]{definitions/options/match.lua}
+
+\noindent
+% Das Präfix “waste ” und das Suffix “ rubbisch” der Zeichenketten wird
+% verworfen.
+The prefix “waste ” and the suffix “ rubbisch” of the string are
+discarded.
+
+\InputLuaExample[firstline=29,lastline=29]{definitions/options/match.lua}
+
+\noindent
+% Da Funktion \lua{string.match(value, match)} immer eine Zeichenkette
+% zurückgibt, ist der Wert des Schlüssel auch immer eine Zeichenkette.
+Since function \lua{string.match(value, match)} always returns a string,
+the value of the key is also always a string.
 
 %%
 %
@@ -707,6 +782,27 @@ local defintions = {
 }
 \end{minted}
 
+%%
+%
+%%
+
+\subsubsection{\texttt{required}}
+
+\InputLuaExample[firstline=4,lastline=5]{definitions/options/required.lua}
+
+\InputLuaExample[firstline=13,lastline=14]{definitions/options/required.lua}
+
+\noindent
+A recursive example:
+
+\InputLuaExample[firstline=18,lastline=23]{definitions/options/required.lua}
+\InputLuaExample[firstline=29,lastline=30]{definitions/options/required.lua}
+\InputLuaExample[firstline=38,lastline=39]{definitions/options/required.lua}
+
+%%
+%
+%%
+
 \subsubsection{\texttt{sub\_keys}}
 
 % Mit der Option \lua{sub_keys} können ineinander verschachtelte
@@ -714,7 +810,7 @@ local defintions = {
 The \lua{sub_keys} option can be used to build nested key-value pair
 definitions.
 
-\inputminted[firstline=4,lastline=16]{lua}{examples/definitions/options/sub-keys.lua}
+\InputLuaExample[firstline=4,lastline=16]{definitions/options/sub-keys.lua}
 
 %%
 %
@@ -727,7 +823,7 @@ The function \lua{render(tbl)} reverses the function
 into a key-value string. The resulting string usually has a different
 order as the input table.
 
-\inputminted[firstline=4,lastline=11]{lua}{examples/functions/render.lua}
+\InputLuaExample[firstline=4,lastline=11]{functions/render.lua}
 
 \noindent
 In Lua only tables with 1-based consecutive integer keys (a.k.a. array

@@ -29,7 +29,7 @@ local def = {
 
   -- name of the key, can be omitted
   name = 'key',
-  opposite_values = { [true] = 'show', [false] = 'hide' },
+  opposite_keys = { [true] = 'show', [false] = 'hide' },
 
   --- A callback function
   ---@tparam any value The current value of key.
