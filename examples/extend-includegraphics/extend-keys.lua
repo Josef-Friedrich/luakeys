@@ -1,3 +1,4 @@
+require('busted.runner')()
 local luakeys = require('luakeys')
 
 local parse = luakeys.define({

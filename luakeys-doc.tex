@@ -25,8 +25,10 @@
   \inputminted[linenos=true]{latex}{examples/#1}
 }
 
-\def\InputLuaExample#1{
-  \inputminted[linenos=true]{lua}{examples/#1}
+\NewDocumentCommand { \InputLuaExample } { O{} m } {
+  \begin{mdframed}
+  \inputminted[linenos=false,#1]{lua}{examples/#2}
+  \end{mdframed}
 }
 
 \begin{document}
@@ -45,14 +47,7 @@
 
 \vfill
 
-\begin{minted}{lua}
-local luakeys = require('luakeys')
-local kv = luakeys.parse(
-  'level1={level2={naked,dim=1cm,bool=false,num=-0.001,str="lua,{}"}}',
-  { convert_dimensions = true }
-)
-luakeys.debug(kv)
-\end{minted}
+\InputLuaExample[firstline=4,lastline=7]{first-page.lua}
 
 \noindent
 Result:
@@ -326,24 +321,12 @@ If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
 detects the \TeX{} dimensions and converts them into scaled points using
 the function \lua{tex.sp(dim)}.
 
-\begin{minted}{lua}
-local result = luakeys.parse('dim=1cm', {
-  convert_dimensions = true,
-})
--- result = { dim = 1864679 }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=7]{options/convert-dimensions.lua}
 
 \noindent
 By default the dimensions are not converted into scaled points.
 
-\begin{minted}{lua}
-local result = luakeys.parse('dim=1cm', {
-  convert_dimensions = false,
-})
--- or
-result = luakeys.parse('dim=1cm')
--- result = { dim = '1cm' }
-\end{minted}
+\InputLuaExample[firstline=13,lastline=18]{options/convert-dimensions.lua}
 
 \noindent
 If you want to convert a scale point into a unit string you can use the module
@@ -731,7 +714,7 @@ local defintions = {
 The \lua{sub_keys} option can be used to build nested key-value pair
 definitions.
 
-\inputminted[firstline=4,lastline=16]{lua}{examples/docs/definitions/options/sub-keys.lua}
+\inputminted[firstline=4,lastline=16]{lua}{examples/definitions/options/sub-keys.lua}
 
 %%
 %
@@ -744,7 +727,7 @@ The function \lua{render(tbl)} reverses the function
 into a key-value string. The resulting string usually has a different
 order as the input table.
 
-\inputminted[firstline=4,lastline=11]{lua}{examples/docs/functions/render.lua}
+\inputminted[firstline=4,lastline=11]{lua}{examples/functions/render.lua}
 
 \noindent
 In Lua only tables with 1-based consecutive integer keys (a.k.a. array

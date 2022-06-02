@@ -23,6 +23,10 @@ test: install test_lua test_tex doc_pdf
 test_lua:
 	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip test/lua/test-*.lua
 
+test_lua_examples:
+	# busted -R --lua=/usr/bin/lua5.3 --exclude-tags=skip "examples/*.lua"
+	find examples -iname "*.lua" -exec busted {} \;
+
 test_tex: test_tex_plain test_tex_latex
 
 test_tex_plain:
