@@ -47,19 +47,19 @@ if not token then
 end
 
 --- This table stores all allowed option keys.
-local option_keys = {
-  'case_insensitive_keys',
-  'convert_dimensions',
-  'converter',
-  'debug',
-  'default',
-  'defaults',
-  'definitions',
-  'naked_as_value',
-  'no_error',
-  'postprocess',
-  'preprocess',
-  'unpack_single_array_values',
+local all_options = {
+  case_insensitive_keys = false,
+  convert_dimensions = false,
+  converter = false,
+  debug = false,
+  default = true,
+  defaults = false,
+  definitions = false,
+  naked_as_value = false,
+  no_error = false,
+  postprocess = false,
+  preprocess = false,
+  unpack_single_array_values = true,
 }
 
 --- The default options.
@@ -127,9 +127,13 @@ end
 -- @treturn table
 local function normalize_parse_options(options_raw)
   options_raw = luafy_options(options_raw)
+  for key, _ in pairs(options_raw) do
+    if all_options[key] == nil then
+      throw_error('Unknown parse option: ' .. key)
+    end
+  end
   local options = {}
-
-  for _, option_name in ipairs(option_keys) do
+  for option_name, _ in pairs(all_options) do
     if options_raw[option_name] ~= nil then
       options[option_name] = options_raw[option_name]
     else
@@ -752,8 +756,7 @@ local function apply_definitions(defintions,
       local true_value = def.opposite_keys[true]
       local false_value = def.opposite_keys[false]
       if true_value == nil or false_value == nil then
-        throw_error(
-          'Usage opposite_keys = { [true] = "...", [false] = "..." }')
+        throw_error('Usage opposite_keys = { [true] = "...", [false] = "..." }')
       end
       if remove_from_array(input, true_value) ~= nil then
         value = true
@@ -769,8 +772,7 @@ local function apply_definitions(defintions,
 
     -- def.required
     if def.required ~= nil and def.required and value == nil then
-      throw_error(string.format(
-        'Missing required key “%s”!', key))
+      throw_error(string.format('Missing required key “%s”!', key))
     end
 
     if value ~= nil then
