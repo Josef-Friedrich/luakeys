@@ -56,8 +56,8 @@ describe('Key defintions', function()
         it(
           'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
           function()
-            assert.are.same(apply_defintions(defintions, nil, { ['my_key2'] = 42 }),
-              { key2 = 42 })
+            assert.are.same(apply_defintions(defintions, nil,
+              { ['my_key2'] = 42 }), { key2 = 42 })
           end)
 
         it('should find a alias standalone values as key names', function()
@@ -182,7 +182,8 @@ describe('Key defintions', function()
           'should throw an error if only two keys of the mutually exclusive group are present.',
           function()
             assert.has_error(function()
-              apply_defintions(defintions, nil, { k1 = 'value', k2 = 'value' }, {})
+              apply_defintions(defintions, nil, { k1 = 'value', k2 = 'value' },
+                {})
             end)
           end)
 
@@ -254,10 +255,10 @@ describe('Key defintions', function()
       end)
 
       it('Option “sub_keys”', function()
-        local defintions = { { name = 'level1', sub_keys = { { name = 'level2' } } } }
-        local input = { level1 = { level2 = 'value' } }
-        assert.are.same(apply_defintions(defintions, nil, input),
-          { level1 = { level2 = 'value' } })
+        local result = luakeys.parse('level1={level2=value}', {
+          definitions = { level1 = { sub_keys = { level2 = { default = 1 } } } },
+        })
+        assert.are.same(result, { level1 = { level2 = 'value' } })
       end)
     end)
 
