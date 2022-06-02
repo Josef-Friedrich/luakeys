@@ -46,6 +46,38 @@ if not token then
   }
 end
 
+--- https://stackoverflow.com/a/1283608/10193818
+local function merge_tables(target, t2)
+  for k, v in pairs(t2) do
+    if type(v) == 'table' then
+      if type(target[k] or false) == 'table' then
+        merge_tables(target[k] or {}, t2[k] or {})
+      elseif target[k] == nil then
+        target[k] = v
+      end
+    elseif target[k] == nil then
+      target[k] = v
+    end
+  end
+  return target
+end
+
+--- http://lua-users.org/wiki/CopyTable
+local function clone_table(orig)
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for orig_key, orig_value in next, orig, nil do
+      copy[clone_table(orig_key)] = clone_table(orig_value)
+    end
+    setmetatable(copy, clone_table(getmetatable(orig)))
+  else -- number, string, boolean, etc
+    copy = orig
+  end
+  return copy
+end
+
 --- This table stores all allowed option keys.
 local all_options = {
   case_insensitive_keys = false,
@@ -63,14 +95,7 @@ local all_options = {
 }
 
 --- The default options.
-local default_options = {
-  convert_dimensions = false,
-  debug = false,
-  default = true,
-  naked_as_value = false,
-  no_error = false,
-  unpack_single_array_values = true,
-}
+local default_options = clone_table(all_options)
 
 local function throw_error(message)
   if type(tex.error) == 'function' then
@@ -142,38 +167,6 @@ local function normalize_parse_options(options_raw)
   end
 
   return options
-end
-
---- https://stackoverflow.com/a/1283608/10193818
-local function merge_tables(target, t2)
-  for k, v in pairs(t2) do
-    if type(v) == 'table' then
-      if type(target[k] or false) == 'table' then
-        merge_tables(target[k] or {}, t2[k] or {})
-      elseif target[k] == nil then
-        target[k] = v
-      end
-    elseif target[k] == nil then
-      target[k] = v
-    end
-  end
-  return target
-end
-
---- http://lua-users.org/wiki/CopyTable
-local function clone_table(orig)
-  local orig_type = type(orig)
-  local copy
-  if orig_type == 'table' then
-    copy = {}
-    for orig_key, orig_value in next, orig, nil do
-      copy[clone_table(orig_key)] = clone_table(orig_value)
-    end
-    setmetatable(copy, clone_table(getmetatable(orig)))
-  else -- number, string, boolean, etc
-    copy = orig
-  end
-  return copy
 end
 
 --- Convert back to strings
@@ -593,7 +586,7 @@ local function normalize(raw, options)
     end
   end
 
-  if not options.naked_as_value and options.definitions == nil then
+  if not options.naked_as_value and options.definitions == false then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, options.default
@@ -956,7 +949,7 @@ local function parse(kv_string, options)
   local result_def = nil
   -- In this table are all unknown keys stored
   local result_unknown = nil
-  if options.definitions ~= nil then
+  if options.definitions ~= nil and type(options.definitions) == 'table' then
     result_def = {}
     result_def, result_unknown = apply_definitions(options.definitions, options,
       result_parse, result_def, {}, {}, clone_table(result_parse))
