@@ -812,7 +812,7 @@ local function apply_definitions(defintions,
         if not is_in_choices then
           throw_error('The value “' .. value ..
                         '” does not exist in the choices: ' ..
-                        table.concat(def.choices, ', '))
+                        table.concat(def.choices, ', ') .. '!')
         end
       end
 
