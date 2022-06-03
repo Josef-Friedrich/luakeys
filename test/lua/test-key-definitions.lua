@@ -125,7 +125,7 @@ describe('Key defintions', function()
           assert.has_error(function()
             apply_defintions(defintions, nil, { key = 'unknown' })
           end,
-            'The value “unknown” does not exist in the choices: one, two, three')
+            'The value “unknown” does not exist in the choices: one, two, three!')
         end)
       end)
 
