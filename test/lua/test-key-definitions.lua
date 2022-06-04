@@ -125,7 +125,7 @@ describe('Key defintions', function()
           assert.has_error(function()
             apply_defintions(defintions, nil, { key = 'unknown' })
           end,
-            'The value “unknown” does not exist in the choices: one, two, three')
+            'The value “unknown” does not exist in the choices: one, two, three!')
         end)
       end)
 
@@ -184,7 +184,8 @@ describe('Key defintions', function()
             assert.has_error(function()
               apply_defintions(defintions, nil, { k1 = 'value', k2 = 'value' },
                 {})
-            end)
+            end,
+              'The key “k1” belongs to a mutually exclusive group “group1” and the key “k2” is already present!')
           end)
 
         it('should let other keys untouched.', function()

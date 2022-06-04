@@ -840,7 +840,7 @@ local function apply_definitions(defintions,
         if not is_in_choices then
           throw_error('The value “' .. value ..
                         '” does not exist in the choices: ' ..
-                        table.concat(def.choices, ', '))
+                        table.concat(def.choices, ', ') .. '!')
         end
       end
 
@@ -862,7 +862,8 @@ local function apply_definitions(defintions,
       if def.exclusive_group ~= nil then
         if exclusive_groups[def.exclusive_group] ~= nil then
           throw_error('The key “' .. key ..
-                        '” belongs to a mutually exclusive group and the key “' ..
+                        '” belongs to a mutually exclusive group “' ..
+                        def.exclusive_group .. '” and the key “' ..
                         exclusive_groups[def.exclusive_group] ..
                         '” is already present!')
         else

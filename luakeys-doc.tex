@@ -60,7 +60,7 @@ Result:
       ['naked'] = true,
       ['dim'] = 1864679,
       ['bool'] = false,
-      ['num'] = -0.001
+      ['num'] = -0.001,
       ['str'] = 'lua,{}',
     }
   }
@@ -508,8 +508,7 @@ luakeys.parse('unknown', { definitions = { 'key' }, no_error = true })
 \end{minted}
 
 %%
-%luakeys.debug(result) -- { key1 = 'new', key2 = 'default' }
-
+%
 %%
 
 \subsection{\texttt{define(defintions, options)}}
@@ -642,6 +641,34 @@ as the value.
 %
 %%
 
+\subsubsection{\texttt{choices}}
+
+\InputLuaExample[firstline=4,lastline=5]{definitions/options/choices.lua}
+
+\InputLuaExample[firstline=13,lastline=15]{definitions/options/choices.lua}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{default}}
+
+\InputLuaExample[firstline=4,lastline=9]{definitions/options/default.lua}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{exclusive\_group}}
+
+\InputLuaExample[firstline=4,lastline=9]{definitions/options/exclusive-group.lua}
+
+\InputLuaExample[firstline=21,lastline=23]{definitions/options/exclusive-group.lua}
+
+%%
+%
+%%
+
 \subsubsection{\texttt{opposite\_keys}}
 
 % Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
@@ -666,6 +693,7 @@ Examples of opposing keys are: \lua{show} and \lua{hide}, \lua{dark} and
 % die Schlüssel \lua{show} und \lua{hide}.
 The example below uses the \lua{show} and \lua{hide} keys as the
 opposite key pair.
+%
 % Wird der Schlüssel \lua{show} von der Funktion \lua{parse} gelesen,
 % dann erhält der Zielschlüssel \lua{visibility} den Wert \lua{true}.
 If the key \lua{show} is parsed by the \lua{parse} function, then the
@@ -852,17 +880,13 @@ The function \lua{render(tbl)} reverses the function
 into a key-value string. The resulting string usually has a different
 order as the input table.
 
-\InputLuaExample[firstline=4,lastline=11]{functions/render.lua}
+\InputLuaExample[firstline=4,lastline=10]{functions/render.lua}
 
 \noindent
 In Lua only tables with 1-based consecutive integer keys (a.k.a. array
 tables) can be parsed in order.
 
-\begin{minted}{lua}
-result = luakeys.parse('one,two,three', { naked_as_value = true })
-print(luakeys.render(result))
---- one,two,three, (always)
-\end{minted}
+\InputLuaExample[firstline=16,lastline=17]{functions/render.lua}
 
 %%
 %
@@ -875,12 +899,7 @@ output (stdout). It is a utility function that can be used to debug and
 inspect the resulting Lua table of the function \lua{parse}. You have to
 compile your \TeX{} document in a console to see the terminal output.
 
-%\luakeysdebug{level1={level2={key=value}}}
-
-\begin{minted}{lua}
-result = luakeys.parse('level1={level2={key=value}}')
-luakeys.debug(result)
-\end{minted}
+\InputLuaExample[firstline=4,lastline=5]{functions/debug.lua}
 
 \noindent
 The output should look like this:
