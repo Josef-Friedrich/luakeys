@@ -834,7 +834,8 @@ local function apply_definitions(defintions,
       if def.exclusive_group ~= nil then
         if exclusive_groups[def.exclusive_group] ~= nil then
           throw_error('The key “' .. key ..
-                        '” belongs to a mutually exclusive group and the key “' ..
+                        '” belongs to a mutually exclusive group “' ..
+                        def.exclusive_group .. '” and the key “' ..
                         exclusive_groups[def.exclusive_group] ..
                         '” is already present!')
         else

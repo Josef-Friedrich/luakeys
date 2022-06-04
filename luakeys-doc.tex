@@ -652,6 +652,24 @@ as the value.
 %
 %%
 
+\subsubsection{\texttt{default}}
+
+\InputLuaExample[firstline=4,lastline=9]{definitions/options/default.lua}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{exclusive\_group}}
+
+\InputLuaExample[firstline=4,lastline=9]{definitions/options/exclusive-group.lua}
+
+\InputLuaExample[firstline=21,lastline=23]{definitions/options/exclusive-group.lua}
+
+%%
+%
+%%
+
 \subsubsection{\texttt{opposite\_keys}}
 
 % Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
@@ -676,6 +694,7 @@ Examples of opposing keys are: \lua{show} and \lua{hide}, \lua{dark} and
 % die Schlüssel \lua{show} und \lua{hide}.
 The example below uses the \lua{show} and \lua{hide} keys as the
 opposite key pair.
+%
 % Wird der Schlüssel \lua{show} von der Funktion \lua{parse} gelesen,
 % dann erhält der Zielschlüssel \lua{visibility} den Wert \lua{true}.
 If the key \lua{show} is parsed by the \lua{parse} function, then the
