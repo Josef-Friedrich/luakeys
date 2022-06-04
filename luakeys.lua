@@ -409,6 +409,9 @@ local function generate_parser(initial_rule, convert_dimensions)
       Variable('string_quoted') * -Variable('value') +
       Variable('string_unquoted'),
 
+    -- for is.boolean()
+    boolean_only = Variable('boolean') * -1,
+
     -- boolean_true / boolean_false
     boolean =
       (
@@ -426,11 +429,17 @@ local function generate_parser(initial_rule, convert_dimensions)
       Pattern('FALSE') +
       Pattern('False'),
 
+    -- for is.dimension()
+    dimension_only = Variable('dimension') * -1,
+
     dimension = (
       Variable('sign')^0 * white_space^0 *
       Variable('tex_number') * white_space^0 *
       Variable('unit')
     ) / capture_dimension,
+
+    -- for is.number()
+    number_only = Variable('number') * -1,
 
     number =
       (white_space^0 * (Variable('lua_number') / tonumber) * white_space^0) ,
@@ -619,7 +628,7 @@ local is = {
     if type(value) == 'boolean' then
       return true
     end
-    local parser = generate_parser('boolean', false)
+    local parser = generate_parser('boolean_only', false)
     local result = parser:match(value)
     return result ~= nil
   end,
@@ -628,7 +637,7 @@ local is = {
     if value == nil then
       return false
     end
-    local parser = generate_parser('dimension', false)
+    local parser = generate_parser('dimension_only', false)
     local result = parser:match(value)
     return result ~= nil
   end,
@@ -648,7 +657,7 @@ local is = {
     if type(value) == 'number' then
       return true
     end
-    local parser = generate_parser('number', false)
+    local parser = generate_parser('number_only', false)
     local result = parser:match(value)
     return result ~= nil
   end,
