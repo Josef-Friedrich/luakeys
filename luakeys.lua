@@ -612,21 +612,49 @@ local function normalize(raw, options)
 end
 
 local is = {
-  dimension = function(str)
-    if str == nil then
+  boolean = function(value)
+    if value == nil then
       return false
     end
-    local parser = generate_parser('dimension', false)
-    local result = parser:match(str)
+    if type(value) == 'boolean' then
+      return true
+    end
+    local parser = generate_parser('boolean', false)
+    local result = parser:match(value)
     return result ~= nil
   end,
 
-  integer = function(str)
-    local n = tonumber(str)
+  dimension = function(value)
+    if value == nil then
+      return false
+    end
+    local parser = generate_parser('dimension', false)
+    local result = parser:match(value)
+    return result ~= nil
+  end,
+
+  integer = function(value)
+    local n = tonumber(value)
     if n == nil then
       return false
     end
     return n == math.floor(n)
+  end,
+
+  number = function(value)
+    if value == nil then
+      return false
+    end
+    if type(value) == 'number' then
+      return true
+    end
+    local parser = generate_parser('number', false)
+    local result = parser:match(value)
+    return result ~= nil
+  end,
+
+  string = function(value)
+    return type(value) == 'string'
   end,
 }
 
