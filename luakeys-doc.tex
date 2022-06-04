@@ -968,10 +968,10 @@ result store.
 \subsection{An attempt to put the syntax into words}
 
 A key-value pair is definied by an equal sign (\texttt{key=value}).
-Several key-value pairs or values without keys are lined up with commas
-(\texttt{key=value,value}) and build a key-value list. Curly brackets
-can be used to create a recursive data structure of nested key-value
-lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
+Several key-value pairs or keys without values (naked keys) are lined up
+with commas (\texttt{key=value,naked}) and build a key-value list. Curly
+brackets can be used to create a recursive data structure of nested
+key-value lists (\texttt{level1=\{level2=\{key=value,naked\}\}}).
 
 %%
 %
@@ -994,9 +994,17 @@ lists (\texttt{level1=\{level2=\{key=value,value\}\}}).
   \alt <string-quoted>
   \alt <string-unquoted>
 
+<dimension> ::= <number> <unit>
+
+<number> ::= <sign> ( <integer> [ <fractional> ] | <fractional> )
+
+<fractional> ::= `.' <integer>
+
 <sign> ::= `-' | `+'
 
-<integer> ::= `0' | `1' | `2' | `3' | `4' | `5' | `6' | `7' | `8' | `9'
+<integer> ::= <digit> \{ <digit> \}
+
+<digit> ::= `0' | `1' | `2' | `3' | `4' | `5' | `6' | `7' | `8' | `9'
 
 <unit> ::= `bp' | `BP'
   \alt `cc' | `CC'

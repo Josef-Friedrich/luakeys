@@ -17,16 +17,6 @@
 -- luakeys-debug.sty and luakeys-debug.tex.
 --- A key-value parser written with Lpeg.
 --
--- Explanations of some LPeg notation forms:
---
--- * `patt ^ 0` = `expression *`
--- * `patt ^ 1` = `expression +`
--- * `patt ^ -1` = `expression ?`
--- * `patt1 * patt2` = `expression1 expression2`: Sequence
--- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
---
--- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf)
---
 -- @module luakeys
 local lpeg = require('lpeg')
 
@@ -309,6 +299,16 @@ end
 -- @section
 
 --- Generate the PEG parser using Lpeg.
+--
+-- Explanations of some LPeg notation forms:
+--
+-- * `patt ^ 0` = `expression *`
+-- * `patt ^ 1` = `expression +`
+-- * `patt ^ -1` = `expression ?`
+-- * `patt1 * patt2` = `expression1 expression2`: Sequence
+-- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
+--
+-- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf)
 --
 -- @treturn userdata The parser.
 local function generate_parser(initial_rule, convert_dimensions)
