@@ -433,7 +433,6 @@ local function generate_parser(initial_rule, convert_dimensions)
     dimension_only = Variable('dimension') * -1,
 
     dimension = (
-      Variable('sign')^0 * white_space^0 *
       Variable('tex_number') * white_space^0 *
       Variable('unit')
     ) / capture_dimension,
@@ -441,12 +440,20 @@ local function generate_parser(initial_rule, convert_dimensions)
     -- for is.number()
     number_only = Variable('number') * -1,
 
-    number =
-      (white_space^0 * (Variable('lua_number') / tonumber) * white_space^0) ,
+    -- capture number
+    number = Variable('tex_number') / tonumber,
 
+    -- sign? white_space? (integer+ fractional? / fractional)
     tex_number =
-      (Variable('integer')^1 * (Pattern('.') * Variable('integer')^1)^0) +
-      (Pattern('.') * Variable('integer')^1),
+      Variable('sign')^0 * white_space^0 *
+      (Variable('integer')^1 * Variable('fractional')^0) +
+      Variable('fractional'),
+
+    sign = Set('-+'),
+
+    fractional = Pattern('.') * Variable('integer')^1,
+
+    integer = Range('09')^1,
 
     -- 'bp' / 'BP' / 'cc' / etc.
     -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
@@ -464,18 +471,6 @@ local function generate_parser(initial_rule, convert_dimensions)
       Pattern('pc') + Pattern('PC') +
       Pattern('pt') + Pattern('PT') +
       Pattern('sp') + Pattern('SP'),
-
-    lua_number =
-      Variable('int') *
-      Variable('frac')^-1,
-
-    int = Variable('sign')^-1 * (
-      Range('19') * Variable('integer') + Variable('integer')
-    ),
-
-    frac = Pattern('.') * Variable('integer'),
-    sign = Set('-+'),
-    integer = Range('09')^1,
 
     -- '"' ('\"' / !'"')* '"'
     string_quoted =
