@@ -680,6 +680,58 @@ local function apply_definitions(defintions,
   leftover,
   key_path,
   input_root)
+
+  local function set_default_value(definition, options)
+    if definition.default ~= nil then
+      return definition.default
+    elseif options ~= nil and options.default ~= nil then
+      return options.default
+    end
+    return true
+  end
+
+  local function find_value(search_key, input, definition, options)
+    if input[search_key] ~= nil then
+      local value = input[search_key]
+      input[search_key] = nil
+      return value
+      --- naked keys: values with integer keys
+    elseif remove_from_array(input, search_key) ~= nil then
+      return set_default_value(definition, options)
+    end
+  end
+
+  local apply = {
+
+    alias = function(value, key, definition_option, defintion, input)
+      if type(definition_option) == 'string' then
+        definition_option = { definition_option }
+      end
+      local alias_value
+      local used_alias_key
+      -- To get an error if the key and an alias is present
+      if value ~= nil then
+        alias_value = value
+        used_alias_key = key
+      end
+      for _, alias in ipairs(definition_option) do
+        local v = find_value(alias)
+        if v ~= nil then
+          if alias_value ~= nil then
+            throw_error(string.format(
+              'Duplicate aliases “%s” and “%s” for key “%s”!',
+              used_alias_key, alias, key))
+          end
+          used_alias_key = alias
+          alias_value = v
+        end
+      end
+      if alias_value ~= nil then
+        return alias_value
+      end
+    end,
+  }
+
   --- standalone values are removed.
   -- For some callbacks and the third return value of parse, we
   -- need an unchanged raw result from the parse function.
@@ -725,27 +777,8 @@ local function apply_definitions(defintions,
     if key == nil then
       throw_error('key name couldn’t be detected!')
     end
-    local function set_default_value(def, options)
-      if def.default ~= nil then
-        return def.default
-      elseif options ~= nil and options.default ~= nil then
-        return options.default
-      end
-      return true
-    end
 
-    local function find_value(search_key)
-      if input[search_key] ~= nil then
-        local value = input[search_key]
-        input[search_key] = nil
-        return value
-        --- naked keys: values with integer keys
-      elseif remove_from_array(input, search_key) ~= nil then
-        return set_default_value(def, options)
-      end
-    end
-
-    local value = find_value(key)
+    local value = find_value(key, input, def, options)
 
     -- def.alias
     if def.alias ~= nil then
@@ -760,7 +793,7 @@ local function apply_definitions(defintions,
         used_alias_key = key
       end
       for _, alias in ipairs(def.alias) do
-        local v = find_value(alias)
+        local v = find_value(alias, input, def, options)
         if v ~= nil then
           if alias_value ~= nil then
             throw_error(string.format(
