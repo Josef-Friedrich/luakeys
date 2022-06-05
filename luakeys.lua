@@ -702,8 +702,18 @@ local function apply_definitions(defintions,
   end
 
   local apply = {
+    always_present = function(value,
+      key,
+      definition_option,
+      defintion,
+      input,
+      options)
+      if value == nil and definition_option then
+        return set_default_value(defintion, options)
+      end
+    end,
 
-    alias = function(value, key, definition_option, defintion, input)
+    alias = function(value, key, definition_option, defintion, input, options)
       if type(definition_option) == 'string' then
         definition_option = { definition_option }
       end
@@ -715,7 +725,7 @@ local function apply_definitions(defintions,
         used_alias_key = key
       end
       for _, alias in ipairs(definition_option) do
-        local v = find_value(alias)
+        local v = find_value(alias, input, defintion, options)
         if v ~= nil then
           if alias_value ~= nil then
             throw_error(string.format(
@@ -730,6 +740,88 @@ local function apply_definitions(defintions,
         return alias_value
       end
     end,
+
+    choices = function(value, key, definition_option)
+      if value == nil then
+        return
+      end
+      if definition_option ~= nil and type(definition_option) == 'table' then
+        local is_in_choices = false
+        for _, choice in ipairs(definition_option) do
+          if value == choice then
+            is_in_choices = true
+          end
+        end
+        if not is_in_choices then
+          throw_error('The value “' .. value ..
+                        '” does not exist in the choices: ' ..
+                        table.concat(definition_option, ', ') .. '!')
+        end
+      end
+    end,
+
+    data_type = function(value, key, definition_option)
+      if value == nil then
+        return
+      end
+      if definition_option ~= nil then
+        local converted
+        if definition_option == 'string' then
+          converted = tostring(value)
+        elseif definition_option == 'dimension' then
+          if is.dimension(value) then
+            converted = value
+          end
+        elseif definition_option == 'boolean' then
+          if value == 0 or value == '' or not value then
+            converted = false
+          else
+            converted = true
+          end
+        elseif definition_option == 'integer' then
+          if is.integer(value) then
+            converted = tonumber(value)
+          end
+        else
+          throw_error('Unknown data type: ' .. definition_option)
+        end
+        if converted == nil then
+          throw_error('The value “' .. value .. '” of the key “' .. key ..
+                        '” could not be converted into the data type “' ..
+                        definition_option .. '”!')
+        else
+          return converted
+        end
+      end
+    end,
+
+    opposite_keys = function(value,
+      key,
+      definition_option,
+      defintion,
+      input,
+      options)
+      if definition_option ~= nil then
+        local true_value = definition_option[true]
+        local false_value = definition_option[false]
+        if true_value == nil or false_value == nil then
+          throw_error(
+            'Usage opposite_keys = { [true] = "...", [false] = "..." }')
+        end
+        if remove_from_array(input, true_value) ~= nil then
+          return true
+        elseif remove_from_array(input, false_value) ~= nil then
+          return false
+        end
+      end
+    end,
+
+    required = function(value, key, definition_option)
+      if definition_option ~= nil and definition_option and value == nil then
+        throw_error(string.format('Missing required key “%s”!', key))
+      end
+    end,
+
   }
 
   --- standalone values are removed.
@@ -780,106 +872,24 @@ local function apply_definitions(defintions,
 
     local value = find_value(key, input, def, options)
 
-    -- def.alias
-    if def.alias ~= nil then
-      if type(def.alias) == 'string' then
-        def.alias = { def.alias }
-      end
-      local alias_value
-      local used_alias_key
-      -- To get an error if the key and an alias is present
-      if value ~= nil then
-        alias_value = value
-        used_alias_key = key
-      end
-      for _, alias in ipairs(def.alias) do
-        local v = find_value(alias, input, def, options)
-        if v ~= nil then
-          if alias_value ~= nil then
-            throw_error(string.format(
-              'Duplicate aliases “%s” and “%s” for key “%s”!',
-              used_alias_key, alias, key))
-          end
-          used_alias_key = alias
-          alias_value = v
+    for _, def_opt in ipairs({
+      'alias',
+      'opposite_keys',
+      'always_present',
+      'required',
+      'data_type',
+      'choices',
+    }) do
+      if def[def_opt] ~= nil then
+        local tmp_value = apply[def_opt](value, key, def[def_opt], def, input,
+          options)
+        if tmp_value ~= nil then
+          value = tmp_value
         end
       end
-      if alias_value ~= nil then
-        value = alias_value
-      end
-    end
-
-    -- def.opposite_keys
-    if def.opposite_keys ~= nil then
-      local true_value = def.opposite_keys[true]
-      local false_value = def.opposite_keys[false]
-      if true_value == nil or false_value == nil then
-        throw_error('Usage opposite_keys = { [true] = "...", [false] = "..." }')
-      end
-      if remove_from_array(input, true_value) ~= nil then
-        value = true
-      elseif remove_from_array(input, false_value) ~= nil then
-        value = false
-      end
-    end
-
-    -- def.always_present
-    if value == nil and def.always_present then
-      value = set_default_value(def, options)
-    end
-
-    -- def.required
-    if def.required ~= nil and def.required and value == nil then
-      throw_error(string.format('Missing required key “%s”!', key))
     end
 
     if value ~= nil then
-
-      -- def.data_type
-      if def.data_type ~= nil then
-        local converted
-        if def.data_type == 'string' then
-          converted = tostring(value)
-        elseif def.data_type == 'dimension' then
-          if is.dimension(value) then
-            converted = value
-          end
-        elseif def.data_type == 'boolean' then
-          if value == 0 or value == '' or not value then
-            converted = false
-          else
-            converted = true
-          end
-        elseif def.data_type == 'integer' then
-          if is.integer(value) then
-            converted = tonumber(value)
-          end
-        else
-          throw_error('Unknown data type: ' .. def.data_type)
-        end
-        if converted == nil then
-          throw_error('The value “' .. value .. '” of the key “' .. key ..
-                        '” could not be converted into the data type “' ..
-                        def.data_type .. '”!')
-        else
-          value = converted
-        end
-      end
-
-      -- def.choices
-      if def.choices ~= nil and type(def.choices) == 'table' then
-        local is_in_choices = false
-        for _, choice in ipairs(def.choices) do
-          if value == choice then
-            is_in_choices = true
-          end
-        end
-        if not is_in_choices then
-          throw_error('The value “' .. value ..
-                        '” does not exist in the choices: ' ..
-                        table.concat(def.choices, ', ') .. '!')
-        end
-      end
 
       -- def.match
       if def.match ~= nil then
