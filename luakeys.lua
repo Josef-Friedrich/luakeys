@@ -665,52 +665,52 @@ local is = {
 --- Apply the key-value-pair definitions (defintions) on an input table in a
 --- recursive fashion.
 ---
----@param defintions table A table containing all definitions.
----@param options table The parse options table.
+---@param defs table A table containing all definitions.
+---@param opts table The parse options table.
 ---@param input table The current input table.
 ---@param output table The current output table.
 ---@param leftover table Always the root leftover table.
 ---@param key_path table An array of key names leading to the current
 ---@param input_root table The root input table
 ---  input and output table.
-local function apply_definitions(defintions,
-  options,
+local function apply_definitions(defs,
+  opts,
   input,
   output,
   leftover,
   key_path,
   input_root)
 
-  local function set_default_value(definition)
-    if definition.default ~= nil then
-      return definition.default
-    elseif options ~= nil and options.default ~= nil then
-      return options.default
+  local function set_default_value(def)
+    if def.default ~= nil then
+      return def.default
+    elseif opts ~= nil and opts.default ~= nil then
+      return opts.default
     end
     return true
   end
 
-  local function find_value(search_key, definition)
+  local function find_value(search_key, def)
     if input[search_key] ~= nil then
       local value = input[search_key]
       input[search_key] = nil
       return value
       --- naked keys: values with integer keys
     elseif remove_from_array(input, search_key) ~= nil then
-      return set_default_value(definition)
+      return set_default_value(def)
     end
   end
 
   local apply = {
-    always_present = function(value, key, definition_option, defintion)
-      if value == nil and definition_option then
-        return set_default_value(defintion)
+    always_present = function(value, key, def)
+      if value == nil and def.always_present then
+        return set_default_value(def)
       end
     end,
 
-    alias = function(value, key, definition_option, defintion)
-      if type(definition_option) == 'string' then
-        definition_option = { definition_option }
+    alias = function(value, key, def)
+      if type(def.alias) == 'string' then
+        def.alias = { def.alias }
       end
       local alias_value
       local used_alias_key
@@ -719,8 +719,8 @@ local function apply_definitions(defintions,
         alias_value = value
         used_alias_key = key
       end
-      for _, alias in ipairs(definition_option) do
-        local v = find_value(alias, defintion)
+      for _, alias in ipairs(def.alias) do
+        local v = find_value(alias, def)
         if v ~= nil then
           if alias_value ~= nil then
             throw_error(string.format(
@@ -736,13 +736,13 @@ local function apply_definitions(defintions,
       end
     end,
 
-    choices = function(value, key, definition_option)
+    choices = function(value, key, def)
       if value == nil then
         return
       end
-      if definition_option ~= nil and type(definition_option) == 'table' then
+      if def.choices ~= nil and type(def.choices) == 'table' then
         local is_in_choices = false
-        for _, choice in ipairs(definition_option) do
+        for _, choice in ipairs(def.choices) do
           if value == choice then
             is_in_choices = true
           end
@@ -750,50 +750,50 @@ local function apply_definitions(defintions,
         if not is_in_choices then
           throw_error('The value “' .. value ..
                         '” does not exist in the choices: ' ..
-                        table.concat(definition_option, ', ') .. '!')
+                        table.concat(def.choices, ', ') .. '!')
         end
       end
     end,
 
-    data_type = function(value, key, definition_option)
+    data_type = function(value, key, def)
       if value == nil then
         return
       end
-      if definition_option ~= nil then
+      if def.data_type ~= nil then
         local converted
-        if definition_option == 'string' then
+        if def.data_type == 'string' then
           converted = tostring(value)
-        elseif definition_option == 'dimension' then
+        elseif def.data_type == 'dimension' then
           if is.dimension(value) then
             converted = value
           end
-        elseif definition_option == 'boolean' then
+        elseif def.data_type == 'boolean' then
           if value == 0 or value == '' or not value then
             converted = false
           else
             converted = true
           end
-        elseif definition_option == 'integer' then
+        elseif def.data_type == 'integer' then
           if is.integer(value) then
             converted = tonumber(value)
           end
         else
-          throw_error('Unknown data type: ' .. definition_option)
+          throw_error('Unknown data type: ' .. def.data_type)
         end
         if converted == nil then
           throw_error('The value “' .. value .. '” of the key “' .. key ..
                         '” could not be converted into the data type “' ..
-                        definition_option .. '”!')
+                        def.data_type .. '”!')
         else
           return converted
         end
       end
     end,
 
-    opposite_keys = function(value, key, definition_option, defintion)
-      if definition_option ~= nil then
-        local true_value = definition_option[true]
-        local false_value = definition_option[false]
+    opposite_keys = function(value, key, def)
+      if def.opposite_keys ~= nil then
+        local true_value = def.opposite_keys[true]
+        local false_value = def.opposite_keys[false]
         if true_value == nil or false_value == nil then
           throw_error(
             'Usage opposite_keys = { [true] = "...", [false] = "..." }')
@@ -806,12 +806,11 @@ local function apply_definitions(defintions,
       end
     end,
 
-    required = function(value, key, definition_option)
-      if definition_option ~= nil and definition_option and value == nil then
+    required = function(value, key, def)
+      if def.required ~= nil and def.required and value == nil then
         throw_error(string.format('Missing required key “%s”!', key))
       end
     end,
-
   }
 
   --- standalone values are removed.
@@ -840,7 +839,7 @@ local function apply_definitions(defintions,
     return new_key_path
   end
 
-  for index, def in pairs(defintions) do
+  for index, def in pairs(defs) do
     --- Find key and def
     local key
     if type(def) == 'table' and def.name == nil and type(index) == 'string' then
@@ -871,7 +870,7 @@ local function apply_definitions(defintions,
       'choices',
     }) do
       if def[def_opt] ~= nil then
-        local tmp_value = apply[def_opt](value, key, def[def_opt], def)
+        local tmp_value = apply[def_opt](value, key, def)
         if tmp_value ~= nil then
           value = tmp_value
         end
@@ -936,7 +935,7 @@ local function apply_definitions(defintions,
       elseif type(value) == 'table' then
         v = value
       end
-      v = apply_definitions(def.sub_keys, options, v, output[key], leftover,
+      v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
         add_to_key_path(key_path, key), input_root)
       if get_table_size(v) > 0 then
         value = v
