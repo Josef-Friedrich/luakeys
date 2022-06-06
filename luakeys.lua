@@ -682,6 +682,17 @@ local function apply_definitions(defs,
   input_root)
   local exclusive_groups = {}
 
+  local function add_to_key_path(key_path, key)
+    local new_key_path = {}
+
+    for index, value in ipairs(key_path) do
+      new_key_path[index] = value
+    end
+
+    table.insert(new_key_path, key)
+    return new_key_path
+  end
+
   local function set_default_value(def)
     if def.default ~= nil then
       return def.default
@@ -875,6 +886,25 @@ local function apply_definitions(defs,
         throw_error(string.format('Missing required key “%s”!', key))
       end
     end,
+
+    sub_keys = function(value, key, def)
+      if def.sub_keys ~= nil then
+        local v
+        -- To get keys defined with always_present
+        if value == nil then
+          v = {}
+        elseif type(value) == 'string' then
+          v = { value }
+        elseif type(value) == 'table' then
+          v = value
+        end
+        v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
+          add_to_key_path(key_path, key), input_root)
+        if get_table_size(v) > 0 then
+          return v
+        end
+      end
+    end,
   }
 
   --- standalone values are removed.
@@ -889,17 +919,6 @@ local function apply_definitions(defs,
   end
   if key_path == nil then
     key_path = {}
-  end
-
-  local function add_to_key_path(key_path, key)
-    local new_key_path = {}
-
-    for index, value in ipairs(key_path) do
-      new_key_path[index] = value
-    end
-
-    table.insert(new_key_path, key)
-    return new_key_path
   end
 
   for index, def in pairs(defs) do
@@ -936,30 +955,13 @@ local function apply_definitions(defs,
       'macro',
       'l3_tl_set',
       'process',
+      'sub_keys',
     }) do
       if def[def_opt] ~= nil then
         local tmp_value = apply[def_opt](value, key, def)
         if tmp_value ~= nil then
           value = tmp_value
         end
-      end
-    end
-
-    -- def.sub_keys
-    if def.sub_keys ~= nil then
-      local v
-      -- To get keys defined with always_present
-      if value == nil then
-        v = {}
-      elseif type(value) == 'string' then
-        v = { value }
-      elseif type(value) == 'table' then
-        v = value
-      end
-      v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
-        add_to_key_path(key_path, key), input_root)
-      if get_table_size(v) > 0 then
-        value = v
       end
     end
 
