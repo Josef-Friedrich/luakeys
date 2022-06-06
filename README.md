@@ -46,10 +46,13 @@ local definition = {
 
   -- Only values listed in the array table are allowed.
   choices = { 'one', 'two', 'three' },
-  data_type = 'string', -- or boolean, integer,
-  default = 'value',
 
-  --
+  -- Possible data types: boolean, dimension, integer, number, string
+  data_type = 'string',
+
+  default = true,
+
+  -- The key belongs to a mutually exclusive group of keys.
   exclusive_group = 'name',
 
   -- > \g_my_token_list_tl
@@ -69,6 +72,7 @@ local definition = {
   end,
   required = true,
   sub_keys = { key_level_2 = { ... } },
+
 }
 ```
 

@@ -573,10 +573,13 @@ local defintions = {
 
     -- Only values listed in the array table are allowed.
     choices = { 'one', 'two', 'three' },
-    data_type = 'string', -- or boolean, integer,
-    default = 'value',
 
-    --
+    -- Possible data types: boolean, dimension, integer, number, string
+    data_type = 'string',
+
+    default = true,
+
+    -- The key belongs to a mutually exclusive group of keys.
     exclusive_group = 'name',
 
     -- > \g_my_token_list_tl
@@ -646,6 +649,15 @@ as the value.
 \InputLuaExample[firstline=4,lastline=5]{definitions/options/choices.lua}
 
 \InputLuaExample[firstline=13,lastline=15]{definitions/options/choices.lua}
+
+%%
+%
+%%
+
+\subsubsection{\texttt{data\_type}}
+
+\InputLuaExample[firstline=4,lastline=8]{definitions/options/data-type.lua}
+\InputLuaExample[firstline=11,lastline=15]{definitions/options/data-type.lua}
 
 %%
 %

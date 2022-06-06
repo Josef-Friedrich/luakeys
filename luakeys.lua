@@ -775,22 +775,31 @@ local function apply_definitions(defs,
       end
       if def.data_type ~= nil then
         local converted
-        if def.data_type == 'string' then
-          converted = tostring(value)
-        elseif def.data_type == 'dimension' then
-          if is.dimension(value) then
-            converted = value
-          end
-        elseif def.data_type == 'boolean' then
+        -- boolean
+        if def.data_type == 'boolean' then
           if value == 0 or value == '' or not value then
             converted = false
           else
             converted = true
           end
+          -- dimension
+        elseif def.data_type == 'dimension' then
+          if is.dimension(value) then
+            converted = value
+          end
+          -- integer
         elseif def.data_type == 'integer' then
-          if is.integer(value) then
+          if is.number(value) then
+            converted = math.floor(tonumber(value))
+          end
+          -- number
+        elseif def.data_type == 'number' then
+          if is.number(value) then
             converted = tonumber(value)
           end
+          -- string
+        elseif def.data_type == 'string' then
+          converted = tostring(value)
         else
           throw_error('Unknown data type: ' .. def.data_type)
         end
@@ -1081,7 +1090,7 @@ local export = {
   --- @see parse
   parse = parse,
 
-  define =  function (defintions, parse_options)
+  define = function(defintions, parse_options)
     return function(kv_string, inner_parse_options)
       local options
       if inner_parse_options ~= nil then
