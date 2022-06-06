@@ -1062,25 +1062,6 @@ local function parse(kv_string, options)
   return result, result_unknown, result_parse
 end
 
-local function define(defintions, parse_options)
-  return function(kv_string, inner_parse_options)
-    local options
-    if inner_parse_options ~= nil then
-      options = inner_parse_options
-    elseif parse_options ~= nil then
-      options = parse_options
-    end
-
-    if options == nil then
-      options = {}
-    end
-
-    options.definitions = defintions
-
-    return parse(kv_string, options)
-  end
-end
-
 --- Store results
 -- @section
 
@@ -1100,8 +1081,24 @@ local export = {
   --- @see parse
   parse = parse,
 
-  --- @see define
-  define = define,
+  define =  function (defintions, parse_options)
+    return function(kv_string, inner_parse_options)
+      local options
+      if inner_parse_options ~= nil then
+        options = inner_parse_options
+      elseif parse_options ~= nil then
+        options = parse_options
+      end
+
+      if options == nil then
+        options = {}
+      end
+
+      options.definitions = defintions
+
+      return parse(kv_string, options)
+    end
+  end,
 
   --- @see render
   render = render,
