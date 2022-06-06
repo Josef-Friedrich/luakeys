@@ -36,6 +36,61 @@ if not token then
   }
 end
 
+local utils = {
+  --- Convert a key so that it can be written as a table field without
+  --  quotes and square brackets (for example `one 2` becomes `one_2`).
+  --  The key can then reference values from a table using dot notation.
+  --  (`table["one 2"]` becomes `table.one_2`).
+  --
+  -- @tparam string key The key to be converted.
+  --
+  -- @treturn string The converted key.
+  luafy_key = function(key)
+    return key:gsub('[^%w]+', '_')
+  end,
+
+  --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
+  --
+  -- @tparam table value A table or any input.
+  --
+  -- @treturn number The size of the array like table. 0 if the input is
+  -- no table or the table is empty.
+  get_array_size = function(value)
+    local count = 0
+    if type(value) == 'table' then
+      for _ in ipairs(value) do
+        count = count + 1
+      end
+    end
+    return count
+  end,
+
+  --- Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
+  --
+  -- @tparam table value A table or any input.
+  --
+  -- @treturn number The size of the array like table. 0 if the input is
+  -- no table or the table is empty.
+  get_table_size = function(value)
+    local count = 0
+    if type(value) == 'table' then
+      for _ in pairs(value) do
+        count = count + 1
+      end
+    end
+    return count
+  end,
+
+  remove_from_array = function(array, element)
+    for index, value in pairs(array) do
+      if element == value then
+        array[index] = nil
+        return value
+      end
+    end
+  end,
+}
+
 --- https://stackoverflow.com/a/1283608/10193818
 local function merge_tables(target, t2)
   for k, v in pairs(t2) do
@@ -101,18 +156,6 @@ local function set_l3_code_cctab(cctab_id)
   l3_code_cctab = cctab_id
 end
 
---- Convert a key so that it can be written as a table field without
---  quotes and square brackets (for example `one 2` becomes `one_2`).
---  The key can then reference values from a table using dot notation.
---  (`table["one 2"]` becomes `table.one_2`).
---
--- @tparam string key The key to be converted.
---
--- @treturn string The converted key.
-local function luafy_key(key)
-  return key:gsub('[^%w]+', '_')
-end
-
 --- Convert all keys in a table to strings containig only alphanumeric
 -- characters and underscores.
 --
@@ -126,7 +169,7 @@ local function luafy_options(raw_options)
   end
   local options = {}
   for key, value in pairs(raw_options) do
-    options[luafy_key(key)] = value
+    options[utils.luafy_key(key)] = value
   end
   return options
 end
@@ -490,47 +533,6 @@ local function generate_parser(initial_rule, convert_dimensions)
 -- LuaFormatter on
 end
 
---- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
---
--- @tparam table value A table or any input.
---
--- @treturn number The size of the array like table. 0 if the input is
--- no table or the table is empty.
-local function get_array_size(value)
-  local count = 0
-  if type(value) == 'table' then
-    for _ in ipairs(value) do
-      count = count + 1
-    end
-  end
-  return count
-end
-
---- Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
---
--- @tparam table value A table or any input.
---
--- @treturn number The size of the array like table. 0 if the input is
--- no table or the table is empty.
-local function get_table_size(value)
-  local count = 0
-  if type(value) == 'table' then
-    for _ in pairs(value) do
-      count = count + 1
-    end
-  end
-  return count
-end
-
-local function remove_from_array(array, element)
-  for index, value in pairs(array) do
-    if element == value then
-      array[index] = nil
-      return value
-    end
-  end
-end
-
 local function visit_parse_tree(parse_tree, callback_func)
   if type(parse_tree) ~= 'table' then
     throw_error('Parse tree has to be a table got: ' .. tostring(parse_tree))
@@ -578,8 +580,8 @@ end
 local function normalize(raw, options)
   if options.unpack_single_array_values then
     raw = visit_parse_tree(raw, function(key, value)
-      if type(value) == 'table' and get_array_size(value) == 1 and
-        get_table_size(value) == 1 and type(value[1]) ~= 'table' then
+      if type(value) == 'table' and utils.get_array_size(value) == 1 and
+        utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
         return key, value[1]
       end
       return key, value
@@ -708,7 +710,7 @@ local function apply_definitions(defs,
       input[search_key] = nil
       return value
       --- naked keys: values with integer keys
-    elseif remove_from_array(input, search_key) ~= nil then
+    elseif utils.remove_from_array(input, search_key) ~= nil then
       return set_default_value(def)
     end
   end
@@ -864,9 +866,9 @@ local function apply_definitions(defs,
           throw_error(
             'Usage opposite_keys = { [true] = "...", [false] = "..." }')
         end
-        if remove_from_array(input, true_value) ~= nil then
+        if utils.remove_from_array(input, true_value) ~= nil then
           return true
-        elseif remove_from_array(input, false_value) ~= nil then
+        elseif utils.remove_from_array(input, false_value) ~= nil then
           return false
         end
       end
@@ -900,7 +902,7 @@ local function apply_definitions(defs,
         end
         v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
           add_to_key_path(key_path, key), input_root)
-        if get_table_size(v) > 0 then
+        if utils.get_table_size(v) > 0 then
           return v
         end
       end
@@ -968,7 +970,7 @@ local function apply_definitions(defs,
     output[key] = value
   end
 
-  if get_table_size(input) > 0 then
+  if utils.get_table_size(input) > 0 then
     -- Move to the current leftover table.
     local current_leftover = leftover
     for _, key in ipairs(key_path) do
@@ -1054,7 +1056,7 @@ local function parse(kv_string, options)
 
   -- no_error
   if not options.no_error and type(result_unknown) == 'table' and
-    get_table_size(result_unknown) > 0 then
+    utils.get_table_size(result_unknown) > 0 then
     throw_error('Unknown keys: ' .. render(result_unknown))
   end
   return result, result_unknown, result_parse
@@ -1139,7 +1141,7 @@ local export = {
 -- http://olivinelabs.com/busted/#private
 if _TEST then
   export.apply_definitions = apply_definitions
-  export.luafy_key = luafy_key
+  export.luafy_key = utils.luafy_key
   export.luafy_options = luafy_options
   export.merge_tables = merge_tables
   export.normalize = normalize
