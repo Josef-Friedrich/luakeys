@@ -681,7 +681,7 @@ local function apply_definitions(defintions,
   key_path,
   input_root)
 
-  local function set_default_value(definition, options)
+  local function set_default_value(definition)
     if definition.default ~= nil then
       return definition.default
     elseif options ~= nil and options.default ~= nil then
@@ -690,30 +690,25 @@ local function apply_definitions(defintions,
     return true
   end
 
-  local function find_value(search_key, input, definition, options)
+  local function find_value(search_key, definition)
     if input[search_key] ~= nil then
       local value = input[search_key]
       input[search_key] = nil
       return value
       --- naked keys: values with integer keys
     elseif remove_from_array(input, search_key) ~= nil then
-      return set_default_value(definition, options)
+      return set_default_value(definition)
     end
   end
 
   local apply = {
-    always_present = function(value,
-      key,
-      definition_option,
-      defintion,
-      input,
-      options)
+    always_present = function(value, key, definition_option, defintion)
       if value == nil and definition_option then
-        return set_default_value(defintion, options)
+        return set_default_value(defintion)
       end
     end,
 
-    alias = function(value, key, definition_option, defintion, input, options)
+    alias = function(value, key, definition_option, defintion)
       if type(definition_option) == 'string' then
         definition_option = { definition_option }
       end
@@ -725,7 +720,7 @@ local function apply_definitions(defintions,
         used_alias_key = key
       end
       for _, alias in ipairs(definition_option) do
-        local v = find_value(alias, input, defintion, options)
+        local v = find_value(alias, defintion)
         if v ~= nil then
           if alias_value ~= nil then
             throw_error(string.format(
@@ -795,12 +790,7 @@ local function apply_definitions(defintions,
       end
     end,
 
-    opposite_keys = function(value,
-      key,
-      definition_option,
-      defintion,
-      input,
-      options)
+    opposite_keys = function(value, key, definition_option, defintion)
       if definition_option ~= nil then
         local true_value = definition_option[true]
         local false_value = definition_option[false]
@@ -870,7 +860,7 @@ local function apply_definitions(defintions,
       throw_error('key name couldn’t be detected!')
     end
 
-    local value = find_value(key, input, def, options)
+    local value = find_value(key, def)
 
     for _, def_opt in ipairs({
       'alias',
@@ -881,8 +871,7 @@ local function apply_definitions(defintions,
       'choices',
     }) do
       if def[def_opt] ~= nil then
-        local tmp_value = apply[def_opt](value, key, def[def_opt], def, input,
-          options)
+        local tmp_value = apply[def_opt](value, key, def[def_opt], def)
         if tmp_value ~= nil then
           value = tmp_value
         end
