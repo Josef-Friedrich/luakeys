@@ -680,6 +680,7 @@ local function apply_definitions(defs,
   leftover,
   key_path,
   input_root)
+  local exclusive_groups = {}
 
   local function set_default_value(def)
     if def.default ~= nil then
@@ -790,6 +791,60 @@ local function apply_definitions(defs,
       end
     end,
 
+    exclusive_group = function(value, key, def)
+      if value == nil then
+        return
+      end
+      if def.exclusive_group ~= nil then
+        if exclusive_groups[def.exclusive_group] ~= nil then
+          throw_error('The key “' .. key ..
+                        '” belongs to a mutually exclusive group “' ..
+                        def.exclusive_group .. '” and the key “' ..
+                        exclusive_groups[def.exclusive_group] ..
+                        '” is already present!')
+        else
+          exclusive_groups[def.exclusive_group] = key
+        end
+      end
+    end,
+
+    l3_tl_set = function(value, key, def)
+      if value == nil then
+        return
+      end
+      if def.l3_tl_set ~= nil then
+        tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
+        tex.print('{' .. value .. '}')
+      end
+    end,
+
+    macro = function(value, key, def)
+      if value == nil then
+        return
+      end
+      if def.macro ~= nil then
+        token.set_macro(def.macro, value, 'global')
+      end
+    end,
+
+    match = function(value, key, def)
+      if value == nil then
+        return
+      end
+      if def.match ~= nil then
+        if type(def.match) ~= 'string' then
+          throw_error('def.match has to be a string')
+        end
+        local match = string.match(value, def.match)
+        if match == nil then
+          throw_error('The value “' .. value .. '” of the key “' .. key ..
+                        '” does not match “' .. def.match .. '”!')
+        else
+          return match
+        end
+      end
+    end,
+
     opposite_keys = function(value, key, def)
       if def.opposite_keys ~= nil then
         local true_value = def.opposite_keys[true]
@@ -803,6 +858,15 @@ local function apply_definitions(defs,
         elseif remove_from_array(input, false_value) ~= nil then
           return false
         end
+      end
+    end,
+
+    process = function(value, key, def)
+      if value == nil then
+        return
+      end
+      if def.process ~= nil and type(def.process) == 'function' then
+        return def.process(value, input_root, output, leftover)
       end
     end,
 
@@ -826,7 +890,6 @@ local function apply_definitions(defs,
   if key_path == nil then
     key_path = {}
   end
-  local exclusive_groups = {}
 
   local function add_to_key_path(key_path, key)
     local new_key_path = {}
@@ -868,59 +931,17 @@ local function apply_definitions(defs,
       'required',
       'data_type',
       'choices',
+      'match',
+      'exclusive_group',
+      'macro',
+      'l3_tl_set',
+      'process',
     }) do
       if def[def_opt] ~= nil then
         local tmp_value = apply[def_opt](value, key, def)
         if tmp_value ~= nil then
           value = tmp_value
         end
-      end
-    end
-
-    if value ~= nil then
-
-      -- def.match
-      if def.match ~= nil then
-        if type(def.match) ~= 'string' then
-          throw_error('def.match has to be a string')
-        end
-        local match = string.match(value, def.match)
-        if match == nil then
-          throw_error('The value “' .. value .. '” of the key “' .. key ..
-                        '” does not match “' .. def.match .. '”!')
-        else
-          value = match
-        end
-      end
-
-      -- def.exclusive_group
-      if def.exclusive_group ~= nil then
-        if exclusive_groups[def.exclusive_group] ~= nil then
-          throw_error('The key “' .. key ..
-                        '” belongs to a mutually exclusive group “' ..
-                        def.exclusive_group .. '” and the key “' ..
-                        exclusive_groups[def.exclusive_group] ..
-                        '” is already present!')
-        else
-          exclusive_groups[def.exclusive_group] = key
-        end
-      end
-
-      -- def.macro
-      if def.macro ~= nil then
-        token.set_macro(def.macro, value, 'global')
-      end
-
-      -- def.l3_tl_set
-      if def.l3_tl_set ~= nil then
-        tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
-        tex.print('{' .. value .. '}')
-        break
-      end
-
-      -- def.process
-      if def.process ~= nil and type(def.process) == 'function' then
-        value = def.process(value, input_root, output, leftover)
       end
     end
 
