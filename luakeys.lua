@@ -714,12 +714,6 @@ local function apply_definitions(defs,
   end
 
   local apply = {
-    always_present = function(value, key, def)
-      if value == nil and def.always_present then
-        return set_default_value(def)
-      end
-    end,
-
     alias = function(value, key, def)
       if type(def.alias) == 'string' then
         def.alias = { def.alias }
@@ -745,6 +739,12 @@ local function apply_definitions(defs,
       end
       if alias_value ~= nil then
         return alias_value
+      end
+    end,
+
+    always_present = function(value, key, def)
+      if value == nil and def.always_present then
+        return set_default_value(def)
       end
     end,
 
@@ -1085,32 +1085,6 @@ end
 --- A table to store parsed key-value results.
 local result_store = {}
 
---- The function `save(identifier, result): void` saves a result (a
---  table from a previous run of `parse`) under an identifier.
---  Therefore, it is not necessary to pollute the global namespace to
---  store results for the later usage.
---
--- @tparam string identifier The identifier under which the result is
---   saved.
---
--- @tparam table result A result to be stored and that was created by
---   the key-value parser.
-local function save(identifier, result)
-  result_store[identifier] = result
-end
-
---- The function `get(identifier): table` retrieves a saved result
---  from the result store.
---
--- @tparam string identifier The identifier under which the result was
---   saved.
-local function get(identifier)
-  -- if result_store[identifier] == nil then
-  --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
-  -- end
-  return result_store[identifier]
-end
-
 --- Exports
 -- @section
 
@@ -1133,11 +1107,31 @@ local export = {
   --- @see debug
   debug = debug,
 
-  --- @see save
-  save = save,
+  --- The function `save(identifier, result): void` saves a result (a
+  --  table from a previous run of `parse`) under an identifier.
+  --  Therefore, it is not necessary to pollute the global namespace to
+  --  store results for the later usage.
+  --
+  -- @tparam string identifier The identifier under which the result is
+  --   saved.
+  --
+  -- @tparam table result A result to be stored and that was created by
+  --   the key-value parser.
+  save = function(identifier, result)
+    result_store[identifier] = result
+  end,
 
-  --- @see get
-  get = get,
+  --- The function `get(identifier): table` retrieves a saved result
+  --  from the result store.
+  --
+  -- @tparam string identifier The identifier under which the result was
+  --   saved.
+  get = function(identifier)
+    -- if result_store[identifier] == nil then
+    --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
+    -- end
+    return result_store[identifier]
+  end,
 
   is = is,
 }
