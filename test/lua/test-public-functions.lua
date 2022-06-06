@@ -211,28 +211,6 @@ describe('Function “parse()”', function()
         end)
     end)
 
-    describe('Options “defaults”', function()
-      it('Should add a default key.', function()
-        assert.are.same(luakeys.parse('key1=new', {
-          defaults = { key1 = 'default', key2 = 'default' },
-        }), { key1 = 'new', key2 = 'default' })
-      end)
-
-      it('Should not overwrite an existing value', function()
-        assert.are.same(
-          luakeys.parse('key=new', { defaults = { key = 'old' } }),
-          { key = 'new' })
-      end)
-
-      it('Should work in a nested table', function()
-        assert.are.same(luakeys.parse('level1={level2={key1=new}}', {
-          defaults = {
-            level1 = { level2 = { key1 = 'default', key2 = 'default' } },
-          },
-        }), { level1 = { level2 = { key1 = 'new', key2 = 'default' } } })
-      end)
-    end)
-
     describe('Option “preprocess”', function()
       it('should add keys.', function()
         local result = luakeys.parse('key=value', {

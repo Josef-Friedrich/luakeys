@@ -378,6 +378,7 @@ Transcript written on debug.log.
 %%
 
 \subsubsection{\texttt{default}}
+\label{option-default}
 
 The option \lua{default} can be used to specify which value naked keys
 (keys without a value) get. This option has no influence on keys with
@@ -398,6 +399,7 @@ luakeys.debug(result) -- { naked = true }
 %%
 
 \subsubsection{\texttt{defaults}}
+\label{options-defaults}
 
 % Mit der Option „defaults“ kann nicht nur ein einiger Standardwert
 % angegeben werden, sondern eine ganze Tabelle mit Standardwerten.
@@ -665,6 +667,16 @@ as the value.
 
 \subsubsection{\texttt{default}}
 
+% Verwenden Sie die Option „\lua{default}“, um für jeden nackten Schlüssel
+% einzeln einen Standardwert bereit zu stellen.
+Use the \lua{default} option to provide a default value for each naked
+key individually.
+%
+% Mit der globalen \lua{default} Option kann für alle nackten Schlüssel ein
+% Standardwert vorgegeben werden.
+With the global \lua{default} option (\ref{option-default}) a default
+value can be specified for all naked keys.
+
 \InputLuaExample[firstline=4,lastline=9]{definitions/options/default.lua}
 
 %%
@@ -673,7 +685,24 @@ as the value.
 
 \subsubsection{\texttt{exclusive\_group}}
 
+% Alle Schlüssel, die der gleichen ausschließenden Gruppe angehören,
+% dürfen nicht gemeinsam angegeben werden.
+All keys belonging to the same exclusive group must not be specified
+together.
+%
+% Nur ein Schlüssel aus dieser Gruppe ist erlaubt.
+Only one key from this group is allowed.
+%
+% Als Name für diese ausschließende Gruppe kann irgend ein beliebiger
+% Wert verwendet werden.
+Any value can be used as a name for this exclusive group.
+
 \InputLuaExample[firstline=4,lastline=9]{definitions/options/exclusive-group.lua}
+
+% Werden mehrer Schlüssel der Gruppe angegeben, so wird eine
+% Fehlermeldung geworfen.
+If more than one key of the group is specified, an error message is
+thrown.
 
 \InputLuaExample[firstline=21,lastline=23]{definitions/options/exclusive-group.lua}
 
