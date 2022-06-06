@@ -127,44 +127,4 @@ describe('Test private functions', function()
     end)
 
   end)
-
-  describe('Function “merge_tables”', function()
-    local merge_tables = luakeys.merge_tables
-
-    it('Merge arrays', function()
-      local target = { 'a', 'b' }
-      local t2 = { 'c', 'd' }
-      merge_tables(target, t2)
-      assert.is.same(target, { 'a', 'b' })
-    end)
-
-    it('Empty defaults', function()
-      local target = { 'a', 'b' }
-      local t2 = {}
-      merge_tables(target, t2)
-      assert.is.same(target, { 'a', 'b' })
-    end)
-
-    it('Empty target', function()
-      local target = {}
-      local t2 = { 'c', 'd' }
-      merge_tables(target, t2)
-      assert.is.same(target, { 'c', 'd' })
-    end)
-
-    it('Merge tables', function()
-      local target = { a = 'A' }
-      local t2 = { b = 'B' }
-      merge_tables(target, t2)
-      assert.is.same(target, { a = 'A', b = 'B' })
-    end)
-
-    it('Merge nested tables', function()
-      local target = { a = 'A', b = { c = 'C' } }
-      local t2 = { b = { d = 'D' } }
-      merge_tables(target, t2)
-      assert.is.same(target, { a = 'A', b = { c = 'C', d = 'D' } })
-    end)
-
-  end)
 end)

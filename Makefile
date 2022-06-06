@@ -43,7 +43,6 @@ doc_pdf:
 	makeindex -s gglo.ist -o $(jobname)-doc.gls $(jobname)-doc.glo
 	makeindex -s gind.ist -o $(jobname)-doc.ind $(jobname)-doc.idx
 	lualatex --shell-escape $(jobname)-doc.tex
-	sleep 1
 	mkdir -p $(texmf)/doc
 	cp $(jobname)-doc.pdf $(texmf)/doc
 

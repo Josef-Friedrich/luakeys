@@ -1149,7 +1149,6 @@ if _TEST then
   export.apply_definitions = apply_definitions
   export.luafy_key = utils.luafy_key
   export.luafy_options = luafy_options
-  export.merge_tables = merge_tables
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.parse_kv_string = parse_kv_string
