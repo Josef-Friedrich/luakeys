@@ -91,42 +91,6 @@ describe('Function “parse()”', function()
       }))
     end)
 
-    describe('Option “case_insensitive_keys”', function()
-      it('default', function()
-        assert.are.same({ TEST = 'Test' }, luakeys.parse('TEST=Test'))
-      end)
-
-      it('true', function()
-        assert.are.same({ test = 'Test' }, luakeys.parse('TEST=Test', {
-          case_insensitive_keys = true,
-        }))
-      end)
-
-      it('recursive', function()
-        assert.are.same({ test1 = { test2 = 'Test' } }, luakeys.parse(
-          'TEST1={TEST2={Test}}', { case_insensitive_keys = true }))
-      end)
-
-      it('false', function()
-        assert.are.same({ TEST = 'Test' }, luakeys.parse('TEST=Test', {
-          case_insensitive_keys = false,
-        }))
-      end)
-    end)
-
-    describe('Option “convert_dimensions”', function()
-      it('true', function()
-        assert.are.same({ dim = 1234567 },
-          luakeys.parse('dim=1cm', { convert_dimensions = true }))
-      end)
-
-      it('false', function()
-        assert.are.same({ dim = '1cm' }, luakeys.parse('dim=1cm', {
-          convert_dimensions = false,
-        }))
-      end)
-    end)
-
     describe('Option “converter”', function()
       it('standalone string values as keys', function()
         local function converter(key, value)
@@ -507,14 +471,14 @@ describe('Table “is”', function()
     end)
   end)
 
-  it('Function “number()”', function ()
+  it('Function “number()”', function()
     assert.is.equal(luakeys.is.number(1), true)
     assert.is.equal(luakeys.is.number(1.1), true)
     assert.is.equal(luakeys.is.number('1'), true)
     assert.is.equal(luakeys.is.number('1.1'), true)
   end)
 
-  it('Function “string()”', function ()
+  it('Function “string()”', function()
     assert.is.equal(luakeys.is.string(''), true)
     assert.is.equal(luakeys.is.string('string'), true)
     assert.is.equal(luakeys.is.string(true), false)
