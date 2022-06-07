@@ -1,19 +1,11 @@
 require('busted.runner')()
 
-local luakeys
+local luakeys = require('luakeys')
 
 describe('LPeg Parser', function()
-  setup(function()
-    _G._TEST = true
-    luakeys = require('luakeys')
-  end)
-
-  teardown(function()
-    _G._TEST = nil
-  end)
 
   local assert_value = function(actual, expected)
-    local result = luakeys.parse_kv_string('key=' .. actual)
+    local result = luakeys.parse('key=' .. actual)
     local input = result.key
     assert.are.equal(expected, input)
   end
@@ -116,7 +108,7 @@ describe('LPeg Parser', function()
 
   describe('Dimension', function()
     local function assert_dimension(actual)
-      local result = luakeys.parse_kv_string('key=' .. actual,
+      local result = luakeys.parse('key=' .. actual,
         { convert_dimensions = true })
       assert.are.equal(result.key, 1234567)
     end
@@ -166,7 +158,7 @@ describe('LPeg Parser', function()
 
   describe('Type', function()
     local function assert_type(actual, expected_type)
-      local result = luakeys.parse_kv_string('key=' .. actual,
+      local result = luakeys.parse('key=' .. actual,
         { convert_dimensions = true })
       assert.are.equal(expected_type, type(result.key))
     end
@@ -229,7 +221,8 @@ describe('LPeg Parser', function()
 
     describe('Keys', function()
       local function assert_deep_equals(actual, expected)
-        assert.are.same(expected, luakeys.parse_kv_string(actual))
+        assert.are.same(expected,
+          luakeys.parse(actual, { naked_as_value = true }))
       end
 
       it('Simple string', function()
@@ -256,7 +249,7 @@ describe('LPeg Parser', function()
 
   describe('Nested', function()
     it('single value nested', function()
-      assert.are.same({ key = { 1 } }, luakeys.parse_kv_string('key={1}'))
+      assert.are.same({ key = { 1 } }, luakeys.parse('key={1}', { unpack = false }))
     end)
   end)
 end)

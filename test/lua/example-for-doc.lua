@@ -79,6 +79,6 @@ local options = {
   naked_as_value = true,
 
   -- { key = { 'value' } } -> { key = 'value' }
-  unpack_single_array_value = false,
+  unpack = false,
 }
 local result = luakeys.parse('one,two,three', options)

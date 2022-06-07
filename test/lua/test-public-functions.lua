@@ -226,8 +226,8 @@ describe('Function “parse()”', function()
     end)
 
     describe('Option “unpack_single_valued_array”', function()
-      local options_true = { unpack_single_array_values = true }
-      local options_false = { unpack_single_array_values = false }
+      local options_true = { unpack = true }
+      local options_false = { unpack = false }
 
       it('unpacked: single string', function()
         assert.is.same({ key = 'string' },
@@ -380,7 +380,7 @@ describe('Function “parse()”', function()
 
     it('Deeply nested string value', function()
       assert_parse('{{{one}}}', { { { { 'one' } } } }, {
-        unpack_single_array_values = false,
+        unpack = false,
         naked_as_value = true,
       })
     end)

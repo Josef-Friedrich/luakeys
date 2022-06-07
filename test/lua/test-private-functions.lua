@@ -64,7 +64,7 @@ describe('Test private functions', function()
 
       it('true recursive', function()
         assert.are.same(normalize({ level_1 = { level_2 = { 'standalone' } } },
-          get_options({ naked_as_value = false, unpack_single_array_values = false })), {
+          get_options({ naked_as_value = false, unpack = false })), {
           level_1 = {
             level_2 = { standalone = true },
           },

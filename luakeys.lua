@@ -136,7 +136,7 @@ local all_options = {
   no_error = false,
   postprocess = false,
   preprocess = false,
-  unpack_single_array_values = true,
+  unpack = true,
 }
 
 --- The default options.
@@ -574,11 +574,11 @@ end
 --   parser
 --
 -- @tparam table options Some options. A table with the key
---   `unpack_single_array_values`
+--   `unpack`
 --
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, opts)
-  if opts.unpack_single_array_values then
+  if opts.unpack then
     raw = visit_parse_tree(raw, function(key, value)
       if type(value) == 'table' and utils.get_array_size(value) == 1 and
         utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
@@ -998,18 +998,13 @@ local function apply_definitions(defs,
   return output, unknown
 end
 
-local function parse_kv_string(kv_string, convert_dimensions)
-  local parser = generate_parser('list', convert_dimensions)
-  return parser:match(kv_string)
-end
-
 --- Parse a LaTeX/TeX style key-value string into a Lua table.
 --
 -- @tparam string kv_string A string in the TeX/LaTeX style key-value
 --   format as described above.
 --
 -- @tparam table opts A table containing the settings:
--- `convert_dimensions`, `unpack_single_array_values`,
+-- `convert_dimensions`, `unpack`,
 -- `naked_as_value`, `converter`, `debug`, `preprocess`, `postprocess`.
 --
 -- @treturn table A hopefully properly parsed table you can do something
@@ -1019,7 +1014,8 @@ local function parse(kv_string, opts)
     return {}
   end
   opts = normalize_parse_options(opts)
-  local result_parse = parse_kv_string(kv_string, opts.convert_dimensions)
+
+  local result_parse = generate_parser('list', opts.convert_dimensions):match(kv_string)
 
   local function apply_processor(name)
     if opts[name] ~= nil and type(opts[name]) == 'function' then
@@ -1151,7 +1147,6 @@ if _TEST then
   export.luafy_options = luafy_options
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
-  export.parse_kv_string = parse_kv_string
   export.visit_parse_tree = visit_parse_tree
 end
 

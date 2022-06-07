@@ -325,7 +325,7 @@ local options = {
   no_error = false,
 
   -- { key = { 'value' } } -> { key = 'value' }
-  unpack_single_array_value = false,
+  unpack = false,
 }
 local result = luakeys.parse('one,two,three', options)
 \end{minted}
@@ -1384,7 +1384,7 @@ An example of how to use the command in \LaTeX:
 \usepackage{luakeys-debug}
 \begin{document}
 \luakeysdebug[
-  unpack single array values=false,
+  unpack=false,
   convert dimensions=false
 ]{one,two,three}
 \end{document}
