@@ -131,7 +131,7 @@ local all_options = {
   debug = false,
   default = true,
   defaults = false,
-  definitions = false,
+  defs = false,
   naked_as_value = false,
   no_error = false,
   postprocess = false,
@@ -592,7 +592,7 @@ local function normalize(raw, opts)
     end
   end
 
-  if not opts.naked_as_value and opts.definitions == false then
+  if not opts.naked_as_value and opts.defs == false then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, opts.default
@@ -664,7 +664,7 @@ local is = {
   end,
 }
 
---- Apply the key-value-pair definitions (defintions) on an input table in a
+--- Apply the key-value-pair definitions (defs) on an input table in a
 --- recursive fashion.
 ---
 ---@param defs table A table containing all definitions.
@@ -1043,9 +1043,9 @@ local function parse(kv_string, opts)
   local result_def = nil
   -- In this table are all unknown keys stored
   local result_unknown = nil
-  if opts.definitions ~= nil and type(opts.definitions) == 'table' then
+  if opts.defs ~= nil and type(opts.defs) == 'table' then
     result_def = {}
-    result_def, result_unknown = apply_definitions(opts.definitions, opts,
+    result_def, result_unknown = apply_definitions(opts.defs, opts,
       result_parse, result_def, {}, {}, clone_table(result_parse))
   end
 
@@ -1086,7 +1086,7 @@ local export = {
   --- @see parse
   parse = parse,
 
-  define = function(defintions, opts)
+  define = function(defs, opts)
     return function(kv_string, inner_opts)
       local options
       if inner_opts ~= nil then
@@ -1099,7 +1099,7 @@ local export = {
         options = {}
       end
 
-      options.definitions = defintions
+      options.defs = defs
 
       return parse(kv_string, options)
     end

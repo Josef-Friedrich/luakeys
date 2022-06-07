@@ -103,7 +103,7 @@ local options = {
   defaults = { key = 'value' },
 
   -- Key-value pair defintions.
-  definitions = { key = { default = 'value' } },
+  defs = { key = { default = 'value' } },
 
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }

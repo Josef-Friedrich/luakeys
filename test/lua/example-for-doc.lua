@@ -70,7 +70,7 @@ local options = {
   defaults = { key = 'value' },
 
   -- Key-value pair defintions.
-  definitions = defintions,
+  defs = defintions,
 
   -- Standalone values aka values with numeric keys are converted to
   -- keys holding the value true:

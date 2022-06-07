@@ -4,7 +4,7 @@ local luakeys = require('luakeys')
 local function assert_type(data_type, input_value, expected_value)
   assert.are.same({ key = expected_value },
     luakeys.parse('key=' .. tostring(input_value),
-      { definitions = { key = { data_type = data_type } } }))
+      { defs = { key = { data_type = data_type } } }))
 end
 
 it('result', function()

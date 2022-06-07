@@ -17,6 +17,7 @@
 \setminted{
   breaklines=true,
   fontsize=\footnotesize,
+  style=manni,
 }
 \def\lua#1{\mintinline{lua}|#1|}
 \def\latex#1{\mintinline{latex}|#1|}
@@ -229,12 +230,11 @@ hopefully unambiguous and familiar to external readers.
 \begin{center}
 \begin{tabular}{lll}
 Abbreviation & spelled out & Example \\\hline
-\lua{kv_string} & Key-value string & \lua{'key=value'}\\
-\lua{opts} & Options & \lua{ { no_error = false } }\\
-\lua{opt} & Option & \lua{no_error}, \lua{naked_as_value}\\
+\lua{kv_string} & Key-value string & \lua{'key=value'} \\
+\lua{opts} & Options (for the parse function) & \lua{ { no_error = false } } \\
 \lua{defs} & Definitions \\
 \lua{def} & Definition \\
-\lua{attr} & Attributes \\
+\lua{attr} & Attributes (of a definition) \\
 \end{tabular}
 \end{center}
 
@@ -289,46 +289,7 @@ In plain \TeX:
 The \lua{parse} function can be called with an options table. This
 options are supported:
 
-% Update also in README.md
-\begin{minted}{lua}
-local options = {
-  -- { KEY = 'Value' } -> { key = 'value' }
-  case_insensitive_keys = false,
-
-  -- Visit all key-value pairs in the recursive parse tree.
-  converter = function(key, value, depth, current_tree, root_tree)
-    return key, value
-  end,
-
-  -- Automatically convert dimensions into scaled points (1cm -> 1864679).
-  -- default: false
-  convert_dimensions = false,
-
-  -- Print the result table to the console.
-  debug = false,
-
-  -- The default value for naked keys (keys without a value).
-  default = true
-
-  -- A table with some default values. The result table is merged with
-  -- this table.
-  defaults = { key = 'value' },
-
-  -- Key-value pair defintions.
-  definitions = { key = { default = 'value' } },
-
-  -- If true, naked keys are converted to values:
-  -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
-  naked_as_value = false,
-
-  -- Throw no error if there are unknown keys.
-  no_error = false,
-
-  -- { key = { 'value' } } -> { key = 'value' }
-  unpack = false,
-}
-local result = luakeys.parse('one,two,three', options)
-\end{minted}
+\InputLuaExample[firstline=5,lastline=40]{opts/all-opts.lua}
 
 \noindent
 The options can also be set globally using the exported table
@@ -353,12 +314,12 @@ If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
 detects the \TeX{} dimensions and converts them into scaled points using
 the function \lua{tex.sp(dim)}.
 
-\InputLuaExample[firstline=4,lastline=7]{options/convert-dimensions.lua}
+\InputLuaExample[firstline=4,lastline=7]{opts/convert-dimensions.lua}
 
 \noindent
 By default the dimensions are not converted into scaled points.
 
-\InputLuaExample[firstline=13,lastline=18]{options/convert-dimensions.lua}
+\InputLuaExample[firstline=13,lastline=18]{opts/convert-dimensions.lua}
 
 \noindent
 If you want to convert a scale point into a unit string you can use the module
@@ -412,19 +373,20 @@ Transcript written on debug.log.
 \subsubsection{Option “\texttt{default}”}
 \label{option-default}
 
+% Mit der Option \lua{default} kann angegeben werden, welchen Wert
+% nackte Schlüssel (Schlüssel ohne Wert) erhalten. Diese Option hat
+% keinen Einfluss auf Schlüssel mit Werten.
 The option \lua{default} can be used to specify which value naked keys
 (keys without a value) get. This option has no influence on keys with
-values. By default, naked keys get the value \lua{true}.
+values.
 
-\begin{minted}{lua}
-local result = luakeys.parse('naked', { default = 1 })
-luakeys.debug(result) -- { naked = 1 }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=5]{opts/default.lua}
 
-\begin{minted}{lua}
-local result = luakeys.parse('naked')
-luakeys.debug(result) -- { naked = true }
-\end{minted}
+\noindent
+% Standardmäßig erhalten nackte Schlüssel den Wert \lua{true}.
+By default, naked keys get the value \lua{true}.
+
+\InputLuaExample[firstline=11,lastline=12]{opts/default.lua}
 
 %%
 %
@@ -445,48 +407,32 @@ The result table is merged into the defaults table.
 Values in the defaults table are
 overwritten by values in the result table.
 
-\begin{minted}{lua}
-local result = luakeys.parse('key1=new', {
-  defaults = { key1 = 'default', key2 = 'default' },
-})
-luakeys.debug(result) -- { key1 = 'new', key2 = 'default' }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=7]{opts/defaults.lua}
 
 %%
 %
 %%
 
-\subsubsection{Option “\texttt{definitions}”}
+\subsubsection{Option “\texttt{defs}”}
 
 % Für mehr Information wie Schlüssel definiert werden, lesen sie das
 % kapitel 3.2
 For more informations on how keys are defined, see section \ref{define}.
-% Wenn sie die Option \lua{definitions} verwenden, können sie auf den
+% Wenn sie die Option \lua{defs} verwenden, können sie auf den
 % Aufruf der Funktion \lua{define} verzichten.
-If you use the \lua{definitions} option, you don't need to call the
+If you use the \lua{defs} option, you don't need to call the
 \lua{define} function.
-
+%
+% Anstatt
 Instead of ...
 
-\begin{minted}{lua}
-local parse = luakeys.define({
-  one = { default = 1 },
-  two = { default = 2 },
-})
-parse('one,two') -- { one = 1, two = 2 }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=5]{opts/defs.lua}
 
 \noindent
+% können wir schreiben ..
 we can write ...
 
-\begin{minted}{lua}
-local result = luakeys.parse('one,two', {
-  defintions = {
-    one = { default = 1 },
-    two = { default = 2 },
-  }
-}) -- { one = 1, two = 2 }
-\end{minted}
+\InputLuaExample[firstline=11,lastline=13]{opts/defs.lua}
 
 %%
 %
@@ -500,20 +446,12 @@ local result = luakeys.parse('one,two', {
 With the help of the option \lua{naked_as_value}, naked keys are not
 given a default value, but are stored as values in a Lua table.
 
-\begin{minted}{lua}
-local result = luakeys.parse('one,two,three')
-luakeys.debug(result) -- { one = true, two = true, three = true }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=5]{opts/naked-as-value.lua}
 
 \noindent
 If we set the option \lua{naked_as_value} to \lua{true}:
 
-\begin{minted}{lua}
-local result = luakeys.parse('one,two,three', { naked_as_value = true })
-luakeys.debug(result)
--- { [1] = 'one', [2] = 'two', [3] = 'three' }
--- { 'one', 'two', 'three' }
-\end{minted}
+\InputLuaExample[firstline=11,lastline=14]{opts/naked-as-value.lua}
 
 %%
 %
@@ -527,24 +465,18 @@ By default the parse function throws an error if there are unknown keys.
 % Mit Hilfe der Option \lua{no_error} kann dies unterbunden werden.
 This can be prevented with the help of the \lua{no_error} option.
 
-\begin{minted}{lua}
-luakeys.parse('unknown', { definitions = { 'key' } })
--- Error message: Unknown keys: unknown,
-\end{minted}
+\InputLuaExample[firstline=5,lastline=6]{opts/no-error.lua}
 
 \noindent
 If we set the option \lua{no_error} to \lua{true}:
 
-\begin{minted}{lua}
-luakeys.parse('unknown', { definitions = { 'key' }, no_error = true })
--- No error message
-\end{minted}
+\InputLuaExample[firstline=9,lastline=10]{opts/no-error.lua}
 
 %%
 %
 %%
 
-\subsection{\texttt{define(defintions, options)}}
+\subsection{\texttt{define(defs, opts)}}
 \label{define}
 
 The \lua{define} function returns a \lua{parse} function (see
@@ -560,13 +492,13 @@ key-value pair is then stored under this key.
 
 \begin{minted}{lua}
 -- standalone string values
-local defintions = { 'key' }
+local defs = { 'key' }
 
 -- keys in a Lua table
-local defintions = { key = { ... } }
+local defs = { key = { ... } }
 
 -- by the “name” option
-local defintions = { { name = 'key', ... } }
+local defs = { { name = 'key', ... } }
 
 local parse = luakeys.define(defintions)
 local result, unknown = parse(

@@ -118,10 +118,10 @@ describe('Function “parse()”', function()
       end)
     end)
 
-    describe('Option “definitions”', function()
+    describe('Option “defs”', function()
       it('should return three return tables', function()
         local result, result_unknown, result_parse =
-          luakeys.parse('key', { definitions = { key = { default = 'value' } } })
+          luakeys.parse('key', { defs = { key = { default = 'value' } } })
         assert.are.same(result, { key = 'value' })
         assert.are.same(result_unknown, {})
         assert.are.same(result_parse, { 'key' })
@@ -130,7 +130,7 @@ describe('Function “parse()”', function()
       it('all arguments of process callback', function()
         local result, result_unknown, result_parse = luakeys.parse(
           'key=value,unknown=unknown', {
-            definitions = {
+            defs = {
               key = {
                 process = function(value, pre_def, result, unknown)
                   assert.are.same(pre_def,
@@ -162,7 +162,7 @@ describe('Function “parse()”', function()
       it('should prefer the default option for the key defintions.', function()
         assert.are.same({ naked = 2 }, luakeys.parse('naked', {
           default = 1,
-          definitions = { naked = { default = 2 } },
+          defs = { naked = { default = 2 } },
         }))
       end)
 
@@ -170,7 +170,7 @@ describe('Function “parse()”', function()
         function()
           assert.are.same({ naked = 1 }, luakeys.parse('naked', {
             default = 1,
-            definitions = { naked = {} },
+            defs = { naked = {} },
           }))
         end)
     end)
@@ -211,21 +211,21 @@ describe('Function “parse()”', function()
     describe('Option “no_error”', function()
       local warn_unknown_keys = luakeys.warn_unknown_keys
       it('A definied key should throw no error.', function()
-        luakeys.parse('key', { definitions = { 'key' } })
+        luakeys.parse('key', { defs = { 'key' } })
       end)
 
       it('An non-empty unkown table should throw an error.', function()
         assert.has_error(function()
-          luakeys.parse('unknown', { definitions = { 'key' } })
+          luakeys.parse('unknown', { defs = { 'key' } })
         end, 'Unknown keys: unknown,')
       end)
 
       it('should prevent an error.', function()
-        luakeys.parse('unknown', { definitions = { 'key' }, no_error = true })
+        luakeys.parse('unknown', { defs = { 'key' }, no_error = true })
       end)
     end)
 
-    describe('Option “unpack_single_valued_array”', function()
+    describe('Option “unpack”', function()
       local options_true = { unpack = true }
       local options_false = { unpack = false }
 

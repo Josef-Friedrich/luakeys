@@ -46,7 +46,7 @@ describe('Defintions', function()
         expected_value)
         assert.are.same({ key = expected_value },
           luakeys.parse('key=' .. tostring(input_value),
-            { definitions = { key = { data_type = data_type } } }),
+            { defs = { key = { data_type = data_type } } }),
           data_type .. '; input: ' .. tostring(input_value) .. ' expected: ' ..
             tostring(expected_value))
       end
@@ -108,7 +108,7 @@ describe('Defintions', function()
       local function assert_exclusive_group(input_kv_string,
         expected)
         assert.are.same(expected, luakeys.parse(input_kv_string,
-          { definitions = defintions }))
+          { defs = defintions }))
       end
 
       it(

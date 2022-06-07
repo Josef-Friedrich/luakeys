@@ -3,7 +3,7 @@ local luakeys = require('luakeys')
 
 local result, leftover = luakeys.parse('level1={level2,unknown}', {
   no_error = true,
-  definitions = {
+  defs = {
     level1 = {
       sub_keys = {
         level2 = { default = 42 }
