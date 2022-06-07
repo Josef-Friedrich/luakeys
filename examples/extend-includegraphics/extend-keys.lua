@@ -16,14 +16,14 @@ local parse = luakeys.define({
 local function print_image_macro(image_path, kv_string)
   local caption = ''
   local options = ''
-  local keys, leftover = parse(kv_string)
+  local keys, unknown = parse(kv_string)
   if keys['caption'] ~= nil then
     caption = '\\ImageCaption{' .. keys['caption'] .. '}'
   end
   if keys['width'] ~= nil then
-    leftover['width'] = keys['width']
+    unknown['width'] = keys['width']
   end
-  options = luakeys.render(leftover)
+  options = luakeys.render(unknown)
 
   tex.print('\\includegraphics[' .. options .. ']{' .. image_path .. '}' ..
               caption)

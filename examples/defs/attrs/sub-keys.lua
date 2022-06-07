@@ -1,7 +1,7 @@
 require('busted.runner')()
 local luakeys = require('luakeys')
 
-local result, leftover = luakeys.parse('level1={level2,unknown}', {
+local result, unknown = luakeys.parse('level1={level2,unknown}', {
   no_error = true,
   defs = {
     level1 = {
@@ -12,12 +12,12 @@ local result, leftover = luakeys.parse('level1={level2,unknown}', {
   },
 })
 luakeys.debug(result) -- { level1 = { level2 = 42 } }
-luakeys.debug(leftover) -- { level1 = { 'unknown' } }
+luakeys.debug(unknown) -- { level1 = { 'unknown' } }
 
 it('result', function ()
   assert.is.same(result, { level1 = { level2 = 42 } })
 end)
 
-it('leftover', function ()
-  assert.is.same(leftover, { level1 = { [2] = 'unknown' } })
+it('unknown', function ()
+  assert.is.same(unknown, { level1 = { [2] = 'unknown' } })
 end)

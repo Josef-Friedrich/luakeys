@@ -194,23 +194,23 @@ describe('Key defintions', function()
     end)
 
     describe('Return values', function()
-      describe('leftover', function()
+      describe('unknown', function()
         it('should be an empty table if all keys are defined', function()
-          local result, leftover = apply_definitions({ 'key' }, nil,
+          local result, unknown = apply_definitions({ 'key' }, nil,
             { key = 'value' })
-          assert.are.same(leftover, {})
+          assert.are.same(unknown, {})
         end)
 
         it('should be an non-empty table if all keys are defined', function()
-          local result, leftover = apply_definitions({ 'key' }, nil, {
+          local result, unknown = apply_definitions({ 'key' }, nil, {
             key = 'value',
             unknown = 'unknown',
           })
-          assert.are.same(leftover, { unknown = 'unknown' })
+          assert.are.same(unknown, { unknown = 'unknown' })
         end)
 
         it('should be an non-empty table if all keys are defined', function()
-          local result, leftover = apply_definitions({
+          local result, unknown = apply_definitions({
             key1 = { sub_keys = { 'known1' } },
             key2 = { sub_keys = { 'known2' } },
           }, nil, {
@@ -218,7 +218,7 @@ describe('Key defintions', function()
             key2 = { known2 = 1, unknown2 = 1, unknown3 = 1 },
             unknown = 'unknown',
           })
-          assert.are.same(leftover, {
+          assert.are.same(unknown, {
             key1 = { unknown1 = 1 },
             key2 = { unknown2 = 1, unknown3 = 1 },
             unknown = 'unknown',
@@ -241,38 +241,38 @@ describe('Key defintions', function()
       local kv_string = 'key=value,unknown=unknown'
 
       it('can be given as stand-alone values.', function()
-        local result, leftover = define_parse({ 'key' }, kv_string)
+        local result, unknown = define_parse({ 'key' }, kv_string)
         assert.are.same(result, { key = 'value' })
-        assert.are.same(leftover, { unknown = 'unknown' })
+        assert.are.same(unknown, { unknown = 'unknown' })
       end)
 
       it('can be specified as keys in a Lua table.', function()
-        local result, leftover = define_parse({ key = {} }, kv_string)
+        local result, unknown = define_parse({ key = {} }, kv_string)
         assert.are.same(result, { key = 'value' })
-        assert.are.same(leftover, { unknown = 'unknown' })
+        assert.are.same(unknown, { unknown = 'unknown' })
       end)
 
       it('can be specified by the “name” option.', function()
-        local result, leftover = define_parse({ { name = 'key' } }, kv_string)
+        local result, unknown = define_parse({ { name = 'key' } }, kv_string)
         assert.are.same(result, { key = 'value' })
-        assert.are.same(leftover, { unknown = 'unknown' })
+        assert.are.same(unknown, { unknown = 'unknown' })
       end)
 
       it('can be specified in a nested example.', function()
-        local result, leftover = define_parse({
+        local result, unknown = define_parse({
           level1 = { sub_keys = { level2 = { sub_keys = { key = {} } } } },
         }, 'level1={level2={key=value,unknown=unknown}}')
         assert.are.same(result, { level1 = { level2 = { key = 'value' } } })
-        assert.are.same(leftover,
+        assert.are.same(unknown,
           { level1 = { level2 = { unknown = 'unknown' } } })
       end)
     end)
 
-    it('Return values: result and leftover', function()
+    it('Return values: result and unknown', function()
       local parse = define({ { name = 'key1' } })
-      local result, leftover = parse('key1=value1')
+      local result, unknown = parse('key1=value1')
       assert.are.same(result, { key1 = 'value1' })
-      assert.are.same(leftover, {})
+      assert.are.same(unknown, {})
     end)
 
     it('should merge inner default options', function()

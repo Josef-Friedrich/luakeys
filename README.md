@@ -67,7 +67,7 @@ local definition = {
   -- name of the key, can be omitted
   name = 'key',
   opposite_keys = { [true] = 'show', [false] = 'hide' },
-  process = function(value, result, leftover)
+  process = function(value, result, unknown)
     return value
   end,
   required = true,
