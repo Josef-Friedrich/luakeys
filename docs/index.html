@@ -29,7 +29,9 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Functions">Functions</a></li>
 <li><a href="#Tables">Tables</a></li>
+<li><a href="#Fields">Fields</a></li>
 <li><a href="#Local_Functions">Local Functions</a></li>
 <li><a href="#Convert_back_to_strings">Convert back to strings </a></li>
 <li><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></li>
@@ -48,11 +50,31 @@
 <div id="content">
 
 <h1>Module <code>luakeys</code></h1>
-<p>This table stores all allowed option keys.</p>
-<p></p>
+<p>Convert a key so that it can be written as a table field without
+  quotes and square brackets (for example <code>one 2</code> becomes <code>one_2</code>).</p>
+<p>  The key can then reference values from a table using dot notation.
+  (<code>table[&quot;one 2&quot;]</code> becomes <code>table.one_2</code>).</p>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_array_size">get_array_size (value)</a></td>
+	<td class="summary">Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_table_size">get_table_size (value)</a></td>
+	<td class="summary">Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
+	</tr>
+</table>
 <h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#all_options">all_options</a></td>
+	<td class="summary">This table stores all allowed option keys.</td>
+	</tr>
+</table>
+<h2><a href="#Fields">Fields</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#default_options">default_options</a></td>
@@ -62,9 +84,12 @@
 <h2><a href="#Local_Functions">Local Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#luafy_key">luafy_key (key)</a></td>
-	<td class="summary">Convert a key so that it can be written as a table field without
-  quotes and square brackets (for example <code>one 2</code> becomes <code>one_2</code>).</td>
+	<td class="name" nowrap><a href="#merge_tables">merge_tables (target, t2)</a></td>
+	<td class="summary">https://stackoverflow.com/a/1283608/10193818</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#clone_table">clone_table (orig)</a></td>
+	<td class="summary">http://lua-users.org/wiki/CopyTable</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#luafy_options">luafy_options (raw_options)</a></td>
@@ -75,14 +100,6 @@
 	<td class="name" nowrap><a href="#normalize_parse_options">normalize_parse_options (options_raw)</a></td>
 	<td class="summary">All option keys can be written with underscores or with spaces as
  separators.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#merge_tables">merge_tables (target, t2)</a></td>
-	<td class="summary">https://stackoverflow.com/a/1283608/10193818</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#clone_table">clone_table (orig)</a></td>
-	<td class="summary">http://lua-users.org/wiki/CopyTable</td>
 	</tr>
 </table>
 <h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
@@ -123,21 +140,17 @@
  value of a new table entry.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_array_size">get_array_size (value)</a></td>
-	<td class="summary">Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#get_table_size">get_table_size (value)</a></td>
-	<td class="summary">Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#normalize">normalize (raw, options)</a></td>
 	<td class="summary">Normalize the result tables of the LPeg parser.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#apply_definitions">apply_definitions (defintions, options, input, output, leftover, key_path, input_root)</a></td>
+	<td class="name" nowrap><a href="#apply_definitions">apply_definitions (defs, opts, input, output, leftover, key_path, input_root)</a></td>
 	<td class="summary">Apply the key-value-pair definitions (defintions) on an input table in a
  recursive fashion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#input">input</a></td>
+	<td class="summary">standalone values are removed.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#parse">parse (kv_string, options)</a></td>
@@ -149,16 +162,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#result_store">result_store</a></td>
 	<td class="summary">A table to store parsed key-value results.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#save">save (identifier, result)</a></td>
-	<td class="summary">The function <code>save(identifier, result): void</code> saves a result (a
-  table from a previous run of <a href="index.html#parse">parse</a>) under an identifier.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#get">get (identifier)</a></td>
-	<td class="summary">The function <code>get(identifier): table</code> retrieves a saved result
-  from the result store.</td>
 	</tr>
 </table>
 <h2><a href="#Exports">Exports </a></h2>
@@ -176,10 +179,6 @@
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#define">define</a></td>
-	<td class="summary"></td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#render">render</a></td>
 	<td class="summary"></td>
 	</tr>
@@ -188,12 +187,14 @@
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#save">save</a></td>
-	<td class="summary"></td>
+	<td class="name" nowrap><a href="#save">save (identifier, result)</a></td>
+	<td class="summary">The function <code>save(identifier, result): void</code> saves a result (a
+  table from a previous run of <a href="index.html#parse">parse</a>) under an identifier.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get">get</a></td>
-	<td class="summary"></td>
+	<td class="name" nowrap><a href="#get">get (identifier)</a></td>
+	<td class="summary">The function <code>get(identifier): table</code> retrieves a saved result
+  from the result store.</td>
 	</tr>
 </table>
 
@@ -201,20 +202,86 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_array_size"></a>
+    <strong>get_array_size (value)</strong>
+    </dt>
+    <dd>
+    Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table or any input.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The size of the array like table. 0 if the input is
+ no table or the table is empty.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_table_size"></a>
+    <strong>get_table_size (value)</strong>
+    </dt>
+    <dd>
+    Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A table or any input.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The size of the array like table. 0 if the input is
+ no table or the table is empty.
+    </ol>
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
     <dt>
-    <a name = "default_options"></a>
-    <strong>default_options</strong>
+    <a name = "all_options"></a>
+    <strong>all_options</strong>
     </dt>
     <dd>
-    The default options.
+    This table stores all allowed option keys.
 
 
     <h3>Fields:</h3>
     <ul>
+        <li><span class="parameter">case_insensitive_keys</span>
+
+        </li>
         <li><span class="parameter">convert_dimensions</span>
+
+        </li>
+        <li><span class="parameter">converter</span>
 
         </li>
         <li><span class="parameter">debug</span>
@@ -223,10 +290,22 @@
         <li><span class="parameter">default</span>
 
         </li>
+        <li><span class="parameter">defaults</span>
+
+        </li>
+        <li><span class="parameter">definitions</span>
+
+        </li>
         <li><span class="parameter">naked_as_value</span>
 
         </li>
         <li><span class="parameter">no_error</span>
+
+        </li>
+        <li><span class="parameter">postprocess</span>
+
+        </li>
+        <li><span class="parameter">preprocess</span>
 
         </li>
         <li><span class="parameter">unpack_single_array_values</span>
@@ -240,34 +319,65 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "default_options"></a>
+    <strong>default_options</strong>
+    </dt>
+    <dd>
+    The default options.
+
+
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "luafy_key"></a>
-    <strong>luafy_key (key)</strong>
+    <a name = "merge_tables"></a>
+    <strong>merge_tables (target, t2)</strong>
     </dt>
     <dd>
-    Convert a key so that it can be written as a table field without
-  quotes and square brackets (for example <code>one 2</code> becomes <code>one_2</code>).
-  The key can then reference values from a table using dot notation.
-  (<code>table[&quot;one 2&quot;]</code> becomes <code>table.one_2</code>).
+    https://stackoverflow.com/a/1283608/10193818
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">key</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
-         The key to be converted.
+        <li><span class="parameter">target</span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+
         </li>
     </ul>
 
-    <h3>Returns:</h3>
-    <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
-        The converted key.
-    </ol>
+
+
+
+</dd>
+    <dt>
+    <a name = "clone_table"></a>
+    <strong>clone_table (orig)</strong>
+    </dt>
+    <dd>
+    http://lua-users.org/wiki/CopyTable
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">orig</span>
+
+        </li>
+    </ul>
+
 
 
 
@@ -327,49 +437,6 @@
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
 
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "merge_tables"></a>
-    <strong>merge_tables (target, t2)</strong>
-    </dt>
-    <dd>
-    https://stackoverflow.com/a/1283608/10193818
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">target</span>
-
-        </li>
-        <li><span class="parameter">t2</span>
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "clone_table"></a>
-    <strong>clone_table (orig)</strong>
-    </dt>
-    <dd>
-    http://lua-users.org/wiki/CopyTable
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">orig</span>
-
-        </li>
-    </ul>
-
 
 
 
@@ -482,7 +549,19 @@
     <strong>generate_parser (initial_rule, convert_dimensions)</strong>
     </dt>
     <dd>
-    Generate the PEG parser using Lpeg.
+    <p>Generate the PEG parser using Lpeg.</p>
+
+<p> Explanations of some LPeg notation forms:</p>
+
+<ul>
+<li><code>patt ^ 0</code> = <code>expression *</code></li>
+<li><code>patt ^ 1</code> = <code>expression +</code></li>
+<li><code>patt ^ -1</code> = <code>expression ?</code></li>
+<li><code>patt1 * patt2</code> = <code>expression1 expression2</code>: Sequence</li>
+<li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code>: Ordered choice</p></li>
+<li><p><a href="https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf">TUGboat article: Parsing complex data formats in LuaTEX with LPEG</a></p></li>
+</ul>
+
 
 
     <h3>Parameters:</h3>
@@ -572,62 +651,6 @@
 
 </dd>
     <dt>
-    <a name = "get_array_size"></a>
-    <strong>get_array_size (value)</strong>
-    </dt>
-    <dd>
-    Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">value</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table or any input.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">number</span></span>
-        The size of the array like table. 0 if the input is
- no table or the table is empty.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "get_table_size"></a>
-    <strong>get_table_size (value)</strong>
-    </dt>
-    <dd>
-    Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">value</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table or any input.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">number</span></span>
-        The size of the array like table. 0 if the input is
- no table or the table is empty.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "normalize"></a>
     <strong>normalize (raw, options)</strong>
     </dt>
@@ -670,7 +693,7 @@
 </dd>
     <dt>
     <a name = "apply_definitions"></a>
-    <strong>apply_definitions (defintions, options, input, output, leftover, key_path, input_root)</strong>
+    <strong>apply_definitions (defs, opts, input, output, leftover, key_path, input_root)</strong>
     </dt>
     <dd>
     Apply the key-value-pair definitions (defintions) on an input table in a
@@ -679,10 +702,10 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">defintions</span>
+        <li><span class="parameter">defs</span>
          table A table containing all definitions.
         </li>
-        <li><span class="parameter">options</span>
+        <li><span class="parameter">opts</span>
          table The parse options table.
         </li>
         <li><span class="parameter">input</span>
@@ -702,6 +725,22 @@
   input and output table.
         </li>
     </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "input"></a>
+    <strong>input</strong>
+    </dt>
+    <dd>
+    standalone values are removed.
+ For some callbacks and the third return value of parse, we
+ need an unchanged raw result from the parse function.
+
+
 
 
 
@@ -755,59 +794,6 @@
     A table to store parsed key-value results.
 
 
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "save"></a>
-    <strong>save (identifier, result)</strong>
-    </dt>
-    <dd>
-    The function <code>save(identifier, result): void</code> saves a result (a
-  table from a previous run of <a href="index.html#parse">parse</a>) under an identifier.
-  Therefore, it is not necessary to pollute the global namespace to
-  store results for the later usage.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">identifier</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
-         The identifier under which the result is
-   saved.
-        </li>
-        <li><span class="parameter">result</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A result to be stored and that was created by
-   the key-value parser.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "get"></a>
-    <strong>get (identifier)</strong>
-    </dt>
-    <dd>
-    The function <code>get(identifier): table</code> retrieves a saved result
-  from the result store.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">identifier</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
-         The identifier under which the result was
-   saved.
-        </li>
-    </ul>
 
 
 
@@ -873,24 +859,6 @@
 
 </dd>
     <dt>
-    <a name = "define"></a>
-    <strong>define</strong>
-    </dt>
-    <dd>
-
-
-
-
-
-
-    <h3>See also:</h3>
-    <ul>
-         <a href="index.html#define">define</a>
-    </ul>
-
-
-</dd>
-    <dt>
     <a name = "render"></a>
     <strong>render</strong>
     </dt>
@@ -928,37 +896,54 @@
 </dd>
     <dt>
     <a name = "save"></a>
-    <strong>save</strong>
+    <strong>save (identifier, result)</strong>
     </dt>
     <dd>
+    The function <code>save(identifier, result): void</code> saves a result (a
+  table from a previous run of <a href="index.html#parse">parse</a>) under an identifier.
+  Therefore, it is not necessary to pollute the global namespace to
+  store results for the later usage.
 
 
-
-
-
-
-    <h3>See also:</h3>
+    <h3>Parameters:</h3>
     <ul>
-         <a href="index.html#save">save</a>
+        <li><span class="parameter">identifier</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         The identifier under which the result is
+   saved.
+        </li>
+        <li><span class="parameter">result</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+         A result to be stored and that was created by
+   the key-value parser.
+        </li>
     </ul>
+
+
+
 
 
 </dd>
     <dt>
     <a name = "get"></a>
-    <strong>get</strong>
+    <strong>get (identifier)</strong>
     </dt>
     <dd>
+    The function <code>get(identifier): table</code> retrieves a saved result
+  from the result store.
 
 
-
-
-
-
-    <h3>See also:</h3>
+    <h3>Parameters:</h3>
     <ul>
-         <a href="index.html#get">get</a>
+        <li><span class="parameter">identifier</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+         The identifier under which the result was
+   saved.
+        </li>
     </ul>
+
+
+
 
 
 </dd>
@@ -969,7 +954,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-06-01 19:40:57 </i>
+<i style="float:right;">Last updated 2022-06-07 08:53:50 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

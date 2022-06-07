@@ -538,12 +538,12 @@ local defintions = { key = { ... } }
 local defintions = { { name = 'key', ... } }
 
 local parse = luakeys.define(defintions)
-local result, leftover = parse(
+local result, unknown = parse(
   'key=value,unknown=unknown',
   { no_error = true }
 )
 luakeys.debug(result) -- { key = 'value' }
-luakeys.debug(leftover) -- { unknown = 'unknown' }
+luakeys.debug(unknown) -- { unknown = 'unknown' }
 \end{minted}
 
 \noindent
@@ -554,56 +554,15 @@ names can be used.
 local parse = luakeys.define({
   level1 = { sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } } },
 })
-local result, leftover = parse('level1={level2={key=value,unknown=unknown}}')
+local result, unknown = parse('level1={level2={key=value,unknown=unknown}}')
 luakeys.debug(result) -- { level1 = { level2 = { key = 'value' } } })
-luakeys.debug(leftover) -- { level1 = { level2 = { unknown = 'unknown' } } })
+luakeys.debug(unknown) -- { level1 = { level2 = { unknown = 'unknown' } } })
 \end{minted}
 
 The code example below lists all the settings that can be used to define
 key-value pairs.
 
-\begin{minted}{lua}
-local defintions = {
-  key = {
-    -- Allow different key names.
-    -- or a single string: alias = 'k'
-    alias = { 'k', 'ke' },
-
-    -- The key is always included in the result. If no default value is
-    -- definied, true is taken as the value.
-    always_present = false,
-
-    -- Only values listed in the array table are allowed.
-    choices = { 'one', 'two', 'three' },
-
-    -- Possible data types: boolean, dimension, integer, number, string
-    data_type = 'string',
-
-    default = true,
-
-    -- The key belongs to a mutually exclusive group of keys.
-    exclusive_group = 'name',
-
-    -- > \g_my_token_list_tl
-    l3_tl_set = 'my_token_list',
-
-    -- > \MacroName
-    macro = 'MacroName', -- > \MacroName
-
-    -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
-    match = '^%d%d%d%d%-%d%d%-%d%d$',
-
-    -- name of the key, can be omitted
-    name = 'key',
-    opposite_keys = { [true] = 'show', [false] = 'hide' },
-    process = function(value, result, leftover)
-      return value
-    end,
-    required = true,
-    sub_keys = { key_level_2 = { ... } },
-  }
-}
-\end{minted}
+\InputLuaExample[firstline=5,lastline=44]{definitions/all-options.lua}
 
 %%
 %
@@ -648,7 +607,16 @@ as the value.
 
 \subsubsection{\texttt{choices}}
 
+% source: Python argparse documentation.
+Some key values should be selected from a restricted set of choices.
+These can be handled by passing an array table containing choices.
+
 \InputLuaExample[firstline=4,lastline=5]{definitions/options/choices.lua}
+
+\noindent
+When the key-value pair is parsed, values will be checked, and an error
+message will be displayed if the value was not one of the acceptable
+choices:
 
 \InputLuaExample[firstline=13,lastline=15]{definitions/options/choices.lua}
 
@@ -657,6 +625,28 @@ as the value.
 %%
 
 \subsubsection{\texttt{data\_type}}
+
+% source: Python argparse documentation.
+The \lua{data_type} option allows type-checking and type conversions to
+be performed.
+%
+% Folgende Datentypen werden unterstützt:
+The following data types are supported:
+\lua{'boolean'},
+\lua{'dimension'},
+\lua{'integer'},
+\lua{'number'},
+\lua{'string'}.
+%
+% Bei den drei Datentypen integer, number, dimension kann eine
+% Typenumwandlung scheitern.
+A type conversion can fail with the three data types
+\lua{'dimension'},
+\lua{'integer'},
+\lua{'number'}.
+%
+% Dann wird eine Fehlermeldung ausgegeben.
+Then an error message is displayed.
 
 \InputLuaExample[firstline=4,lastline=8]{definitions/options/data-type.lua}
 \InputLuaExample[firstline=11,lastline=15]{definitions/options/data-type.lua}
@@ -850,12 +840,15 @@ function is called:
 \item \lua{value}:
 % Der zum schlüssel gehörende aktuelle Wert.
 The current value asssociated with the key.
+
 \item \lua{input}:
 % Die Ergebnis-Tabelle, die vor dem Zeitpunkt geklont wurde, als mit dem
 % Anwenden der Definitionen begonnen wurde.
 The result table cloned before the time the definitions started to be applied.
+
 \item \lua{result}: The table in which the final result will be saved.
-\item \lua{unknown}: The table in which the leftover key-value pairs
+
+\item \lua{unknown}: The table in which the unknown key-value pairs
 are stored.
 \end{enumerate}
 
