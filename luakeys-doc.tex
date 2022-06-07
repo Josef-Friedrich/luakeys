@@ -438,6 +438,27 @@ we can write ...
 %
 %%
 
+\subsubsection{Option “\texttt{format\_keys}”}
+
+\begin{description}
+\item[lower] \strut
+
+\InputLuaExample[firstline=4,lastline=5]{opts/format-keys.lua}
+
+\item[snake] \strut
+
+\InputLuaExample[firstline=11,lastline=12]{opts/format-keys.lua}
+
+\item[upper] \strut
+
+\InputLuaExample[firstline=18,lastline=19]{opts/format-keys.lua}
+
+\end{description}
+
+%%
+%
+%%
+
 \subsubsection{Option “\texttt{naked\_as\_value}”}
 
 % Mit Hilfe der Option \lua{naked_as_value} werden nackte Schlüssel
@@ -1412,6 +1433,9 @@ An example of how to use the command in \LaTeX:
 * New option: case\_insensitive\_keys
 }
 \changes{v0.6}{2022/05/29}{
+* New option “format\_keys”
+* Remove option “case\_insensitive\_keys”. Use
+  “format_keys = \{ lower \}” to achieve the same effect.
 * The default value of the option “convert\_dimension” is now false.
 * The function “print” is now called “debug”.
 * The option “standalone\_as\_true” is renamed to “naked\_as\_value”. The

@@ -575,13 +575,13 @@ local function normalize(raw, opts)
         for _, style in ipairs(opts.format_keys) do
           if style == 'lower' then
             key = key:lower()
-          elseif style == 'upper' then
-            key = key:upper()
           elseif style == 'snake' then
             key = key:gsub('[^%w]+', '_')
+          elseif style == 'upper' then
+            key = key:upper()
           else
             throw_error('Unknown style to format keys: ' .. tostring(style) ..
-                          ' Allowed styles are: lower, upper, snake')
+                          ' Allowed styles are: lower, snake, upper')
           end
         end
       end
@@ -1023,9 +1023,7 @@ local function parse(kv_string, opts)
   if opts.converter ~= nil and type(opts.converter) == 'function' then
     raw = visit_tree(raw, opts.converter)
   end
-  if opts.defaults ~= nil and type(opts.defaults) == 'table' then
-    merge_tables(raw, opts.defaults)
-  end
+
   raw = normalize(raw, opts)
 
   apply_processor('postprocess')
@@ -1046,6 +1044,11 @@ local function parse(kv_string, opts)
   else
     result = result_def
   end
+
+  if opts.defaults ~= nil and type(opts.defaults) == 'table' then
+    merge_tables(result, opts.defaults)
+  end
+
   if opts.debug then
     debug(result)
   end

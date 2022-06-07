@@ -25,7 +25,7 @@ local opts = {
   -- Key-value pair defintions.
   defs = { key = { default = 'value' } },
 
-  -- lower, upper, snake
+  -- lower, snake, upper
   format_keys = { 'snake' },
 
   -- If true, naked keys are converted to values:
@@ -38,7 +38,6 @@ local opts = {
   -- { key = { 'value' } } -> { key = 'value' }
   unpack = false,
 }
-opts.defaults = nil
 local result = luakeys.parse('key', opts)
 
 it('true', function ()
