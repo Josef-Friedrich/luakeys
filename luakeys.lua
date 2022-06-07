@@ -577,8 +577,8 @@ end
 --   `unpack_single_array_values`
 --
 -- @treturn table A normalized table ready for the outside world.
-local function normalize(raw, options)
-  if options.unpack_single_array_values then
+local function normalize(raw, opts)
+  if opts.unpack_single_array_values then
     raw = visit_parse_tree(raw, function(key, value)
       if type(value) == 'table' and utils.get_array_size(value) == 1 and
         utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
@@ -592,10 +592,10 @@ local function normalize(raw, options)
     end
   end
 
-  if not options.naked_as_value and options.definitions == false then
+  if not opts.naked_as_value and opts.definitions == false then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
-        return value, options.default
+        return value, opts.default
       end
       return key, value
     end)
@@ -605,7 +605,7 @@ local function normalize(raw, options)
     end
   end
 
-  if options.case_insensitive_keys then
+  if opts.case_insensitive_keys then
     raw = visit_parse_tree(raw, function(key, value)
       if type(key) == 'string' then
         return key:lower(), value
@@ -671,7 +671,7 @@ local is = {
 ---@param opts table The parse options table.
 ---@param input table The current input table.
 ---@param output table The current output table.
----@param leftover table Always the root leftover table.
+---@param unknown table Always the root unknown table.
 ---@param key_path table An array of key names leading to the current
 ---@param input_root table The root input table
 ---  input and output table.
@@ -679,7 +679,7 @@ local function apply_definitions(defs,
   opts,
   input,
   output,
-  leftover,
+  unknown,
   key_path,
   input_root)
   local exclusive_groups = {}
@@ -888,7 +888,7 @@ local function apply_definitions(defs,
         return
       end
       if def.process ~= nil and type(def.process) == 'function' then
-        return def.process(value, input_root, output, leftover)
+        return def.process(value, input_root, output, unknown)
       end
     end,
 
@@ -909,7 +909,7 @@ local function apply_definitions(defs,
         elseif type(value) == 'table' then
           v = value
         end
-        v = apply_definitions(def.sub_keys, opts, v, output[key], leftover,
+        v = apply_definitions(def.sub_keys, opts, v, output[key], unknown,
           add_to_key_path(key_path, key), input_root)
         if utils.get_table_size(v) > 0 then
           return v
@@ -925,8 +925,8 @@ local function apply_definitions(defs,
   if output == nil then
     output = {}
   end
-  if leftover == nil then
-    leftover = {}
+  if unknown == nil then
+    unknown = {}
   end
   if key_path == nil then
     key_path = {}
@@ -980,22 +980,22 @@ local function apply_definitions(defs,
   end
 
   if utils.get_table_size(input) > 0 then
-    -- Move to the current leftover table.
-    local current_leftover = leftover
+    -- Move to the current unknown table.
+    local current_unknown = unknown
     for _, key in ipairs(key_path) do
-      if current_leftover[key] == nil then
-        current_leftover[key] = {}
+      if current_unknown[key] == nil then
+        current_unknown[key] = {}
       end
-      current_leftover = current_leftover[key]
+      current_unknown = current_unknown[key]
     end
 
-    -- Copy all leftover key-value-pairs to the current leftover table.
+    -- Copy all unknown key-value-pairs to the current unknown table.
     for key, value in pairs(input) do
-      current_leftover[key] = value
+      current_unknown[key] = value
     end
   end
 
-  return output, leftover
+  return output, unknown
 end
 
 local function parse_kv_string(kv_string, convert_dimensions)
@@ -1008,23 +1008,23 @@ end
 -- @tparam string kv_string A string in the TeX/LaTeX style key-value
 --   format as described above.
 --
--- @tparam table options A table containing the settings:
+-- @tparam table opts A table containing the settings:
 -- `convert_dimensions`, `unpack_single_array_values`,
 -- `naked_as_value`, `converter`, `debug`, `preprocess`, `postprocess`.
 --
 -- @treturn table A hopefully properly parsed table you can do something
 -- useful with.
-local function parse(kv_string, options)
+local function parse(kv_string, opts)
   if kv_string == nil then
     return {}
   end
-  options = normalize_parse_options(options)
-  local result_parse = parse_kv_string(kv_string, options.convert_dimensions)
+  opts = normalize_parse_options(opts)
+  local result_parse = parse_kv_string(kv_string, opts.convert_dimensions)
 
   local function apply_processor(name)
-    if options[name] ~= nil and type(options[name]) == 'function' then
-      options[name](result_parse, kv_string)
-      if options.debug then
+    if opts[name] ~= nil and type(opts[name]) == 'function' then
+      opts[name](result_parse, kv_string)
+      if opts.debug then
         print('After execution of the function: ' .. name)
         debug(result_parse)
       end
@@ -1033,13 +1033,13 @@ local function parse(kv_string, options)
 
   apply_processor('preprocess')
 
-  if options.converter ~= nil and type(options.converter) == 'function' then
-    result_parse = visit_parse_tree(result_parse, options.converter)
+  if opts.converter ~= nil and type(opts.converter) == 'function' then
+    result_parse = visit_parse_tree(result_parse, opts.converter)
   end
-  if options.defaults ~= nil and type(options.defaults) == 'table' then
-    merge_tables(result_parse, options.defaults)
+  if opts.defaults ~= nil and type(opts.defaults) == 'table' then
+    merge_tables(result_parse, opts.defaults)
   end
-  result_parse = normalize(result_parse, options)
+  result_parse = normalize(result_parse, opts)
 
   apply_processor('postprocess')
 
@@ -1047,9 +1047,9 @@ local function parse(kv_string, options)
   local result_def = nil
   -- In this table are all unknown keys stored
   local result_unknown = nil
-  if options.definitions ~= nil and type(options.definitions) == 'table' then
+  if opts.definitions ~= nil and type(opts.definitions) == 'table' then
     result_def = {}
-    result_def, result_unknown = apply_definitions(options.definitions, options,
+    result_def, result_unknown = apply_definitions(opts.definitions, opts,
       result_parse, result_def, {}, {}, clone_table(result_parse))
   end
 
@@ -1059,12 +1059,12 @@ local function parse(kv_string, options)
   else
     result = result_def
   end
-  if options.debug then
+  if opts.debug then
     debug(result)
   end
 
   -- no_error
-  if not options.no_error and type(result_unknown) == 'table' and
+  if not opts.no_error and type(result_unknown) == 'table' and
     utils.get_table_size(result_unknown) > 0 then
     throw_error('Unknown keys: ' .. render(result_unknown))
   end
@@ -1090,13 +1090,13 @@ local export = {
   --- @see parse
   parse = parse,
 
-  define = function(defintions, parse_options)
-    return function(kv_string, inner_parse_options)
+  define = function(defintions, opts)
+    return function(kv_string, inner_opts)
       local options
-      if inner_parse_options ~= nil then
-        options = inner_parse_options
-      elseif parse_options ~= nil then
-        options = parse_options
+      if inner_opts ~= nil then
+        options = inner_opts
+      elseif opts ~= nil then
+        options = opts
       end
 
       if options == nil then
