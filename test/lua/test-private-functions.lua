@@ -79,8 +79,8 @@ describe('Test private functions', function()
 
   end)
 
-  describe('Function “visit_parse_tree()”', function()
-    local visit = luakeys.visit_parse_tree
+  describe('Function “visit_tree()”', function()
+    local visit = luakeys.visit_tree
 
     it('Change the value', function()
       local function callback_func(key, value)

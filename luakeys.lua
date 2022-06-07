@@ -533,22 +533,22 @@ local function generate_parser(initial_rule, convert_dimensions)
 -- LuaFormatter on
 end
 
-local function visit_parse_tree(parse_tree, callback_func)
-  if type(parse_tree) ~= 'table' then
-    throw_error('Parse tree has to be a table got: ' .. tostring(parse_tree))
+local function visit_tree(tree, callback_func)
+  if type(tree) ~= 'table' then
+    throw_error('Parameter “tree” has to be a table, got: ' ..
+                  tostring(tree))
   end
-  local function visit_parse_tree_recursive(root_table,
-    current_table,
+  local function visit_tree_recursive(tree,
+    current,
     result,
     depth,
     callback_func)
-    for key, value in pairs(current_table) do
+    for key, value in pairs(current) do
       if type(value) == 'table' then
-        value = visit_parse_tree_recursive(root_table, value, {}, depth + 1,
-          callback_func)
+        value = visit_tree_recursive(tree, value, {}, depth + 1, callback_func)
       end
 
-      key, value = callback_func(key, value, depth, current_table, root_table)
+      key, value = callback_func(key, value, depth, current, tree)
 
       if key ~= nil and value ~= nil then
         result[key] = value
@@ -559,8 +559,7 @@ local function visit_parse_tree(parse_tree, callback_func)
     end
   end
 
-  return
-    visit_parse_tree_recursive(parse_tree, parse_tree, {}, 1, callback_func)
+  return visit_tree_recursive(tree, tree, {}, 1, callback_func)
 end
 
 --- Normalize the result tables of the LPeg parser. This normalization
@@ -579,7 +578,7 @@ end
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, opts)
   if opts.unpack then
-    raw = visit_parse_tree(raw, function(key, value)
+    raw = visit_tree(raw, function(key, value)
       if type(value) == 'table' and utils.get_array_size(value) == 1 and
         utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
         return key, value[1]
@@ -593,7 +592,7 @@ local function normalize(raw, opts)
   end
 
   if not opts.naked_as_value and opts.defs == false then
-    raw = visit_parse_tree(raw, function(key, value)
+    raw = visit_tree(raw, function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, opts.default
       end
@@ -606,7 +605,7 @@ local function normalize(raw, opts)
   end
 
   if opts.case_insensitive_keys then
-    raw = visit_parse_tree(raw, function(key, value)
+    raw = visit_tree(raw, function(key, value)
       if type(key) == 'string' then
         return key:lower(), value
       end
@@ -1015,14 +1014,14 @@ local function parse(kv_string, opts)
   end
   opts = normalize_parse_options(opts)
 
-  local result_parse = generate_parser('list', opts.convert_dimensions):match(kv_string)
+  local raw = generate_parser('list', opts.convert_dimensions):match(kv_string)
 
   local function apply_processor(name)
     if opts[name] ~= nil and type(opts[name]) == 'function' then
-      opts[name](result_parse, kv_string)
+      opts[name](raw, kv_string)
       if opts.debug then
         print('After execution of the function: ' .. name)
-        debug(result_parse)
+        debug(raw)
       end
     end
   end
@@ -1030,28 +1029,28 @@ local function parse(kv_string, opts)
   apply_processor('preprocess')
 
   if opts.converter ~= nil and type(opts.converter) == 'function' then
-    result_parse = visit_parse_tree(result_parse, opts.converter)
+    raw = visit_tree(raw, opts.converter)
   end
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then
-    merge_tables(result_parse, opts.defaults)
+    merge_tables(raw, opts.defaults)
   end
-  result_parse = normalize(result_parse, opts)
+  raw = normalize(raw, opts)
 
   apply_processor('postprocess')
 
   -- The result after applying the defintions.
   local result_def = nil
   -- In this table are all unknown keys stored
-  local result_unknown = nil
+  local unknown = nil
   if opts.defs ~= nil and type(opts.defs) == 'table' then
     result_def = {}
-    result_def, result_unknown = apply_definitions(opts.defs, opts,
-      result_parse, result_def, {}, {}, clone_table(result_parse))
+    result_def, unknown = apply_definitions(opts.defs, opts, raw, result_def,
+      {}, {}, clone_table(raw))
   end
 
   local result
   if result_def == nil then
-    result = result_parse
+    result = raw
   else
     result = result_def
   end
@@ -1060,11 +1059,11 @@ local function parse(kv_string, opts)
   end
 
   -- no_error
-  if not opts.no_error and type(result_unknown) == 'table' and
-    utils.get_table_size(result_unknown) > 0 then
-    throw_error('Unknown keys: ' .. render(result_unknown))
+  if not opts.no_error and type(unknown) == 'table' and
+    utils.get_table_size(unknown) > 0 then
+    throw_error('Unknown keys: ' .. render(unknown))
   end
-  return result, result_unknown, result_parse
+  return result, unknown, raw
 end
 
 --- Store results
@@ -1147,7 +1146,7 @@ if _TEST then
   export.luafy_options = luafy_options
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
-  export.visit_parse_tree = visit_parse_tree
+  export.visit_tree = visit_tree
 end
 
 return export
