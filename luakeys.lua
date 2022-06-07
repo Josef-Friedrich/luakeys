@@ -212,17 +212,17 @@ end
 --  1-based consecutive integer keys (a.k.a. array tables) can be
 --  parsed in order.
 --
--- @tparam table tbl A table to be converted into a key-value string.
+-- @tparam table result A table to be converted into a key-value string.
 --
 -- @treturn string A key-value string that can be passed to a TeX
 -- macro.
-local function render(tbl)
-  local function render_inner(tbl)
+local function render(result)
+  local function render_inner(result)
     local output = {}
     local function add(text)
       table.insert(output, text)
     end
-    for key, value in pairs(tbl) do
+    for key, value in pairs(result) do
       if (key and type(key) == 'string') then
         if (type(value) == 'table') then
           if (next(value)) then
@@ -241,25 +241,25 @@ local function render(tbl)
     end
     return table.concat(output)
   end
-  return render_inner(tbl)
+  return render_inner(result)
 end
 
 --- The function `stringify(tbl, for_tex)` converts a Lua table into a
 --   printable string. Stringify a table means to convert the table into
---   a string. This function is used to realize the `print` function.
+--   a string. This function is used to realize the `debug` function.
 --   `stringify(tbl, true)` (`for_tex = true`) generates a string which
 --   can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
 --   this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
 --   string suitable for the terminal.
 --
--- @tparam table input A table to stringify.
+-- @tparam table result A table to stringify.
 --
 -- @tparam boolean for_tex Stringify the table into a text string that
 --   can be embeded inside a TeX document via tex.print(). Curly braces
 --   and whites spaces are escaped.
 --
 -- https://stackoverflow.com/a/54593224/10193818
-local function stringify(input, for_tex)
+local function stringify(result, for_tex)
   local line_break, start_bracket, end_bracket, indent
 
   if for_tex then
@@ -322,7 +322,7 @@ local function stringify(input, for_tex)
   end
 
   return
-    start_bracket .. line_break .. stringify_inner(input, 1) .. line_break ..
+    start_bracket .. line_break .. stringify_inner(result, 1) .. line_break ..
       end_bracket
 end
 
@@ -332,10 +332,10 @@ end
 --   `parse`. You have to compile your TeX document in a console to
 --   see the terminal output.
 --
--- @tparam table tbl A table to be printed to standard output for
+-- @tparam table result A table to be printed to standard output for
 -- debugging purposes.
-local function debug(tbl)
-  print('\n' .. stringify(tbl, false))
+local function debug(result)
+  print('\n' .. stringify(result, false))
 end
 
 --- Parser / Lpeg related

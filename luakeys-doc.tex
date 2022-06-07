@@ -901,9 +901,9 @@ definitions.
 %
 %-----------------------------------------------------------------------
 
-\subsection{Function \texttt{render(tbl)}: string}
+\subsection{Function \texttt{render(result)}: string}
 
-The function \lua{render(tbl)} reverses the function
+The function \lua{render(result)} reverses the function
 \lua{parse(kv_string)}. It takes a Lua table and converts this table
 into a key-value string. The resulting string usually has a different
 order as the input table.
@@ -920,9 +920,9 @@ tables) can be parsed in order.
 %
 %%
 
-\subsection{Function \texttt{debug(tbl): void}}
+\subsection{Function \texttt{debug(result): void}}
 
-The function \lua{debug(tbl)} pretty prints a Lua table to standard
+The function \lua{debug(result)} pretty prints a Lua table to standard
 output (stdout). It is a utility function that can be used to debug and
 inspect the resulting Lua table of the function \lua{parse}. You have to
 compile your \TeX{} document in a console to see the terminal output.
