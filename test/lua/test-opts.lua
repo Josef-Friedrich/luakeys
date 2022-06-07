@@ -2,6 +2,17 @@ require('busted.runner')()
 local luakeys = require('luakeys')
 
 describe('Options', function()
+  describe('Option “convert_dimensions”', function()
+    it('true', function()
+      assert.are.same({ dim = 1234567 },
+        luakeys.parse('dim=1cm', { convert_dimensions = true }))
+    end)
+
+    it('false', function()
+      assert.are.same({ dim = '1cm' },
+        luakeys.parse('dim=1cm', { convert_dimensions = false }))
+    end)
+  end)
 
   describe('Option “converter”', function()
     it('standalone string values as keys', function()
@@ -128,6 +139,42 @@ describe('Options', function()
     it('Should join the keys of nested tables.', function()
       assert_defaults('a=A,b={c=C}', { b = { d = 'D' } },
         { a = 'A', b = { c = 'C', d = 'D' } })
+    end)
+  end)
+
+  describe('Option “format_keys”', function()
+    local function assert_format_keys(kv_string, styles, expected)
+      assert.are.same(expected,
+        luakeys.parse(kv_string, { format_keys = styles }))
+    end
+
+    describe('lower', function()
+      it('default', function()
+        assert_format_keys('TEST=Test', {}, { TEST = 'Test' })
+      end)
+
+      it('true', function()
+        assert_format_keys('TEST=Test', { 'lower' }, { test = 'Test' })
+      end)
+
+      it('recursive', function()
+        assert_format_keys('TEST1={TEST2={Test}}', { 'lower' },
+          { test1 = { test2 = 'Test' } })
+      end)
+    end)
+
+    describe('snake', function()
+      it('Whitespaces', function()
+        assert_format_keys('key   one=1', { 'snake' }, { key_one = 1 })
+      end)
+
+      it('special characters', function()
+        assert_format_keys('löve=1', { 'snake' }, { l_ve = 1 })
+      end)
+
+      it('Numbers', function()
+        assert_format_keys('1 2 3', { 'snake' }, { ['1_2_3'] = true })
+      end)
     end)
   end)
 

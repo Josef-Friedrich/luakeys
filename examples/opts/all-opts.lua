@@ -3,9 +3,6 @@ local luakeys = require('luakeys')
 
 -- Update also in README.md
 local opts = {
-  -- { KEY = 'Value' } -> { key = 'value' }
-  case_insensitive_keys = false,
-
   -- Visit all key-value pairs in the recursive parse tree.
   converter = function(key, value, depth, current_tree, root_tree)
     return key, value
@@ -27,6 +24,9 @@ local opts = {
 
   -- Key-value pair defintions.
   defs = { key = { default = 'value' } },
+
+  -- lower, upper, snake
+  format_keys = { 'snake' },
 
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }

@@ -71,13 +71,6 @@ describe('Function “parse()”', function()
       defaults.convert_dimensions = old
     end)
 
-    it('with spaces', function()
-      assert.are.same({ '1cm' }, luakeys.parse('1cm', {
-        ['convert dimensions'] = false,
-        naked_as_value = true,
-      }))
-    end)
-
     it('Unknown options should trigger an error message.', function()
       assert.has_error(function()
         luakeys.parse('key', { xxx = true })

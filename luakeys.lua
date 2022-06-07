@@ -37,18 +37,6 @@ if not token then
 end
 
 local utils = {
-  --- Convert a key so that it can be written as a table field without
-  --  quotes and square brackets (for example `one 2` becomes `one_2`).
-  --  The key can then reference values from a table using dot notation.
-  --  (`table["one 2"]` becomes `table.one_2`).
-  --
-  -- @tparam string key The key to be converted.
-  --
-  -- @treturn string The converted key.
-  luafy_key = function(key)
-    return key:gsub('[^%w]+', '_')
-  end,
-
   --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
   --
   -- @tparam table value A table or any input.
@@ -125,13 +113,13 @@ end
 
 --- This table stores all allowed option keys.
 local all_options = {
-  case_insensitive_keys = false,
   convert_dimensions = false,
   converter = false,
   debug = false,
   default = true,
   defaults = false,
   defs = false,
+  format_keys = false,
   naked_as_value = false,
   no_error = false,
   postprocess = false,
@@ -156,24 +144,6 @@ local function set_l3_code_cctab(cctab_id)
   l3_code_cctab = cctab_id
 end
 
---- Convert all keys in a table to strings containig only alphanumeric
--- characters and underscores.
---
--- @param raw_options Some raw options.
---
--- @treturn table Returns always a table. If the input value is not a
--- an empty table is returned.
-local function luafy_options(raw_options)
-  if type(raw_options) ~= 'table' then
-    raw_options = {}
-  end
-  local options = {}
-  for key, value in pairs(raw_options) do
-    options[utils.luafy_key(key)] = value
-  end
-  return options
-end
-
 --- All option keys can be written with underscores or with spaces as
 -- separators.
 -- For the LaTeX version of the macro
@@ -183,23 +153,25 @@ end
 -- empty or some keys are not set.
 --
 -- @treturn table
-local function normalize_parse_options(options_raw)
-  options_raw = luafy_options(options_raw)
-  for key, _ in pairs(options_raw) do
+local function normalize_parse_options(opts)
+  if type(opts) ~= 'table' then
+    opts = {}
+  end
+  for key, _ in pairs(opts) do
     if all_options[key] == nil then
       throw_error('Unknown parse option: ' .. key)
     end
   end
-  local options = {}
+  local o = {}
   for option_name, _ in pairs(all_options) do
-    if options_raw[option_name] ~= nil then
-      options[option_name] = options_raw[option_name]
+    if opts[option_name] ~= nil then
+      o[option_name] = opts[option_name]
     else
-      options[option_name] = default_options[option_name]
+      o[option_name] = default_options[option_name]
     end
   end
 
-  return options
+  return o
 end
 
 --- Convert back to strings
@@ -559,7 +531,12 @@ local function visit_tree(tree, callback_func)
     end
   end
 
-  return visit_tree_recursive(tree, tree, {}, 1, callback_func)
+  local result = visit_tree_recursive(tree, tree, {}, 1, callback_func)
+
+  if result == nil then
+    return {}
+  end
+  return result
 end
 
 --- Normalize the result tables of the LPeg parser. This normalization
@@ -572,45 +549,60 @@ end
 -- @tparam table raw The raw input table coming directly from the PEG
 --   parser
 --
--- @tparam table options Some options. A table with the key
+-- @tparam table opts Some options. A table with the key
 --   `unpack`
 --
 -- @treturn table A normalized table ready for the outside world.
 local function normalize(raw, opts)
-  if opts.unpack then
-    raw = visit_tree(raw, function(key, value)
+  local hooks = {
+    unpack = function(key, value)
       if type(value) == 'table' and utils.get_array_size(value) == 1 and
         utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
         return key, value[1]
       end
       return key, value
-    end)
+    end,
 
-    if raw == nil then
-      raw = {}
-    end
-  end
-
-  if not opts.naked_as_value and opts.defs == false then
-    raw = visit_tree(raw, function(key, value)
+    process_naked = function(key, value)
       if type(key) == 'number' and type(value) == 'string' then
         return value, opts.default
       end
       return key, value
-    end)
+    end,
 
-    if raw == nil then
-      raw = {}
-    end
-  end
-
-  if opts.case_insensitive_keys then
-    raw = visit_tree(raw, function(key, value)
+    format_key = function(key, value)
       if type(key) == 'string' then
-        return key:lower(), value
+        for _, style in ipairs(opts.format_keys) do
+          if style == 'lower' then
+            key = key:lower()
+          elseif style == 'upper' then
+            key = key:upper()
+          elseif style == 'snake' then
+            key = key:gsub('[^%w]+', '_')
+          else
+            throw_error('Unknown style to format keys: ' .. tostring(style) ..
+                          ' Allowed styles are: lower, upper, snake')
+          end
+        end
       end
       return key, value
-    end)
+    end,
+  }
+
+  if opts.unpack then
+    raw = visit_tree(raw, hooks.unpack)
+  end
+
+  if not opts.naked_as_value and opts.defs == false then
+    raw = visit_tree(raw, hooks.process_naked)
+  end
+
+  if opts.format_keys then
+    if type(opts.format_keys) ~= 'table' then
+      throw_error('The option “format_keys” has to be a table not ' ..
+                    type(opts.format_keys))
+    end
+    raw = visit_tree(raw, hooks.format_key)
   end
 
   return raw
@@ -1142,8 +1134,6 @@ local export = {
 -- http://olivinelabs.com/busted/#private
 if _TEST then
   export.apply_definitions = apply_definitions
-  export.luafy_key = utils.luafy_key
-  export.luafy_options = luafy_options
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.visit_tree = visit_tree

@@ -4,42 +4,6 @@ local luakeys = require('luakeys')
 
 describe('Defintions', function()
   describe('Attributes', function()
-    describe('Attribute “case_insensitive_keys”', function()
-      it('default', function()
-        assert.are.same({ TEST = 'Test' }, luakeys.parse('TEST=Test'))
-      end)
-
-      it('true', function()
-        assert.are.same({ test = 'Test' }, luakeys.parse('TEST=Test', {
-          case_insensitive_keys = true,
-        }))
-      end)
-
-      it('recursive', function()
-        assert.are.same({ test1 = { test2 = 'Test' } }, luakeys.parse(
-          'TEST1={TEST2={Test}}', { case_insensitive_keys = true }))
-      end)
-
-      it('false', function()
-        assert.are.same({ TEST = 'Test' }, luakeys.parse('TEST=Test', {
-          case_insensitive_keys = false,
-        }))
-      end)
-    end)
-
-    describe('Attribute “convert_dimensions”', function()
-      it('true', function()
-        assert.are.same({ dim = 1234567 },
-          luakeys.parse('dim=1cm', { convert_dimensions = true }))
-      end)
-
-      it('false', function()
-        assert.are.same({ dim = '1cm' }, luakeys.parse('dim=1cm', {
-          convert_dimensions = false,
-        }))
-      end)
-    end)
-
     describe('Attribute “data_type”', function()
       local function assert_data_type(data_type,
         input_value,

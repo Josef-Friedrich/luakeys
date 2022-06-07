@@ -37,7 +37,10 @@
 }%
 \def\luakeysdebug@parse@options#1{
   \directlua{
-    luakeys.save('debug_options', luakeys.parse('#1'))
+    luakeys.save(
+      'debug_options',
+      luakeys.parse('#1', { format_keys = { 'snake', 'lower' } })
+    )
   }
 }%
 \def\luakeysdebug@output#1{
