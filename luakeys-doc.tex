@@ -168,7 +168,7 @@ To learn more about the individual functions (local functions), please
 read the \href{https://josef-friedrich.github.io/luakeys/}{source code
 documentation}, which was created with
 \href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
-this functions:
+this functions and tables:
 
 \InputLuaExample[firstline=3,lastline=12]{export.lua}
 
@@ -214,11 +214,14 @@ The raw result of the Lpeg grammar parser. \\
 %
 %%
 
-\subsection{Function \texttt{parse(kv\_string, opts): table}}
+\subsection{Function \texttt{parse(kv\_string, opts): result, unknown, raw}}
 \label{parse}
 
-The function \lua{parse(kv_string, opts)} parses a key-value string
-into a Lua table.
+% Die Function parse ist die wichtigste Funktion des Pakets.
+The function \lua{parse(kv_string, opts)} is the most important function
+of the package.
+% Sie konvertiert eine Schlüssel-Wert-Zeichenkette in eine Lua Tabelle.
+It converts a key-value string into a Lua table.
 
 \begin{minted}{latex}
 \newcommand{\mykeyvalcmd}[2][]{
@@ -250,7 +253,7 @@ In plain \TeX:
 The \lua{parse} function can be called with an options table. This
 options are supported:
 
-\InputLuaExample[firstline=5,lastline=40]{opts/all-opts.lua}
+\InputLuaExample[firstline=5,lastline=67]{opts/all-opts.lua}
 
 \noindent
 The options can also be set globally using the exported table
@@ -408,8 +411,13 @@ we can write ...
 \item[upper] \strut
 
 \InputLuaExample[firstline=18,lastline=19]{opts/format-keys.lua}
-
 \end{description}
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{hooks}”}
 
 %%
 %
@@ -463,7 +471,7 @@ If we set the option \lua{no_error} to \lua{true}:
 %
 %%
 
-\subsection{Function \texttt{define(defs, opts): parsefunc}}
+\subsection{Function \texttt{define(defs, opts): parse}}
 \label{define}
 
 The \lua{define} function returns a \lua{parse} function (see
@@ -474,40 +482,16 @@ The name of a key can be specified in three ways:
 \item as a string.
 \item as a key in a Lua table. The definition of the corresponding
 key-value pair is then stored under this key.
-\item by the “name” option.
+\item by the “name” attribute.
 \end{enumerate}
 
-\begin{minted}{lua}
--- standalone string values
-local defs = { 'key' }
-
--- keys in a Lua table
-local defs = { key = { ... } }
-
--- by the “name” option
-local defs = { { name = 'key', ... } }
-
-local parse = luakeys.define(defs)
-local result, unknown = parse(
-  'key=value,unknown=unknown',
-  { no_error = true }
-)
-luakeys.debug(result) -- { key = 'value' }
-luakeys.debug(unknown) -- { unknown = 'unknown' }
-\end{minted}
+\InputLuaExample[firstline=4,lastline=16]{functions/define.lua}
 
 \noindent
 For nested definitions, only the last two ways of specifying the key
 names can be used.
 
-\begin{minted}{lua}
-local parse = luakeys.define({
-  level1 = { sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } } },
-})
-local result, unknown = parse('level1={level2={key=value,unknown=unknown}}')
-luakeys.debug(result) -- { level1 = { level2 = { key = 'value' } } })
-luakeys.debug(unknown) -- { level1 = { level2 = { unknown = 'unknown' } } })
-\end{minted}
+\InputLuaExample[firstline=26,lastline=33]{functions/define.lua}
 
 %-----------------------------------------------------------------------
 %
@@ -878,7 +862,7 @@ definitions.
 %
 %-----------------------------------------------------------------------
 
-\subsection{Function \texttt{render(result)}: string}
+\subsection{Function \texttt{render(result): string}}
 
 The function \lua{render(result)} reverses the function
 \lua{parse(kv_string)}. It takes a Lua table and converts this table
@@ -934,7 +918,7 @@ store results for the later usage.
 %
 %%
 
-\subsection{Function \texttt{get(identifier): table}}
+\subsection{Function \texttt{get(identifier): result}}
 
 The function \lua{get(identifier)} retrieves a saved result from the
 result store.
