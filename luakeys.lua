@@ -937,14 +937,14 @@ local function parse(kv_string, opts)
     kv_string = opts.hooks.kv_string(kv_string)
   end
 
-  local raw = generate_parser('list', opts.convert_dimensions):match(kv_string)
-
+  local result = generate_parser('list', opts.convert_dimensions):match(kv_string)
+  local raw = clone_table(result)
   local function apply_processor(name)
     if opts[name] ~= nil and type(opts[name]) == 'function' then
-      opts[name](raw, kv_string)
+      opts[name](result, kv_string)
       if opts.debug then
         print('After execution of the hook: ' .. name)
-        debug(raw)
+        debug(result)
       end
     end
   end
@@ -952,16 +952,16 @@ local function parse(kv_string, opts)
   apply_processor('preprocess')
 
   if opts.converter ~= nil and type(opts.converter) == 'function' then
-    raw = visit_tree(raw, opts.converter)
+    result = visit_tree(result, opts.converter)
   end
 
   --- Normalize the result table of the LPeg parser. This normalization
   --  tasks are performed on the raw input table coming directly from
   --  the PEG parser:
   --
-  --- @param raw table The raw input table coming directly from the PEG parser
+  --- @param result table The raw input table coming directly from the PEG parser
   --- @param opts table Some options. A table with the key `unpack
-  local function apply_opts(raw, opts)
+  local function apply_opts(result, opts)
     local callbacks = {
       unpack = function(key, value)
         if type(value) == 'table' and utils.get_array_size(value) == 1 and
@@ -998,11 +998,11 @@ local function parse(kv_string, opts)
     }
 
     if opts.unpack then
-      raw = visit_tree(raw, callbacks.unpack)
+      result = visit_tree(result, callbacks.unpack)
     end
 
     if not opts.naked_as_value and opts.defs == false then
-      raw = visit_tree(raw, callbacks.process_naked)
+      result = visit_tree(result, callbacks.process_naked)
     end
 
     if opts.format_keys then
@@ -1010,27 +1010,21 @@ local function parse(kv_string, opts)
         throw_error('The option “format_keys” has to be a table not ' ..
                       type(opts.format_keys))
       end
-      raw = visit_tree(raw, callbacks.format_key)
+      result = visit_tree(result, callbacks.format_key)
     end
 
-    return raw
+    return result
   end
 
-  raw = apply_opts(raw, opts)
+  result = apply_opts(result, opts)
 
   apply_processor('postprocess')
 
-  -- The result after applying the definitions.
-  local result = nil
   -- All unknown keys are stored in this table
   local unknown = nil
   if type(opts.defs) == 'table' then
-    result, unknown = apply_definitions(opts.defs, opts, raw, {}, {}, {},
-      clone_table(raw))
-  end
-
-  if result == nil then
-    result = raw
+    result, unknown = apply_definitions(opts.defs, opts, result, {}, {}, {},
+      clone_table(result))
   end
 
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then
