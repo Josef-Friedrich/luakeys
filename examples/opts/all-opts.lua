@@ -3,11 +3,6 @@ local luakeys = require('luakeys')
 
 -- Update also in README.md
 local opts = {
-  -- Visit all key-value pairs in the recursive parse tree.
-  converter = function(key, value, depth, current, result)
-    return key, value
-  end,
-
   -- Automatically convert dimensions into scaled points (1cm -> 1864679).
   convert_dimensions = false,
 
@@ -32,18 +27,31 @@ local opts = {
       return kv_string
     end,
 
+    -- Visit all key-value pairs recursively.
+    keys_before_opts = function(key, value, depth, current, result)
+      return key, value
+    end,
+
+    -- Visit the current result table.
+    result_before_opts = function(result)
+    end,
+
+    -- Visit all key-value pairs recursively.
     keys_before_def = function(key, value, depth, current, result)
       return key, value
     end,
 
+    -- Visit the current result table.
     result_before_def = function(result)
     end,
 
-    keys = function(key, value, depth, current, result)
+    -- Visit all key-value pairs recursively.
+    keys_at_end = function(key, value, depth, current, result)
       return key, value
     end,
 
-    result = function(result)
+    -- Visit the current result table.
+    result_at_end = function(result)
     end,
   },
 

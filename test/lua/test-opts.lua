@@ -39,33 +39,6 @@ describe('Options', function()
     end)
   end)
 
-  describe('Option “converter”', function()
-    it('standalone string values as keys', function()
-      local function converter(key, value)
-        if type(key) == 'number' and type(value) == 'string' then
-          return value, true
-        end
-        return key, value
-      end
-
-      assert.are.same(luakeys.parse('one,two,three={four}',
-        { converter = converter }),
-        { one = true, two = true, three = { four = true } })
-    end)
-
-    it('case insensitive keys', function()
-      local function converter(key, value)
-        if type(key) == 'string' then
-          return key:lower(), value
-        end
-        return key, value
-      end
-
-      assert.are.same(luakeys.parse('TEST=test', { converter = converter }),
-        { test = 'test' })
-    end)
-  end)
-
   describe('Option “defs”', function()
     it('should return three return tables', function()
       local result, result_unknown, result_parse =
@@ -204,7 +177,7 @@ describe('Options', function()
   end)
 
   describe('Option “hooks”', function()
-    it('kv_string', function()
+    it('Hook “kv_string”', function()
       local result = luakeys.parse('key=unknown', {
         hooks = {
           kv_string = function(kv_string)
@@ -214,23 +187,50 @@ describe('Options', function()
       })
       assert.are.same(result, { key = 'value' })
     end)
-  end)
 
-  describe('Option “preprocess”', function()
-    it('should add keys.', function()
-      local result = luakeys.parse('key=value', {
-        preprocess = function(result, kv_string)
-          result['additional_key'] = 'value'
-          result['kv_string'] = kv_string
-        end,
-      })
+    describe('Hook “keys_before_opts”', function()
+      it('standalone string values as keys', function()
+        local function keys_before_opts(key, value)
+          if type(key) == 'number' and type(value) == 'string' then
+            return value, 42
+          end
+          return key, value
+        end
 
-      assert.are.same(result, {
-        additional_key = 'value',
-        key = 'value',
-        kv_string = 'key=value',
-      })
+        assert.are.same(luakeys.parse('one,two,three={four}', {
+          hooks = { keys_before_opts = keys_before_opts },
+          naked_as_value = true,
+        }), { one = 42, two = 42, three = { four = 42 } })
+      end)
+
+      it('case insensitive keys', function()
+        assert.are.same(luakeys.parse('TEST=test', {
+          hooks = {
+            keys_before_opts = function(key, value)
+              if type(key) == 'string' then
+                return key:lower(), value
+              end
+              return key, value
+            end,
+          },
+        }), { test = 'test' })
+      end)
     end)
+
+    describe('Hook “result_at_end”', function()
+      it('should add keys.', function()
+        local result = luakeys.parse('key=value', {
+          hooks = {
+            result_at_end = function(result)
+              result['additional_key'] = 'value'
+            end,
+          },
+        })
+
+        assert.are.same(result, { additional_key = 'value', key = 'value' })
+      end)
+    end)
+
   end)
 
   describe('Option “naked_as_value”', function()

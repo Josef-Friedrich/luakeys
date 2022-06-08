@@ -114,7 +114,6 @@ end
 --- This table stores all allowed option keys.
 local all_options = {
   convert_dimensions = false,
-  converter = false,
   debug = false,
   default = true,
   defaults = false,
@@ -930,37 +929,44 @@ local function parse(kv_string, opts)
     end
     return o
   end
-
   opts = normalize_opts(opts)
 
   if type(opts.hooks.kv_string) == 'function' then
     kv_string = opts.hooks.kv_string(kv_string)
   end
 
-  local result = generate_parser('list', opts.convert_dimensions):match(kv_string)
+  local result = generate_parser('list', opts.convert_dimensions):match(
+    kv_string)
   local raw = clone_table(result)
-  local function apply_processor(name)
-    if opts[name] ~= nil and type(opts[name]) == 'function' then
-      opts[name](result, kv_string)
+
+  local function apply_hook(name)
+    if type(opts.hooks[name]) == 'function' then
+      if name:match('^keys') then
+        result = visit_tree(result, opts.hooks[name])
+      else
+        opts.hooks[name](result)
+      end
+
       if opts.debug then
-        print('After execution of the hook: ' .. name)
+        print('After the execution of the hook: ' .. name)
         debug(result)
       end
     end
   end
 
-  apply_processor('preprocess')
-
-  if opts.converter ~= nil and type(opts.converter) == 'function' then
-    result = visit_tree(result, opts.converter)
+  local function apply_hooks(at)
+    apply_hook('keys_' .. at)
+    apply_hook('result_' .. at)
   end
+
+  apply_hooks('before_opts')
 
   --- Normalize the result table of the LPeg parser. This normalization
   --  tasks are performed on the raw input table coming directly from
   --  the PEG parser:
   --
   --- @param result table The raw input table coming directly from the PEG parser
-  --- @param opts table Some options. A table with the key `unpack
+  --- @param opts table Some options.
   local function apply_opts(result, opts)
     local callbacks = {
       unpack = function(key, value)
@@ -1015,17 +1021,17 @@ local function parse(kv_string, opts)
 
     return result
   end
-
   result = apply_opts(result, opts)
-
-  apply_processor('postprocess')
 
   -- All unknown keys are stored in this table
   local unknown = nil
   if type(opts.defs) == 'table' then
+    apply_hooks('before_defs')
     result, unknown = apply_definitions(opts.defs, opts, result, {}, {}, {},
       clone_table(result))
   end
+
+  apply_hooks('at_end')
 
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then
     merge_tables(result, opts.defaults)
