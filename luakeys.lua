@@ -145,36 +145,6 @@ local function set_l3_code_cctab(cctab_id)
   l3_code_cctab = cctab_id
 end
 
---- All option keys can be written with underscores or with spaces as
--- separators.
--- For the LaTeX version of the macro
---  `\luakeysdebug[options]{kv-string}`.
---
--- @tparam table options_raw Options in a raw format. The table may be
--- empty or some keys are not set.
---
--- @treturn table
-local function normalize_parse_options(opts)
-  if type(opts) ~= 'table' then
-    opts = {}
-  end
-  for key, _ in pairs(opts) do
-    if all_options[key] == nil then
-      throw_error('Unknown parse option: ' .. key)
-    end
-  end
-  local o = {}
-  for option_name, _ in pairs(all_options) do
-    if opts[option_name] ~= nil then
-      o[option_name] = opts[option_name]
-    else
-      o[option_name] = default_options[option_name]
-    end
-  end
-
-  return o
-end
-
 --- Convert back to strings
 -- @section
 
@@ -1004,7 +974,33 @@ local function parse(kv_string, opts)
   if kv_string == nil then
     return {}
   end
-  opts = normalize_parse_options(opts)
+
+  --- Normalize the parse options.
+  ---
+  --- @param opts table Options in a raw format. The table may be empty or some keys are not set.
+  ---
+  --- @return table
+  local function normalize_opts(opts)
+    if type(opts) ~= 'table' then
+      opts = {}
+    end
+    for key, _ in pairs(opts) do
+      if all_options[key] == nil then
+        throw_error('Unknown parse option: ' .. key)
+      end
+    end
+    local o = {}
+    for name, _ in pairs(all_options) do
+      if opts[name] ~= nil then
+        o[name] = opts[name]
+      else
+        o[name] = default_options[name]
+      end
+    end
+    return o
+  end
+
+  opts = normalize_opts(opts)
 
   if type(opts.hooks.kv_string) == 'function' then
     kv_string = opts.hooks.kv_string(kv_string)
@@ -1137,7 +1133,6 @@ local export = {
 -- http://olivinelabs.com/busted/#private
 if _TEST then
   export.normalize = normalize
-  export.normalize_parse_options = normalize_parse_options
   export.visit_tree = visit_tree
 end
 

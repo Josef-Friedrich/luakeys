@@ -12,41 +12,6 @@ describe('Test private functions', function()
     _G._TEST = nil
   end)
 
-  local get_options = function(options)
-    return luakeys.normalize_parse_options(options)
-  end
-
-  describe('Function “normalize()”', function()
-    local normalize = luakeys.normalize
-
-    it('Unchanged', function()
-      assert.are.same(normalize({ one = ' one ' }, get_options()),
-        { one = ' one ' })
-    end)
-
-    describe('Option naked_as_value', function()
-      it('true', function()
-        assert.are.same(normalize({ 'standalone' },
-          get_options({ naked_as_value = false })), { standalone = true })
-      end)
-
-      it('true recursive', function()
-        assert.are.same(normalize({ level_1 = { level_2 = { 'standalone' } } },
-          get_options({ naked_as_value = false, unpack = false })), {
-          level_1 = {
-            level_2 = { standalone = true },
-          },
-        })
-      end)
-
-      it('false', function()
-        assert.are.same(normalize({ 'standalone' },
-          get_options({ naked_as_value = true })), { 'standalone' })
-      end)
-    end)
-
-  end)
-
   describe('Function “visit_tree()”', function()
     local visit = luakeys.visit_tree
 
