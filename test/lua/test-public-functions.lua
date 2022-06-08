@@ -54,31 +54,6 @@ end)
 
 describe('Function “parse()”', function()
   describe('Options', function()
-    it('Change default options', function()
-      local defaults = luakeys.opts
-      local old = defaults.convert_dimensions
-      defaults.convert_dimensions = true
-      assert.are.same({ 1234567 },
-        luakeys.parse('1cm', { naked_as_value = true }))
-      defaults.convert_dimensions = false
-      assert.are
-        .same({ '1cm' }, luakeys.parse('1cm', { naked_as_value = true }))
-      -- Restore
-      defaults.convert_dimensions = old
-    end)
-
-    it('Unknown options should trigger an error message.', function()
-      assert.has_error(function()
-        luakeys.parse('key', { xxx = true })
-      end, 'Unknown parse option: xxx')
-    end)
-
-    it('with underscores', function()
-      assert.are.same({ '1cm' }, luakeys.parse('1cm', {
-        convert_dimensions = false,
-        naked_as_value = true,
-      }))
-    end)
   end)
 
   describe('Return values', function()

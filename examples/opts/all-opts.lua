@@ -4,12 +4,11 @@ local luakeys = require('luakeys')
 -- Update also in README.md
 local opts = {
   -- Visit all key-value pairs in the recursive parse tree.
-  converter = function(key, value, depth, current_tree, root_tree)
+  converter = function(key, value, depth, current, result)
     return key, value
   end,
 
   -- Automatically convert dimensions into scaled points (1cm -> 1864679).
-  -- default: false
   convert_dimensions = false,
 
   -- Print the result table to the console.
@@ -28,6 +27,26 @@ local opts = {
   -- lower, snake, upper
   format_keys = { 'snake' },
 
+  hooks = {
+    kv_string = function(kv_string)
+      return kv_string
+    end,
+
+    keys_before_def = function(key, value, depth, current, result)
+      return key, value
+    end,
+
+    result_before_def = function(result)
+    end,
+
+    keys = function(key, value, depth, current, result)
+      return key, value
+    end,
+
+    result = function(result)
+    end,
+  },
+
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
   naked_as_value = false,
@@ -40,6 +59,6 @@ local opts = {
 }
 local result = luakeys.parse('key', opts)
 
-it('true', function ()
+it('true', function()
   assert.are.same({ key = 'value' }, result)
 end)

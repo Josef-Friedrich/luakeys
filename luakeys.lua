@@ -120,6 +120,7 @@ local all_options = {
   defaults = false,
   defs = false,
   format_keys = false,
+  hooks = {},
   naked_as_value = false,
   no_error = false,
   postprocess = false,
@@ -1006,6 +1007,10 @@ local function parse(kv_string, opts)
   end
   opts = normalize_parse_options(opts)
 
+  if type(opts.hooks.kv_string) == 'function' then
+    kv_string = opts.hooks.kv_string(kv_string)
+  end
+
   local raw = generate_parser('list', opts.convert_dimensions):match(kv_string)
 
   local function apply_processor(name)
@@ -1029,20 +1034,16 @@ local function parse(kv_string, opts)
   apply_processor('postprocess')
 
   -- The result after applying the definitions.
-  local result_def = nil
-  -- In this table are all unknown keys stored
+  local result = nil
+  -- All unknown keys are stored in this table
   local unknown = nil
-  if opts.defs ~= nil and type(opts.defs) == 'table' then
-    result_def = {}
-    result_def, unknown = apply_definitions(opts.defs, opts, raw, result_def,
+  if type(opts.defs) == 'table' then
+    result, unknown = apply_definitions(opts.defs, opts, raw, {},
       {}, {}, clone_table(raw))
   end
 
-  local result
-  if result_def == nil then
+  if result == nil then
     result = raw
-  else
-    result = result_def
   end
 
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then

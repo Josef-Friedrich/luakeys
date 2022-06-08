@@ -2,6 +2,31 @@ require('busted.runner')()
 local luakeys = require('luakeys')
 
 describe('Options', function()
+  it('Change default options', function()
+    local defaults = luakeys.opts
+    local old = defaults.convert_dimensions
+    defaults.convert_dimensions = true
+    assert.are
+      .same({ 1234567 }, luakeys.parse('1cm', { naked_as_value = true }))
+    defaults.convert_dimensions = false
+    assert.are.same({ '1cm' }, luakeys.parse('1cm', { naked_as_value = true }))
+    -- Restore
+    defaults.convert_dimensions = old
+  end)
+
+  it('Unknown options should trigger an error message.', function()
+    assert.has_error(function()
+      luakeys.parse('key', { xxx = true })
+    end, 'Unknown parse option: xxx')
+  end)
+
+  it('with underscores', function()
+    assert.are.same({ '1cm' }, luakeys.parse('1cm', {
+      convert_dimensions = false,
+      naked_as_value = true,
+    }))
+  end)
+
   describe('Option “convert_dimensions”', function()
     it('true', function()
       assert.are.same({ dim = 1234567 },
@@ -175,6 +200,19 @@ describe('Options', function()
       it('Numbers', function()
         assert_format_keys('1 2 3', { 'snake' }, { ['1_2_3'] = true })
       end)
+    end)
+  end)
+
+  describe('Option “hooks”', function()
+    it('kv_string', function()
+      local result = luakeys.parse('key=unknown', {
+        hooks = {
+          kv_string = function(kv_string)
+            return kv_string:gsub('unknown', 'value')
+          end,
+        },
+      })
+      assert.are.same(result, { key = 'value' })
     end)
   end)
 
