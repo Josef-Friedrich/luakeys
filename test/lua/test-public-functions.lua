@@ -52,6 +52,28 @@ describe('Function “render()”', function()
   end)
 end)
 
+describe('Function “define()”', function()
+  it('returns a parse function', function()
+    local parse = luakeys.define({ { name = 'key1' } })
+    local result, unknown = parse('key1=value1')
+    assert.are.same(result, { key1 = 'value1' })
+    assert.are.same(unknown, {})
+  end)
+
+  it('specify opts on the parse function', function()
+    local parse = luakeys.define({ 'key1', 'key2' })
+    local result = parse('key1=value1', { defaults = { key2 = 'value2' } })
+    assert.are.same(result, { key1 = 'value1', key2 = 'value2' })
+  end)
+
+  it('specify opts on the define function', function()
+    local parse = luakeys.define({ 'key1', 'key2' },
+      { defaults = { key2 = 'value2' } })
+    local result = parse('key1=value1')
+    assert.are.same(result, { key1 = 'value1', key2 = 'value2' })
+  end)
+end)
+
 describe('Function “parse()”', function()
   describe('Options', function()
   end)
@@ -64,10 +86,8 @@ describe('Function “parse()”', function()
       end)
 
       it('should be a non-empty table if some keys are not defined', function()
-        local _, unknown = luakeys.parse('key=value,unknown=unknown', {
-          defs = { 'key' },
-          no_error = true,
-        })
+        local _, unknown = luakeys.parse('key=value,unknown=unknown',
+          { defs = { 'key' }, no_error = true })
         assert.are.same(unknown, { unknown = 'unknown' })
       end)
 

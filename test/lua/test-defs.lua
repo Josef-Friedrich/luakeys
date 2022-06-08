@@ -20,6 +20,19 @@ describe('Defintions', function()
     it('can be specified by the “name” option.', function()
       assert_key_name({ { name = 'key' } })
     end)
+
+    it('can be specified in a nested example.', function()
+      local result, unknown = luakeys.parse(
+        'level1={level2={key=value,unknown=unknown}}', {
+          defs = {
+            level1 = { sub_keys = { level2 = { sub_keys = { key = {} } } } },
+          },
+          no_error = true,
+        })
+      assert.are.same(result, { level1 = { level2 = { key = 'value' } } })
+      assert.are
+        .same(unknown, { level1 = { level2 = { unknown = 'unknown' } } })
+    end)
   end)
 
   describe('Attributes', function()
