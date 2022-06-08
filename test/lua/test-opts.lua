@@ -17,7 +17,7 @@ describe('Options', function()
   it('Unknown options should trigger an error message.', function()
     assert.has_error(function()
       luakeys.parse('key', { xxx = true })
-    end, 'Unknown parse option: xxx')
+    end, 'Unknown parse option: xxx!')
   end)
 
   it('with underscores', function()
@@ -177,6 +177,17 @@ describe('Options', function()
   end)
 
   describe('Option “hooks”', function()
+    it('Unknown hook', function()
+      assert.has_error(function()
+        luakeys.parse('', {
+          hooks = {
+            xxx = function()
+            end,
+          },
+        })
+      end, 'Unknown hook: xxx!')
+
+    end)
     it('Hook “kv_string”', function()
       local result = luakeys.parse('key=unknown', {
         hooks = {
@@ -230,7 +241,6 @@ describe('Options', function()
         assert.are.same(result, { additional_key = 'value', key = 'value' })
       end)
     end)
-
   end)
 
   describe('Option “naked_as_value”', function()

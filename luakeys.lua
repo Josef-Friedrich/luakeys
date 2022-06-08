@@ -916,18 +916,35 @@ local function parse(kv_string, opts)
     end
     for key, _ in pairs(opts) do
       if all_options[key] == nil then
-        throw_error('Unknown parse option: ' .. key)
+        throw_error('Unknown parse option: ' .. tostring(key) .. '!')
       end
     end
-    local o = {}
+    local old_opts = opts
+    opts = {}
     for name, _ in pairs(all_options) do
-      if opts[name] ~= nil then
-        o[name] = opts[name]
+      if old_opts[name] ~= nil then
+        opts[name] = old_opts[name]
       else
-        o[name] = default_options[name]
+        opts[name] = default_options[name]
       end
     end
-    return o
+
+    local hooks = {
+      kv_string = true,
+      keys_before_opts = true,
+      result_before_opts = true,
+      keys_before_def = true,
+      result_before_def = true,
+      keys_at_end = true,
+      result_at_end = true,
+    }
+
+    for hook in pairs(opts.hooks) do
+      if hooks[hook] == nil then
+        throw_error('Unknown hook: ' .. tostring(hook) .. '!')
+      end
+    end
+    return opts
   end
   opts = normalize_opts(opts)
 
