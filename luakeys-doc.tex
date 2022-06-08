@@ -478,7 +478,7 @@ local defs = { key = { ... } }
 -- by the “name” option
 local defs = { { name = 'key', ... } }
 
-local parse = luakeys.define(defintions)
+local parse = luakeys.define(defs)
 local result, unknown = parse(
   'key=value,unknown=unknown',
   { no_error = true }

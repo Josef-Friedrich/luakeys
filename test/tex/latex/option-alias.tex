@@ -22,11 +22,11 @@ Should be “value2”:
 Should be “value3”:
 
 \directlua{
-  local defintions = {
+  local defs = {
     key1 = { alias = 'k1' },
     key2 = { alias = { 'k2', 'my_key2' } },
   }
-  local parser = luakeys.define(defintions)
+  local parser = luakeys.define(defs)
   local result = parser('my_key2=value3')
   tex.print(result.key2)
 }

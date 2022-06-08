@@ -53,8 +53,8 @@ describe('Function “render()”', function()
 end)
 
 describe('Function “parse()”', function()
-  local function assert_parse(input, expected, options)
-    assert.are.same(expected, luakeys.parse(input, options))
+  local function assert_parse(input, expected, opts)
+    assert.are.same(expected, luakeys.parse(input, opts))
   end
 
   describe('Options', function()

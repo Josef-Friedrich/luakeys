@@ -2,7 +2,7 @@ require('busted.runner')()
 local luakeys = require('luakeys')
 
 -- Update this code example in the README.md
-local defintions = {
+local defs = {
   key = {
     -- Allow different key names.
     -- or a single string: alias = 'k'
@@ -43,7 +43,7 @@ local defintions = {
   }
 }
 
-local parse = luakeys.define(defintions)
+local parse = luakeys.define(defs)
 assert.has_error(function ()
   parse('key=one')
 end)

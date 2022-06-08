@@ -1028,7 +1028,7 @@ local function parse(kv_string, opts)
 
   apply_processor('postprocess')
 
-  -- The result after applying the defintions.
+  -- The result after applying the definitions.
   local result_def = nil
   -- In this table are all unknown keys stored
   local unknown = nil

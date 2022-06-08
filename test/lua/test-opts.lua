@@ -81,14 +81,14 @@ describe('Options', function()
       assert.are.same({ naked = true }, luakeys.parse('naked'))
     end)
 
-    it('should prefer the default option for the key defintions.', function()
+    it('should prefer the default option for the key definitions.', function()
       assert.are.same({ naked = 2 }, luakeys.parse('naked', {
         default = 1,
         defs = { naked = { default = 2 } },
       }))
     end)
 
-    it('should be used as the default value if using key defintions.',
+    it('should be used as the default value if using key definitions.',
       function()
         assert.are.same({ naked = 1 }, luakeys.parse('naked', {
           default = 1,

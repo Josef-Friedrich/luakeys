@@ -5,13 +5,13 @@ local luakeys = require('luakeys')
 describe('Defintions', function()
   describe('Attributes', function()
     describe('Attribute “alias”', function()
-      local defintions = {
+      local definitions = {
         key1 = { alias = 'k1' },
         key2 = { alias = { 'k2', 'my_key2' } },
       }
       local function assert_alias(kv_string, expected, defs)
         if defs == nil then
-          defs = defintions
+          defs = definitions
         end
         assert.are.same(expected, luakeys.parse(kv_string, { defs = defs }))
       end
@@ -85,16 +85,16 @@ describe('Defintions', function()
     end)
 
     describe('Attribute “choices”', function()
-      local defintions = { key = { choices = { 'one', 'two', 'three' } } }
+      local defs = { key = { choices = { 'one', 'two', 'three' } } }
 
       it('should throw no exception', function()
-        assert.are.same(luakeys.parse('key = one', { defs = defintions }),
+        assert.are.same(luakeys.parse('key = one', { defs = defs }),
           { key = 'one' })
       end)
 
       it('should throw an exception if no choice was found.', function()
         assert.has_error(function()
-          luakeys.parse('key = unknown', { defs = defintions })
+          luakeys.parse('key = unknown', { defs = defs })
         end,
           'The value “unknown” does not exist in the choices: one, two, three!')
       end)
@@ -158,7 +158,7 @@ describe('Defintions', function()
     end)
 
     describe('Attribute “exclusive_group”', function()
-      local defintions = {
+      local defs = {
         k1 = { exclusive_group = 'group1' },
         k2 = { exclusive_group = 'group1' },
         k3 = { exclusive_group = 'group3' },
@@ -168,7 +168,7 @@ describe('Defintions', function()
       local function assert_exclusive_group(input_kv_string,
         expected)
         assert.are.same(expected,
-          luakeys.parse(input_kv_string, { defs = defintions }))
+          luakeys.parse(input_kv_string, { defs = defs }))
       end
 
       it(
@@ -196,5 +196,72 @@ describe('Defintions', function()
           { k1 = 'value', k3 = 'value' })
       end)
     end)
+
+    it('Attribute “match”', function()
+      assert.are.same(luakeys.parse('date = 1978-12-03', {
+        defs = { date = { match = '^%d%d%d%d%-%d%d%-%d%d$' } },
+      }), { date = '1978-12-03' })
+    end)
+
+    describe('Attribute “opposite_keys”', function()
+      local function assert_opposite_keys(kv_string, expected)
+        assert.are.same(expected, luakeys.parse(kv_string, {
+          no_error = true,
+          defs = {
+            visibility = { opposite_keys = { [true] = 'show', [false] = 'hide' } },
+          },
+        }))
+      end
+
+      it('should return true if a truthy string value is given.', function()
+        assert_opposite_keys('show', { visibility = true })
+      end)
+
+      it('should return false if a falsy string is given.', function()
+        assert_opposite_keys('hide', { visibility = false })
+      end)
+
+      it('should return an empty table if a unknown string value is given.',
+        function()
+          assert_opposite_keys('unknown', {})
+        end)
+    end)
+
+    it('Attribute “process”', function()
+      assert.are.same(luakeys.parse('width = 0.5', {
+        defs = {
+          width = {
+            process = function(value)
+              if type(value) == 'number' and value >= 0 and value <= 1 then
+                return tostring(value) .. '\\linewidth'
+              end
+              return value
+            end,
+          },
+        },
+      }), { width = '0.5\\linewidth' })
+    end)
+
+    describe('Attribute “required”', function()
+      local defs = { key = { required = true } }
+      it('should pass if a value is provided', function()
+        assert.are.same(luakeys.parse('key=value', { defs = defs }),
+          { key = 'value' })
+      end)
+
+      it('should throw an error if the key is missing', function()
+        assert.has_error(function()
+          luakeys.parse('unknown=value', { defs = defs })
+        end)
+      end)
+    end)
+
+    it('Attribute “sub_keys”', function()
+      local result = luakeys.parse('level1={level2=value}', {
+        defs = { level1 = { sub_keys = { level2 = { default = 1 } } } },
+      })
+      assert.are.same(result, { level1 = { level2 = 'value' } })
+    end)
+
   end)
 end)

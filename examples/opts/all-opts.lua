@@ -22,7 +22,7 @@ local opts = {
   -- this table.
   defaults = { key = 'value' },
 
-  -- Key-value pair defintions.
+  -- Key-value pair definitions.
   defs = { key = { default = 'value' } },
 
   -- lower, snake, upper
