@@ -4,6 +4,78 @@ local luakeys = require('luakeys')
 
 describe('Defintions', function()
   describe('Attributes', function()
+    describe('Attribute “alias”', function()
+      local defintions = {
+        key1 = { alias = 'k1' },
+        key2 = { alias = { 'k2', 'my_key2' } },
+      }
+      local function assert_alias(kv_string, expected, defs)
+        if defs == nil then
+          defs = defintions
+        end
+        assert.are.same(expected, luakeys.parse(kv_string, { defs = defs }))
+      end
+
+      it(
+        'should find a value if the “alias” option is specified as a string and store it under the original key name.',
+        function()
+          assert_alias('k1 = 42', { key1 = 42 })
+        end)
+
+      it(
+        'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
+        function()
+          assert_alias('my_key2=42', { key2 = 42 })
+        end)
+
+      it('should find a alias standalone values as key names', function()
+        assert_alias('ke', { key = true }, { key = { alias = { 'k', 'ke' } } })
+      end)
+
+      it('should find a value in a nested definition', function()
+        assert_alias('l1 = { l2 = value } }', { level1 = { level2 = 'value' } },
+          {
+            level1 = {
+              alias = 'l1',
+              sub_keys = { level2 = { alias = { 'l2', 'level_2' } } },
+            },
+          })
+      end)
+
+      describe('Error messages', function()
+        it('should throw an error if two aliases are present', function()
+          assert.has_error(function()
+            assert_alias('k = value, ke = value', {},
+              { key = { alias = { 'k', 'ke' } } })
+          end, 'Duplicate aliases “k” and “ke” for key “key”!')
+        end)
+
+        it('should throw an error if the key and an alias are present',
+          function()
+            assert.has_error(function()
+              assert_alias('key = value, k = value', {},
+                { key = { alias = { 'k', 'ke' } } })
+            end, 'Duplicate aliases “key” and “k” for key “key”!')
+          end)
+      end)
+    end)
+
+    describe('Attribute “choices”', function()
+      local defintions = { key = { choices = { 'one', 'two', 'three' } } }
+
+      it('should throw no exception', function()
+        assert.are.same(luakeys.parse('key = one', { defs = defintions }),
+          { key = 'one' })
+      end)
+
+      it('should throw an exception if no choice was found.', function()
+        assert.has_error(function()
+          luakeys.parse('key = unknown', { defs = defintions })
+        end,
+          'The value “unknown” does not exist in the choices: one, two, three!')
+      end)
+    end)
+
     describe('Attribute “data_type”', function()
       local function assert_data_type(data_type,
         input_value,
@@ -71,8 +143,8 @@ describe('Defintions', function()
 
       local function assert_exclusive_group(input_kv_string,
         expected)
-        assert.are.same(expected, luakeys.parse(input_kv_string,
-          { defs = defintions }))
+        assert.are.same(expected,
+          luakeys.parse(input_kv_string, { defs = defintions }))
       end
 
       it(

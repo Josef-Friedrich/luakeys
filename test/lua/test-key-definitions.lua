@@ -38,65 +38,13 @@ describe('Key defintions', function()
       end)
     end)
 
-    describe('Options', function()
+    describe('Attributes', function()
 
-      describe('Option “alias”', function()
-        local defintions = {
-          key1 = { alias = 'k1' },
-          key2 = { alias = { 'k2', 'my_key2' } },
-        }
-
-        it(
-          'should find a value if the “alias” option is specified as a string and store it under the original key name.',
-          function()
-            assert.are.same(apply_definitions(defintions, nil, { k1 = 42 }),
-              { key1 = 42 })
-          end)
-
-        it(
-          'should find a value if the “alias” option is specified as an array of string and store it under the original key name.',
-          function()
-            assert.are.same(apply_definitions(defintions, nil,
-              { ['my_key2'] = 42 }), { key2 = 42 })
-          end)
-
-        it('should find a alias standalone values as key names', function()
-          assert.are.same(apply_definitions({ key = { alias = { 'k', 'ke' } } },
-            nil, { 'ke' }), { key = true })
-        end)
-
-        it('should find a value in a nested definition', function()
-          assert.are.same(apply_definitions({
-            level1 = {
-              alias = 'l1',
-              sub_keys = { level2 = { alias = { 'l2', 'level_2' } } },
-            },
-          }, nil, { l1 = { l2 = 'value' } }), { level1 = { level2 = 'value' } })
-        end)
-
-        describe('Error messages', function()
-          it('should throw an error if two aliases are present', function()
-            assert.has_error(function()
-              apply_definitions({ key = { alias = { 'k', 'ke' } } }, nil,
-                { k = 'value', ke = 'value' })
-            end, 'Duplicate aliases “k” and “ke” for key “key”!')
-          end)
-
-          it('should throw an error if the key and an alias are present',
-            function()
-              assert.has_error(function()
-                apply_definitions({ key = { alias = { 'k', 'ke' } } }, nil,
-                  { key = 'value', k = 'value' })
-              end, 'Duplicate aliases “key” and “k” for key “key”!')
-            end)
-        end)
-
-      end)
-
-      describe('Option “always_present”', function()
+      describe('Attribute “always_present”', function()
         it('should pass an value to the key if the input is empty', function()
-          assert.are.same(apply_definitions({ key = { always_present = true } },
-            nil, {}), { key = true })
+          assert.are.same(
+            apply_definitions({ key = { always_present = true } }, nil, {}),
+            { key = true })
         end)
 
         it('should use the default value', function()
@@ -114,28 +62,13 @@ describe('Key defintions', function()
         end)
       end)
 
-      describe('Option “choices”', function()
-        local defintions = { key = { choices = { 'one', 'two', 'three' } } }
-        it('should throw no exception', function()
-          assert.are.same(apply_definitions(defintions, nil, { key = 'one' }),
-            { key = 'one' })
-        end)
-
-        it('should throw an exception if no choice was found.', function()
-          assert.has_error(function()
-            apply_definitions(defintions, nil, { key = 'unknown' })
-          end,
-            'The value “unknown” does not exist in the choices: one, two, three!')
-        end)
-      end)
-
-      it('Option “match”', function()
+      it('Attribute “match”', function()
         assert.are.same(apply_definitions({
           date = { match = '^%d%d%d%d%-%d%d%-%d%d$' },
         }, nil, { date = '1978-12-03' }), { date = '1978-12-03' })
       end)
 
-      describe('Option “opposite_keys”', function()
+      describe('Attribute “opposite_keys”', function()
         local defintions = {
           visibility = { opposite_keys = { [true] = 'show', [false] = 'hide' } },
         }
@@ -158,7 +91,7 @@ describe('Key defintions', function()
           end)
       end)
 
-      it('Option “process”', function()
+      it('Attribute “process”', function()
         assert.are.same(apply_definitions({
           width = {
             process = function(value)
@@ -171,7 +104,7 @@ describe('Key defintions', function()
         }, nil, { width = 0.5 }), { width = '0.5\\linewidth' })
       end)
 
-      describe('Option “required”', function()
+      describe('Attribute “required”', function()
         it('should pass if a value is provided', function()
           assert.are.same(apply_definitions({ key = { required = true } }, nil,
             { key = 'value' }), { key = 'value' })
@@ -185,7 +118,7 @@ describe('Key defintions', function()
         end)
       end)
 
-      it('Option “sub_keys”', function()
+      it('Attribute “sub_keys”', function()
         local result = luakeys.parse('level1={level2=value}', {
           defs = { level1 = { sub_keys = { level2 = { default = 1 } } } },
         })
