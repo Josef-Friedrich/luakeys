@@ -991,16 +991,15 @@ local function apply_definitions(defs,
 end
 
 --- Parse a LaTeX/TeX style key-value string into a Lua table.
+---
+---@param kv_string string A string in the TeX/LaTeX style key-value format as described above.
+---@param opts table A table containing the settings:
+---   `convert_dimensions`, `unpack`, `naked_as_value`, `converter`,
+---   `debug`, `preprocess`, `postprocess`.
 --
--- @tparam string kv_string A string in the TeX/LaTeX style key-value
---   format as described above.
---
--- @tparam table opts A table containing the settings:
--- `convert_dimensions`, `unpack`,
--- `naked_as_value`, `converter`, `debug`, `preprocess`, `postprocess`.
---
--- @treturn table A hopefully properly parsed table you can do something
--- useful with.
+---@return table result The final result of all individual parsing and normalization steps.
+---@return table unknown A table with unknown, undefinied key-value pairs.
+---@return table raw The unprocessed, raw result of the LPeg parser.
 local function parse(kv_string, opts)
   if kv_string == nil then
     return {}

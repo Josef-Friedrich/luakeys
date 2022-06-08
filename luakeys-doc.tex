@@ -195,9 +195,18 @@ Abbreviation & spelled out & Example \\\hline
 These unabbreviated variable names are commonly used.
 \begin{center}
 \begin{tabular}{ll}
-\lua{result} & The result of the parse function \\
-\lua{unknown} & A table of unknown, not definied key-value pairs \\
-\lua{raw} & The raw result of the Lpeg grammar parser \\
+
+\lua{result} &
+% Das Endergebnis aller einzelnen Übersetzungs- und Normalisierungsschritte
+The final result of all individual parsing and normalization steps. \\
+
+\lua{unknown} &
+% Ein Tabelle mit unbekannten, nicht definierten Schlüssel-Wert-Paaren
+A table with unknown, undefinied key-value pairs. \\
+
+\lua{raw} &
+% Das unbearbeitete, rohe Ergebnis der LPeg-Syntaxanalyse.
+The raw result of the Lpeg grammar parser. \\
 \end{tabular}
 \end{center}
 
