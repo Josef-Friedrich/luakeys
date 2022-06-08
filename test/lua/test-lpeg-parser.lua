@@ -3,13 +3,13 @@ require('busted.runner')()
 local luakeys = require('luakeys')
 
 local function assert_result(kv_string, expected, opts)
-  assert.are.same(expected, luakeys.parse(kv_string, opts))
+  local result, unknown, raw = luakeys.parse(kv_string, opts)
+  assert.are.same(expected, raw)
 end
 
 local function assert_value(actual, expected)
-  local result = luakeys.parse('key=' .. actual)
-  local input = result.key
-  assert.are.equal(expected, input)
+  local result, unknown, raw = luakeys.parse('key=' .. actual)
+  assert.are.equal(expected, raw.key)
 end
 
 describe('LPeg Parser', function()
@@ -363,8 +363,7 @@ end)
 describe('Array', function()
   it('Key with nested tables', function()
     assert_result('t={a,b},z={{a,b},{c,d}}',
-      { t = { 'a', 'b' }, z = { { 'a', 'b' }, { 'c', 'd' } } },
-      { naked_as_value = true })
+      { t = { 'a', 'b' }, z = { { 'a', 'b' }, { 'c', 'd' } } })
   end)
 
   it('Nested list of strings', function()
@@ -373,24 +372,21 @@ describe('Array', function()
   end)
 
   it('standalone and key value pair', function()
-    assert_result('{one,two,tree={four}}', { { 'one', 'two', tree = 'four' } },
-      { naked_as_value = true })
+    assert_result('{one,two,tree={four}}',
+      { { 'one', 'two', tree = { 'four' } } })
   end)
 
   it('Deeply nested string value', function()
-    assert_result('{{{one}}}', { { { { 'one' } } } },
-      { unpack = false, naked_as_value = true })
+    assert_result('{{{one}}}', { { { { 'one' } } } })
   end)
 end)
 
 describe('Only values', function()
   it('List of mixed values', function()
-    assert_result('-1.1,text,-1cm,True', { -1.1, 'text', '-1cm', true },
-      { naked_as_value = true })
+    assert_result('-1.1,text,-1cm,True', { -1.1, 'text', '-1cm', true })
   end)
 
   it('Only string values', function()
-    assert_result('one,two,three', { 'one', 'two', 'three' },
-      { naked_as_value = true })
+    assert_result('one,two,three', { 'one', 'two', 'three' })
   end)
 end)

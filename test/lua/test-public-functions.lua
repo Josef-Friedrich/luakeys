@@ -75,9 +75,6 @@ describe('Function “define()”', function()
 end)
 
 describe('Function “parse()”', function()
-  describe('Options', function()
-  end)
-
   describe('Return values', function()
     describe('Second return value: “unknown”', function()
       it('should be an empty table if all keys are defined', function()
@@ -108,7 +105,6 @@ describe('Function “parse()”', function()
         })
       end)
     end)
-
   end)
 end)
 

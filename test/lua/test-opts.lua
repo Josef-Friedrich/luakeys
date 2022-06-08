@@ -309,7 +309,6 @@ describe('Options', function()
   end)
 
   describe('Option “no_error”', function()
-    local warn_unknown_keys = luakeys.warn_unknown_keys
     it('A definied key should throw no error.', function()
       luakeys.parse('key', { defs = { 'key' } })
     end)
