@@ -510,75 +510,6 @@ local function visit_tree(tree, callback_func)
   return result
 end
 
---- Normalize the result tables of the LPeg parser. This normalization
---  tasks are performed on the raw input table coming directly from the
---  PEG parser:
---
--- * Unpack all single valued array like tables: `{ 'text' }` into
---    `text`
---
--- @tparam table raw The raw input table coming directly from the PEG
---   parser
---
--- @tparam table opts Some options. A table with the key
---   `unpack`
---
--- @treturn table A normalized table ready for the outside world.
-local function normalize(raw, opts)
-  local hooks = {
-    unpack = function(key, value)
-      if type(value) == 'table' and utils.get_array_size(value) == 1 and
-        utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
-        return key, value[1]
-      end
-      return key, value
-    end,
-
-    process_naked = function(key, value)
-      if type(key) == 'number' and type(value) == 'string' then
-        return value, opts.default
-      end
-      return key, value
-    end,
-
-    format_key = function(key, value)
-      if type(key) == 'string' then
-        for _, style in ipairs(opts.format_keys) do
-          if style == 'lower' then
-            key = key:lower()
-          elseif style == 'snake' then
-            key = key:gsub('[^%w]+', '_')
-          elseif style == 'upper' then
-            key = key:upper()
-          else
-            throw_error('Unknown style to format keys: ' .. tostring(style) ..
-                          ' Allowed styles are: lower, snake, upper')
-          end
-        end
-      end
-      return key, value
-    end,
-  }
-
-  if opts.unpack then
-    raw = visit_tree(raw, hooks.unpack)
-  end
-
-  if not opts.naked_as_value and opts.defs == false then
-    raw = visit_tree(raw, hooks.process_naked)
-  end
-
-  if opts.format_keys then
-    if type(opts.format_keys) ~= 'table' then
-      throw_error('The option “format_keys” has to be a table not ' ..
-                    type(opts.format_keys))
-    end
-    raw = visit_tree(raw, hooks.format_key)
-  end
-
-  return raw
-end
-
 local is = {
   boolean = function(value)
     if value == nil then
@@ -1012,7 +943,7 @@ local function parse(kv_string, opts)
     if opts[name] ~= nil and type(opts[name]) == 'function' then
       opts[name](raw, kv_string)
       if opts.debug then
-        print('After execution of the function: ' .. name)
+        print('After execution of the hook: ' .. name)
         debug(raw)
       end
     end
@@ -1024,7 +955,68 @@ local function parse(kv_string, opts)
     raw = visit_tree(raw, opts.converter)
   end
 
-  raw = normalize(raw, opts)
+  --- Normalize the result table of the LPeg parser. This normalization
+  --  tasks are performed on the raw input table coming directly from
+  --  the PEG parser:
+  --
+  --- @param raw table The raw input table coming directly from the PEG parser
+  --- @param opts table Some options. A table with the key `unpack
+  local function apply_opts(raw, opts)
+    local callbacks = {
+      unpack = function(key, value)
+        if type(value) == 'table' and utils.get_array_size(value) == 1 and
+          utils.get_table_size(value) == 1 and type(value[1]) ~= 'table' then
+          return key, value[1]
+        end
+        return key, value
+      end,
+
+      process_naked = function(key, value)
+        if type(key) == 'number' and type(value) == 'string' then
+          return value, opts.default
+        end
+        return key, value
+      end,
+
+      format_key = function(key, value)
+        if type(key) == 'string' then
+          for _, style in ipairs(opts.format_keys) do
+            if style == 'lower' then
+              key = key:lower()
+            elseif style == 'snake' then
+              key = key:gsub('[^%w]+', '_')
+            elseif style == 'upper' then
+              key = key:upper()
+            else
+              throw_error('Unknown style to format keys: ' .. tostring(style) ..
+                            ' Allowed styles are: lower, snake, upper')
+            end
+          end
+        end
+        return key, value
+      end,
+    }
+
+    if opts.unpack then
+      raw = visit_tree(raw, callbacks.unpack)
+    end
+
+    if not opts.naked_as_value and opts.defs == false then
+      raw = visit_tree(raw, callbacks.process_naked)
+    end
+
+    if opts.format_keys then
+      if type(opts.format_keys) ~= 'table' then
+        throw_error('The option “format_keys” has to be a table not ' ..
+                      type(opts.format_keys))
+      end
+      raw = visit_tree(raw, callbacks.format_key)
+    end
+
+    return raw
+  end
+
+  raw = apply_opts(raw, opts)
 
   apply_processor('postprocess')
 
@@ -1033,8 +1025,8 @@ local function parse(kv_string, opts)
   -- All unknown keys are stored in this table
   local unknown = nil
   if type(opts.defs) == 'table' then
-    result, unknown = apply_definitions(opts.defs, opts, raw, {},
-      {}, {}, clone_table(raw))
+    result, unknown = apply_definitions(opts.defs, opts, raw, {}, {}, {},
+      clone_table(raw))
   end
 
   if result == nil then
@@ -1132,7 +1124,6 @@ local export = {
 
 -- http://olivinelabs.com/busted/#private
 if _TEST then
-  export.normalize = normalize
   export.visit_tree = visit_tree
 end
 
