@@ -188,6 +188,7 @@ describe('Options', function()
       end, 'Unknown hook: xxx!')
 
     end)
+
     it('Hook “kv_string”', function()
       local result = luakeys.parse('key=unknown', {
         hooks = {
@@ -239,6 +240,54 @@ describe('Options', function()
         })
 
         assert.are.same(result, { additional_key = 'value', key = 'value' })
+      end)
+    end)
+
+    describe('Hook “keys_at_end”', function()
+      local function assert_hook(kv_string, hook, expected)
+        assert.is.same(luakeys.parse(kv_string, {
+          hooks = { keys_at_end = hook },
+          naked_as_value = true,
+          unpack = false,
+        }), expected)
+      end
+
+      it('Change the value', function()
+        local hook = function(key, value)
+          if type(value) == 'number' then
+            return key, value + 1
+          end
+          return key, value
+        end
+        assert_hook('1, 2, 3', hook, { 2, 3, 4 })
+        assert_hook('l1 = { l2 = 1 }', hook, { l1 = { l2 = 2 } })
+        assert_hook('', hook, {})
+      end)
+
+      it('Return nothing', function()
+        assert_hook('l1={l2=1}', function(key, value)
+        end, {})
+      end)
+
+      it('Return key and value unchanged', function()
+        assert_hook('l1={l2=1}', function(key, value)
+          return key, value
+        end, { l1 = { l2 = 1 } })
+      end)
+
+      it('change keys', function()
+        assert_hook('l1={l2=1}', function(key, value)
+          return 'prefix_' .. key, value
+        end, { prefix_l1 = { prefix_l2 = 1 } })
+      end)
+
+      it('depth', function()
+        assert_hook('%,d1={%,d2={%}}', function(key, value, depth)
+          if value == '%' then
+            return key, depth
+          end
+          return key, value
+        end, { 1, d1 = { 2, d2 = { 3 } } })
       end)
     end)
   end)
@@ -305,5 +354,4 @@ describe('Options', function()
         luakeys.parse('{{one}}', options_false))
     end)
   end)
-
 end)

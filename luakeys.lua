@@ -1139,9 +1139,4 @@ local export = {
   is = is,
 }
 
--- http://olivinelabs.com/busted/#private
-if _TEST then
-  export.visit_tree = visit_tree
-end
-
 return export
