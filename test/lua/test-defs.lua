@@ -3,6 +3,25 @@ require('busted.runner')()
 local luakeys = require('luakeys')
 
 describe('Defintions', function()
+  describe('Name of the keys', function()
+    local function assert_key_name(defs)
+      assert.are.same(luakeys.parse('key=value,unknown=unknown',
+        { defs = defs, no_error = true }), { key = 'value' })
+    end
+
+    it('can be given as stand-alone values.', function()
+      assert_key_name({ 'key' })
+    end)
+
+    it('can be specified as keys in a Lua table.', function()
+      assert_key_name({ key = {} })
+    end)
+
+    it('can be specified by the “name” option.', function()
+      assert_key_name({ { name = 'key' } })
+    end)
+  end)
+
   describe('Attributes', function()
     describe('Attribute “alias”', function()
       local definitions = {

@@ -80,6 +80,41 @@ describe('Function “parse()”', function()
       }))
     end)
   end)
+
+  describe('Return values', function()
+    describe('Second return value: “unknown”', function()
+      it('should be an empty table if all keys are defined', function()
+        local _, unknown = luakeys.parse('key=value', { defs = { 'key' } })
+        assert.are.same(unknown, {})
+      end)
+
+      it('should be a non-empty table if some keys are not defined', function()
+        local _, unknown = luakeys.parse('key=value,unknown=unknown', {
+          defs = { 'key' },
+          no_error = true,
+        })
+        assert.are.same(unknown, { unknown = 'unknown' })
+      end)
+
+      it('Should be a non-empty table in a recursive example', function()
+        local _, unknown = luakeys.parse(
+          'key1={known1=1,unknown1=1},key2={known2=1,unknown2=1,unknown3=1},unknown=unknown',
+          {
+            no_error = true,
+            defs = {
+              key1 = { sub_keys = { 'known1' } },
+              key2 = { sub_keys = { 'known2' } },
+            },
+          })
+        assert.are.same(unknown, {
+          key1 = { unknown1 = 1 },
+          key2 = { unknown2 = 1, unknown3 = 1 },
+          unknown = 'unknown',
+        })
+      end)
+    end)
+
+  end)
 end)
 
 it('Function “debug()”', function()

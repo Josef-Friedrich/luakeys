@@ -1136,7 +1136,6 @@ local export = {
 
 -- http://olivinelabs.com/busted/#private
 if _TEST then
-  export.apply_definitions = apply_definitions
   export.normalize = normalize
   export.normalize_parse_options = normalize_parse_options
   export.visit_tree = visit_tree
