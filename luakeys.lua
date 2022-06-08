@@ -1072,7 +1072,7 @@ local result_store = {}
 
 local export = {
   --- @see default_options
-  default_options = default_options,
+  opts = default_options,
 
   --- @see stringify
   stringify = stringify,

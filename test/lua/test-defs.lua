@@ -60,6 +60,30 @@ describe('Defintions', function()
       end)
     end)
 
+    describe('Attribute “always_present”', function()
+      it('should pass an value to the key if the input is empty', function()
+        assert.are.same(luakeys.parse('', {
+          defs = { key = { always_present = true } },
+        }), { key = true })
+      end)
+
+      it('should use the default value', function()
+        assert.are.same(luakeys.parse('', {
+          defs = { key = { always_present = true, default = 'value' } },
+        }), { key = 'value' })
+      end)
+
+      it('should work in an nested definition', function()
+        assert.are.same(luakeys.parse('', {
+          defs = {
+            level1 = {
+              sub_keys = { key = { always_present = true, default = 'value' } },
+            },
+          },
+        }), { level1 = { key = 'value' } })
+      end)
+    end)
+
     describe('Attribute “choices”', function()
       local defintions = { key = { choices = { 'one', 'two', 'three' } } }
 
@@ -172,6 +196,5 @@ describe('Defintions', function()
           { k1 = 'value', k3 = 'value' })
       end)
     end)
-
   end)
 end)

@@ -1,0 +1,16 @@
+\documentclass{article}
+\directlua{
+  luakeys = require('luakeys')
+}
+
+\newcommand{\helloworld}[2][]{
+  \directlua{
+    local keys = luakeys.parse('\luaescapestring{\unexpanded{#1}}')
+    luakeys.debug(keys)
+    local marg = '#2'
+    tex.print(keys.greeting .. ', ' .. marg .. keys.punctuation)
+  }
+}
+\begin{document}
+\helloworld[greeting=hello,punctuation=!]{world} % hello, world!
+\end{document}

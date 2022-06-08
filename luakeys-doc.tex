@@ -22,8 +22,10 @@
 \def\lua#1{\mintinline{lua}|#1|}
 \def\latex#1{\mintinline{latex}|#1|}
 
-\def\InputLatexExample#1{
-  \inputminted[linenos=true]{latex}{examples/#1}
+\NewDocumentCommand { \InputLatexExample } { O{} m } {
+  \begin{mdframed}
+  \inputminted[linenos=false,#1]{latex}{examples/#2}
+  \end{mdframed}
 }
 
 \NewDocumentCommand { \InputLuaExample } { O{} m } {
@@ -108,9 +110,7 @@ This package would not be possible without the article
 %
 %-----------------------------------------------------------------------
 
-\clearpage
-
-\section{How the package is included or loaded}
+\section{How the package is loaded}
 
 %%
 %
@@ -122,24 +122,7 @@ The core functionality of this package is realized in Lua. So you can
 use \texttt{luakeys} without using the wrapper \TeX{} files
 \texttt{luakeys.sty} and \texttt{luakeys.tex}.
 
-\begin{minted}{latex}
-\documentclass{article}
-\directlua{
-  luakeys = require('luakeys')
-}
-
-\newcommand{\helloworld}[2][]{
-  \directlua{
-    local keys = luakeys.parse('\luaescapestring{\unexpanded{#1}}')
-    luakeys.debug(keys)
-    local marg = '#2'
-    tex.print(keys.greeting .. ', ' .. marg .. keys.punctuation)
-  }
-}
-\begin{document}
-\helloworld[greeting=hello,punctuation=!]{world}
-\end{document}
-\end{minted}
+\InputLatexExample{loading/lua.tex}
 
 %%
 %
@@ -158,19 +141,7 @@ The supplied Lua\LaTeX{} file is quite small:
 \noindent
 It loads the Lua module into the global variable \texttt{luakeys}.
 
-\begin{minted}{latex}
-\documentclass{article}
-\usepackage{luakeys}
-
-\begin{document}
-  \directlua{
-    local keys = luakeys.parse('one,two,three', { naked_as_value = true })
-    tex.print(keys[1])
-    tex.print(keys[2])
-    tex.print(keys[3])
-  }
-\end{document}
-\end{minted}
+\InputLatexExample{loading/latex.tex}
 
 %%
 %
@@ -189,17 +160,7 @@ line:
 It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 \texttt{luakeys.lua} into the global variable \texttt{luakeys}.
 
-\begin{minted}{latex}
-\input luakeys.tex
-
-\directlua{
-  local keys = luakeys.parse('one,two,three', { naked_as_value = true })
-  tex.print(keys[1])
-  tex.print(keys[2])
-  tex.print(keys[3])
-}
-\bye
-\end{minted}
+\InputLatexExample{loading/tex.tex}
 
 \section{Lua interface / API}
 
@@ -209,16 +170,7 @@ documentation}, which was created with
 \href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
 this functions:
 
-\begin{minted}{lua}
-local luakeys = require('luakeys')
-local stringify = luakeys.stringify
-local parse = luakeys.parse
-local render = luakeys.render
-local debug = luakeys.debug
-local save = luakeys.save
-local get = luakeys.get
-local is = luakeys.is
-\end{minted}
+\InputLuaExample[firstline=3,lastline=12]{export.lua}
 
 \subsection{Lua indentifier names}
 
@@ -253,10 +205,10 @@ These unabbreviated variable names are commonly used.
 %
 %%
 
-\subsection{Function \texttt{parse(kv\_string, options)}: table}
+\subsection{Function \texttt{parse(kv\_string, opts): table}}
 \label{parse}
 
-The function \lua{parse(kv_string, options)} parses a key-value string
+The function \lua{parse(kv_string, opts)} parses a key-value string
 into a Lua table.
 
 \begin{minted}{latex}
@@ -293,16 +245,11 @@ options are supported:
 
 \noindent
 The options can also be set globally using the exported table
-|default_options|:
+|opts|:
 
-\begin{minted}{lua}
-luakeys.parse('dim=1cm') -- {dim = 1864679}
-luakeys.default_options.convert_dimensions = false
--- or:
--- local defaults = luakeys.default_options
--- defaults.convert_dimensions = false
-luakeys.parse('dim=1cm') -- {dim = '1cm'}
-\end{minted}
+\InputLuaExample[firstline=4,lastline=4]{opts/exported-default-opts.lua}
+
+\InputLuaExample[firstline=10,lastline=11]{opts/exported-default-opts.lua}
 
 %%
 %
@@ -507,7 +454,7 @@ If we set the option \lua{no_error} to \lua{true}:
 %
 %%
 
-\subsection{\texttt{define(defs, opts)}}
+\subsection{Function \texttt{define(defs, opts): parsefunc}}
 \label{define}
 
 The \lua{define} function returns a \lua{parse} function (see
@@ -1433,6 +1380,8 @@ An example of how to use the command in \LaTeX:
 * New option: case\_insensitive\_keys
 }
 \changes{v0.6}{2022/05/29}{
+* Rename global options table from “default\_options” to
+* New function “define(defs, opts)”
 * New option “format\_keys”
 * Remove option “case\_insensitive\_keys”. Use
   “format_keys = \{ lower \}” to achieve the same effect.

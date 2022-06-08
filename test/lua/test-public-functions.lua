@@ -59,7 +59,7 @@ describe('Function “parse()”', function()
 
   describe('Options', function()
     it('Change default options', function()
-      local defaults = luakeys.default_options
+      local defaults = luakeys.opts
       local old = defaults.convert_dimensions
       defaults.convert_dimensions = true
       assert.are.same({ 1234567 },
@@ -206,10 +206,8 @@ describe('Function “parse()”', function()
     end)
 
     it('Deeply nested string value', function()
-      assert_parse('{{{one}}}', { { { { 'one' } } } }, {
-        unpack = false,
-        naked_as_value = true,
-      })
+      assert_parse('{{{one}}}', { { { { 'one' } } } },
+        { unpack = false, naked_as_value = true })
     end)
   end)
 

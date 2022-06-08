@@ -39,29 +39,6 @@ describe('Key defintions', function()
     end)
 
     describe('Attributes', function()
-
-      describe('Attribute “always_present”', function()
-        it('should pass an value to the key if the input is empty', function()
-          assert.are.same(
-            apply_definitions({ key = { always_present = true } }, nil, {}),
-            { key = true })
-        end)
-
-        it('should use the default value', function()
-          assert.are.same(apply_definitions({
-            key = { always_present = true, default = 'value' },
-          }, nil, {}), { key = 'value' })
-        end)
-
-        it('should work in an nested definition', function()
-          assert.are.same(apply_definitions({
-            level1 = {
-              sub_keys = { key = { always_present = true, default = 'value' } },
-            },
-          }, nil, {}), { level1 = { key = 'value' } })
-        end)
-      end)
-
       it('Attribute “match”', function()
         assert.are.same(apply_definitions({
           date = { match = '^%d%d%d%d%-%d%d%-%d%d$' },
