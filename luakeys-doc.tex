@@ -1205,9 +1205,12 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 
 \subsubsection{dimension}
 
+\begin{multicols}{3}
+\tiny
 \begin{center}
 \begin{tabular}{rl}
-\textbf{Unit name} & \textbf{Description} \\\hline
+% \textbf{Unit name}
+& \textbf{Description} \\\hline
 bp & big point \\
 cc & cicero \\
 cm & centimeter \\
@@ -1224,7 +1227,8 @@ sp & scaledpoint \\
 \end{tabular}
 \end{center}
 
-\begin{multicols}{2}
+\columnbreak
+
 \begin{minted}{latex}
 \luakeysdebug{
   bp = 1bp,
@@ -1242,6 +1246,9 @@ sp & scaledpoint \\
   sp = 1sp,
 }
 \end{minted}
+
+\columnbreak
+
 \begin{minted}{lua}
 {
   ['bp'] = 65781,
@@ -1267,24 +1274,18 @@ sp & scaledpoint \\
 
 \subsubsection{string}
 
-There are two ways to specify strings: With or without quotes. If the
-text have to contain commas or equal signs, then double quotation
-marks must be used.
+% Es gibt zwei Möglichkeiten Zeichenketten anzugeben:
+There are two ways to specify strings:
+%
+% Mit oder ohne doppelte Anführungszeichen.
+With or without double quotes.
+%
+% Wenn der Text Kommas, geschweifte Klammern oder Gleichheitszeichen
+% enthalten soll, müssen doppelte Anführungszeichen verwendet werden.
+If the text have to contain commas, curly braces or equal signs, then
+double quotes must be used.
 
-\begin{multicols}{2}
-\begin{minted}{latex}
-\luakeysdebug{
-  without quotes = no commas and equal signs are allowed,
-  with double quotes = ", and = are allowed",
-}
-\end{minted}
-\begin{minted}{lua}
-{
-  ['without quotes'] = 'no commas and equal signs are allowed',
-  ['with double quotes'] = ', and = are allowed',
-}
-\end{minted}
-\end{multicols}
+\InputLuaExample[firstline=4,lastline=17]{data-types/string.lua}
 
 \subsubsection{Naked keys}
 
