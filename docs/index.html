@@ -27,6 +27,7 @@
 <h1>luakeys</h1>
 
 
+
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
@@ -50,18 +51,14 @@
 <div id="content">
 
 <h1>Module <code>luakeys</code></h1>
-<p>Convert a key so that it can be written as a table field without
-  quotes and square brackets (for example <code>one 2</code> becomes <code>one_2</code>).</p>
-<p>  The key can then reference values from a table using dot notation.
-  (<code>table[&quot;one 2&quot;]</code> becomes <code>table.one_2</code>).</p>
+<p>Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</p>
+<p>
+
+</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#get_array_size">get_array_size (value)</a></td>
-	<td class="summary">Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
-	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_table_size">get_table_size (value)</a></td>
 	<td class="summary">Get the size of a table <code>{ one = &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.</td>
@@ -91,31 +88,21 @@
 	<td class="name" nowrap><a href="#clone_table">clone_table (orig)</a></td>
 	<td class="summary">http://lua-users.org/wiki/CopyTable</td>
 	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#luafy_options">luafy_options (raw_options)</a></td>
-	<td class="summary">Convert all keys in a table to strings containig only alphanumeric
- characters and underscores.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#normalize_parse_options">normalize_parse_options (options_raw)</a></td>
-	<td class="summary">All option keys can be written with underscores or with spaces as
- separators.</td>
-	</tr>
 </table>
 <h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#render">render (tbl)</a></td>
+	<td class="name" nowrap><a href="#render">render (result)</a></td>
 	<td class="summary">The function <code>render(tbl)</code> reverses the function
   <code>parse(kv_string)</code>.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#stringify">stringify (input, for_tex)</a></td>
+	<td class="name" nowrap><a href="#stringify">stringify (result, for_tex)</a></td>
 	<td class="summary">The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
    printable string.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#debug">debug (tbl)</a></td>
+	<td class="name" nowrap><a href="#debug">debug (result)</a></td>
 	<td class="summary">The function <code>debug(tbl)</code> pretty prints a Lua table to standard
    output (stdout).</td>
 	</tr>
@@ -140,12 +127,8 @@
  value of a new table entry.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize">normalize (raw, options)</a></td>
-	<td class="summary">Normalize the result tables of the LPeg parser.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#apply_definitions">apply_definitions (defs, opts, input, output, unknown, key_path, input_root)</a></td>
-	<td class="summary">Apply the key-value-pair definitions (definitions) on an input table in a
+	<td class="summary">Apply the key-value-pair definitions (defs) on an input table in a
  recursive fashion.</td>
 	</tr>
 	<tr>
@@ -153,8 +136,16 @@
 	<td class="summary">standalone values are removed.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#parse">parse (kv_string, options)</a></td>
+	<td class="name" nowrap><a href="#parse">parse (kv_string, opts)</a></td>
 	<td class="summary">Parse a LaTeX/TeX style key-value string into a Lua table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_opts">normalize_opts (opts)</a></td>
+	<td class="summary">Normalize the parse options.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#apply_opts">apply_opts (result, opts)</a></td>
+	<td class="summary">Normalize the result table of the LPeg parser.</td>
 	</tr>
 </table>
 <h2><a href="#Store_results">Store results </a></h2>
@@ -167,24 +158,34 @@
 <h2><a href="#Exports">Exports </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#default_options">default_options</a></td>
-	<td class="summary"></td>
+	<td class="name" nowrap><a href="#opts">opts</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#stringify">stringify</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#parse">parse</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#render">render</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#debug">debug</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#save">save (identifier, result)</a></td>
@@ -206,34 +207,6 @@
 
     <dl class="function">
     <dt>
-    <a name = "get_array_size"></a>
-    <strong>get_array_size (value)</strong>
-    </dt>
-    <dd>
-    Get the size of an array like table <code>{ &apos;one&apos;, &apos;two&apos;, &apos;three&apos; }</code> = 3.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">value</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table or any input.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">number</span></span>
-        The size of the array like table. 0 if the input is
- no table or the table is empty.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "get_table_size"></a>
     <strong>get_table_size (value)</strong>
     </dt>
@@ -244,7 +217,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">value</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A table or any input.
         </li>
     </ul>
@@ -275,40 +248,39 @@
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">case_insensitive_keys</span>
-
-        </li>
         <li><span class="parameter">convert_dimensions</span>
 
-        </li>
-        <li><span class="parameter">converter</span>
+
 
         </li>
         <li><span class="parameter">debug</span>
 
+
+
         </li>
         <li><span class="parameter">default</span>
+
+
 
         </li>
         <li><span class="parameter">defaults</span>
 
-        </li>
-        <li><span class="parameter">definitions</span>
+
 
         </li>
-        <li><span class="parameter">naked_as_value</span>
+        <li><span class="parameter">defs</span>
+
+
 
         </li>
-        <li><span class="parameter">no_error</span>
+        <li><span class="parameter">format_keys</span>
+
+
 
         </li>
-        <li><span class="parameter">postprocess</span>
+        <li><span class="parameter">hooks</span>
 
-        </li>
-        <li><span class="parameter">preprocess</span>
 
-        </li>
-        <li><span class="parameter">unpack</span>
 
         </li>
     </ul>
@@ -352,8 +324,12 @@
     <ul>
         <li><span class="parameter">target</span>
 
+
+
         </li>
         <li><span class="parameter">t2</span>
+
+
 
         </li>
     </ul>
@@ -375,68 +351,11 @@
     <ul>
         <li><span class="parameter">orig</span>
 
+
+
         </li>
     </ul>
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "luafy_options"></a>
-    <strong>luafy_options (raw_options)</strong>
-    </dt>
-    <dd>
-    Convert all keys in a table to strings containig only alphanumeric
- characters and underscores.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">raw_options</span>
-         Some raw options.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-        Returns always a table. If the input value is not a
- an empty table is returned.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "normalize_parse_options"></a>
-    <strong>normalize_parse_options (options_raw)</strong>
-    </dt>
-    <dd>
-    All option keys can be written with underscores or with spaces as
- separators.
- For the LaTeX version of the macro
-  <code>\luakeysdebug[options]{kv-string}</code>.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">options_raw</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         Options in a raw format. The table may be
- empty or some keys are not set.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-
-    </ol>
 
 
 
@@ -448,7 +367,7 @@
     <dl class="function">
     <dt>
     <a name = "render"></a>
-    <strong>render (tbl)</strong>
+    <strong>render (result)</strong>
     </dt>
     <dd>
     The function <code>render(tbl)</code> reverses the function
@@ -461,8 +380,8 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+        <li><span class="parameter">result</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A table to be converted into a key-value string.
         </li>
     </ul>
@@ -470,7 +389,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
         A key-value string that can be passed to a TeX
  macro.
     </ol>
@@ -481,12 +400,12 @@
 </dd>
     <dt>
     <a name = "stringify"></a>
-    <strong>stringify (input, for_tex)</strong>
+    <strong>stringify (result, for_tex)</strong>
     </dt>
     <dd>
     The function <code>stringify(tbl, for_tex)</code> converts a Lua table into a
    printable string.  Stringify a table means to convert the table into
-   a string. This function is used to realize the <a href="https://www.lua.org/manual/5.2/manual.html#pdf-print">print</a> function.
+   a string. This function is used to realize the <a href="index.html#debug">debug</a> function.
    <code>stringify(tbl, true)</code> (<code>for_tex = true</code>) generates a string which
    can be embeded into TeX documents. The macro <code>\luakeysdebug{}</code> uses
    this option. <code>stringify(tbl, false)</code> or <code>stringify(tbl)</code> generate a
@@ -495,8 +414,8 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">input</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+        <li><span class="parameter">result</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A table to stringify.
         </li>
         <li><span class="parameter">for_tex</span>
@@ -516,7 +435,7 @@
 </dd>
     <dt>
     <a name = "debug"></a>
-    <strong>debug (tbl)</strong>
+    <strong>debug (result)</strong>
     </dt>
     <dd>
     The function <code>debug(tbl)</code> pretty prints a Lua table to standard
@@ -528,8 +447,8 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+        <li><span class="parameter">result</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A table to be printed to standard output for
  debugging purposes.
         </li>
@@ -549,18 +468,20 @@
     <strong>generate_parser (initial_rule, convert_dimensions)</strong>
     </dt>
     <dd>
-    <p>Generate the PEG parser using Lpeg.</p>
+
+<p>Generate the PEG parser using Lpeg. </p>
 
 <p> Explanations of some LPeg notation forms:</p>
 
 <ul>
-<li><code>patt ^ 0</code> = <code>expression *</code></li>
-<li><code>patt ^ 1</code> = <code>expression +</code></li>
-<li><code>patt ^ -1</code> = <code>expression ?</code></li>
-<li><code>patt1 * patt2</code> = <code>expression1 expression2</code>: Sequence</li>
-<li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code>: Ordered choice</p></li>
-<li><p><a href="https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf">TUGboat article: Parsing complex data formats in LuaTEX with LPEG</a></p></li>
+    <li><p><code>patt ^ 0</code> = <code>expression *</code></p></li>
+    <li><p><code>patt ^ 1</code> = <code>expression +</code></p></li>
+    <li><p><code>patt ^ -1</code> = <code>expression ?</code></p></li>
+    <li><p><code>patt1 * patt2</code> = <code>expression1 expression2</code>: Sequence</p></li>
+    <li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code>: Ordered choice</p></li>
+    <li><p><a href="https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf">TUGboat article: Parsing complex data formats in LuaTEX with LPEG</a></p></li>
 </ul>
+
 
 
 
@@ -568,8 +489,12 @@
     <ul>
         <li><span class="parameter">initial_rule</span>
 
+
+
         </li>
         <li><span class="parameter">convert_dimensions</span>
+
+
 
         </li>
     </ul>
@@ -597,6 +522,8 @@
     <ul>
         <li><span class="parameter">match</span>
 
+
+
         </li>
     </ul>
 
@@ -615,7 +542,7 @@
 <p> # Key value pair</p>
 
 <p> If arg1 and arg2 are not nil, then arg1 is the key and arg2 is the
- value of a new table entry.</p>
+ value of a new table entry. </p>
 
 <p> # Index value</p>
 
@@ -626,65 +553,32 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">table</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+
 
         </li>
         <li><span class="parameter">arg1</span>
             <span class="types"><span class="type">mixed</span></span>
 
+
+
         </li>
         <li><span class="parameter">arg2</span>
             <span class="types"><span class="type">mixed</span></span>
 
+
+
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-
-    </ol>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
 
-
-</dd>
-    <dt>
-    <a name = "normalize"></a>
-    <strong>normalize (raw, options)</strong>
-    </dt>
-    <dd>
-    <p>Normalize the result tables of the LPeg parser.  This normalization
-  tasks are performed on the raw input table coming directly from the
-  PEG parser:</p>
-
-<ul>
-<li>Unpack all single valued array like tables: <code>{ &apos;text&apos; }</code> into
- <code>text</code></li>
-</ul>
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">raw</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         The raw input table coming directly from the PEG
-   parser
-        </li>
-        <li><span class="parameter">options</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         Some options. A table with the key
-   <code>unpack</code>
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-        A normalized table ready for the outside world.
     </ol>
 
 
@@ -696,7 +590,7 @@
     <strong>apply_definitions (defs, opts, input, output, unknown, key_path, input_root)</strong>
     </dt>
     <dd>
-    Apply the key-value-pair definitions (definitions) on an input table in a
+    Apply the key-value-pair definitions (defs) on an input table in a
  recursive fashion.
 
 
@@ -749,7 +643,7 @@
 </dd>
     <dt>
     <a name = "parse"></a>
-    <strong>parse (kv_string, options)</strong>
+    <strong>parse (kv_string, opts)</strong>
     </dt>
     <dd>
     Parse a LaTeX/TeX style key-value string into a Lua table.
@@ -758,25 +652,74 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">kv_string</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
-         A string in the TeX/LaTeX style key-value
-   format as described above.
+         string A string in the TeX/LaTeX style key-value format as described above.
         </li>
-        <li><span class="parameter">options</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-         A table containing the settings:
- <code>convert_dimensions</code>, <code>unpack</code>,
- <code>naked_as_value</code>, <code>converter</code>, <a href="index.html#debug">debug</a>, <code>preprocess</code>, <code>postprocess</code>.
+        <li><span class="parameter">opts</span>
+         table A table containing the settings:
+   <code>convert_dimensions</code>, <code>unpack</code>, <code>naked_as_value</code>, <code>converter</code>,
+   <a href="index.html#debug">debug</a>, <code>preprocess</code>, <code>postprocess</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        table result The final result of all individual parsing and normalization steps.</li>
+        <li>
+        table unknown A table with unknown, undefinied key-value pairs.</li>
+        <li>
+        table raw The unprocessed, raw result of the LPeg parser.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize_opts"></a>
+    <strong>normalize_opts (opts)</strong>
+    </dt>
+    <dd>
+    Normalize the parse options.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">opts</span>
+         table Options in a raw format. The table may be empty or some keys are not set.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
-        A hopefully properly parsed table you can do something
- useful with.
+        table
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "apply_opts"></a>
+    <strong>apply_opts (result, opts)</strong>
+    </dt>
+    <dd>
+    Normalize the result table of the LPeg parser.  This normalization
+  tasks are performed on the raw input table coming directly from
+  the PEG parser:
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">result</span>
+         table The raw input table coming directly from the PEG parser
+        </li>
+        <li><span class="parameter">opts</span>
+         table Some options.
+        </li>
+    </ul>
+
 
 
 
@@ -805,10 +748,12 @@
 
     <dl class="function">
     <dt>
-    <a name = "default_options"></a>
-    <strong>default_options</strong>
+    <a name = "opts"></a>
+    <strong>opts</strong>
     </dt>
     <dd>
+
+
 
 
 
@@ -833,6 +778,8 @@
 
 
 
+
+
     <h3>See also:</h3>
     <ul>
          <a href="index.html#stringify">stringify</a>
@@ -845,6 +792,8 @@
     <strong>parse</strong>
     </dt>
     <dd>
+
+
 
 
 
@@ -869,6 +818,8 @@
 
 
 
+
+
     <h3>See also:</h3>
     <ul>
          <a href="index.html#render">render</a>
@@ -881,6 +832,8 @@
     <strong>debug</strong>
     </dt>
     <dd>
+
+
 
 
 
@@ -908,12 +861,12 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">identifier</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          The identifier under which the result is
    saved.
         </li>
         <li><span class="parameter">result</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.5">table</a></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A result to be stored and that was created by
    the key-value parser.
         </li>
@@ -936,7 +889,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">identifier</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.2/manual.html#6.4">string</a></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          The identifier under which the result was
    saved.
         </li>
@@ -954,7 +907,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-06-07 08:53:50 </i>
+<i style="float:right;">Last updated 2022-06-09 21:14:30 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

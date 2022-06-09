@@ -597,7 +597,7 @@ local function apply_definitions(defs,
       local value = input[search_key]
       input[search_key] = nil
       return value
-      --- naked keys: values with integer keys
+      -- naked keys: values with integer keys
     elseif utils.remove_from_array(input, search_key) ~= nil then
       return set_default_value(def)
     end
