@@ -419,6 +419,27 @@ we can write ...
 
 \subsubsection{Option “\texttt{hooks}”}
 
+\begin{enumerate}
+\item \lua{kv_string}
+\item \lua{keys_before_opts}
+\item \lua{result_before_opts}
+\item \lua{keys_before_def}
+\item \lua{result_before_def}
+\item \lua{process} (See definition)
+\item \lua{keys_at_end}
+\item \lua{result_at_end}
+\end{enumerate}
+
+\paragraph{\texttt{kv\_string}}
+
+\InputLuaExample[firstline=4,lastline=11]{hooks/kv-string.lua}
+
+\paragraph{\texttt{keys\_*}}
+
+\InputLuaExample[firstline=4,lastline=16]{hooks/keys-at-end.lua}
+
+\paragraph{\texttt{result\_*}}
+
 %%
 %
 %%
@@ -462,6 +483,12 @@ If we set the option \lua{no_error} to \lua{true}:
 %%
 
 \subsubsection{Option “\texttt{unpack}”}
+
+% Mit Hilfe der Option \lua{unpack} werden alle Tabellen, die nur aus
+% einem einzigen nackten Schlüssel bzw. einen einzigen alleinstehenden
+% Wert bestehen, aufgelöst.
+With the help of the option \lua{unpack}, all tables that consist of
+only one a single naked key or a single standalone value are unpacked.
 
 \InputLuaExample[firstline=4,lastline=5]{opts/unpack.lua}
 
@@ -1163,45 +1190,28 @@ marks must be used.
 \end{minted}
 \end{multicols}
 
-\subsubsection{Standalone values}
+\subsubsection{Naked keys}
 
-Standalone values are values without a key. They are converted into an
-array. In Lua an array is a table with numeric indexes (The first index
-is 1).
+% Nackte Schlüssel sind Schlüssel ohne Wert.
+Naked keys are keys without a value.
+%
+% Mit der Option \lua{naked_as_value} können sie als Werte in ein Feld
+% übernommen werden.
+Using the option \lua{naked_as_value} they can be converted into values
+and stored into an array.
+%
+% In Lua ist ein Feld eine Tabelle mit numerischen Indizes (der erste
+% Index ist 1).
+In Lua an array is a table with numeric indexes (The first index is 1).
 
-\begin{multicols}{2}
-\begin{minted}{latex}
-\luakeysdebug{one,two,three}
-\end{minted}
-\columnbreak
-\begin{minted}{lua}
-{ 'one', 'two', 'three' }
-\end{minted}
-
-\noindent
-is equivalent to
-
-\begin{minted}{lua}
-{
-  [1] = 'one',
-  [2] = 'two',
-  [3] = 'three',
-}
-\end{minted}
-\end{multicols}
+\InputLatexExample[firstline=5,lastline=12]{luakeysdebug/naked-keys.tex}
 
 \noindent
+% VAlle erkannten Datentypen können als eigenständige Werte verwendet
+% werden.
 All recognized data types can be used as standalone values.
 
-\begin{multicols}{2}
-\begin{minted}{latex}
-\luakeysdebug{one,2,3cm}
-\end{minted}
-\columnbreak
-\begin{minted}{lua}
-{ 'one', 2, 5594039 }
-\end{minted}
-\end{multicols}
+\InputLatexExample[firstline=14,lastline=19]{luakeysdebug/naked-keys.tex}
 
 %-----------------------------------------------------------------------
 %

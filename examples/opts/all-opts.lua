@@ -22,6 +22,7 @@ local opts = {
   -- lower, snake, upper
   format_keys = { 'snake' },
 
+  -- Listed in the order of execution
   hooks = {
     kv_string = function(kv_string)
       return kv_string
@@ -32,7 +33,7 @@ local opts = {
       return key, value
     end,
 
-    -- Visit the current result table.
+    -- Visit the result table.
     result_before_opts = function(result)
     end,
 
@@ -41,7 +42,7 @@ local opts = {
       return key, value
     end,
 
-    -- Visit the current result table.
+    -- Visit the result table.
     result_before_def = function(result)
     end,
 
@@ -50,7 +51,7 @@ local opts = {
       return key, value
     end,
 
-    -- Visit the current result table.
+    -- Visit the result table.
     result_at_end = function(result)
     end,
   },

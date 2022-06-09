@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{luakeys-debug}
+
+\begin{document}
+\luakeysdebug[naked_as_value=true]{one,two,three}
+% {
+%   [1] = 'one',
+%   [2] = 'two',
+%   [3] = 'three',
+% }
+% =
+% { 'one', 'two', 'three' }
+
+\luakeysdebug[naked_as_value=true]{one,2,3cm}
+% {
+%   [1] = 'one',
+%   [2] = 2,
+%   [3] = '3cm',
+% }
+\end{document}
