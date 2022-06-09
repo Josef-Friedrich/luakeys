@@ -1,6 +1,6 @@
 \documentclass{ltxdoc}
 
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
@@ -84,23 +84,37 @@ Result:
 \section{Introduction}
 
 \noindent
-|luakeys| is a Lua module that can parse key-value options like the
-\TeX{} packages \href{https://www.ctan.org/pkg/keyval}{keyval},
+% |luakeys| ist ein Lua-Modul / Lua\TeX package, das wie die Pakete ...
+% Schlüssel-Wert-Optionen analysieren kann.
+|luakeys| is a Lua module / Lua\TeX package that can parse key-value
+options like the \TeX{} packages
+\href{https://www.ctan.org/pkg/keyval}{keyval},
 \href{https://www.ctan.org/pkg/kvsetkeys}{kvsetkeys},
 \href{https://www.ctan.org/pkg/kvoptions}{kvoptions},
 \href{https://www.ctan.org/pkg/xkeyval}{xkeyval},
-\href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc. do. |luakeys|,
-however, accomplishes this task entirely, by using the Lua language and
-doesn’t rely on \TeX{}. Therefore this package can only be used with the
-\TeX{} engine Lua\TeX{}. Since |luakeys| uses
+\href{https://www.ctan.org/pkg/pgfkeys}{pgfkeys} etc.
+%
+% |luakeys|, erfüllt diese Aufgabe jedoch, indem es die Sprache Lua
+% verwendet und nicht auf \TeX{} angewiesen ist.
+|luakeys|, however, accomplishes this task by using the Lua language and
+doesn’t rely on \TeX{}.
+%
+% Deshalb kann dieses Paket nur mit der \TeX{}-Engine Lua\TeX{}
+% verwendet werden.
+Therefore this package can only be used with the
+\TeX{} engine Lua\TeX{}.
+%
+% Da |luakeys| \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}
+% verwendet, sollte der Parsing-Mechanismus ziemlich robust sein.
+Since |luakeys| uses
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
 mechanism should be pretty robust.
 
 The TUGboat article
 \href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}
 {“Implementing key–value input: An introduction” (Volume 30 (2009), No. 1)}
-by Joseph Wright and Christian Feuersänger gives a good overview of the
-available key-value packages.
+by \emph{Joseph Wright} and \emph{Christian Feuersänger} gives a good
+overview of the available key-value packages.
 
 This package would not be possible without the article
 \href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
@@ -118,9 +132,13 @@ This package would not be possible without the article
 
 \subsection{Using the Lua module \texttt{luakeys.lua}}
 
-The core functionality of this package is realized in Lua. So you can
-use \texttt{luakeys} without using the wrapper \TeX{} files
-\texttt{luakeys.sty} and \texttt{luakeys.tex}.
+% Die Kernfunktionalität dieses Pakets ist in Lua realisiert.
+The core functionality of this package is realized in Lua.
+%
+% Sie können also |luakeys| auch ohne die Wrapper-Dateien
+% \texttt{luakeys.sty} und \texttt{luakeys.tex} verwenden.
+So you can use |luakeys| even without using the wrapper files
+|luakeys.sty| and |luakeys.tex|.
 
 \InputLatexExample{loading/lua.tex}
 
@@ -130,6 +148,22 @@ use \texttt{luakeys} without using the wrapper \TeX{} files
 
 \subsection{Using the Lua\LaTeX{} wrapper \texttt{luakeys.sty}}
 
+% Der Paketmanager MikTeX lädt beispielsweise Pakete erst bei Bedarf
+% herunter.
+For example, the MiK\TeX{} package manager downloads packages only when
+needed.
+%
+% Es wurde berichtet, dass dieser automatische Download nur mit Hilfe der
+% Hüll-Dateien funktioniert.
+It has been reported that this automatic download only works with this
+wrapper files.
+%
+% Wahrscheinlich hält MiK\TeX nach einem Auftreten des LaTeX macros
+% “\latex{\usepackage{luakeys}} ”Ausschau.
+Probably MiK\TeX{} is searching for an occurrence of the \LaTeX{} macro
+“\latex{\usepackage{luakeys}}”.
+
+% Die mitgelieferte Lua\LaTeX{}-Datei ist recht klein:
 The supplied Lua\LaTeX{} file is quite small:
 
 \begin{minted}{latex}
