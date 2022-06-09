@@ -34,6 +34,8 @@
   \end{mdframed}
 }
 
+\catcode`_=12
+
 \begin{document}
 
 \providecommand*{\url}{\texttt}
@@ -44,7 +46,7 @@
   \url{josef@friedrich.rocks}\\%
   \href{https://github.com/Josef-Friedrich/luakeys}{github.com/Josef-Friedrich/luakeys}%
 }
-\date{v0.5 from 2022/04/04}
+\date{v0.6 from 2022/06/09}
 
 \maketitle
 
@@ -248,7 +250,7 @@ The raw result of the Lpeg grammar parser. \\
 %
 %%
 
-\subsection{Function \texttt{parse(kv\_string, opts): result, unknown, raw}}
+\subsection{Function \texttt{parse(kv_string, opts): result, unknown, raw}}
 \label{parse}
 
 % Die Function parse ist die wichtigste Funktion des Pakets.
@@ -287,7 +289,7 @@ In plain \TeX:
 The \lua{parse} function can be called with an options table. This
 options are supported:
 
-\InputLuaExample[firstline=5,lastline=67]{opts/all-opts.lua}
+\InputLuaExample[firstline=5,lastline=69]{opts/all-opts.lua}
 
 \noindent
 The options can also be set globally using the exported table
@@ -301,7 +303,7 @@ The options can also be set globally using the exported table
 %
 %%
 
-\subsubsection{Option “\texttt{convert\_dimensions}”}
+\subsubsection{Option “\texttt{convert_dimensions}”}
 
 If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
 detects the \TeX{} dimensions and converts them into scaled points using
@@ -431,7 +433,7 @@ we can write ...
 %
 %%
 
-\subsubsection{Option “\texttt{format\_keys}”}
+\subsubsection{Option “\texttt{format_keys}”}
 
 \begin{description}
 \item[lower] \strut
@@ -485,7 +487,7 @@ definitions.
 }
 
 \begin{enumerate}
-\item \lua{kv_string} \TmpSignature{function(kv\_string): kv\_string}
+\item \lua{kv_string} \TmpSignature{function(kv_string): kv_string}
 \item \lua{keys_before_opts} \TmpKeySignature
 \item \lua{result_before_opts} \TmpResultSignature
 \item \lua{keys_before_def} \TmpKeySignature
@@ -495,7 +497,7 @@ definitions.
 \item \lua{result} \TmpResultSignature
 \end{enumerate}
 
-\paragraph{\texttt{kv\_string}}
+\paragraph{\texttt{kv_string}}
 
 % Der Hook \lua{kv_string} wird als erste
 % der Hook-Funktionen noch vor der LPeg-Syntax-Analyse aufgerufen.
@@ -504,7 +506,7 @@ before the LPeg syntax parser is executed.
 
 \InputLuaExample[firstline=4,lastline=11]{hooks/kv-string.lua}
 
-\paragraph{\texttt{keys\_*}}
+\paragraph{\texttt{keys_*}}
 
 % Die Hooks \lua{keys_*} werden rekursiv auf jeden Schlüssel in der
 % aktuellen Ergebnistabelle aufgerufen.
@@ -528,7 +530,7 @@ hook function.
 
 \InputLuaExample[firstline=4,lastline=16]{hooks/keys-depth.lua}
 
-\paragraph{\texttt{result\_*}}
+\paragraph{\texttt{result_*}}
 
 % Die Hooks \lua{result_*} werden einmal mit der aktuellen
 % Ergebnistabelle als Parameter aufgerufen.
@@ -539,7 +541,7 @@ as a parameter.
 %
 %%
 
-\subsubsection{Option “\texttt{naked\_as\_value}”}
+\subsubsection{Option “\texttt{naked_as_value}”}
 
 % Mit Hilfe der Option \lua{naked_as_value} werden nackte Schlüssel
 % nicht mit einem Standardwert versehen, sondern als Werte in die
@@ -558,7 +560,7 @@ If we set the option \lua{naked_as_value} to \lua{true}:
 %
 %%
 
-\subsubsection{Option “\texttt{no\_error}”}
+\subsubsection{Option “\texttt{no_error}”}
 
 % Standardmaßig wirft parse-Funktion einen Fehler, wenn es unbekannte
 % Schlüssel gibt.
@@ -662,7 +664,7 @@ multiple aliases by a list of strings.
 %
 %%
 
-\subsubsection{Attribute “\texttt{always\_present}”}
+\subsubsection{Attribute “\texttt{always_present}”}
 
 % Die Option \lua{default} wird nur bei nackten Schlüsseln verwendet.
 The \lua{default} attribute is used only for naked keys.
@@ -701,7 +703,7 @@ choices:
 %
 %%
 
-\subsubsection{Attribute “\texttt{data\_type}”}
+\subsubsection{Attribute “\texttt{data_type}”}
 
 % source: Python argparse documentation.
 The \lua{data_type} attribute allows type-checking and type conversions to
@@ -750,7 +752,7 @@ value can be specified for all naked keys.
 %
 %%
 
-\subsubsection{Attribute “\texttt{exclusive\_group}”}
+\subsubsection{Attribute “\texttt{exclusive_group}”}
 
 % Alle Schlüssel, die der gleichen ausschließenden Gruppe angehören,
 % dürfen nicht gemeinsam angegeben werden.
@@ -777,7 +779,7 @@ thrown.
 %
 %%
 
-\subsubsection{Attribute “\texttt{opposite\_keys}”}
+\subsubsection{Attribute “\texttt{opposite_keys}”}
 
 % Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
 % Schlüssel in Wahrheitswerte umzuwandeln und diesen Wahrheitswert unter
@@ -972,7 +974,7 @@ A recursive example:
 %
 %%
 
-\subsubsection{Attribute “\texttt{sub\_keys}”}
+\subsubsection{Attribute “\texttt{sub_keys}”}
 
 % Mit dem Attribut \lua{sub_keys} können ineinander verschachtelte
 % Schlüssel-Wert-Paar-Definitionen aufgebaut werden.
@@ -1475,21 +1477,22 @@ An example of how to use the command in \LaTeX:
 }
 \changes{v0.5}{2022/04/04}{
 * Add possibility to change options globally
-* New option: standalone\_as\_true
+* New option: standalone_as_true
 * Add a recursive converter callback / hook to process the parse tree
-* New option: case\_insensitive\_keys
+* New option: case_insensitive_keys
 }
-\changes{v0.6}{2022/05/29}{
-* Rename global options table from “default\_options” to
-* New function “define(defs, opts)”
-* New option “format\_keys”
-* Remove option “case\_insensitive\_keys”. Use
+\changes{v0.6}{2022/06/09}{
+* New feature: keys now can be defined using the function
+  “define(defs, opts)” or “define(kv_string, { defs = { key = { ... } } })”
+* Rename the global options table from “default_options” to “opts”
+* New option “format_keys”
+* Remove option “case_insensitive_keys”. Use
   “format_keys = \{ lower \}” to achieve the same effect.
-* The default value of the option “convert\_dimension” is now false.
-* The function “print” is now called “debug”.
-* The option “standalone\_as\_true” is renamed to “naked\_as\_value”. The
-  boolean value of the option must be changed to the opposite to
+* The default value of the option “convert_dimension” is now false.
+* The option “standalone_as_true” is renamed to “naked_as_value”.
+  The boolean value of the option must be changed to the opposite to
   produce the previous effect.
+* The function “print()” is now called “debug()”
 }
 \pagebreak
 \PrintChanges

@@ -32,61 +32,53 @@ The Current Maintainer of this work is Josef Friedrich.
 
 ## Documentation
 
-### Key-value pair definition
+### Key-value pair definitions
 
 ```lua
-local definition = {
-  -- Allow different key names.
-  -- or a single string: alias = 'k'
-  alias = { 'k', 'ke' },
+local defs = {
+  key = {
+    -- Allow different key names.
+    -- or a single string: alias = 'k'
+    alias = { 'k', 'ke' },
 
-  -- The key is always included in the result. If no default value is
-  -- definied, true is taken as the value.
-  always_present = false,
+    -- The key is always included in the result. If no default value is
+    -- definied, true is taken as the value.
+    always_present = false,
 
-  -- Only values listed in the array table are allowed.
-  choices = { 'one', 'two', 'three' },
+    -- Only values listed in the array table are allowed.
+    choices = { 'one', 'two', 'three' },
 
-  -- Possible data types: boolean, dimension, integer, number, string
-  data_type = 'string',
+    -- Possible data types: boolean, dimension, integer, number, string
+    data_type = 'string',
 
-  default = true,
+    default = true,
 
-  -- The key belongs to a mutually exclusive group of keys.
-  exclusive_group = 'name',
+    -- The key belongs to a mutually exclusive group of keys.
+    exclusive_group = 'name',
 
-  -- > \g_my_token_list_tl
-  l3_tl_set = 'my_token_list',
+    -- > \MacroName
+    macro = 'MacroName', -- > \MacroName
 
-  -- > \MacroName
-  macro = 'MacroName', -- > \MacroName
+    -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
+    match = '^%d%d%d%d%-%d%d%-%d%d$',
 
-  -- See http://www.lua.org/manual/5.3/manual.html#6.4.1
-  match = '^%d%d%d%d%-%d%d%-%d%d$',
-
-  -- name of the key, can be omitted
-  name = 'key',
-  opposite_keys = { [true] = 'show', [false] = 'hide' },
-  process = function(value, result, unknown)
-    return value
-  end,
-  required = true,
-  sub_keys = { key_level_2 = { ... } },
-
+    -- The name of the key, can be omitted
+    name = 'key',
+    opposite_keys = { [true] = 'show', [false] = 'hide' },
+    process = function(value, input, result, unknown)
+      return value
+    end,
+    required = true,
+    sub_keys = { key_level_2 = { } },
+  }
 }
 ```
 
-### Parser options (options)
+### Parser options (opts)
 
 ```lua
-local options = {
-  -- Visit all key-value pairs in the recursive parse tree.
-  converter = function(key, value, depth, current_tree, root_tree)
-    return key, value
-  end,
-
+local opts = {
   -- Automatically convert dimensions into scaled points (1cm -> 1864679).
-  -- default: false
   convert_dimensions = false,
 
   -- Print the result table to the console.
@@ -102,8 +94,42 @@ local options = {
   -- Key-value pair definitions.
   defs = { key = { default = 'value' } },
 
-  -- lower, upper, snake
+  -- lower, snake, upper
   format_keys = { 'snake' },
+
+  -- Listed in the order of execution
+  hooks = {
+    kv_string = function(kv_string)
+      return kv_string
+    end,
+
+    -- Visit all key-value pairs recursively.
+    keys_before_opts = function(key, value, depth, current, result)
+      return key, value
+    end,
+
+    -- Visit the result table.
+    result_before_opts = function(result)
+    end,
+
+    -- Visit all key-value pairs recursively.
+    keys_before_def = function(key, value, depth, current, result)
+      return key, value
+    end,
+
+    -- Visit the result table.
+    result_before_def = function(result)
+    end,
+
+    -- Visit all key-value pairs recursively.
+    keys = function(key, value, depth, current, result)
+      return key, value
+    end,
+
+    -- Visit the result table.
+    result = function(result)
+    end,
+  },
 
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
@@ -115,7 +141,7 @@ local options = {
   -- { key = { 'value' } } -> { key = 'value' }
   unpack = false,
 }
-local result = luakeys.parse('one,two,three', options)
+local result = luakeys.parse('one,two,three', opts)
 ```
 
 ## Tasks
