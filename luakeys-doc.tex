@@ -463,6 +463,12 @@ definitions.
 
 \paragraph{\texttt{kv\_string}}
 
+Der Hook \lua{kv_string} wird als erste
+der Hook-Funktionen noch vor der LPeg-Syntax-Analyse aufgerufen
+
+The \lua{kv_string} hook is called as the first of the hook functions
+before the LPeg syntax parser is executed.
+
 \InputLuaExample[firstline=4,lastline=11]{hooks/kv-string.lua}
 
 \paragraph{\texttt{keys\_*}}
