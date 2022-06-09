@@ -23,9 +23,6 @@ local defs = {
     -- The key belongs to a mutually exclusive group of keys.
     exclusive_group = 'name',
 
-    -- > \g_my_token_list_tl
-    l3_tl_set = 'my_token_list',
-
     -- > \MacroName
     macro = 'MacroName', -- > \MacroName
 

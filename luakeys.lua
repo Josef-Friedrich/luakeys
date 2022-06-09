@@ -140,10 +140,6 @@ end
 
 local l3_code_cctab = 10
 
-local function set_l3_code_cctab(cctab_id)
-  l3_code_cctab = cctab_id
-end
-
 --- Convert back to strings
 -- @section
 
@@ -935,8 +931,8 @@ local function parse(kv_string, opts)
       result_before_opts = true,
       keys_before_def = true,
       result_before_def = true,
-      keys_at_end = true,
-      result_at_end = true,
+      keys = true,
+      result = true,
     }
 
     for hook in pairs(opts.hooks) do
@@ -972,8 +968,13 @@ local function parse(kv_string, opts)
   end
 
   local function apply_hooks(at)
-    apply_hook('keys_' .. at)
-    apply_hook('result_' .. at)
+    if at ~= nil then
+      at = '_' .. at
+    else
+      at = ''
+    end
+    apply_hook('keys' .. at)
+    apply_hook('result' .. at)
   end
 
   apply_hooks('before_opts')
@@ -1048,7 +1049,7 @@ local function parse(kv_string, opts)
       clone_table(result))
   end
 
-  apply_hooks('at_end')
+  apply_hooks()
 
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then
     merge_tables(result, opts.defaults)

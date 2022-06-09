@@ -5,7 +5,7 @@ local result = luakeys.parse('x,d1={x,d2={x}}', {
   naked_as_value = true,
   unpack = false,
   hooks = {
-    keys_at_end = function(key, value, depth)
+    keys = function(key, value, depth)
       if value == 'x' then
         return key, depth
       end

@@ -229,11 +229,11 @@ describe('Options', function()
       end)
     end)
 
-    describe('Hook “result_at_end”', function()
+    describe('Hook “result”', function()
       it('should add keys.', function()
         local result = luakeys.parse('key=value', {
           hooks = {
-            result_at_end = function(result)
+            result = function(result)
               result['additional_key'] = 'value'
             end,
           },
@@ -243,10 +243,10 @@ describe('Options', function()
       end)
     end)
 
-    describe('Hook “keys_at_end”', function()
+    describe('Hook “keys”', function()
       local function assert_hook(kv_string, hook, expected)
         assert.is.same(luakeys.parse(kv_string, {
-          hooks = { keys_at_end = hook },
+          hooks = { keys = hook },
           naked_as_value = true,
           unpack = false,
         }), expected)

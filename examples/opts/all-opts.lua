@@ -47,12 +47,12 @@ local opts = {
     end,
 
     -- Visit all key-value pairs recursively.
-    keys_at_end = function(key, value, depth, current, result)
+    keys = function(key, value, depth, current, result)
       return key, value
     end,
 
     -- Visit the result table.
-    result_at_end = function(result)
+    result = function(result)
     end,
   },
 

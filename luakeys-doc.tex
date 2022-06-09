@@ -419,15 +419,46 @@ we can write ...
 
 \subsubsection{Option “\texttt{hooks}”}
 
+% Die folgenden Hooks bzw. Callback-Funktionen ermöglichen es in den
+% Verarbeitungsprozess der \lua{parse}-Function einzugreifen.
+The following hooks or callback functions allow to intervene in the
+processing of the \lua{parse} function.
+%
+% Die Funktionen sind in der Verarbeitungsreihenfolge aufgelistet.
+The functions are listed in processing order.
+%
+% \lua{*_before_opts} bedeutet, dass die Hooks nach der LPeg Syntaxanalyse
+% und vor dem Anwenden der Optionen ausgeführt
+\lua{*_before_opts} means that the hooks are executed after the LPeg
+syntax analysis and before the options are applied.
+%
+% Die Hooks \lua{*_before_defs} werden vor dem Anwenden der
+% Schlüssel-Wert-Definitionen ausgeführt
+The \lua{*_before_defs} hooks are executed before applying the key value
+definitions.
+
+\def\TmpSignature#1{
+  {
+    \scriptsize\texttt{ = #1}
+  }
+}
+
+\def\TmpKeySignature{
+  \TmpSignature{function(key, value, depth, current, result): key, value}
+}
+\def\TmpResultSignature{
+  \TmpSignature{function(result): void}
+}
+
 \begin{enumerate}
-\item \lua{kv_string}
-\item \lua{keys_before_opts}
-\item \lua{result_before_opts}
-\item \lua{keys_before_def}
-\item \lua{result_before_def}
-\item \lua{process} (See definition)
-\item \lua{keys_at_end}
-\item \lua{result_at_end}
+\item \lua{kv_string} \TmpSignature{function(kv\_string): kv\_string}
+\item \lua{keys_before_opts} \TmpKeySignature
+\item \lua{result_before_opts} \TmpResultSignature
+\item \lua{keys_before_def} \TmpKeySignature
+\item \lua{result_before_def} \TmpResultSignature
+\item (\lua{process}) (has to be definied using defs, see \ref{attr-process})
+\item \lua{keys} \TmpKeySignature
+\item \lua{result} \TmpResultSignature
 \end{enumerate}
 
 \paragraph{\texttt{kv\_string}}
@@ -436,9 +467,34 @@ we can write ...
 
 \paragraph{\texttt{keys\_*}}
 
-\InputLuaExample[firstline=4,lastline=16]{hooks/keys-at-end.lua}
+% Die Hooks \lua{keys_*} werden rekursiv auf jeden Schlüssel in der
+% aktuellen Ergebnistabelle aufgerufen.
+The hooks \lua{keys_*} are called recursively on each key in the current
+result table.
+% Die Hook-Funktion muss zwei Werte zurückgeben: \lua{key, value}
+The hook function must return two values: \lua{key, value}.
+%
+% Das folgende Beispiel gibt \lua{key} und \lua{value} unverändert zurück,
+% sodass die Ergebnistabelle nicht verändert wird.
+The following example returns \lua{key} and \lua{value} unchanged, so
+the result table is not changed.
+
+\InputLuaExample[firstline=4,lastline=11]{hooks/keys-unchanged.lua}
+
+\noindent
+% Das nächste Beispiel demonstriert den dritten Parameter \lua{depth}
+% der Hook-Funktion.
+The next example demonstrates the third parameter \lua{depth} of the
+hook function.
+
+\InputLuaExample[firstline=4,lastline=16]{hooks/keys-depth.lua}
 
 \paragraph{\texttt{result\_*}}
+
+% Die Hooks \lua{result_*} werden einmal mit der aktuellen
+% Ergebnistabelle als Parameter aufgerufen.
+The hooks \lua{result_*} are called once with the current result table
+as a parameter.
 
 %%
 %
@@ -544,7 +600,7 @@ chosen to distinguish them from the options of the \lua{parse} function.
 The code example below lists all the attributes that can be used to
 define key-value pairs.
 
-\InputLuaExample[firstline=5,lastline=44]{defs/all-attrs.lua}
+\InputLuaExample[firstline=5,lastline=41]{defs/all-attrs.lua}
 
 %%
 %
@@ -813,6 +869,7 @@ Instead of ...
 %%
 
 \subsubsection{Attribute “\texttt{process}”}
+\label{attr-process}
 
 The \lua{process} attribute can be used to define a function whose return
 value is passed to the key. Four parameters are passed when the
