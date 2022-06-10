@@ -3,6 +3,13 @@ require('busted.runner')()
 local luakeys = require('luakeys')
 
 describe('Defintions', function()
+  it('should throw an error if there is an unknown attribute',
+    function()
+      assert.has_error(function()
+        luakeys.parse('', { defs = { key = { xxx = true } } })
+      end, 'Unknown definition attribute: xxx')
+    end)
+
   describe('Name of the keys', function()
     local function assert_key_name(defs)
       assert.are.same(luakeys.parse('key=value,unknown=unknown',
@@ -25,13 +32,16 @@ describe('Defintions', function()
       local result, unknown = luakeys.parse(
         'level1={level2={key=value,unknown=unknown}}', {
           defs = {
-            level1 = { sub_keys = { level2 = { sub_keys = { key = {} } } } },
+            level1 = {
+              sub_keys = { level2 = { sub_keys = { key = {} } } },
+            },
           },
           no_error = true,
         })
-      assert.are.same(result, { level1 = { level2 = { key = 'value' } } })
-      assert.are
-        .same(unknown, { level1 = { level2 = { unknown = 'unknown' } } })
+      assert.are.same(result,
+        { level1 = { level2 = { key = 'value' } } })
+      assert.are.same(unknown,
+        { level1 = { level2 = { unknown = 'unknown' } } })
     end)
   end)
 
@@ -45,7 +55,8 @@ describe('Defintions', function()
         if defs == nil then
           defs = definitions
         end
-        assert.are.same(expected, luakeys.parse(kv_string, { defs = defs }))
+        assert.are.same(expected,
+          luakeys.parse(kv_string, { defs = defs }))
       end
 
       it(
@@ -60,13 +71,15 @@ describe('Defintions', function()
           assert_alias('my_key2=42', { key2 = 42 })
         end)
 
-      it('should find a alias standalone values as key names', function()
-        assert_alias('ke', { key = true }, { key = { alias = { 'k', 'ke' } } })
-      end)
+      it('should find a alias standalone values as key names',
+        function()
+          assert_alias('ke', { key = true },
+            { key = { alias = { 'k', 'ke' } } })
+        end)
 
       it('should find a value in a nested definition', function()
-        assert_alias('l1 = { l2 = value } }', { level1 = { level2 = 'value' } },
-          {
+        assert_alias('l1 = { l2 = value } }',
+          { level1 = { level2 = 'value' } }, {
             level1 = {
               alias = 'l1',
               sub_keys = { level2 = { alias = { 'l2', 'level_2' } } },
@@ -75,29 +88,33 @@ describe('Defintions', function()
       end)
 
       describe('Error messages', function()
-        it('should throw an error if two aliases are present', function()
-          assert.has_error(function()
-            assert_alias('k = value, ke = value', {},
-              { key = { alias = { 'k', 'ke' } } })
-          end, 'Duplicate aliases “k” and “ke” for key “key”!')
-        end)
+        it('should throw an error if two aliases are present',
+          function()
+            assert.has_error(function()
+              assert_alias('k = value, ke = value', {},
+                { key = { alias = { 'k', 'ke' } } })
+            end,
+              'Duplicate aliases “k” and “ke” for key “key”!')
+          end)
 
         it('should throw an error if the key and an alias are present',
           function()
             assert.has_error(function()
               assert_alias('key = value, k = value', {},
                 { key = { alias = { 'k', 'ke' } } })
-            end, 'Duplicate aliases “key” and “k” for key “key”!')
+            end,
+              'Duplicate aliases “key” and “k” for key “key”!')
           end)
       end)
     end)
 
     describe('Attribute “always_present”', function()
-      it('should pass an value to the key if the input is empty', function()
-        assert.are.same(luakeys.parse('', {
-          defs = { key = { always_present = true } },
-        }), { key = true })
-      end)
+      it('should pass an value to the key if the input is empty',
+        function()
+          assert.are.same(luakeys.parse('', {
+            defs = { key = { always_present = true } },
+          }), { key = true })
+        end)
 
       it('should use the default value', function()
         assert.are.same(luakeys.parse('', {
@@ -109,7 +126,9 @@ describe('Defintions', function()
         assert.are.same(luakeys.parse('', {
           defs = {
             level1 = {
-              sub_keys = { key = { always_present = true, default = 'value' } },
+              sub_keys = {
+                key = { always_present = true, default = 'value' },
+              },
             },
           },
         }), { level1 = { key = 'value' } })
@@ -139,18 +158,19 @@ describe('Defintions', function()
         assert.are.same({ key = expected_value },
           luakeys.parse('key=' .. tostring(input_value),
             { defs = { key = { data_type = data_type } } }),
-          data_type .. '; input: ' .. tostring(input_value) .. ' expected: ' ..
-            tostring(expected_value))
+          data_type .. '; input: ' .. tostring(input_value) ..
+            ' expected: ' .. tostring(expected_value))
       end
 
-      it('should convert different input values into boolean', function()
-        assert_data_type('boolean', 'test', true)
-        assert_data_type('boolean', true, true)
-        assert_data_type('boolean', false, false)
-        assert_data_type('boolean', 0, false)
-        assert_data_type('boolean', 1, true)
-        assert_data_type('boolean', {}, true)
-      end)
+      it('should convert different input values into boolean',
+        function()
+          assert_data_type('boolean', 'test', true)
+          assert_data_type('boolean', true, true)
+          assert_data_type('boolean', false, false)
+          assert_data_type('boolean', 0, false)
+          assert_data_type('boolean', 1, true)
+          assert_data_type('boolean', {}, true)
+        end)
 
       it('should check input values if they are dimensions', function()
         assert_data_type('dimension', '1cm', '1cm')
@@ -180,13 +200,14 @@ describe('Defintions', function()
         end)
       end)
 
-      it('should convert different input values into strings', function()
-        assert_data_type('string', 'test', 'test')
-        assert_data_type('string', 1, '1')
-        assert_data_type('string', 1.23, '1.23')
-        assert_data_type('string', true, 'true')
-        assert_data_type('string', '1cm', '1cm')
-      end)
+      it('should convert different input values into strings',
+        function()
+          assert_data_type('string', 'test', 'test')
+          assert_data_type('string', 1, '1')
+          assert_data_type('string', 1.23, '1.23')
+          assert_data_type('string', true, 'true')
+          assert_data_type('string', '1cm', '1cm')
+        end)
     end)
 
     describe('Attribute “exclusive_group”', function()
@@ -223,10 +244,11 @@ describe('Defintions', function()
         assert_exclusive_group('k4', { k4 = 'value' })
       end)
 
-      it('two keys of two different exclusive groups should pass.', function()
-        assert_exclusive_group('k1=value,k3=value',
-          { k1 = 'value', k3 = 'value' })
-      end)
+      it('two keys of two different exclusive groups should pass.',
+        function()
+          assert_exclusive_group('k1=value,k3=value',
+            { k1 = 'value', k3 = 'value' })
+        end)
     end)
 
     it('Attribute “match”', function()
@@ -240,20 +262,24 @@ describe('Defintions', function()
         assert.are.same(expected, luakeys.parse(kv_string, {
           no_error = true,
           defs = {
-            visibility = { opposite_keys = { [true] = 'show', [false] = 'hide' } },
+            visibility = {
+              opposite_keys = { [true] = 'show', [false] = 'hide' },
+            },
           },
         }))
       end
 
-      it('should return true if a truthy string value is given.', function()
-        assert_opposite_keys('show', { visibility = true })
-      end)
+      it('should return true if a truthy string value is given.',
+        function()
+          assert_opposite_keys('show', { visibility = true })
+        end)
 
       it('should return false if a falsy string is given.', function()
         assert_opposite_keys('hide', { visibility = false })
       end)
 
-      it('should return an empty table if a unknown string value is given.',
+      it(
+        'should return an empty table if a unknown string value is given.',
         function()
           assert_opposite_keys('unknown', {})
         end)
@@ -296,10 +322,11 @@ describe('Defintions', function()
         assert_pick('string', 'A string', '1,"A string"')
       end)
 
-      it('Error: unknown data type', function ()
-        assert.has_error(function ()
-          luakeys.parse('key', { defs = { key = { pick = 'xxx' } }})
-        end, 'Wrong setting. Allowed settings for the attribute “def.pick” are: true, boolean, dimension, integer, number, string. Got “xxx”.')
+      it('Error: unknown data type', function()
+        assert.has_error(function()
+          luakeys.parse('key', { defs = { key = { pick = 'xxx' } } })
+        end,
+          'Wrong setting. Allowed settings for the attribute “def.pick” are: true, boolean, dimension, integer, number, string. Got “xxx”.')
       end)
     end)
 
