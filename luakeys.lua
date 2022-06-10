@@ -514,7 +514,7 @@ local is = {
       return true
     end
     local parser = generate_parser('boolean_only', false)
-    local result = parser:match(value)
+    local result = parser:match(tostring(value))
     return result ~= nil
   end,
 
@@ -523,7 +523,7 @@ local is = {
       return false
     end
     local parser = generate_parser('dimension_only', false)
-    local result = parser:match(value)
+    local result = parser:match(tostring(value))
     return result ~= nil
   end,
 
@@ -543,7 +543,7 @@ local is = {
       return true
     end
     local parser = generate_parser('number_only', false)
-    local result = parser:match(value)
+    local result = parser:match(tostring(value))
     return result ~= nil
   end,
 
@@ -780,6 +780,29 @@ local function apply_definitions(defs,
       end
     end,
 
+    pick = function(value, key, def)
+      if def.pick then
+        for i, v in ipairs(input) do
+          if not def.pick == true and is[def.pick] == nil then
+            throw_error(
+              'Wrong setting. Allowed settings for attribute “def.pick”: true, boolean, dimension, integer, number, string')
+          end
+          local picked_value = nil
+          if is[def.pick] ~= nil then
+            if is[def.pick](v) then
+              picked_value = v
+            end
+          elseif v ~= nil then
+            picked_value = v
+          end
+          if picked_value ~= nil then
+            input[i] = nil
+            return picked_value
+          end
+        end
+      end
+    end,
+
     required = function(value, key, def)
       if def.required ~= nil and def.required and value == nil then
         throw_error(string.format('Missing required key “%s”!', key))
@@ -821,7 +844,7 @@ local function apply_definitions(defs,
   end
 
   for index, def in pairs(defs) do
-    --- Find key and def
+    -- Find key and def
     local key
     if type(def) == 'table' and def.name == nil and type(index) == 'string' then
       key = index
@@ -845,6 +868,7 @@ local function apply_definitions(defs,
     for _, def_opt in ipairs({
       'alias',
       'opposite_keys',
+      'pick',
       'always_present',
       'required',
       'data_type',

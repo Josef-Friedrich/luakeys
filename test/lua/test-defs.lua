@@ -259,6 +259,44 @@ describe('Defintions', function()
         end)
     end)
 
+    describe('Attribute “pick”', function()
+      local function assert_pick(pick_setting,
+        expected_value,
+        kv_string)
+        if kv_string == nil then
+          kv_string = 'first,false,1cm,1,1.23,"A string"'
+        end
+        assert.are.same(luakeys.parse(kv_string, {
+          no_error = true,
+          defs = { key = { pick = pick_setting } },
+        }), { key = expected_value })
+      end
+
+      it('true', function()
+        assert_pick(true, 'first')
+      end)
+
+      it('boolean', function()
+        assert_pick('boolean', false)
+      end)
+
+      it('dimension', function()
+        assert_pick('dimension', '1cm')
+      end)
+
+      it('integer', function()
+        assert_pick('integer', 1)
+      end)
+
+      it('number', function()
+        assert_pick('number', 1.23, '1.23,1')
+      end)
+
+      it('string', function()
+        assert_pick('string', 'A string', '1,"A string"')
+      end)
+    end)
+
     it('Attribute “process”', function()
       assert.are.same(luakeys.parse('width = 0.5', {
         defs = {

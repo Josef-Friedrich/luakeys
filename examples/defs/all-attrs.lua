@@ -32,6 +32,11 @@ local defs = {
     -- The name of the key, can be omitted
     name = 'key',
     opposite_keys = { [true] = 'show', [false] = 'hide' },
+
+    -- Pick a value
+    -- boolean
+    pick = false,
+
     process = function(value, input, result, unknown)
       return value
     end,
