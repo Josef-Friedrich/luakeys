@@ -7,6 +7,7 @@ break_before_functioncall_rp: false
 break_before_functiondef_rp: false
 chop_down_parameter: true
 chop_down_table: true
+column_limit: 72
 continuation_indent_width: 2
 double_quote_to_single_quote: true
 extra_sep_at_table_end: true

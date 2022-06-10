@@ -242,7 +242,8 @@ local function stringify(result, for_tex)
             add(0, stringify_inner(value, depth + 1))
             add(depth, end_bracket .. ',');
           else
-            add(depth, key .. ' = ' .. start_bracket .. end_bracket .. ',')
+            add(depth,
+              key .. ' = ' .. start_bracket .. end_bracket .. ',')
           end
         else
           if (type(value) == 'string') then
@@ -259,9 +260,8 @@ local function stringify(result, for_tex)
     return table.concat(output, line_break)
   end
 
-  return
-    start_bracket .. line_break .. stringify_inner(result, 1) .. line_break ..
-      end_bracket
+  return start_bracket .. line_break .. stringify_inner(result, 1) ..
+           line_break .. end_bracket
 end
 
 --- The function `debug(tbl)` pretty prints a Lua table to standard
@@ -292,7 +292,8 @@ end
 -- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf)
 --
 -- @treturn userdata The parser.
-local function generate_parser(initial_rule, convert_dimensions)
+local function generate_parser(initial_rule,
+  convert_dimensions)
   if convert_dimensions == nil then
     convert_dimensions = false
   end
@@ -483,7 +484,8 @@ local function visit_tree(tree, callback_func)
     callback_func)
     for key, value in pairs(current) do
       if type(value) == 'table' then
-        value = visit_tree_recursive(tree, value, {}, depth + 1, callback_func)
+        value = visit_tree_recursive(tree, value, {}, depth + 1,
+          callback_func)
       end
 
       key, value = callback_func(key, value, depth, current, tree)
@@ -692,9 +694,10 @@ local function apply_definitions(defs,
           throw_error('Unknown data type: ' .. def.data_type)
         end
         if converted == nil then
-          throw_error('The value “' .. value .. '” of the key “' .. key ..
-                        '” could not be converted into the data type “' ..
-                        def.data_type .. '”!')
+          throw_error(
+            'The value “' .. value .. '” of the key “' .. key ..
+              '” could not be converted into the data type “' ..
+              def.data_type .. '”!')
         else
           return converted
         end
@@ -723,7 +726,8 @@ local function apply_definitions(defs,
         return
       end
       if def.l3_tl_set ~= nil then
-        tex.print(l3_code_cctab, '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
+        tex.print(l3_code_cctab,
+          '\\tl_set:Nn \\g_' .. def.l3_tl_set .. '_tl')
         tex.print('{' .. value .. '}')
       end
     end,
@@ -747,8 +751,9 @@ local function apply_definitions(defs,
         end
         local match = string.match(value, def.match)
         if match == nil then
-          throw_error('The value “' .. value .. '” of the key “' .. key ..
-                        '” does not match “' .. def.match .. '”!')
+          throw_error(
+            'The value “' .. value .. '” of the key “' .. key ..
+              '” does not match “' .. def.match .. '”!')
         else
           return match
         end
@@ -782,6 +787,9 @@ local function apply_definitions(defs,
 
     pick = function(value, key, def)
       if def.pick then
+        if value ~= nil then
+          return value
+        end
         for i, v in ipairs(input) do
           if not def.pick == true and is[def.pick] == nil then
             throw_error(
@@ -820,8 +828,8 @@ local function apply_definitions(defs,
         elseif type(value) == 'table' then
           v = value
         end
-        v = apply_definitions(def.sub_keys, opts, v, output[key], unknown,
-          add_to_key_path(key_path, key), input_root)
+        v = apply_definitions(def.sub_keys, opts, v, output[key],
+          unknown, add_to_key_path(key_path, key), input_root)
         if utils.get_table_size(v) > 0 then
           return v
         end
@@ -846,7 +854,8 @@ local function apply_definitions(defs,
   for index, def in pairs(defs) do
     -- Find key and def
     local key
-    if type(def) == 'table' and def.name == nil and type(index) == 'string' then
+    if type(def) == 'table' and def.name == nil and type(index) ==
+      'string' then
       key = index
     elseif type(def) == 'table' and def.name ~= nil then
       key = def.name
@@ -1036,7 +1045,8 @@ local function parse(kv_string, opts)
             elseif style == 'upper' then
               key = key:upper()
             else
-              throw_error('Unknown style to format keys: ' .. tostring(style) ..
+              throw_error('Unknown style to format keys: ' ..
+                            tostring(style) ..
                             ' Allowed styles are: lower, snake, upper')
             end
           end
@@ -1055,8 +1065,9 @@ local function parse(kv_string, opts)
 
     if opts.format_keys then
       if type(opts.format_keys) ~= 'table' then
-        throw_error('The option “format_keys” has to be a table not ' ..
-                      type(opts.format_keys))
+        throw_error(
+          'The option “format_keys” has to be a table not ' ..
+            type(opts.format_keys))
       end
       result = visit_tree(result, callbacks.format_key)
     end
@@ -1069,8 +1080,8 @@ local function parse(kv_string, opts)
   local unknown = nil
   if type(opts.defs) == 'table' then
     apply_hooks('before_defs')
-    result, unknown = apply_definitions(opts.defs, opts, result, {}, {}, {},
-      clone_table(result))
+    result, unknown = apply_definitions(opts.defs, opts, result, {}, {},
+      {}, clone_table(result))
   end
 
   apply_hooks()

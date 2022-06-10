@@ -7,6 +7,7 @@
 
 \usepackage{mdframed}
 \usepackage{minted}
+\usepackage{luakeys}
 \usepackage{luakeys-debug}
 \usepackage{multicol}
 \usepackage{luacode}
@@ -22,13 +23,13 @@
 \def\lua#1{\mintinline{lua}|#1|}
 \def\latex#1{\mintinline{latex}|#1|}
 
-\NewDocumentCommand { \InputLatexExample } { O{} m } {
+\NewDocumentCommand { \InputLatex } { O{} m } {
   \begin{mdframed}
   \inputminted[linenos=false,#1]{latex}{examples/#2}
   \end{mdframed}
 }
 
-\NewDocumentCommand { \InputLuaExample } { O{} m } {
+\NewDocumentCommand { \InputLua } { O{} m } {
   \begin{mdframed}
   \inputminted[linenos=false,#1]{lua}{examples/#2}
   \end{mdframed}
@@ -44,7 +45,8 @@
 \author{%
   Josef Friedrich\\%
   \url{josef@friedrich.rocks}\\%
-  \href{https://github.com/Josef-Friedrich/luakeys}{github.com/Josef-Friedrich/luakeys}%
+  \href{https://github.com/Josef-Friedrich/luakeys}
+       {github.com/Josef-Friedrich/luakeys}%
 }
 \date{v0.6 from 2022/06/09}
 
@@ -52,7 +54,7 @@
 
 \vfill
 
-\InputLuaExample[firstline=4,lastline=7]{first-page.lua}
+\InputLua[firstline=4,lastline=7]{first-page.lua}
 
 \noindent
 Result:
@@ -114,13 +116,14 @@ mechanism should be pretty robust.
 
 The TUGboat article
 \href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}
-{“Implementing key–value input: An introduction” (Volume 30 (2009), No. 1)}
-by \emph{Joseph Wright} and \emph{Christian Feuersänger} gives a good
-overview of the available key-value packages.
+{“Implementing key–value input: An introduction” (Volume 30 (2009), No.
+1)} by \emph{Joseph Wright} and \emph{Christian Feuersänger} gives a
+good overview of the available key-value packages.
 
 This package would not be possible without the article
 \href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
-{“Parsing complex data formats in LuaTEX with LPEG” (Volume 40 (2019), No. 2)}.
+{“Parsing complex data formats in LuaTEX with LPEG” (Volume 40 (2019),
+No. 2)}.
 
 %-----------------------------------------------------------------------
 %
@@ -142,7 +145,7 @@ The core functionality of this package is realized in Lua.
 So you can use |luakeys| even without using the wrapper files
 |luakeys.sty| and |luakeys.tex|.
 
-\InputLatexExample{loading/lua.tex}
+\InputLatex{loading/lua.tex}
 
 %%
 %
@@ -155,8 +158,8 @@ So you can use |luakeys| even without using the wrapper files
 For example, the MiK\TeX{} package manager downloads packages only when
 needed.
 %
-% Es wurde berichtet, dass dieser automatische Download nur mit Hilfe der
-% Hüll-Dateien funktioniert.
+% Es wurde berichtet, dass dieser automatische Download nur mit Hilfe
+% der Hüll-Dateien funktioniert.
 It has been reported that this automatic download only works with this
 wrapper files.
 %
@@ -177,7 +180,7 @@ The supplied Lua\LaTeX{} file is quite small:
 \noindent
 It loads the Lua module into the global variable \texttt{luakeys}.
 
-\InputLatexExample{loading/latex.tex}
+\InputLatex{loading/latex.tex}
 
 %%
 %
@@ -196,7 +199,7 @@ line:
 It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 \texttt{luakeys.lua} into the global variable \texttt{luakeys}.
 
-\InputLatexExample{loading/tex.tex}
+\InputLatex{loading/tex.tex}
 
 \section{Lua interface / API}
 
@@ -206,7 +209,7 @@ documentation}, which was created with
 \href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
 this functions and tables:
 
-\InputLuaExample[firstline=3,lastline=12]{export.lua}
+\InputLua[firstline=3,lastline=12]{export.lua}
 
 \subsection{Lua indentifier names}
 
@@ -219,7 +222,8 @@ hopefully unambiguous and familiar to external readers.
 \begin{tabular}{lll}
 Abbreviation & spelled out & Example \\\hline
 \lua{kv_string} & Key-value string & \lua{'key=value'} \\
-\lua{opts} & Options (for the parse function) & \lua{ { no_error = false } } \\
+\lua{opts} & Options (for the parse function) &
+\lua{ { no_error = false } } \\
 \lua{defs} & Definitions \\
 \lua{def} & Definition \\
 \lua{attr} & Attributes (of a definition) \\
@@ -233,7 +237,8 @@ These unabbreviated variable names are commonly used.
 \begin{tabular}{ll}
 
 \lua{result} &
-% Das Endergebnis aller einzelnen Übersetzungs- und Normalisierungsschritte
+% Das Endergebnis aller einzelnen Übersetzungs- und
+% Normalisierungsschritte
 The final result of all individual parsing and normalization steps. \\
 
 \lua{unknown} &
@@ -250,7 +255,8 @@ The raw result of the Lpeg grammar parser. \\
 %
 %%
 
-\subsection{Function \texttt{parse(kv_string, opts): result, unknown, raw}}
+\subsection{Function \texttt{parse(kv_string, opts): result, unknown,
+raw}}
 \label{parse}
 
 % Die Function parse ist die wichtigste Funktion des Pakets.
@@ -289,15 +295,15 @@ In plain \TeX:
 The \lua{parse} function can be called with an options table. This
 options are supported:
 
-\InputLuaExample[firstline=5,lastline=69]{opts/all-opts.lua}
+\InputLua[firstline=5,lastline=69]{opts/all-opts.lua}
 
 \noindent
 The options can also be set globally using the exported table
 |opts|:
 
-\InputLuaExample[firstline=4,lastline=4]{opts/exported-default-opts.lua}
+\InputLua[firstline=4,lastline=4]{opts/exported-default-opts.lua}
 
-\InputLuaExample[firstline=10,lastline=11]{opts/exported-default-opts.lua}
+\InputLua[firstline=10,lastline=11]{opts/exported-default-opts.lua}
 
 %%
 %
@@ -309,15 +315,16 @@ If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
 detects the \TeX{} dimensions and converts them into scaled points using
 the function \lua{tex.sp(dim)}.
 
-\InputLuaExample[firstline=4,lastline=7]{opts/convert-dimensions.lua}
+\InputLua[firstline=4,lastline=7]{opts/convert-dimensions.lua}
 
 \noindent
 By default the dimensions are not converted into scaled points.
 
-\InputLuaExample[firstline=13,lastline=18]{opts/convert-dimensions.lua}
+\InputLua[firstline=13,lastline=18]{opts/convert-dimensions.lua}
 
 \noindent
-If you want to convert a scale point into a unit string you can use the module
+If you want to convert a scale point into a unit string you can use the
+module
 \href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
 
 \begin{minted}{lua}
@@ -375,13 +382,13 @@ The option \lua{default} can be used to specify which value naked keys
 (keys without a value) get. This option has no influence on keys with
 values.
 
-\InputLuaExample[firstline=4,lastline=5]{opts/default.lua}
+\InputLua[firstline=4,lastline=5]{opts/default.lua}
 
 \noindent
 % Standardmäßig erhalten nackte Schlüssel den Wert \lua{true}.
 By default, naked keys get the value \lua{true}.
 
-\InputLuaExample[firstline=11,lastline=12]{opts/default.lua}
+\InputLua[firstline=11,lastline=12]{opts/default.lua}
 
 %%
 %
@@ -402,7 +409,7 @@ The result table is merged into the defaults table.
 Values in the defaults table are
 overwritten by values in the result table.
 
-\InputLuaExample[firstline=4,lastline=7]{opts/defaults.lua}
+\InputLua[firstline=4,lastline=7]{opts/defaults.lua}
 
 %%
 %
@@ -421,13 +428,13 @@ If you use the \lua{defs} option, you don't need to call the
 % Anstatt
 Instead of ...
 
-\InputLuaExample[firstline=4,lastline=5]{opts/defs.lua}
+\InputLua[firstline=4,lastline=5]{opts/defs.lua}
 
 \noindent
 % können wir schreiben ..
 we can write ...
 
-\InputLuaExample[firstline=11,lastline=13]{opts/defs.lua}
+\InputLua[firstline=11,lastline=13]{opts/defs.lua}
 
 %%
 %
@@ -438,15 +445,15 @@ we can write ...
 \begin{description}
 \item[lower] \strut
 
-\InputLuaExample[firstline=4,lastline=5]{opts/format-keys.lua}
+\InputLua[firstline=4,lastline=5]{opts/format-keys.lua}
 
 \item[snake] \strut
 
-\InputLuaExample[firstline=11,lastline=12]{opts/format-keys.lua}
+\InputLua[firstline=11,lastline=12]{opts/format-keys.lua}
 
 \item[upper] \strut
 
-\InputLuaExample[firstline=18,lastline=19]{opts/format-keys.lua}
+\InputLua[firstline=18,lastline=19]{opts/format-keys.lua}
 \end{description}
 
 %%
@@ -463,8 +470,8 @@ processing of the \lua{parse} function.
 % Die Funktionen sind in der Verarbeitungsreihenfolge aufgelistet.
 The functions are listed in processing order.
 %
-% \lua{*_before_opts} bedeutet, dass die Hooks nach der LPeg Syntaxanalyse
-% und vor dem Anwenden der Optionen ausgeführt
+% \lua{*_before_opts} bedeutet, dass die Hooks nach der LPeg
+% Syntaxanalyse und vor dem Anwenden der Optionen ausgeführt
 \lua{*_before_opts} means that the hooks are executed after the LPeg
 syntax analysis and before the options are applied.
 %
@@ -504,7 +511,7 @@ definitions.
 The \lua{kv_string} hook is called as the first of the hook functions
 before the LPeg syntax parser is executed.
 
-\InputLuaExample[firstline=4,lastline=11]{hooks/kv-string.lua}
+\InputLua[firstline=4,lastline=11]{hooks/kv-string.lua}
 
 \paragraph{\texttt{keys_*}}
 
@@ -515,12 +522,12 @@ result table.
 % Die Hook-Funktion muss zwei Werte zurückgeben: \lua{key, value}
 The hook function must return two values: \lua{key, value}.
 %
-% Das folgende Beispiel gibt \lua{key} und \lua{value} unverändert zurück,
-% sodass die Ergebnistabelle nicht verändert wird.
+% Das folgende Beispiel gibt \lua{key} und \lua{value} unverändert
+% zurück, sodass die Ergebnistabelle nicht verändert wird.
 The following example returns \lua{key} and \lua{value} unchanged, so
 the result table is not changed.
 
-\InputLuaExample[firstline=4,lastline=11]{hooks/keys-unchanged.lua}
+\InputLua[firstline=4,lastline=11]{hooks/keys-unchanged.lua}
 
 \noindent
 % Das nächste Beispiel demonstriert den dritten Parameter \lua{depth}
@@ -528,7 +535,7 @@ the result table is not changed.
 The next example demonstrates the third parameter \lua{depth} of the
 hook function.
 
-\InputLuaExample[firstline=4,lastline=16]{hooks/keys-depth.lua}
+\InputLua[firstline=4,lastline=16]{hooks/keys-depth.lua}
 
 \paragraph{\texttt{result_*}}
 
@@ -549,12 +556,12 @@ as a parameter.
 With the help of the option \lua{naked_as_value}, naked keys are not
 given a default value, but are stored as values in a Lua table.
 
-\InputLuaExample[firstline=4,lastline=5]{opts/naked-as-value.lua}
+\InputLua[firstline=4,lastline=5]{opts/naked-as-value.lua}
 
 \noindent
 If we set the option \lua{naked_as_value} to \lua{true}:
 
-\InputLuaExample[firstline=11,lastline=14]{opts/naked-as-value.lua}
+\InputLua[firstline=11,lastline=14]{opts/naked-as-value.lua}
 
 %%
 %
@@ -568,12 +575,12 @@ By default the parse function throws an error if there are unknown keys.
 % Mit Hilfe der Option \lua{no_error} kann dies unterbunden werden.
 This can be prevented with the help of the \lua{no_error} option.
 
-\InputLuaExample[firstline=5,lastline=6]{opts/no-error.lua}
+\InputLua[firstline=5,lastline=6]{opts/no-error.lua}
 
 \noindent
 If we set the option \lua{no_error} to \lua{true}:
 
-\InputLuaExample[firstline=9,lastline=10]{opts/no-error.lua}
+\InputLua[firstline=9,lastline=10]{opts/no-error.lua}
 
 %%
 %
@@ -587,9 +594,9 @@ If we set the option \lua{no_error} to \lua{true}:
 With the help of the option \lua{unpack}, all tables that consist of
 only one a single naked key or a single standalone value are unpacked.
 
-\InputLuaExample[firstline=4,lastline=5]{opts/unpack.lua}
+\InputLua[firstline=4,lastline=5]{opts/unpack.lua}
 
-\InputLuaExample[firstline=11,lastline=12]{opts/unpack.lua}
+\InputLua[firstline=11,lastline=12]{opts/unpack.lua}
 
 %%
 %
@@ -609,13 +616,13 @@ key-value pair is then stored under this key.
 \item by the “name” attribute.
 \end{enumerate}
 
-\InputLuaExample[firstline=4,lastline=16]{functions/define.lua}
+\InputLua[firstline=4,lastline=16]{functions/define.lua}
 
 \noindent
 For nested definitions, only the last two ways of specifying the key
 names can be used.
 
-\InputLuaExample[firstline=26,lastline=33]{functions/define.lua}
+\InputLua[firstline=26,lastline=33]{functions/define.lua}
 
 %-----------------------------------------------------------------------
 %
@@ -641,7 +648,7 @@ chosen to distinguish them from the options of the \lua{parse} function.
 The code example below lists all the attributes that can be used to
 define key-value pairs.
 
-\InputLuaExample[firstline=5,lastline=41]{defs/all-attrs.lua}
+\InputLua[firstline=5,lastline=41]{defs/all-attrs.lua}
 
 %%
 %
@@ -653,12 +660,12 @@ With the help of the \lua{alias} attribute, other key names can be used.
 The value is always stored under the original key name. A single alias
 name can be specified by a string ...
 
-\InputLuaExample[firstline=4,lastline=7]{defs/attrs/alias.lua}
+\InputLua[firstline=4,lastline=7]{defs/attrs/alias.lua}
 
 \noindent
 multiple aliases by a list of strings.
 
-\InputLuaExample[firstline=13,lastline=16]{defs/attrs/alias.lua}
+\InputLua[firstline=13,lastline=16]{defs/attrs/alias.lua}
 
 %%
 %
@@ -669,7 +676,7 @@ multiple aliases by a list of strings.
 % Die Option \lua{default} wird nur bei nackten Schlüsseln verwendet.
 The \lua{default} attribute is used only for naked keys.
 
-\InputLuaExample[firstline=4,lastline=5]{defs/attrs/always-present.lua}
+\InputLua[firstline=4,lastline=5]{defs/attrs/always-present.lua}
 
 \noindent
 % Wird die Option \lua{always_present} auf wahr gesetzt, wird der
@@ -678,7 +685,7 @@ If the attribute \lua{always_present} is set to true, the key is always
 included in the result. If no default value is definied, true is taken
 as the value.
 
-\InputLuaExample[firstline=11,lastline=12]{defs/attrs/always-present.lua}
+\InputLua[firstline=11,lastline=12]{defs/attrs/always-present.lua}
 
 %%
 %
@@ -690,14 +697,14 @@ as the value.
 Some key values should be selected from a restricted set of choices.
 These can be handled by passing an array table containing choices.
 
-\InputLuaExample[firstline=4,lastline=5]{defs/attrs/choices.lua}
+\InputLua[firstline=4,lastline=5]{defs/attrs/choices.lua}
 
 \noindent
 When the key-value pair is parsed, values will be checked, and an error
 message will be displayed if the value was not one of the acceptable
 choices:
 
-\InputLuaExample[firstline=13,lastline=15]{defs/attrs/choices.lua}
+\InputLua[firstline=13,lastline=15]{defs/attrs/choices.lua}
 
 %%
 %
@@ -727,8 +734,8 @@ A type conversion can fail with the three data types
 % Dann wird eine Fehlermeldung ausgegeben.
 Then an error message is displayed.
 
-\InputLuaExample[firstline=4,lastline=8]{defs/attrs/data-type.lua}
-\InputLuaExample[firstline=11,lastline=15]{defs/attrs/data-type.lua}
+\InputLua[firstline=4,lastline=8]{defs/attrs/data-type.lua}
+\InputLua[firstline=11,lastline=15]{defs/attrs/data-type.lua}
 
 %%
 %
@@ -746,7 +753,7 @@ key individually.
 With the global \lua{default} attribute (\ref{option-default}) a default
 value can be specified for all naked keys.
 
-\InputLuaExample[firstline=4,lastline=9]{defs/attrs/default.lua}
+\InputLua[firstline=4,lastline=9]{defs/attrs/default.lua}
 
 %%
 %
@@ -766,14 +773,14 @@ Only one key from this group is allowed.
 % Wert verwendet werden.
 Any value can be used as a name for this exclusive group.
 
-\InputLuaExample[firstline=4,lastline=9]{defs/attrs/exclusive-group.lua}
+\InputLua[firstline=4,lastline=9]{defs/attrs/exclusive-group.lua}
 
 % Werden mehrer Schlüssel der Gruppe angegeben, so wird eine
 % Fehlermeldung geworfen.
 If more than one key of the group is specified, an error message is
 thrown.
 
-\InputLuaExample[firstline=21,lastline=23]{defs/attrs/exclusive-group.lua}
+\InputLua[firstline=21,lastline=23]{defs/attrs/exclusive-group.lua}
 
 %%
 %
@@ -809,13 +816,13 @@ opposite key pair.
 If the key \lua{show} is parsed by the \lua{parse} function, then the
 target key \lua{visibility} receives the value \lua{true}.
 
-\InputLuaExample[firstline=4,lastline=7]{defs/attrs/opposite-keys.lua}
+\InputLua[firstline=4,lastline=7]{defs/attrs/opposite-keys.lua}
 
 % Wird der Schlüssel \lua{hide} gelesen, dann \lua{falsch}.
 \noindent
 If the key \lua{hide} is parsed, then \lua{false}.
 
-\InputLuaExample[firstline=13,lastline=13]{defs/attrs/opposite-keys.lua}
+\InputLua[firstline=13,lastline=13]{defs/attrs/opposite-keys.lua}
 
 %%
 %
@@ -846,19 +853,20 @@ parse('key=value')
 
 % Der Wert des Schlüssel wird der Lua Funktion übergeben
 The value of the key is passed to the Lua function
-\lua{string.match(value, match)} ((\url{http://www.lua.org/manual/5.3/manual.html#pdf-string.match})).
+\lua{string.match(value, match)}
+((\url{http://www.lua.org/manual/5.3/manual.html#pdf-string.match})).
 % Werfe einen Blick in das Lua-Handbuch, wie man Patterns schreibt.
 Take a look at the Lua manual on how to write patterns
 (\url{http://www.lua.org/manual/5.3/manual.html#6.4.1})
 
-\InputLuaExample[firstline=4,lastline=6]{defs/attrs/match.lua}
+\InputLua[firstline=4,lastline=6]{defs/attrs/match.lua}
 
 \noindent
 % Kann das Pattern im Wert nicht gefunden werden, wird eine
 % Fehlermeldung ausgegeben.
 If the pattern cannot be found in the value, an error message is issued.
 
-\InputLuaExample[firstline=14,lastline=17]{defs/attrs/match.lua}
+\InputLua[firstline=14,lastline=17]{defs/attrs/match.lua}
 
 \noindent
 % Der Schlüssel erhält das Ergebnis der Funktion \lua{string.match(value,
@@ -868,7 +876,7 @@ The key receives the result of the function \lua{string.match(value,
 match)}, which means that the original value may not be stored
 completely in the key.
 
-\InputLuaExample[firstline=22,lastline=23]{defs/attrs/match.lua}
+\InputLua[firstline=22,lastline=23]{defs/attrs/match.lua}
 
 \noindent
 % Das Präfix “waste ” und das Suffix “ rubbisch” der Zeichenketten wird
@@ -876,7 +884,7 @@ completely in the key.
 The prefix “waste ” and the suffix “ rubbisch” of the string are
 discarded.
 
-\InputLuaExample[firstline=29,lastline=29]{defs/attrs/match.lua}
+\InputLua[firstline=29,lastline=29]{defs/attrs/match.lua}
 
 \noindent
 % Da Funktion \lua{string.match(value, match)} immer eine Zeichenkette
@@ -897,13 +905,49 @@ The \lua{name} attribute allows an alternative notation of key names.
 % Anstatt ...
 Instead of ...
 
-\InputLuaExample[firstline=4,lastline=5]{defs/attrs/name.lua}
+\InputLua[firstline=4,lastline=5]{defs/attrs/name.lua}
 
 \noindent
 % ... können wir schreiben:
 ... we can write:
 
-\InputLuaExample[firstline=11,lastline=15]{defs/attrs/name.lua}
+\InputLua[firstline=11,lastline=15]{defs/attrs/name.lua}
+
+%%
+%
+%%
+
+\subsubsection{Attribute “\texttt{pick}”}
+
+% Das Attribut \lua{pick} sucht nach einem Wert, der keinem Schlüssel
+% zugeordnet ist.
+The attribute \lua{pick} searches for a value not assigned to a key.
+% Es wird nur in der aktuellen Ergebnistabelle gesucht und nicht auf
+% anderen Ebenen in der rekursiven Datenstruktur.
+Only the current results table is searched, not other levels in the
+recursive data structure.
+% Der zuerst gefundene Wert, d. h. der weiter links stehende Wert, wird
+% einem Schlüssel zugewiesen.
+The first value found, i.e. the one further to the left, is assigned to
+a key.
+% Die Suche nach Werte wird aktiviert, wenn das Attribut \lua{pick} auf
+% \lua{true} gesetzt wird.
+The search for values is activated when the attribute \lua{pick} is set
+to \lua{true}.
+% Die Suche kann eingeschränkt werden, indem ein Datentype angegeben
+% wird.
+The search can be limited by specifying a data type.
+% Nach diesen Datentypen kann gesucht werden:
+These data types can be searched for:
+\directlua{
+  local types = {}
+  for t, fn in pairs(luakeys.is) do
+    table.insert(types, t)
+  end
+  tex.print(table.concat(types, ', '))
+}.
+
+\InputLua[firstline=4,lastline=9]{defs/attrs/pick.lua}
 
 %%
 %
@@ -912,8 +956,8 @@ Instead of ...
 \subsubsection{Attribute “\texttt{process}”}
 \label{attr-process}
 
-The \lua{process} attribute can be used to define a function whose return
-value is passed to the key. Four parameters are passed when the
+The \lua{process} attribute can be used to define a function whose
+return value is passed to the key. Four parameters are passed when the
 function is called:
 
 \begin{enumerate}
@@ -924,7 +968,8 @@ The current value asssociated with the key.
 \item \lua{input}:
 % Die Ergebnis-Tabelle, die vor dem Zeitpunkt geklont wurde, als mit dem
 % Anwenden der Definitionen begonnen wurde.
-The result table cloned before the time the definitions started to be applied.
+The result table cloned before the time the definitions started to be
+applied.
 
 \item \lua{result}: The table in which the final result will be saved.
 
@@ -935,23 +980,23 @@ are stored.
 % Das folgende Beispiel demonstriert den Parameter \lua{value}.
 \noindent
 The following example demonstrates the \lua{value} parameter:
-\InputLuaExample[firstline=4,lastline=14]{defs/attrs/process.lua}
+\InputLua[firstline=4,lastline=14]{defs/attrs/process.lua}
 
 \noindent
 The following example demonstrates the \lua{input} parameter:
 
-\InputLuaExample[firstline=22,lastline=34]{defs/attrs/process.lua}
+\InputLua[firstline=22,lastline=34]{defs/attrs/process.lua}
 
 \noindent
 The following example demonstrates the \lua{result} parameter:
 
-\InputLuaExample[firstline=42,lastline=50]{defs/attrs/process.lua}
+\InputLua[firstline=42,lastline=50]{defs/attrs/process.lua}
 
 \noindent
 The following example demonstrates the \lua{unknown} parameter:
 
-\InputLuaExample[firstline=58,lastline=65]{defs/attrs/process.lua}
-\InputLuaExample[firstline=69,lastline=69]{defs/attrs/process.lua}
+\InputLua[firstline=58,lastline=65]{defs/attrs/process.lua}
+\InputLua[firstline=69,lastline=69]{defs/attrs/process.lua}
 
 %%
 %
@@ -959,16 +1004,16 @@ The following example demonstrates the \lua{unknown} parameter:
 
 \subsubsection{Attribute “\texttt{required}”}
 
-\InputLuaExample[firstline=4,lastline=5]{defs/attrs/required.lua}
+\InputLua[firstline=4,lastline=5]{defs/attrs/required.lua}
 
-\InputLuaExample[firstline=13,lastline=14]{defs/attrs/required.lua}
+\InputLua[firstline=13,lastline=14]{defs/attrs/required.lua}
 
 \noindent
 A recursive example:
 
-\InputLuaExample[firstline=18,lastline=23]{defs/attrs/required.lua}
-\InputLuaExample[firstline=29,lastline=30]{defs/attrs/required.lua}
-\InputLuaExample[firstline=38,lastline=39]{defs/attrs/required.lua}
+\InputLua[firstline=18,lastline=23]{defs/attrs/required.lua}
+\InputLua[firstline=29,lastline=30]{defs/attrs/required.lua}
+\InputLua[firstline=38,lastline=39]{defs/attrs/required.lua}
 
 %%
 %
@@ -981,7 +1026,7 @@ A recursive example:
 The \lua{sub_keys} attribute can be used to build nested key-value pair
 definitions.
 
-\InputLuaExample[firstline=4,lastline=16]{defs/attrs/sub-keys.lua}
+\InputLua[firstline=4,lastline=16]{defs/attrs/sub-keys.lua}
 
 %-----------------------------------------------------------------------
 %
@@ -994,13 +1039,13 @@ The function \lua{render(result)} reverses the function
 into a key-value string. The resulting string usually has a different
 order as the input table.
 
-\InputLuaExample[firstline=4,lastline=10]{functions/render.lua}
+\InputLua[firstline=4,lastline=10]{functions/render.lua}
 
 \noindent
 In Lua only tables with 1-based consecutive integer keys (a.k.a. array
 tables) can be parsed in order.
 
-\InputLuaExample[firstline=16,lastline=17]{functions/render.lua}
+\InputLua[firstline=16,lastline=17]{functions/render.lua}
 
 %%
 %
@@ -1013,7 +1058,7 @@ output (stdout). It is a utility function that can be used to debug and
 inspect the resulting Lua table of the function \lua{parse}. You have to
 compile your \TeX{} document in a console to see the terminal output.
 
-\InputLuaExample[firstline=4,lastline=5]{functions/debug.lua}
+\InputLua[firstline=4,lastline=5]{functions/debug.lua}
 
 \noindent
 The output should look like this:
@@ -1055,19 +1100,19 @@ result store.
 \subsection{Table \texttt{is}}
 
 \subsubsection{Function \texttt{is.boolean(value): boolean}}
-\InputLuaExample[firstline=7,lastline=23]{is-table.lua}
+\InputLua[firstline=7,lastline=23]{is-table.lua}
 
 \subsubsection{Function \texttt{is.dimension(value): boolean}}
-\InputLuaExample[firstline=27,lastline=37]{is-table.lua}
+\InputLua[firstline=27,lastline=37]{is-table.lua}
 
 \subsubsection{Function \texttt{is.integer(value): boolean}}
-\InputLuaExample[firstline=41,lastline=46]{is-table.lua}
+\InputLua[firstline=41,lastline=46]{is-table.lua}
 
 \subsubsection{Function \texttt{is.number(value): boolean}}
-\InputLuaExample[firstline=50,lastline=57]{is-table.lua}
+\InputLua[firstline=50,lastline=57]{is-table.lua}
 
 \subsubsection{Function \texttt{is.string(value): boolean}}
-\InputLuaExample[firstline=61,lastline=67]{is-table.lua}
+\InputLua[firstline=61,lastline=67]{is-table.lua}
 
 %-----------------------------------------------------------------------
 %
@@ -1287,7 +1332,7 @@ With or without double quotes.
 If the text have to contain commas, curly braces or equal signs, then
 double quotes must be used.
 
-\InputLuaExample[firstline=4,lastline=17]{data-types/string.lua}
+\InputLua[firstline=4,lastline=17]{data-types/string.lua}
 
 \subsubsection{Naked keys}
 
@@ -1303,14 +1348,14 @@ and stored into an array.
 % Index ist 1).
 In Lua an array is a table with numeric indexes (The first index is 1).
 
-\InputLatexExample[firstline=5,lastline=12]{luakeysdebug/naked-keys.tex}
+\InputLatex[firstline=5,lastline=12]{luakeysdebug/naked-keys.tex}
 
 \noindent
 % VAlle erkannten Datentypen können als eigenständige Werte verwendet
 % werden.
 All recognized data types can be used as standalone values.
 
-\InputLatexExample[firstline=14,lastline=19]{luakeysdebug/naked-keys.tex}
+\InputLatex[firstline=14,lastline=19]{luakeysdebug/naked-keys.tex}
 
 %-----------------------------------------------------------------------
 %
@@ -1327,8 +1372,8 @@ and change the accepted values of the \latex{width} key. A number
 between 0 and 1 is allowed and converted into
 \latex{width=0.5\linewidth}
 
-\InputLuaExample{extend-includegraphics/extend-keys.lua}
-\InputLatexExample{extend-includegraphics/extend-keys.tex}
+\InputLua{extend-includegraphics/extend-keys.lua}
+\InputLatex{extend-includegraphics/extend-keys.tex}
 
 \subsection{Process document class options}
 
@@ -1336,8 +1381,8 @@ between 0 and 1 is allowed and converted into
 \directlua{luakeys.parse('\@classoptionslist')}
 \end{minted}
 
-\InputLatexExample{class-options/test-class.cls}
-\InputLatexExample{class-options/use-test-class.tex}
+\InputLatex{class-options/test-class.cls}
+\InputLatex{class-options/use-test-class.tex}
 
 \begin{minted}{lua}
 {
