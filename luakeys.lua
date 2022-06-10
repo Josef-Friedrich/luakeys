@@ -111,24 +111,51 @@ local function clone_table(orig)
   return copy
 end
 
---- This table stores all allowed option keys.
-local all_options = {
-  convert_dimensions = false,
-  debug = false,
-  default = true,
-  defaults = false,
-  defs = false,
-  format_keys = false,
-  hooks = {},
-  naked_as_value = false,
-  no_error = false,
-  postprocess = false,
-  preprocess = false,
-  unpack = true,
+local namespace = {
+  opts = {
+    convert_dimensions = false,
+    debug = false,
+    default = true,
+    defaults = false,
+    defs = false,
+    format_keys = false,
+    hooks = {},
+    naked_as_value = false,
+    no_error = false,
+    unpack = true,
+  },
+
+  hooks = {
+    kv_string = true,
+    keys_before_opts = true,
+    result_before_opts = true,
+    keys_before_def = true,
+    result_before_def = true,
+    keys = true,
+    result = true,
+  },
+
+  attrs = {
+    alias = true,
+    always_present = true,
+    choices = true,
+    data_type = true,
+    default = true,
+    exclusive_group = true,
+    l3_tl_set = true,
+    macro = true,
+    match = true,
+    name = true,
+    opposite_keys = true,
+    pick = true,
+    process = true,
+    required = true,
+    sub_keys = true,
+  },
 }
 
 --- The default options.
-local default_options = clone_table(all_options)
+local default_options = clone_table(namespace.opts)
 
 local function throw_error(message)
   if type(tex.error) == 'function' then
@@ -867,11 +894,17 @@ local function apply_definitions(defs,
     end
 
     if type(def) ~= 'table' then
-      throw_error('Key definition must be a table')
+      throw_error('Key definition must be a table!')
+    end
+
+    for attr, _ in pairs(def) do
+      if namespace.attrs[attr] == nil then
+        throw_error('Unknown definition attribute: ' .. tostring(attr))
+      end
     end
 
     if key == nil then
-      throw_error('key name couldn’t be detected!')
+      throw_error('Key name couldn’t be detected!')
     end
 
     local value = find_value(key, def)
@@ -946,13 +979,13 @@ local function parse(kv_string, opts)
       opts = {}
     end
     for key, _ in pairs(opts) do
-      if all_options[key] == nil then
+      if namespace.opts[key] == nil then
         throw_error('Unknown parse option: ' .. tostring(key) .. '!')
       end
     end
     local old_opts = opts
     opts = {}
-    for name, _ in pairs(all_options) do
+    for name, _ in pairs(namespace.opts) do
       if old_opts[name] ~= nil then
         opts[name] = old_opts[name]
       else
@@ -960,18 +993,8 @@ local function parse(kv_string, opts)
       end
     end
 
-    local hooks = {
-      kv_string = true,
-      keys_before_opts = true,
-      result_before_opts = true,
-      keys_before_def = true,
-      result_before_def = true,
-      keys = true,
-      result = true,
-    }
-
     for hook in pairs(opts.hooks) do
-      if hooks[hook] == nil then
+      if namespace.hooks[hook] == nil then
         throw_error('Unknown hook: ' .. tostring(hook) .. '!')
       end
     end
