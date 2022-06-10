@@ -850,22 +850,31 @@ parse('key=value')
 
 \subsubsection{Attribute “\texttt{match}”}
 
-% Der Wert des Schlüssel wird der Lua Funktion übergeben
-The value of the key is passed to the Lua function
+% Der Wert des Schlüssel wird zuerst der Lua Funktion
+% \lua{string.match(value, match)} übergeben, bevor er dem Schlüssel
+% zugewiesen wird.
+The value of the key is first passed to the Lua function
 \lua{string.match(value, match)}
-((\url{http://www.lua.org/manual/5.3/manual.html#pdf-string.match})).
+(\url{http://www.lua.org/manual/5.3/manual.html#pdf-string.match})
+before being assigned to the key.
+%
+% Du kannst das Attribut \lua{match} deshalb mit einer Pattern-Matching-
+% Zeichenkette konfigurieren, wie sie in Lua zu Einsatz kommt.
+You can therefore configure the \lua{match} attribute with a pattern
+matching string used in Lua.
+%
 % Werfe einen Blick in das Lua-Handbuch, wie man Patterns schreibt.
 Take a look at the Lua manual on how to write patterns
-(\url{http://www.lua.org/manual/5.3/manual.html#6.4.1})
+(\url{http://www.lua.org/manual/5.3/manual.html#6.4.1}).
 
-\InputLua[firstline=4,lastline=6]{defs/attrs/match.lua}
+\InputLua[firstline=4,lastline=7]{defs/attrs/match/birthday.lua}
 
 \noindent
 % Kann das Pattern im Wert nicht gefunden werden, wird eine
 % Fehlermeldung ausgegeben.
 If the pattern cannot be found in the value, an error message is issued.
 
-\InputLua[firstline=14,lastline=17]{defs/attrs/match.lua}
+\InputLua[firstline=15,lastline=18]{defs/attrs/match/birthday.lua}
 
 \noindent
 % Der Schlüssel erhält das Ergebnis der Funktion \lua{string.match(value,
@@ -874,8 +883,11 @@ If the pattern cannot be found in the value, an error message is issued.
 The key receives the result of the function \lua{string.match(value,
 match)}, which means that the original value may not be stored
 completely in the key.
+%
+% Im nächsten Beispiel wird der gesamte Eingabewert akzeptiert:
+In the next example, the entire input value is accepted:
 
-\InputLua[firstline=22,lastline=23]{defs/attrs/match.lua}
+\InputLua[firstline=4,lastline=5]{defs/attrs/match/year.lua}
 
 \noindent
 % Das Präfix “waste ” und das Suffix “ rubbisch” der Zeichenketten wird
@@ -883,7 +895,7 @@ completely in the key.
 The prefix “waste ” and the suffix “ rubbisch” of the string are
 discarded.
 
-\InputLua[firstline=29,lastline=29]{defs/attrs/match.lua}
+\InputLua[firstline=11,lastline=11]{defs/attrs/match/year.lua}
 
 \noindent
 % Da Funktion \lua{string.match(value, match)} immer eine Zeichenkette
@@ -904,13 +916,13 @@ The \lua{name} attribute allows an alternative notation of key names.
 % Anstatt ...
 Instead of ...
 
-\InputLua[firstline=4,lastline=5]{defs/attrs/name.lua}
+\InputLua[firstline=4,lastline=8]{defs/attrs/name/as-key.lua}
 
 \noindent
 % ... können wir schreiben:
 ... we can write:
 
-\InputLua[firstline=11,lastline=15]{defs/attrs/name.lua}
+\InputLua[firstline=4,lastline=8]{defs/attrs/name/name-attr.lua}
 
 %%
 %
