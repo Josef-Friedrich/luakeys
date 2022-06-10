@@ -1,6 +1,5 @@
 \documentclass{ltxdoc}
 
-\usepackage[hidelinks]{hyperref}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
@@ -922,14 +921,22 @@ Instead of ...
 % Das Attribut \lua{pick} sucht nach einem Wert, der keinem Schlüssel
 % zugeordnet ist.
 The attribute \lua{pick} searches for a value not assigned to a key.
-% Es wird nur in der aktuellen Ergebnistabelle gesucht und nicht auf
-% anderen Ebenen in der rekursiven Datenstruktur.
-Only the current results table is searched, not other levels in the
-recursive data structure.
 % Der zuerst gefundene Wert, d. h. der weiter links stehende Wert, wird
 % einem Schlüssel zugewiesen.
 The first value found, i.e. the one further to the left, is assigned to
 a key.
+
+\InputLua[firstline=4,lastline=6]{defs/attrs/pick/dimension.lua}
+
+\noindent
+% Es wird nur in der aktuellen Ergebnistabelle gesucht und nicht auf
+% anderen Ebenen in der rekursiven Datenstruktur.
+Only the current result table is searched, not other levels in the
+recursive data structure.
+
+\InputLua[firstline=4,lastline=11]{defs/attrs/pick/different-levels.lua}
+
+\noindent
 % Die Suche nach Werte wird aktiviert, wenn das Attribut \lua{pick} auf
 % \lua{true} gesetzt wird.
 The search for values is activated when the attribute \lua{pick} is set
@@ -947,7 +954,11 @@ These data types can be searched for:
   tex.print(table.concat(types, ', '))
 }.
 
-\InputLua[firstline=4,lastline=9]{defs/attrs/pick.lua}
+% Wird einem Schlüssel bereits bei der Eingabe ein Wert zugewiesen, dann
+% wird nicht weiter nach Werten gesucht.
+If a value is already assigned to a key when it is entered, then no
+further search for values is performed.
+\InputLua[firstline=4,lastline=8]{defs/attrs/pick/value-set.lua}
 
 %%
 %

@@ -295,6 +295,12 @@ describe('Defintions', function()
       it('string', function()
         assert_pick('string', 'A string', '1,"A string"')
       end)
+
+      it('Error: unknown data type', function ()
+        assert.has_error(function ()
+          luakeys.parse('key', { defs = { key = { pick = 'xxx' } }})
+        end, 'Wrong setting. Allowed settings for the attribute “def.pick” are: true, boolean, dimension, integer, number, string. Got “xxx”.')
+      end)
     end)
 
     it('Attribute “process”', function()

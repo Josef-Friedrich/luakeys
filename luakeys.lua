@@ -787,14 +787,16 @@ local function apply_definitions(defs,
 
     pick = function(value, key, def)
       if def.pick then
+        if type(def.pick) == 'string' and is[def.pick] == nil then
+          throw_error(
+            'Wrong setting. Allowed settings for the attribute “def.pick” are: true, boolean, dimension, integer, number, string. Got “' ..
+              tostring(def.pick) .. '”.')
+        end
+
         if value ~= nil then
           return value
         end
         for i, v in ipairs(input) do
-          if not def.pick == true and is[def.pick] == nil then
-            throw_error(
-              'Wrong setting. Allowed settings for attribute “def.pick”: true, boolean, dimension, integer, number, string')
-          end
           local picked_value = nil
           if is[def.pick] ~= nil then
             if is[def.pick](v) then
