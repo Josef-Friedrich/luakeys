@@ -1042,7 +1042,22 @@ The following example demonstrates the \lua{unknown} parameter:
 
 \subsubsection{Attribute “\texttt{required}”}
 
+% Durch das Attribut \lua{required} kann erzwungen werden, dass ein
+% bestimmter Schlüssel angegeben werden muss.
+The \lua{required} attribute can be used to enforce that a specific key
+must be specified.
+%
+% Im untenstehenden Beispiel wird der Schlüssel \lua{important} als
+% zwingend notwendig definiert.
+In the example below, the key \lua{important} is defined as mandatory.
+
 \InputLua[firstline=4,lastline=5]{defs/attrs/required.lua}
+
+\noindent
+% Fehlt der Schlüssel \lua{important} in der Eingabe, so tritt eine
+% Fehlermeldung auf.
+If the key \lua{important} is missing in the input, an error message
+occurs.
 
 \InputLua[firstline=13,lastline=14]{defs/attrs/required.lua}
 
@@ -1050,7 +1065,17 @@ The following example demonstrates the \lua{unknown} parameter:
 A recursive example:
 
 \InputLua[firstline=18,lastline=23]{defs/attrs/required.lua}
+
+\noindent
+% Der Schlüssel \lua{important2} auf der Ebene 2 fehlt.
+The \lua{important2} key on level 2 is missing.
+
 \InputLua[firstline=29,lastline=30]{defs/attrs/required.lua}
+
+\noindent
+% Der Schlüssel \lua{important1} auf der untersten Schlüssel-Ebene fehlt.
+The \lua{important1} key at the lowest key level is missing.
+
 \InputLua[firstline=38,lastline=39]{defs/attrs/required.lua}
 
 %%
