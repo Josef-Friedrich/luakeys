@@ -166,7 +166,7 @@ wrapper files.
 % “\latex{\usepackage{luakeys}} ”Ausschau.
 Probably MiK\TeX{} is searching for an occurrence of the \LaTeX{} macro
 “\latex{\usepackage{luakeys}}”.
-
+%
 % Die mitgelieferte Lua\LaTeX{}-Datei ist recht klein:
 The supplied Lua\LaTeX{} file is quite small:
 
@@ -254,8 +254,8 @@ The raw result of the Lpeg grammar parser. \\
 %
 %%
 
-\subsection{Function \texttt{parse(kv_string, opts): result, unknown,
-raw}}
+\subsection{Function “\texttt{parse(kv_string, opts): result, unknown,
+raw}”}
 \label{parse}
 
 % Die Function parse ist die wichtigste Funktion des Pakets.
@@ -310,21 +310,29 @@ The options can also be set globally using the exported table
 
 \subsubsection{Option “\texttt{convert_dimensions}”}
 
+% Wenn Sie die Option \lua{convert_dimensions} auf \lua{true} setzen,
+% erkennt |luakeys| die \TeX{}-Dimensionen und konvertiert sie mit Hilfe
+% der die Funktion \lua{tex.sp(dim)} in scaled points.
 If you set the option \lua{convert_dimensions} to \lua{true}, |luakeys|
 detects the \TeX{} dimensions and converts them into scaled points using
 the function \lua{tex.sp(dim)}.
 
-\InputLua[firstline=4,lastline=7]{opts/convert-dimensions.lua}
+\InputLua[firstline=4,lastline=7]{opts/convert-dimensions/true.lua}
 
 \noindent
+% Standardmäßig werden die Dimensionen nicht in skalierte Punkte
+% umgewandelt.
 By default the dimensions are not converted into scaled points.
 
-\InputLua[firstline=13,lastline=18]{opts/convert-dimensions.lua}
+\InputLua[firstline=4,lastline=9]{opts/convert-dimensions/false.lua}
 
 \noindent
-If you want to convert a scale point into a unit string you can use the
-module
-\href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}{lualibs-util-dim.lua}.
+% Wenn Sie eine skalierte Punktzahl in einen Dimensionszeichenketten
+% umwandeln möchten, können Sie das Modul
+If you want to convert a scaled points number into a dimension string
+you can use the module
+\href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}
+{lualibs-util-dim.lua}.
 
 \begin{minted}{lua}
 require('lualibs')
@@ -601,7 +609,7 @@ only one a single naked key or a single standalone value are unpacked.
 %
 %%
 
-\subsection{Function \texttt{define(defs, opts): parse}}
+\subsection{Function “\texttt{define(defs, opts): parse}”}
 \label{define}
 
 The \lua{define} function returns a \lua{parse} function (see
@@ -979,13 +987,17 @@ further search for values is performed.
 \subsubsection{Attribute “\texttt{process}”}
 \label{attr-process}
 
+% Das Attribut \lua{process} kann dazu verwendet werden, um eine Funktion
+% zu definieren, deren Rückgabewert an den Schlüssel übergeben wird.
 The \lua{process} attribute can be used to define a function whose
-return value is passed to the key. Four parameters are passed when the
-function is called:
+return value is passed to the key.
+%
+% Beim Aufruf der Funktion werden vier Parameter übergeben:
+Four parameters are passed when the function is called:
 
 \begin{enumerate}
 \item \lua{value}:
-% Der zum schlüssel gehörende aktuelle Wert.
+% Der zum Schlüssel gehörende aktuelle Wert.
 The current value asssociated with the key.
 
 \item \lua{input}:
@@ -1000,26 +1012,29 @@ applied.
 are stored.
 \end{enumerate}
 
-% Das folgende Beispiel demonstriert den Parameter \lua{value}.
 \noindent
+% Das folgende Beispiel demonstriert den Parameter \lua{value}:
 The following example demonstrates the \lua{value} parameter:
-\InputLua[firstline=4,lastline=14]{defs/attrs/process.lua}
+\InputLua[firstline=4,lastline=14]{defs/attrs/process/parameter-value.lua}
 
 \noindent
+% Das folgende Beispiel demonstriert den Parameter \lua{input}:
 The following example demonstrates the \lua{input} parameter:
 
-\InputLua[firstline=22,lastline=34]{defs/attrs/process.lua}
+\InputLua[firstline=4,lastline=16]{defs/attrs/process/parameter-input.lua}
 
 \noindent
+% Das folgende Beispiel demonstriert den Parameter \lua{result}:
 The following example demonstrates the \lua{result} parameter:
 
-\InputLua[firstline=42,lastline=50]{defs/attrs/process.lua}
+\InputLua[firstline=4,lastline=12]{defs/attrs/process/parameter-result.lua}
 
 \noindent
+% Das folgende Beispiel demonstriert den Parameter \lua{unknown}:
 The following example demonstrates the \lua{unknown} parameter:
 
-\InputLua[firstline=58,lastline=65]{defs/attrs/process.lua}
-\InputLua[firstline=69,lastline=69]{defs/attrs/process.lua}
+\InputLua[firstline=4,lastline=11]{defs/attrs/process/parameter-unknown.lua}
+\InputLua[firstline=15,lastline=15]{defs/attrs/process/parameter-unknown.lua}
 
 %%
 %
@@ -1055,7 +1070,7 @@ definitions.
 %
 %-----------------------------------------------------------------------
 
-\subsection{Function \texttt{render(result): string}}
+\subsection{Function “\texttt{render(result): string}”}
 
 The function \lua{render(result)} reverses the function
 \lua{parse(kv_string)}. It takes a Lua table and converts this table
@@ -1074,7 +1089,7 @@ tables) can be parsed in order.
 %
 %%
 
-\subsection{Function \texttt{debug(result): void}}
+\subsection{Function “\texttt{debug(result): void}”}
 
 The function \lua{debug(result)} pretty prints a Lua table to standard
 output (stdout). It is a utility function that can be used to debug and
@@ -1100,7 +1115,7 @@ The output should look like this:
 %
 %%
 
-\subsection{Function \texttt{save(identifier, result): void}}
+\subsection{Function “\texttt{save(identifier, result): void}”}
 
 The function \lua{save(identifier, result)} saves a result (a
 table from a previous run of \lua{parse}) under an identifier.
@@ -1111,7 +1126,7 @@ store results for the later usage.
 %
 %%
 
-\subsection{Function \texttt{get(identifier): result}}
+\subsection{Function “\texttt{get(identifier): result}”}
 
 The function \lua{get(identifier)} retrieves a saved result from the
 result store.
@@ -1120,22 +1135,37 @@ result store.
 %
 %%
 
-\subsection{Table \texttt{is}}
+\subsection{Table “\texttt{is}”}
 
-\subsubsection{Function \texttt{is.boolean(value): boolean}}
-\InputLua[firstline=7,lastline=23]{is-table.lua}
+% In der Tabelle \lua{is} werden einige Funktionen zusammengefasst, die
+% überprüft ob eine Eingabe einem bestimmen Datentyp entspricht.
+In the table \lua{is} some functions are summarized, which check whether
+an input corresponds to a certain data type.
+%
+% Alle Funktionen akzeptieren nicht nur die entsprechenden Lua-Datentypen,
+% sondern auch Eingaben als Zeichenketten.
+All functions accept not only the corresponding Lua data types, but also
+input as strings.
+%
+% Beispielsweise wird die Zeichenkette \lua{'true'} von der
+% \lua{is.boolean()}-Funktion als Wahrheitswert erkannt.
+For example, the string \lua{'true'} is recognized by the
+\lua{is.boolean()} function as a boolean value.
 
-\subsubsection{Function \texttt{is.dimension(value): boolean}}
-\InputLua[firstline=27,lastline=37]{is-table.lua}
+\subsubsection{Function “\texttt{is.boolean(value): boolean}”}
+\InputLua[firstline=6,lastline=23]{functions/is/boolean.lua}
 
-\subsubsection{Function \texttt{is.integer(value): boolean}}
-\InputLua[firstline=41,lastline=46]{is-table.lua}
+\subsubsection{Function “\texttt{is.dimension(value): boolean}”}
+\InputLua[firstline=6,lastline=16]{functions/is/dimension.lua}
 
-\subsubsection{Function \texttt{is.number(value): boolean}}
-\InputLua[firstline=50,lastline=57]{is-table.lua}
+\subsubsection{Function “\texttt{is.integer(value): boolean}”}
+\InputLua[firstline=6,lastline=11]{functions/is/integer.lua}
 
-\subsubsection{Function \texttt{is.string(value): boolean}}
-\InputLua[firstline=61,lastline=67]{is-table.lua}
+\subsubsection{Function “\texttt{is.number(value): boolean}”}
+\InputLua[firstline=6,lastline=13]{functions/is/number.lua}
+
+\subsubsection{Function “\texttt{is.string(value): boolean}”}
+\InputLua[firstline=6,lastline=12]{functions/is/string.lua}
 
 %-----------------------------------------------------------------------
 %

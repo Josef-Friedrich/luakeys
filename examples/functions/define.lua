@@ -25,7 +25,7 @@ end)
 
 local parse2 = luakeys.define({
   level1 = {
-    sub_keys = { level2 = { sub_keys = { key = { some_def = 'etc' } } } },
+    sub_keys = { level2 = { sub_keys = { key = { } } } },
   },
 }, { no_error = true })
 local result2, unknown2 = parse2('level1={level2={key=value,unknown=unknown}}')
