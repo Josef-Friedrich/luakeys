@@ -1,0 +1,9 @@
+\input luakeys.tex
+\def\mykeyvalcmd#1{
+  \directlua{
+    local result = luakeys.parse('#1')
+    tex.print('The key “one” has the value ' .. tostring(result.one) .. '.')
+  }
+}
+\mykeyvalcmd{one=1}
+\bye

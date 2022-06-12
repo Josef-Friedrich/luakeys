@@ -1,0 +1,12 @@
+\documentclass{article}
+\usepackage{luakeys}
+\begin{document}
+\newcommand{\mykeyvalcmd}[2][]{
+  \directlua{
+    local result = luakeys.parse('#1')
+    tex.print('The key “one” has the value ' .. tostring(result.one) .. '.')
+  }
+  marg: #2
+}
+\mykeyvalcmd[one=1]{test}
+\end{document}

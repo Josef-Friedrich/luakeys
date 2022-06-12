@@ -179,7 +179,7 @@ The supplied Lua\LaTeX{} file is quite small:
 \noindent
 It loads the Lua module into the global variable \texttt{luakeys}.
 
-\InputLatex{loading/latex.tex}
+\InputLatex{loading/tex-latex.tex}
 
 %%
 %
@@ -198,7 +198,7 @@ line:
 It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 \texttt{luakeys.lua} into the global variable \texttt{luakeys}.
 
-\InputLatex{loading/tex.tex}
+\InputLatex{loading/tex-plain.tex}
 
 \section{Lua interface / API}
 
@@ -261,32 +261,17 @@ raw}”}
 % Die Function parse ist die wichtigste Funktion des Pakets.
 The function \lua{parse(kv_string, opts)} is the most important function
 of the package.
+%
+%
 % Sie konvertiert eine Schlüssel-Wert-Zeichenkette in eine Lua Tabelle.
 It converts a key-value string into a Lua table.
 
-\begin{minted}{latex}
-\newcommand{\mykeyvalcmd}[2][]{
-  \directlua{
-    result = luakeys.parse('#1')
-    luakeys.debug(result)
-  }
-  #2
-}
-\mykeyvalcmd[one=1]{test}
-\end{minted}
+\InputLatex{functions/parse/tex-latex.tex}
 
 \noindent
 In plain \TeX:
 
-\begin{minted}{latex}
-\def\mykeyvalcommand#1{
-  \directlua{
-    result = luakeys.parse('#1')
-    luakeys.debug(result)
-  }
-}
-\mykeyvalcmd{one=1}
-\end{minted}
+\InputLatex{functions/parse/tex-plain.tex}
 
 \subsection{Options to configure the \texttt{parse} function}
 
@@ -345,19 +330,12 @@ tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 
 \subsubsection{Option “\texttt{debug}”}
 
-If the option “debug” is set to ture, the result table is printed to the
-console.
+% Wenn die Option \lua{debug} auf true gesetzt ist, wird die
+% Ergebnistabelle in der Konsole ausgegeben.
+If the option \lua{debug} is set to ture, the result table is printed to
+the console.
 
-\begin{minted}{latex}
-\documentclass{article}
-\usepackage{luakeys}
-\begin{document}
-\directlua{
-  luakeys.parse('one,two,three', { debug = true })
-}
-debug
-\end{document}
-\end{minted}
+\InputLatex{opts/debug-latex.tex}
 
 \begin{verbatim}
 This is LuaHBTeX, Version 1.15.0 (TeX Live 2022)
@@ -1281,7 +1259,7 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 \texttt{FALSE} and \texttt{False} into \lua{false}.
 
 \begin{multicols}{2}
-\InputLatex[firstline=5,lastline=12]{luakeysdebug/boolean.tex}
+\InputLatex[firstline=5,lastline=12]{luakeysdebug/boolean-latex.tex}
 
 \columnbreak
 
@@ -1304,7 +1282,7 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 \subsubsection{number}
 
 \begin{multicols}{2}
-\InputLatex[firstline=5,lastline=13]{luakeysdebug/number.tex}
+\InputLatex[firstline=5,lastline=13]{luakeysdebug/number-latex.tex}
 
 \columnbreak
 
@@ -1369,7 +1347,7 @@ sp & scaledpoint \\
 
 \columnbreak
 
-\InputLatex[firstline=5,lastline=21]{luakeysdebug/dimension/all.tex}
+\InputLatex[firstline=5,lastline=21]{luakeysdebug/dimension/all-latex.tex}
 
 \columnbreak
 
@@ -1400,7 +1378,7 @@ sp & scaledpoint \\
 The next example illustrates the different notations of the dimensions.
 
 \begin{multicols}{2}
-\InputLatex[firstline=5,lastline=12]{luakeysdebug/dimension/notations.tex}
+\InputLatex[firstline=5,lastline=12]{luakeysdebug/dimension/notations-latex.tex}
 
 \columnbreak
 
@@ -1449,14 +1427,14 @@ and stored into an array.
 % Index ist 1).
 In Lua an array is a table with numeric indexes (The first index is 1).
 
-\InputLatex[firstline=5,lastline=12]{luakeysdebug/naked-keys.tex}
+\InputLatex[firstline=5,lastline=12]{luakeysdebug/naked-keys-latex.tex}
 
 \noindent
 % VAlle erkannten Datentypen können als eigenständige Werte verwendet
 % werden.
 All recognized data types can be used as standalone values.
 
-\InputLatex[firstline=14,lastline=19]{luakeysdebug/naked-keys.tex}
+\InputLatex[firstline=14,lastline=19]{luakeysdebug/naked-keys-latex.tex}
 
 %-----------------------------------------------------------------------
 %
@@ -1474,7 +1452,7 @@ between 0 and 1 is allowed and converted into
 \latex{width=0.5\linewidth}
 
 \InputLua{extend-includegraphics/extend-keys.lua}
-\InputLatex{extend-includegraphics/extend-keys.tex}
+\InputLatex{extend-includegraphics/extend-keys-latex.tex}
 
 \subsection{Process document class options}
 
@@ -1483,7 +1461,7 @@ between 0 and 1 is allowed and converted into
 \end{minted}
 
 \InputLatex{class-options/test-class.cls}
-\InputLatex{class-options/use-test-class.tex}
+\InputLatex{class-options/use-test-class-latex.tex}
 
 \begin{minted}{lua}
 {

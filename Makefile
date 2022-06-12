@@ -18,16 +18,22 @@ install_quick:
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
 
-test: install test_lua test_examples_lua test_tex doc_pdf
+test: install test_lua test_examples test_tex doc_pdf
 
 test_lua:
 	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip test/lua/test-*.lua
+
+test_examples: test_examples_lua test_examples_plain test_examples_latex
 
 test_examples_lua:
 	# busted does not recurse in the sub directories
 	# busted -R --lua=/usr/bin/lua5.3 --exclude-tags=skip "examples/*.lua"
 	# find always exists with 0
 	find examples -iname "*.lua" \( -exec busted {} \; -o -quit \)
+test_examples_plain:
+	find examples -iname "*plain.tex" -exec luatex --output-dir=test/tex/plain {} \;
+test_examples_latex:
+	find examples -iname "*latex.tex" -exec latexmk -lualatex -cd --output-directory=test/tex/latex {} \;
 
 test_tex: test_tex_plain test_tex_latex
 
