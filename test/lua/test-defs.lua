@@ -174,9 +174,9 @@ describe('Defintions', function()
 
       it('should check input values if they are dimensions', function()
         assert_data_type('dimension', '1cm', '1cm')
-        assert_data_type('dimension', '12 pt', '12 pt')
+        assert_data_type('dimension', '12 pt', '12pt')
         assert.has_error(function()
-          assert_data_type('dimension', 'xxx', '12 pt')
+          assert_data_type('dimension', 'xxx', '12pt')
         end)
       end)
 

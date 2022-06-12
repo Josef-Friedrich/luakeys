@@ -1279,16 +1279,10 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 \texttt{FALSE} and \texttt{False} into \lua{false}.
 
 \begin{multicols}{2}
-\begin{minted}{latex}
-\luakeysdebug{
-  lower case true = true,
-  upper case true = TRUE,
-  title case true = True
-  lower case false = false,
-  upper case false = FALSE,
-  title case false = False,
-}
-\end{minted}
+\InputLatex[firstline=5,lastline=12]{luakeysdebug/boolean.tex}
+
+\columnbreak
+
 \begin{minted}{lua}
 {
   ['lower case true'] = true,
@@ -1308,18 +1302,19 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 \subsubsection{number}
 
 \begin{multicols}{2}
-\begin{minted}{latex}
-\luakeysdebug{
-  num1 = 4,
-  num2 = -4,
-  num3 = 0.4
-}
-\end{minted}
+\InputLatex[firstline=5,lastline=13]{luakeysdebug/number.tex}
+
+\columnbreak
+
 \begin{minted}{lua}
 {
-  ['num1'] = 4,
-  ['num2'] = -4,
-  ['num3'] = 0.4
+  ['num0'] = 42,
+  ['num1'] = 42,
+  ['num2'] = -42,
+  ['num3'] = 4.2,
+  ['num4'] = 0.42,
+  ['num5'] = 0.42,
+  ['num6'] = '0 . 42', -- string
 }
 \end{minted}
 \end{multicols}
@@ -1354,23 +1349,7 @@ sp & scaledpoint \\
 
 \columnbreak
 
-\begin{minted}{latex}
-\luakeysdebug{
-  bp = 1bp,
-  cc = 1cc,
-  cm = 1cm,
-  dd = 1dd,
-  em = 1em,
-  ex = 1ex,
-  in = 1in,
-  mm = 1mm,
-  nc = 1nc,
-  nd = 1nd,
-  pc = 1pc,
-  pt = 1pt,
-  sp = 1sp,
-}
-\end{minted}
+\InputLatex[firstline=5,lastline=19]{luakeysdebug/dimension/all.tex}
 
 \columnbreak
 
@@ -1389,6 +1368,28 @@ sp & scaledpoint \\
   ['pc'] = 786432,
   ['pt'] = 65536,
   ['sp'] = 1,
+}
+\end{minted}
+\end{multicols}
+
+\noindent
+% Im nächsten Beispiel werden die unterschiedlichen Notationsformen der
+% Dimensionen illustriert.
+The next example illustrates the different notations of the dimensions.
+
+\begin{multicols}{2}
+\InputLatex[firstline=5,lastline=12]{luakeysdebug/dimension/notations.tex}
+
+\columnbreak
+
+\begin{minted}{lua}
+{
+  ['upper'] = 1864679,
+  ['lower'] = 1864679,
+  ['space'] = 1864679,
+  ['plus'] = 1864679,
+  ['minus'] = -1864679,
+  ['nodim'] = '1 c m',
 }
 \end{minted}
 \end{multicols}

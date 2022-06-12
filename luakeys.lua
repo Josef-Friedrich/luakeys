@@ -352,7 +352,17 @@ local function generate_parser(initial_rule,
     return white_space ^ 0 * Pattern(match) * white_space ^ 0
   end
 
+  --- Convert a dimension to an normalized dimension string or an
+  ---- integer in the scaled points format.
+  ---
+  ---@param input string
+  ---
+  ---@return integer|string # A dimension as an integer or a dimension string.
   local capture_dimension = function(input)
+    -- Remove all whitespaces
+    input = input:gsub("%s+", "")
+    -- Convert the unit string into lowercase.
+    input = input:lower()
     if convert_dimensions then
       return tex.sp(input)
     else
