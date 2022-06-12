@@ -38,11 +38,10 @@ end
 
 local utils = {
   --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
-  --
-  -- @tparam table value A table or any input.
-  --
-  -- @treturn number The size of the array like table. 0 if the input is
-  -- no table or the table is empty.
+  ---
+  ---@param value table # A table or any input.
+  ---
+  ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
   get_array_size = function(value)
     local count = 0
     if type(value) == 'table' then
@@ -53,12 +52,11 @@ local utils = {
     return count
   end,
 
-  --- Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
-  --
-  -- @tparam table value A table or any input.
-  --
-  -- @treturn number The size of the array like table. 0 if the input is
-  -- no table or the table is empty.
+  ---Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
+  ---
+  ---@param value table|any # A table or any input.
+  ---
+  ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
   get_table_size = function(value)
     local count = 0
     if type(value) == 'table' then
@@ -81,12 +79,12 @@ local utils = {
 
 --- Merge two tables in the first specified table.
 --- The `merge_tables` function copies all keys from the `source` table
---  to a target table. It returns the modified target table.
-
----@param target table
----@param source table
+--- to a target table. It returns the modified target table.
 ---
 ---@see https://stackoverflow.com/a/1283608/10193818
+---
+---@param target table
+---@param source table
 ---
 ---@return table target The modified target table.
 local function merge_tables(target, source)
@@ -104,7 +102,13 @@ local function merge_tables(target, source)
   return target
 end
 
---- http://lua-users.org/wiki/CopyTable
+---Clone a table.
+---
+---@see http://lua-users.org/wiki/CopyTable
+---
+---@param orig table
+---
+---@return table
 local function clone_table(orig)
   local orig_type = type(orig)
   local copy
@@ -180,16 +184,15 @@ local l3_code_cctab = 10
 -- @section
 
 --- The function `render(tbl)` reverses the function
---  `parse(kv_string)`. It takes a Lua table and converts this table
---  into a key-value string. The resulting string usually has a
---  different order as the input table. In Lua only tables with
---  1-based consecutive integer keys (a.k.a. array tables) can be
---  parsed in order.
---
--- @tparam table result A table to be converted into a key-value string.
---
--- @treturn string A key-value string that can be passed to a TeX
--- macro.
+--- `parse(kv_string)`. It takes a Lua table and converts this table
+--- into a key-value string. The resulting string usually has a
+--- different order as the input table. In Lua only tables with
+--- 1-based consecutive integer keys (a.k.a. array tables) can be
+--- parsed in order.
+---
+---@param result table # A table to be converted into a key-value string.
+---
+---@return string # A key-value string that can be passed to a TeX macro.
 local function render(result)
   local function render_inner(result)
     local output = {}
@@ -219,20 +222,19 @@ local function render(result)
 end
 
 --- The function `stringify(tbl, for_tex)` converts a Lua table into a
---   printable string. Stringify a table means to convert the table into
---   a string. This function is used to realize the `debug` function.
---   `stringify(tbl, true)` (`for_tex = true`) generates a string which
---   can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
---   this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
---   string suitable for the terminal.
---
--- @tparam table result A table to stringify.
---
--- @tparam boolean for_tex Stringify the table into a text string that
---   can be embeded inside a TeX document via tex.print(). Curly braces
---   and whites spaces are escaped.
---
--- https://stackoverflow.com/a/54593224/10193818
+--- printable string. Stringify a table means to convert the table into
+--- a string. This function is used to realize the `debug` function.
+--- `stringify(tbl, true)` (`for_tex = true`) generates a string which
+--- can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
+--- this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
+--- string suitable for the terminal.
+---
+---@see https://stackoverflow.com/a/54593224/10193818
+---
+---@param result table # A table to stringify.
+---@param for_tex? boolean # Stringify the table into a text string that can be embeded inside a TeX document via tex.print(). Curly braces and whites spaces are escaped.
+---
+---@return string
 local function stringify(result, for_tex)
   local line_break, start_bracket, end_bracket, indent
 
@@ -306,8 +308,7 @@ end
 --   `parse`. You have to compile your TeX document in a console to
 --   see the terminal output.
 --
--- @tparam table result A table to be printed to standard output for
--- debugging purposes.
+---@param result table # A table to be printed to standard output for debugging purposes.
 local function debug(result)
   print('\n' .. stringify(result, false))
 end
@@ -316,18 +317,21 @@ end
 -- @section
 
 --- Generate the PEG parser using Lpeg.
---
--- Explanations of some LPeg notation forms:
---
--- * `patt ^ 0` = `expression *`
--- * `patt ^ 1` = `expression +`
--- * `patt ^ -1` = `expression ?`
--- * `patt1 * patt2` = `expression1 expression2`: Sequence
--- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
---
--- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.org/TUGboat/tb40-2/tb125menke-Patterndf)
---
--- @treturn userdata The parser.
+---
+--- Explanations of some LPeg notation forms:
+---
+--- * `patt ^ 0` = `expression *`
+--- * `patt ^ 1` = `expression +`
+--- * `patt ^ -1` = `expression ?`
+--- * `patt1 * patt2` = `expression1 expression2`: Sequence
+--- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
+---
+--- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf)
+---
+---@param initial_rule string
+---@param convert_dimensions? boolean
+---
+---@return userdata # The parser.
 local function generate_parser(initial_rule,
   convert_dimensions)
   if convert_dimensions == nil then
@@ -353,7 +357,7 @@ local function generate_parser(initial_rule,
   end
 
   --- Convert a dimension to an normalized dimension string or an
-  ---- integer in the scaled points format.
+  --- integer in the scaled points format.
   ---
   ---@param input string
   ---
@@ -382,11 +386,11 @@ local function generate_parser(initial_rule,
   -- If arg2 is nil, then arg1 is the value and is added as an indexed
   -- (by an integer) value.
   --
-  -- @tparam table table
-  -- @tparam mixed arg1
-  -- @tparam mixed arg2
-  --
-  -- @treturn table
+  ---@param table table
+  ---@param arg1 any
+  ---@param arg2 any
+  ---
+  ---@return table
   local add_to_table = function(table, arg1, arg2)
     if arg2 == nil then
       local index = #table + 1
@@ -606,14 +610,13 @@ local is = {
 --- Apply the key-value-pair definitions (defs) on an input table in a
 --- recursive fashion.
 ---
----@param defs table A table containing all definitions.
----@param opts table The parse options table.
----@param input table The current input table.
----@param output table The current output table.
----@param unknown table Always the root unknown table.
----@param key_path table An array of key names leading to the current
----@param input_root table The root input table
----  input and output table.
+---@param defs table # A table containing all definitions.
+---@param opts table # The parse options table.
+---@param input table # The current input table.
+---@param output table # The current output table.
+---@param unknown table # Always the root unknown table.
+---@param key_path table # An array of key names leading to the current
+---@param input_root table # The root input table input and output table.
 local function apply_definitions(defs,
   opts,
   input,
@@ -981,14 +984,14 @@ end
 
 --- Parse a LaTeX/TeX style key-value string into a Lua table.
 ---
----@param kv_string string A string in the TeX/LaTeX style key-value format as described above.
----@param opts table A table containing the settings:
+---@param kv_string string # A string in the TeX/LaTeX style key-value format as described above.
+---@param opts table # A table containing the settings:
 ---   `convert_dimensions`, `unpack`, `naked_as_value`, `converter`,
 ---   `debug`, `preprocess`, `postprocess`.
 --
----@return table result The final result of all individual parsing and normalization steps.
----@return table unknown A table with unknown, undefinied key-value pairs.
----@return table raw The unprocessed, raw result of the LPeg parser.
+---@return table result # The final result of all individual parsing and normalization steps.
+---@return table unknown # A table with unknown, undefinied key-value pairs.
+---@return table raw # The unprocessed, raw result of the LPeg parser.
 local function parse(kv_string, opts)
   if kv_string == nil then
     return {}
@@ -996,9 +999,9 @@ local function parse(kv_string, opts)
 
   --- Normalize the parse options.
   ---
-  --- @param opts table Options in a raw format. The table may be empty or some keys are not set.
+  ---@param opts table # Options in a raw format. The table may be empty or some keys are not set.
   ---
-  --- @return table
+  ---@return table
   local function normalize_opts(opts)
     if type(opts) ~= 'table' then
       opts = {}
@@ -1066,8 +1069,8 @@ local function parse(kv_string, opts)
   --  tasks are performed on the raw input table coming directly from
   --  the PEG parser:
   --
-  --- @param result table The raw input table coming directly from the PEG parser
-  --- @param opts table Some options.
+  ---@param result table # The raw input table coming directly from the PEG parser
+  ---@param opts table # Some options.
   local function apply_opts(result, opts)
     local callbacks = {
       unpack = function(key, value)
@@ -1204,11 +1207,9 @@ local export = {
   --  Therefore, it is not necessary to pollute the global namespace to
   --  store results for the later usage.
   --
-  -- @tparam string identifier The identifier under which the result is
-  --   saved.
+  ---@param identifier string # The identifier under which the result is saved.
   --
-  -- @tparam table result A result to be stored and that was created by
-  --   the key-value parser.
+  ---@param result table # A result to be stored and that was created by the key-value parser.
   save = function(identifier, result)
     result_store[identifier] = result
   end,
@@ -1216,8 +1217,9 @@ local export = {
   --- The function `get(identifier): table` retrieves a saved result
   --  from the result store.
   --
-  -- @tparam string identifier The identifier under which the result was
-  --   saved.
+  ---@param identifier string # The identifier under which the result was saved.
+  ---
+  ---@return table
   get = function(identifier)
     -- if result_store[identifier] == nil then
     --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')

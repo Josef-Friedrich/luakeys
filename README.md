@@ -144,6 +144,18 @@ local opts = {
 local result = luakeys.parse('one,two,three', opts)
 ```
 
+## Development
+
+`luakeys` is developed using the
+[Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+extension in Visual Studio Code. This extension understands the [EmmyLua
+annotations](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations).
+The Lua source code documentation is generated with
+[LDoc](https://stevedonovan.github.io/ldoc/manual/doc.md.html).
+
+The Lua code is automatically formatted with the help of the
+[LuaFormatter](https://github.com/Koihik/LuaFormatter).
+
 ## Tasks
 
 ### Installing
@@ -153,6 +165,9 @@ make install
 ```
 
 ### Testing
+
+The framework [busted](https://github.com/Olivine-Labs/busted) is used
+for the tests.
 
 ```
 luarocks install busted
