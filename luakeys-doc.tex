@@ -1251,10 +1251,12 @@ key-value lists (\texttt{level1=\{level2=\{key=value,naked\}\}}).
   \alt `ex' | `EX'
   \alt `in' | `IN'
   \alt `mm' | `MM'
+  \alt `mu' | `MU'
   \alt `nc' | `NC'
   \alt `nd' | `ND'
   \alt `pc' | `PC'
   \alt `pt' | `PT'
+  \alt `px' | `PX'
   \alt `sp' | `SP'
 
 <boolean> ::= <boolean-true> | <boolean-false>
@@ -1325,6 +1327,22 @@ into Lua’s boolean type \lua{true}, the strings \texttt{false},
 
 \subsubsection{dimension}
 
+% Luakeys versucht alle Einheiten zu erkennen, die in der TeX-Welt
+% verwendet werden.
+|luakeys| tries to recognize all units used in the \TeX{} world.
+%
+% Nach dem Lua\TeX-Quellcode .
+According to the Lua\TeX{} source code
+(\href{https://github.com/TeX-Live/luatex/blob/51db1985f5500dafd2393aa2e403fefa57d3cb76/source/texk/web2c/luatexdir/lua/ltexlib.c#L434-L625}
+{source/texk/web2c/luatexdir/lua/ltexlib.c})
+%
+% und nach dem Dimensionen-Modul der lulibs-Bibliothek
+and the dimension module of the lualibs library
+(\href{https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua}
+{lualibs-util-dim.lua}),
+%
+% müssten alle Einheiten erkannt werden
+all units should be recognized.
 \begin{multicols}{3}
 \tiny
 \begin{center}
@@ -1339,17 +1357,19 @@ em & horizontal measure of \emph{M} \\
 ex & vertical measure of \emph{x} \\
 in & inch \\
 mm & milimeter \\
+mu & math unit \\
 nc & new cicero \\
 nd & new didot \\
 pc & pica \\
 pt & point \\
+px & x height current font \\
 sp & scaledpoint \\
 \end{tabular}
 \end{center}
 
 \columnbreak
 
-\InputLatex[firstline=5,lastline=19]{luakeysdebug/dimension/all.tex}
+\InputLatex[firstline=5,lastline=21]{luakeysdebug/dimension/all.tex}
 
 \columnbreak
 
@@ -1363,10 +1383,12 @@ sp & scaledpoint \\
   ['ex'] = 282460,
   ['in'] = 4736286,
   ['mm'] = 186467,
+  ['mu'] = 65536,
   ['nc'] = 839105,
   ['nd'] = 69925,
   ['pc'] = 786432,
   ['pt'] = 65536,
+  ['px'] = 65781,
   ['sp'] = 1,
 }
 \end{minted}
@@ -1389,7 +1411,7 @@ The next example illustrates the different notations of the dimensions.
   ['space'] = 1864679,
   ['plus'] = 1864679,
   ['minus'] = -1864679,
-  ['nodim'] = '1 c m',
+  ['nodim'] = '1 c m', -- string
 }
 \end{minted}
 \end{multicols}

@@ -485,6 +485,7 @@ local function generate_parser(initial_rule,
 
     -- 'bp' / 'BP' / 'cc' / etc.
     -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+    -- https://github.com/TeX-Live/luatex/blob/51db1985f5500dafd2393aa2e403fefa57d3cb76/source/texk/web2c/luatexdir/lua/ltexlib.c#L434-L625
     unit =
       Pattern('bp') + Pattern('BP') +
       Pattern('cc') + Pattern('CC') +
@@ -494,10 +495,12 @@ local function generate_parser(initial_rule,
       Pattern('ex') + Pattern('EX') +
       Pattern('in') + Pattern('IN') +
       Pattern('mm') + Pattern('MM') +
+      Pattern('mu') + Pattern('MU') +
       Pattern('nc') + Pattern('NC') +
       Pattern('nd') + Pattern('ND') +
       Pattern('pc') + Pattern('PC') +
       Pattern('pt') + Pattern('PT') +
+      Pattern('px') + Pattern('PX') +
       Pattern('sp') + Pattern('SP'),
 
     -- '"' ('\"' / !'"')* '"'
