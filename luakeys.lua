@@ -79,17 +79,26 @@ local utils = {
   end,
 }
 
---- https://stackoverflow.com/a/1283608/10193818
-local function merge_tables(target, t2)
-  for k, v in pairs(t2) do
-    if type(v) == 'table' then
-      if type(target[k] or false) == 'table' then
-        merge_tables(target[k] or {}, t2[k] or {})
-      elseif target[k] == nil then
-        target[k] = v
+--- Merge two tables in the first specified table.
+--- The `merge_tables` function copies all keys from the `source` table
+--  to a target table. It returns the modified target table.
+
+---@param target table
+---@param source table
+---
+---@see https://stackoverflow.com/a/1283608/10193818
+---
+---@return table target The modified target table.
+local function merge_tables(target, source)
+  for key, value in pairs(source) do
+    if type(value) == 'table' then
+      if type(target[key] or false) == 'table' then
+        merge_tables(target[key] or {}, source[key] or {})
+      elseif target[key] == nil then
+        target[key] = value
       end
-    elseif target[k] == nil then
-      target[k] = v
+    elseif target[key] == nil then
+      target[key] = value
     end
   end
   return target
@@ -612,7 +621,7 @@ local function apply_definitions(defs,
     return new_key_path
   end
 
-  local function set_default_value(def)
+  local function get_default_value(def)
     if def.default ~= nil then
       return def.default
     elseif opts ~= nil and opts.default ~= nil then
@@ -628,7 +637,7 @@ local function apply_definitions(defs,
       return value
       -- naked keys: values with integer keys
     elseif utils.remove_from_array(input, search_key) ~= nil then
-      return set_default_value(def)
+      return get_default_value(def)
     end
   end
 
@@ -663,7 +672,7 @@ local function apply_definitions(defs,
 
     always_present = function(value, key, def)
       if value == nil and def.always_present then
-        return set_default_value(def)
+        return get_default_value(def)
       end
     end,
 
@@ -883,14 +892,17 @@ local function apply_definitions(defs,
   for index, def in pairs(defs) do
     -- Find key and def
     local key
+    -- `{ key1 = { }, key2 = { } }`
     if type(def) == 'table' and def.name == nil and type(index) ==
       'string' then
       key = index
+      -- `{ { name = 'key1' }, { name = 'key2' } }`
     elseif type(def) == 'table' and def.name ~= nil then
       key = def.name
+      -- Definitions as strings in an array: `{ 'key1', 'key2' }`
     elseif type(index) == 'number' and type(def) == 'string' then
       key = def
-      def = { default = true }
+      def = { default = get_default_value({}) }
     end
 
     if type(def) ~= 'table' then
@@ -1149,7 +1161,10 @@ local export = {
   define = function(defs, opts)
     return function(kv_string, inner_opts)
       local options
-      if inner_opts ~= nil then
+
+      if inner_opts ~= nil and opts ~= nil then
+        options = merge_tables(opts, inner_opts)
+      elseif inner_opts ~= nil then
         options = inner_opts
       elseif opts ~= nil then
         options = opts
