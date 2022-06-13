@@ -84,6 +84,7 @@ Result:
 
 \newpage
 
+% \section{Einführung}
 \section{Introduction}
 
 \noindent
@@ -113,21 +114,62 @@ Since |luakeys| uses
 \href{http://www.inf.puc-rio.br/~roberto/lpeg/}{LPeg}, the parsing
 mechanism should be pretty robust.
 
+% Der Artikel TUGboat
+% \href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}
+% {“Implementing key–value input: An introduction” (Volume 30 (2009), No.
+% 1)} von \emph{Joseph Wright} und \emph{Christian Feuersänger} gibt einen
+% einen guten Überblick über die verfügbaren Key-Value-Pakete.
 The TUGboat article
 \href{http://www.tug.org/tugboat/tb30-1/tb94wright-keyval.pdf}
 {“Implementing key–value input: An introduction” (Volume 30 (2009), No.
 1)} by \emph{Joseph Wright} and \emph{Christian Feuersänger} gives a
 good overview of the available key-value packages.
 
+% Dieses Paket wäre ohne den Artikel
+% \href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
+% {"Parsing complex data formats in LuaTEX with LPEG" (Volume 40 (2019),
+% No. 2)} nicht möglich gewesen.
 This package would not be possible without the article
 \href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
 {“Parsing complex data formats in LuaTEX with LPEG” (Volume 40 (2019),
 No. 2)}.
 
+\subsection{Pros of \texttt{luakeys}}
+
+\begin{itemize}
+% \item Schlüssel-Wert-Paare können unabhängig vom Makro-Paket (latex or
+% context) analysiert werden.
+\item Key-value pairs can be parsed independently of the macro
+collection (\LaTeX{} or Con\TeX{}t).
+
+% \item Sogar in Plain LuaTex können Schlüssel analysiert werden
+\item Even in plain Lua\TeX{} keys can be parsed.
+
+% \item |luakeys| kann mit ineinander verschachtelten listen an
+% Schlüssel-Wert-Paaren umgehen, d. h. es kann mit einer rekursiven
+% Datenstruktur an Schlüssel umgehen.
+\item |luakeys| can handle nested lists of key-value pairs, i.e. it can
+handle a recursive data structure of keys.
+
+% \item Schlüssel müssen nicht, aber können definiert werden.
+\item Keys do not have to be defined, but can they can be defined.
+\end{itemize}
+
+\subsection{Cons of \texttt{luakeys}}
+
+\begin{itemize}
+% \item Das Packet funktioniert nur in der Verbindung mit Lua\TeX.
+\item The package works only in combination with Lua\TeX.
+
+% \item Du musst zwei Sprachen beherrschen: \TeX{} und Lua.
+\item You need to know two languages: \TeX{} and Lua.
+\end{itemize}
+
 %-----------------------------------------------------------------------
 %
 %-----------------------------------------------------------------------
 
+% \section{Wie das Paket geladen wird}
 \section{How the package is loaded}
 
 %%
@@ -177,6 +219,7 @@ The supplied Lua\LaTeX{} file is quite small:
 \end{minted}
 
 \noindent
+% Es lädt das Lua-Modul in die globale Variable \texttt{luakeys}.
 It loads the Lua module into the global variable \texttt{luakeys}.
 
 \InputLatex{loading/tex-latex.tex}
@@ -185,16 +228,24 @@ It loads the Lua module into the global variable \texttt{luakeys}.
 %
 %%
 
+% \subsection{Verwendung des Plain-Lua\TeX{}-Hüllpakets
+% \texttt{luakeys.tex}}
 \subsection{Using the plain Lua\TeX{} wrapper \texttt{luakeys.tex}}
 
-Even smaller is the file \texttt{luakeys.tex}. It consists of only one
-line:
+% Noch kleiner ist die Datei \texttt{luakeys.tex}.
+Even smaller is the file \texttt{luakeys.tex}.
+%
+% Sie besteht aus nur einer Zeile:
+It consists of only one line:
 
 \begin{minted}{latex}
 \directlua{luakeys = require('luakeys')}
 \end{minted}
 
 \noindent
+% Es macht dasselbe wie das Lua\LaTeX{}-Hüllpacket und lädt das
+% Lua-Modul \texttt{luakeys.lua} in die globale Variable
+% \texttt{luakeys}.
 It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 \texttt{luakeys.lua} into the global variable \texttt{luakeys}.
 
@@ -202,13 +253,24 @@ It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 
 \section{Lua interface / API}
 
-To learn more about the individual functions (local functions), please
-read the \href{https://josef-friedrich.github.io/luakeys/}{source code
-documentation}, which was created with
-\href{http://stevedonovan.github.io/ldoc/}{LDoc}. The Lua module exports
-this functions and tables:
+% Das Lua-Modul exportiert diese Funktionen und Tabellen:
+The Lua module exports this functions and tables:
 
 \InputLua[firstline=3,lastline=12]{export.lua}
+
+% Diese Dokumentation stellt nur die öffentlichen Funktionen und
+% Tabellen vor.
+This documentation presents only the public functions and tables.
+%
+% Um mehr über die privaten, nicht exportierten Funktionen zu erfahren,
+% lesen Sie bitte die
+% \href{https://josef-friedrich.github.io/luakeys/}{Quellcode
+% Dokumentation}, die mit
+% \href{http://stevedonovan.github.io/ldoc/}{LDoc} erstellt wurde.
+To learn more about the private, not exported functions, please
+read the \href{https://josef-friedrich.github.io/luakeys/}{source code
+documentation}, which was created with
+\href{http://stevedonovan.github.io/ldoc/}{LDoc}.
 
 \subsection{Lua indentifier names}
 
