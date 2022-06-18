@@ -100,8 +100,8 @@ local utils = {
     end
 
     local char, t = get_next_char()
-    local oarg = {}
     if char == initial_delimiter then
+      local oarg = {}
       char = get_next_char()
       while char ~= end_delimiter do
         table.insert(oarg, char)
