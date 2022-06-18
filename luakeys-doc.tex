@@ -1232,6 +1232,34 @@ For example, the string \lua{'true'} is recognized by the
 \subsubsection{Function “\texttt{is.string(value): boolean}”}
 \InputLua[firstline=6,lastline=12]{functions/is/string.lua}
 
+%%
+%
+%%
+
+\subsection{Table “\texttt{utils}”}
+
+\subsubsection{Function “\texttt{utils.scan_oarg(initial_delimiter?, end_delimiter?): string}”}
+
+% Plain \TeX{} kennt keine optionalen Argumente (oarg).
+Plain \TeX{} does not know optional arguments (oarg).
+%
+% Die Funktion ermöglicht es nicht nur in \LaTeX{}, sondern auch in Plain
+% \TeX{} nach optionalen Argumenten zu suchen.
+The function \\ \lua{luakeys.utils.scan_oarg(initial_delimiter?,
+end_delimiter?): string} allows to search for optional arguments not only
+in \LaTeX{} but also in Plain \TeX.
+%
+% Die Funktion basiert auf der Token-Bibliothek.
+The function is based on the token library.
+%
+% Die beiden Parameter können weggelassen werden.
+The two parameters can be omitted.
+%
+% Dann werden eckige Klammern als Begrenzungszeichen angenommen.
+Then square brackets are assumed to be delimiters.
+
+\InputLatex{utils/scan-oarg-plain.tex}
+
 %-----------------------------------------------------------------------
 %
 %-----------------------------------------------------------------------
