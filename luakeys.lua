@@ -36,6 +36,53 @@ if not token then
   }
 end
 
+--- Merge two tables in the first specified table.
+--- The `merge_tables` function copies all keys from the `source` table
+--- to a target table. It returns the modified target table.
+---
+---@see https://stackoverflow.com/a/1283608/10193818
+---
+---@param target table
+---@param source table
+---
+---@return table target The modified target table.
+local function merge_tables(target, source)
+  for key, value in pairs(source) do
+    if type(value) == 'table' then
+      if type(target[key] or false) == 'table' then
+        merge_tables(target[key] or {}, source[key] or {})
+      elseif target[key] == nil then
+        target[key] = value
+      end
+    elseif target[key] == nil then
+      target[key] = value
+    end
+  end
+  return target
+end
+
+---Clone a table.
+---
+---@see http://lua-users.org/wiki/CopyTable
+---
+---@param orig table
+---
+---@return table
+local function clone_table(orig)
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for orig_key, orig_value in next, orig, nil do
+      copy[clone_table(orig_key)] = clone_table(orig_value)
+    end
+    setmetatable(copy, clone_table(getmetatable(orig)))
+  else -- number, string, boolean, etc
+    copy = orig
+  end
+  return copy
+end
+
 local utils = {
   --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
   ---
@@ -66,6 +113,10 @@ local utils = {
     end
     return count
   end,
+
+  merge_tables = merge_tables,
+
+  clone_table = clone_table,
 
   remove_from_array = function(array, element)
     for index, value in pairs(array) do
@@ -113,53 +164,6 @@ local utils = {
     end
   end,
 }
-
---- Merge two tables in the first specified table.
---- The `merge_tables` function copies all keys from the `source` table
---- to a target table. It returns the modified target table.
----
----@see https://stackoverflow.com/a/1283608/10193818
----
----@param target table
----@param source table
----
----@return table target The modified target table.
-local function merge_tables(target, source)
-  for key, value in pairs(source) do
-    if type(value) == 'table' then
-      if type(target[key] or false) == 'table' then
-        merge_tables(target[key] or {}, source[key] or {})
-      elseif target[key] == nil then
-        target[key] = value
-      end
-    elseif target[key] == nil then
-      target[key] = value
-    end
-  end
-  return target
-end
-
----Clone a table.
----
----@see http://lua-users.org/wiki/CopyTable
----
----@param orig table
----
----@return table
-local function clone_table(orig)
-  local orig_type = type(orig)
-  local copy
-  if orig_type == 'table' then
-    copy = {}
-    for orig_key, orig_value in next, orig, nil do
-      copy[clone_table(orig_key)] = clone_table(orig_value)
-    end
-    setmetatable(copy, clone_table(getmetatable(orig)))
-  else -- number, string, boolean, etc
-    copy = orig
-  end
-  return copy
-end
 
 local namespace = {
   opts = {
@@ -885,18 +889,25 @@ local function apply_definitions(defs,
         if value ~= nil then
           return value
         end
-        for i, v in ipairs(input) do
-          local picked_value = nil
-          if is[def.pick] ~= nil then
-            if is[def.pick](v) then
+        for i, v in pairs(input) do
+          -- We can not use ipairs here. `ipairs(t)` iterates up to the
+          -- first absent index. Values are deleted from the `input`
+          -- table.
+          if type(i) == 'number' then
+            local picked_value = nil
+            -- Pick a value by type:  boolean, dimension, integer, number, string
+            if is[def.pick] ~= nil then
+              if is[def.pick](v) then
+                picked_value = v
+              end
+              -- Pick every value
+            elseif v ~= nil then
               picked_value = v
             end
-          elseif v ~= nil then
-            picked_value = v
-          end
-          if picked_value ~= nil then
-            input[i] = nil
-            return picked_value
+            if picked_value ~= nil then
+              input[i] = nil
+              return picked_value
+            end
           end
         end
       end
@@ -1265,6 +1276,8 @@ local export = {
   end,
 
   is = is,
+
+  utils = utils,
 }
 
 return export
