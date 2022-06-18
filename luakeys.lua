@@ -75,6 +75,43 @@ local utils = {
       end
     end
   end,
+
+  --- Scan a optional argument
+  scan_oarg = function(initial_delimiter, end_delimiter)
+    if initial_delimiter == nil then
+      initial_delimiter = '['
+    end
+
+    if end_delimiter == nil then
+      end_delimiter = ']'
+    end
+
+    local function convert_token(t)
+      if t.index ~= nil then
+        return utf8.char(t.index)
+      else
+        return '\\' .. t.csname
+      end
+    end
+
+    local function get_next_char()
+      local t = token.get_next()
+      return convert_token(t), t
+    end
+
+    local char, t = get_next_char()
+    local oarg = {}
+    if char == initial_delimiter then
+      char = get_next_char()
+      while char ~= end_delimiter do
+        table.insert(oarg, char)
+        char = get_next_char()
+      end
+      return table.concat(oarg, '')
+    else
+      token.put_next(t)
+    end
+  end,
 }
 
 --- Merge two tables in the first specified table.
@@ -364,7 +401,7 @@ local function generate_parser(initial_rule,
   ---@return integer|string # A dimension as an integer or a dimension string.
   local capture_dimension = function(input)
     -- Remove all whitespaces
-    input = input:gsub("%s+", "")
+    input = input:gsub('%s+', '')
     -- Convert the unit string into lowercase.
     input = input:lower()
     if convert_dimensions then
