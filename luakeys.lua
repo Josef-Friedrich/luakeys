@@ -127,7 +127,12 @@ local utils = {
     end
   end,
 
-  --- Scan a optional argument
+  ---Scan for an optional argument.
+  ---
+  ---@param initial_delimiter? string # The character that marks the beginning of an optional argument (by default `[`).
+  ---@param end_delimiter? string # The character that marks the end of an optional argument (by default `]`).
+  ---
+  ---@return string|nil # The string that was enclosed by the delimiters. The delimiters themselves are not returned.
   scan_oarg = function(initial_delimiter, end_delimiter)
     if initial_delimiter == nil then
       initial_delimiter = '['
@@ -343,7 +348,7 @@ local function stringify(result, for_tex)
            line_break .. end_bracket
 end
 
---- The function `debug(tbl)` pretty prints a Lua table to standard
+--- The function `debug(result)` pretty prints a Lua table to standard
 --   output (stdout). It is a utility function that can be used to
 --   debug and inspect the resulting Lua table of the function
 --   `parse`. You have to compile your TeX document in a console to
@@ -369,8 +374,8 @@ end
 ---
 --- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf)
 ---
----@param initial_rule string
----@param convert_dimensions? boolean
+---@param initial_rule string # The name of the first rule of the grammar table passed to the `lpeg.P(attern)` function (e. g. `list`, `number`).
+---@param convert_dimensions? boolean # Whether the dimensions should be converted to scaled points (by default `false`).
 ---
 ---@return userdata # The parser.
 local function generate_parser(initial_rule,
@@ -417,27 +422,27 @@ local function generate_parser(initial_rule,
 
   --- Add values to a table in two modes:
   --
-  -- # Key value pair
+  -- Key-value pair:
   --
-  -- If arg1 and arg2 are not nil, then arg1 is the key and arg2 is the
+  -- If `arg1` and `arg2` are not nil, then `arg1` is the key and `arg2` is the
   -- value of a new table entry.
   --
-  -- # Index value
+  -- Indexed value:
   --
-  -- If arg2 is nil, then arg1 is the value and is added as an indexed
+  -- If `arg2` is nil, then `arg1` is the value and is added as an indexed
   -- (by an integer) value.
   --
-  ---@param table table
-  ---@param arg1 any
-  ---@param arg2 any
+  ---@param result table # The result table to which an additional key-value pair or value should to be added
+  ---@param arg1 any # The key or the value.
+  ---@param arg2? any # Always the value.
   ---
-  ---@return table
-  local add_to_table = function(table, arg1, arg2)
+  ---@return table # The result table to which an additional key-value pair or value has been added.
+  local add_to_table = function(result, arg1, arg2)
     if arg2 == nil then
-      local index = #table + 1
-      return rawset(table, index, arg1)
+      local index = #result + 1
+      return rawset(result, index, arg1)
     else
-      return rawset(table, arg1, arg2)
+      return rawset(result, arg1, arg2)
     end
   end
 
