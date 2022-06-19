@@ -16,50 +16,29 @@
 % This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
 % luakeys-debug.sty and luakeys-debug.tex.
 
-\directlua{
+\directlua
+{
   luakeys = require('luakeys')
 }
 
-% https://tex.stackexchange.com/a/418401/42311
-\catcode`\@=11
-\long\def\LuaKeysIfNextChar#1#2#3{%
-  \let\@tmpa=#1%
-  \def\@tmpb{#2}%
-  \def\@tmpc{#3}%
-  \futurelet\@future\LuaKeysIfNextChar@i%
-}%
-\def\LuaKeysIfNextChar@i{%
-  \ifx\@tmpa\@future%
-    \expandafter\@tmpb
-  \else
-    \expandafter\@tmpc
-  \fi
-}%
-\def\luakeysdebug@parse@options#1{
-  \directlua{
-    luakeys.save(
-      'debug_options',
-      luakeys.parse('#1', { format_keys = { 'snake', 'lower' } })
-    )
-  }
-}%
-\def\luakeysdebug@output#1{
+\def\luakeysdebug%
+{%
+  \directlua%
   {
-    \tt
-    \parindent=0pt
-    \directlua{
-      local result = luakeys.parse('\luaescapestring{\unexpanded{#1}}', luakeys.get('debug_options'))
-      tex.print(luakeys.stringify(result, true))
-      luakeys.debug(result)
-    }
-  }
-}%
-\def\luakeysdebug@oarg[#1]#2{%
-  \luakeysdebug@parse@options{#1}%
-  \luakeysdebug@output{#2}%
-}%
-\def\luakeysdebug@marg#1{%
-  \luakeysdebug@output{#1}%
-}%
-\def\luakeysdebug{\LuaKeysIfNextChar[{\luakeysdebug@oarg}{\luakeysdebug@marg}}%
-\catcode`\@=12
+    local oarg = luakeys.utils.scan_oarg()
+    local marg = token.scan_argument(false)
+    local opts
+    if oarg then
+      opts = luakeys.parse(oarg, { format_keys = { 'snake', 'lower' } })
+    end
+    local result = luakeys.parse(marg, opts)
+    luakeys.debug(result)
+    tex.print(
+      '{' ..
+        '\string\\tt' ..
+        '\string\\parindent=0pt' ..
+        luakeys.stringify(result, true) ..
+      '}'
+    )
+  }%
+}
