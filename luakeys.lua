@@ -1218,6 +1218,24 @@ local result_store = {}
 -- @section
 
 local export = {
+  namespace = namespace,
+
+  ---This function is used in the documentation.
+  ---
+  ---@param from string # A key in the namespace table, either `opts`, `hook` or `attrs`.
+  print_names = function(from)
+    local names = {}
+    for name in pairs(namespace[from]) do
+      table.insert(names, name)
+    end
+    table.sort(names)
+    tex.print(table.concat(names, ', '))
+  end,
+
+  print_default = function(from, name)
+    tex.print(tostring(namespace[from][name]))
+  end,
+
   --- @see default_options
   opts = default_options,
 

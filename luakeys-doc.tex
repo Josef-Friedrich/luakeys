@@ -35,6 +35,17 @@
 }
 
 \catcode`_=12
+\def\DefaultOpt#1{%
+  \texttt{\directlua{
+    tex.print(luakeys.print_default('opts', '#1'))
+  }}%
+}
+
+\def\DefaultOptDescription#1{
+\noindent
+The default value of the option “\texttt{#1}” is:
+\DefaultOpt{#1}.
+}
 
 \begin{document}
 
@@ -339,7 +350,8 @@ In plain \TeX:
 
 \noindent
 The \lua{parse} function can be called with an options table. This
-options are supported:
+options are supported: \catcode`_=12
+\directlua{luakeys.print_names('opts')}
 
 \InputLua[firstline=5,lastline=69]{opts/all-opts.lua}
 
@@ -386,6 +398,8 @@ require('lualibs')
 tex.print(number.todimen(tex.sp('1cm'), 'cm', '%0.0F%s'))
 \end{minted}
 
+\DefaultOptDescription{convert_dimensions}
+
 %%
 %
 %%
@@ -415,6 +429,8 @@ local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./debug.aux)
 Transcript written on debug.log.
 \end{verbatim}
 
+\DefaultOptDescription{debug}
+
 %%
 %
 %%
@@ -437,6 +453,8 @@ By default, naked keys get the value \lua{true}.
 
 \InputLua[firstline=11,lastline=12]{opts/default.lua}
 
+\DefaultOptDescription{default}
+
 %%
 %
 %%
@@ -457,6 +475,8 @@ Values in the defaults table are
 overwritten by values in the result table.
 
 \InputLua[firstline=4,lastline=7]{opts/defaults.lua}
+
+\DefaultOptDescription{defaults}
 
 %%
 %
@@ -483,6 +503,8 @@ we can write ...
 
 \InputLua[firstline=11,lastline=13]{opts/defs.lua}
 
+\DefaultOptDescription{defs}
+
 %%
 %
 %%
@@ -502,6 +524,8 @@ we can write ...
 
 \InputLua[firstline=18,lastline=19]{opts/format-keys.lua}
 \end{description}
+
+\DefaultOptDescription{format_keys}
 
 %%
 %
@@ -610,6 +634,8 @@ If we set the option \lua{naked_as_value} to \lua{true}:
 
 \InputLua[firstline=11,lastline=14]{opts/naked-as-value.lua}
 
+\DefaultOptDescription{naked_as_value}
+
 %%
 %
 %%
@@ -629,6 +655,8 @@ If we set the option \lua{no_error} to \lua{true}:
 
 \InputLua[firstline=9,lastline=10]{opts/no-error.lua}
 
+\DefaultOptDescription{no_error}
+
 %%
 %
 %%
@@ -644,6 +672,8 @@ only one a single naked key or a single standalone value are unpacked.
 \InputLua[firstline=4,lastline=5]{opts/unpack.lua}
 
 \InputLua[firstline=11,lastline=12]{opts/unpack.lua}
+
+\DefaultOptDescription{unpack}
 
 %%
 %
@@ -690,12 +720,16 @@ The name \emph{“attribute”} for an option, a key, a property ... (to
 list just a few naming possibilities) to define keys, was deliberately
 chosen to distinguish them from the options of the \lua{parse} function.
 %
+% Diese Attribute sind erlaubt.
+These attributes are allowed:
+\directlua{luakeys.print_names('attrs')}.
+%
 % Das folgende Codebeispiel listet alle Attribute auf, die verwendet
 % werden können, um Schlüssel-Wert-Paare zu definieren.
 The code example below lists all the attributes that can be used to
 define key-value pairs.
 
-\InputLua[firstline=5,lastline=41]{defs/all-attrs.lua}
+\InputLua[firstline=5,lastline=46]{defs/all-attrs.lua}
 
 %%
 %
