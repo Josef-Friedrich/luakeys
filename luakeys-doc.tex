@@ -856,6 +856,7 @@ Any value can be used as a name for this exclusive group.
 
 \InputLua[firstline=4,lastline=9]{defs/attrs/exclusive-group.lua}
 
+\noindent
 % Werden mehrer Schlüssel der Gruppe angegeben, so wird eine
 % Fehlermeldung geworfen.
 If more than one key of the group is specified, an error message is
@@ -1277,20 +1278,40 @@ For example, the string \lua{'true'} is recognized by the
 % Plain \TeX{} kennt keine optionalen Argumente (oarg).
 Plain \TeX{} does not know optional arguments (oarg).
 %
-% Die Funktion ermöglicht es nicht nur in \LaTeX{}, sondern auch in Plain
-% \TeX{} nach optionalen Argumenten zu suchen.
-The function \\ \lua{luakeys.utils.scan_oarg(initial_delimiter?,
+% Die Funktion ermöglicht es nicht nur in \LaTeX{}, sondern auch in
+% Plain \TeX{} nach optionalen Argumenten zu suchen.
+The function \\ \lua{utils.scan_oarg(initial_delimiter?,
 end_delimiter?): string} allows to search for optional arguments not only
 in \LaTeX{} but also in Plain \TeX.
 %
 % Die Funktion basiert auf der Token-Bibliothek.
-The function is based on the token library.
+The function uses the token library built into Lua\TeX{}.
 %
-% Die beiden Parameter können weggelassen werden.
-The two parameters can be omitted.
+% Die beiden Parameter \lua{initial_delimiter} und \lua{end_delimiter}
+% können weggelassen werden.
+The two parameters \lua{initial_delimiter} and \lua{end_delimiter} can
+be omitted.
 %
 % Dann werden eckige Klammern als Begrenzungszeichen angenommen.
 Then square brackets are assumed to be delimiters.
+%
+% Dieser Lua-Code \lua{utils.scan_oarg('(', ')')} sucht beispielsweise
+% nach an einem optionalen Argument in runden Klammern.
+For example, this Lua code \lua{utils.scan_oarg('(', ')')} searches for
+an optional argument in round brackets
+%
+% Die Funktion gibt die Zeichenkette zwischen den Begrenzungszeichen
+% zurück, oder nil wenn Begrenzungszeichen gefunden werden konnten.
+The function returns the string between the delimiters or \lua{nil} if
+no delimiters could be found.
+%
+% Die Begrenzungszeichen sind im Ergebnis nicht enthalten.
+The delimiters themselves are not included in the result.
+%
+% Nach dem \latex{\directlua{}} darf das Makro, indem
+% \lua{utils.scan_oarg} eingesetzt wird, zu keinen Zeichen expandieren.
+After the \latex{\directlua{}}, the macro using \lua{utils.scan_oarg}
+must not expand to any characters.
 
 \InputLatex{utils/scan-oarg-plain.tex}
 
@@ -1568,6 +1589,10 @@ All recognized data types can be used as standalone values.
 
 \section{Examples}
 
+%%
+%
+%%
+
 \subsection{Extend and modify keys of existing macros}
 
 Extend the includegraphics macro with a new key named \latex{caption}
@@ -1578,11 +1603,28 @@ between 0 and 1 is allowed and converted into
 \InputLua{extend-includegraphics/extend-keys.lua}
 \InputLatex{extend-includegraphics/extend-keys-latex.tex}
 
+%%
+%
+%%
+
 \subsection{Process document class options}
 
-\begin{minted}{latex}
-\directlua{luakeys.parse('\@classoptionslist')}
-\end{minted}
+% Auf die Optionen einer \LaTeX{} Dokumentenklasse kann über das Macro
+% \latex{\@classoptionslist} zu gegriffen werden.
+The options of a \LaTeX{} document class can be accessed via the
+\latex{\@classoptionslist} macro.
+%
+% Die Zeichenkette des Makros \latex{\@classoptionslist} ist bereits
+% expandiert und normalisiert.
+The string of the macro \latex{\@classoptionslist} is already expanded
+and normalized.
+%
+% Neben Leerzeichen werden auch die geschweiften Klammern entfernt.
+In addition to spaces, the curly brackets are also removed.
+% Es ist deshalb nicht möglich, in einander geschachtelte hierarische
+% Schlüssel-Wert-Paare über die Option zu verarbeiten.
+It is therefore not possible to process nested hierarchical key-value
+pairs via the option.
 
 \InputLatex{class-options/test-class.cls}
 \InputLatex{class-options/use-test-class-latex.tex}
