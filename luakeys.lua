@@ -1218,6 +1218,8 @@ local result_store = {}
 -- @section
 
 local export = {
+  version = { 0, 7, 0 },
+
   namespace = namespace,
 
   ---This function is used in the documentation.

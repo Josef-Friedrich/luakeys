@@ -182,11 +182,14 @@ make test
 
 ### Release a new version
 
+This project uses [semantic versioning](https://semver.org).
+
 Update version in:
 
 * luakeys-doc.tex
 * luakeys-debug.sty
 * luakeys.sty
+* luakeys.lua
 
 Update copyright in:
 
@@ -200,4 +203,4 @@ Update copyright in:
 
 Summarize the changes in the luakeys-doc.tex as changes.
 
-Create a new git tag `git tag -sa v0.3`. Prefix the version with “v”.
+Create a new git tag `git tag -sa 0.7.0`.

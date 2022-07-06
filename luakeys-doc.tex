@@ -58,7 +58,7 @@ The default value of the option “\texttt{#1}” is:
   \href{https://github.com/Josef-Friedrich/luakeys}
        {github.com/Josef-Friedrich/luakeys}%
 }
-\date{v0.6 from 2022/06/09}
+\date{0.7.0 from 2022/06/09}
 
 \maketitle
 
@@ -262,12 +262,16 @@ It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 
 \InputLatex{loading/tex-plain.tex}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Lua interface / API}
 
 % Das Lua-Modul exportiert diese Funktionen und Tabellen:
 The Lua module exports this functions and tables:
 
-\InputLua[firstline=3,lastline=12]{export.lua}
+\InputLua[firstline=3,lastline=13]{export.lua}
 
 % Diese Dokumentation stellt nur die öffentlichen Funktionen und
 % Tabellen vor.
@@ -1314,6 +1318,26 @@ After the \latex{\directlua{}}, the macro using \lua{utils.scan_oarg}
 must not expand to any characters.
 
 \InputLatex{utils/scan-oarg-plain.tex}
+
+%%
+%
+%%
+
+\subsection{Table “version”}
+
+% Das luakeys Projekt verwendet semantic versioning
+The luakeys project uses semantic versioning.
+% Die drei Versionenzahlen des Semantic Versioning Schemas werden in
+% einer Tabelle in der Reihenfolge MAJOR, MINOR, PATCH als Ganzzahlen
+% abgelegt.
+The three version numbers of the semantic versioning scheme are stored
+in a table as integers in the order MAJOR, MINOR, PATCH.
+% Mit Hilfe dieser Tabelle kann überprüft werden, ob die richtige
+% Version installiert ist.
+This table can be used to check whether the correct version is
+installed.
+
+\InputLua[firstline=4,lastline=10]{version.lua}
 
 %-----------------------------------------------------------------------
 %
