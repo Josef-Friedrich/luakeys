@@ -4,7 +4,10 @@
 \ProcessOptions\relax
 \directlua{
   luakeys = require('luakeys')
-  local kv = luakeys.parse('\@classoptionslist', { convert_dimensions = false })
+  local kv = luakeys.parse('\@classoptionslist', {
+    convert_dimensions = false,
+    naked_as_value = true
+  })
   luakeys.debug(kv)
 }
 \LoadClass{article}
