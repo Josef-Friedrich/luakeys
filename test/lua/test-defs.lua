@@ -349,14 +349,15 @@ describe('Defintions', function()
       local parse = luakeys.define({
         tikz = {
           process = function(value, input, result, unknown)
-            result.tikz = luakeys.render(value)
+            return luakeys.render(value)
           end,
         },
         foo = {},
         bar = {},
       })
-      local options = parse("foo={one=1, two=2}, bar=baz, tikz={scale=2, red}")
-      assert.are.same(options, { width = '0.5\\linewidth' })
+      local options = parse(
+        'foo={one=1, two=2}, bar=baz, tikz={scale=2, red}')
+      assert.is.equal(type(options.tikz), 'string')
     end)
 
     describe('Attribute “required”', function()
