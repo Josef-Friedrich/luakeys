@@ -345,6 +345,20 @@ describe('Defintions', function()
       }), { width = '0.5\\linewidth' })
     end)
 
+    it('Attribute “process”', function()
+      local parse = luakeys.define({
+        tikz = {
+          process = function(value, input, result, unknown)
+            result.tikz = luakeys.render(value)
+          end,
+        },
+        foo = {},
+        bar = {},
+      })
+      local options = parse("foo={one=1, two=2}, bar=baz, tikz={scale=2, red}")
+      assert.are.same(options, { width = '0.5\\linewidth' })
+    end)
+
     describe('Attribute “required”', function()
       local defs = { key = { required = true } }
       it('should pass if a value is provided', function()
