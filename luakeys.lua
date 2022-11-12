@@ -182,6 +182,11 @@ local namespace = {
     naked_as_value = false,
     no_error = false,
     unpack = true,
+    group_start = '{',
+    group_end = '}',
+    list_separator = ',',
+    assignment_operator = '=',
+    quotation_mark = '"'
   },
 
   hooks = {
@@ -222,6 +227,38 @@ local function throw_error(message)
   else
     error(message)
   end
+end
+
+--- Normalize the parse options.
+---
+---@param opts? table # Options in a raw format. The table may be empty or some keys are not set.
+---
+---@return table
+local function normalize_opts(opts)
+  if type(opts) ~= 'table' then
+    opts = {}
+  end
+  for key, _ in pairs(opts) do
+    if namespace.opts[key] == nil then
+      throw_error('Unknown parse option: ' .. tostring(key) .. '!')
+    end
+  end
+  local old_opts = opts
+  opts = {}
+  for name, _ in pairs(namespace.opts) do
+    if old_opts[name] ~= nil then
+      opts[name] = old_opts[name]
+    else
+      opts[name] = default_options[name]
+    end
+  end
+
+  for hook in pairs(opts.hooks) do
+    if namespace.hooks[hook] == nil then
+      throw_error('Unknown hook: ' .. tostring(hook) .. '!')
+    end
+  end
+  return opts
 end
 
 local l3_code_cctab = 10
@@ -375,13 +412,12 @@ end
 --- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf)
 ---
 ---@param initial_rule string # The name of the first rule of the grammar table passed to the `lpeg.P(attern)` function (e. g. `list`, `number`).
----@param convert_dimensions? boolean # Whether the dimensions should be converted to scaled points (by default `false`).
+---@param opts? table # Whether the dimensions should be converted to scaled points (by default `false`).
 ---
 ---@return userdata # The parser.
-local function generate_parser(initial_rule,
-  convert_dimensions)
-  if convert_dimensions == nil then
-    convert_dimensions = false
+local function generate_parser(initial_rule, opts)
+  if type(opts) ~= 'table' then
+    opts = normalize_opts(opts)
   end
 
   local Variable = lpeg.V
@@ -413,7 +449,7 @@ local function generate_parser(initial_rule,
     input = input:gsub('%s+', '')
     -- Convert the unit string into lowercase.
     input = input:lower()
-    if convert_dimensions then
+    if opts.convert_dimensions then
       return tex.sp(input)
     else
       return input
@@ -458,7 +494,7 @@ local function generate_parser(initial_rule,
 
     -- '{' list '}'
     list_container =
-      ws('{') * Variable('list') * ws('}'),
+      ws(opts.group_start) * Variable('list') * ws(opts.group_end),
 
     -- ( list_container / key_value_pair / value ) ','?
     list_item =
@@ -466,11 +502,11 @@ local function generate_parser(initial_rule,
         Variable('list_container') +
         Variable('key_value_pair') +
         Variable('value')
-      ) * ws(',')^-1,
+      ) * ws(opts.list_separator)^-1,
 
     -- key '=' (list_container / value)
     key_value_pair =
-      (Variable('key') * ws('=')) * (Variable('list_container') + Variable('value')),
+      (Variable('key') * ws(opts.assignment_operator)) * (Variable('list_container') + Variable('value')),
 
     -- number / string_quoted / string_unquoted
     key =
@@ -555,9 +591,9 @@ local function generate_parser(initial_rule,
 
     -- '"' ('\"' / !'"')* '"'
     string_quoted =
-      white_space^0 * Pattern('"') *
-      CaptureSimple((Pattern('\\"') + 1 - Pattern('"'))^0) *
-      Pattern('"') * white_space^0,
+      white_space^0 * Pattern(opts.quotation_mark) *
+      CaptureSimple((Pattern('\\' .. opts.quotation_mark) + 1 - Pattern(opts.quotation_mark))^0) *
+      Pattern(opts.quotation_mark) * white_space^0,
 
     string_unquoted =
       white_space^0 *
@@ -566,7 +602,11 @@ local function generate_parser(initial_rule,
         (Set(' \t')^1 * Variable('word_unquoted')^1)^0) *
       white_space^0,
 
-    word_unquoted = (1 - white_space - Set('{},='))^1
+    word_unquoted = (1 - white_space - Set(
+      opts.group_start ..
+      opts.group_end ..
+      opts.assignment_operator  ..
+      opts.list_separator))^1
   })
 -- LuaFormatter on
 end
@@ -614,7 +654,7 @@ local is = {
     if type(value) == 'boolean' then
       return true
     end
-    local parser = generate_parser('boolean_only', false)
+    local parser = generate_parser('boolean_only')
     local result = parser:match(tostring(value))
     return result ~= nil
   end,
@@ -623,7 +663,7 @@ local is = {
     if value == nil then
       return false
     end
-    local parser = generate_parser('dimension_only', false)
+    local parser = generate_parser('dimension_only')
     local result = parser:match(tostring(value))
     return result ~= nil
   end,
@@ -643,7 +683,7 @@ local is = {
     if type(value) == 'number' then
       return true
     end
-    local parser = generate_parser('number_only', false)
+    local parser = generate_parser('number_only')
     local result = parser:match(tostring(value))
     return result ~= nil
   end,
@@ -1050,45 +1090,13 @@ local function parse(kv_string, opts)
     return {}
   end
 
-  --- Normalize the parse options.
-  ---
-  ---@param opts table # Options in a raw format. The table may be empty or some keys are not set.
-  ---
-  ---@return table
-  local function normalize_opts(opts)
-    if type(opts) ~= 'table' then
-      opts = {}
-    end
-    for key, _ in pairs(opts) do
-      if namespace.opts[key] == nil then
-        throw_error('Unknown parse option: ' .. tostring(key) .. '!')
-      end
-    end
-    local old_opts = opts
-    opts = {}
-    for name, _ in pairs(namespace.opts) do
-      if old_opts[name] ~= nil then
-        opts[name] = old_opts[name]
-      else
-        opts[name] = default_options[name]
-      end
-    end
-
-    for hook in pairs(opts.hooks) do
-      if namespace.hooks[hook] == nil then
-        throw_error('Unknown hook: ' .. tostring(hook) .. '!')
-      end
-    end
-    return opts
-  end
   opts = normalize_opts(opts)
 
   if type(opts.hooks.kv_string) == 'function' then
     kv_string = opts.hooks.kv_string(kv_string)
   end
 
-  local result = generate_parser('list', opts.convert_dimensions):match(
-    kv_string)
+  local result = generate_parser('list', opts):match(kv_string)
   local raw = clone_table(result)
 
   local function apply_hook(name)

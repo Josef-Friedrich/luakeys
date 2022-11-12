@@ -6,10 +6,11 @@ describe('Options', function()
     local defaults = luakeys.opts
     local old = defaults.convert_dimensions
     defaults.convert_dimensions = true
-    assert.are
-      .same({ 1234567 }, luakeys.parse('1cm', { naked_as_value = true }))
+    assert.are.same({ 1234567 },
+      luakeys.parse('1cm', { naked_as_value = true }))
     defaults.convert_dimensions = false
-    assert.are.same({ '1cm' }, luakeys.parse('1cm', { naked_as_value = true }))
+    assert.are.same({ '1cm' },
+      luakeys.parse('1cm', { naked_as_value = true }))
     -- Restore
     defaults.convert_dimensions = old
   end)
@@ -29,13 +30,15 @@ describe('Options', function()
 
   describe('Option “convert_dimensions”', function()
     it('true', function()
-      assert.are.same({ dim = 1234567 },
-        luakeys.parse('dim=1cm', { convert_dimensions = true }))
+      assert.are.same({ dim = 1234567 }, luakeys.parse('dim=1cm', {
+        convert_dimensions = true,
+      }))
     end)
 
     it('false', function()
-      assert.are.same({ dim = '1cm' },
-        luakeys.parse('dim=1cm', { convert_dimensions = false }))
+      assert.are.same({ dim = '1cm' }, luakeys.parse('dim=1cm', {
+        convert_dimensions = false,
+      }))
     end)
   end)
 
@@ -54,7 +57,8 @@ describe('Options', function()
           defs = {
             key = {
               process = function(value, pre_def, result, unknown)
-                assert.are.same(pre_def, { key = 'value', unknown = 'unknown' })
+                assert.are.same(pre_def,
+                  { key = 'value', unknown = 'unknown' })
                 result.new_key = 'result'
                 unknown.new_unknown = 'unknown'
                 return value
@@ -66,25 +70,28 @@ describe('Options', function()
       assert.are.same(result, { key = 'value', new_key = 'result' })
       assert.are.same(result_unknown,
         { unknown = 'unknown', new_unknown = 'unknown' })
-      assert.are.same(result_parse, { key = 'value', unknown = 'unknown' })
+      assert.are.same(result_parse,
+        { key = 'value', unknown = 'unknown' })
     end)
   end)
 
   describe('Option “default”', function()
     it('should give a naked key the value', function()
-      assert.are.same({ naked = 1 }, luakeys.parse('naked', { default = 1 }))
+      assert.are.same({ naked = 1 },
+        luakeys.parse('naked', { default = 1 }))
     end)
 
     it('should be true if no option is specifed', function()
       assert.are.same({ naked = true }, luakeys.parse('naked'))
     end)
 
-    it('should prefer the default option for the key definitions.', function()
-      assert.are.same({ naked = 2 }, luakeys.parse('naked', {
-        default = 1,
-        defs = { naked = { default = 2 } },
-      }))
-    end)
+    it('should prefer the default option for the key definitions.',
+      function()
+        assert.are.same({ naked = 2 }, luakeys.parse('naked', {
+          default = 1,
+          defs = { naked = { default = 2 } },
+        }))
+      end)
 
     it('should be used as the default value if using key definitions.',
       function()
@@ -104,7 +111,8 @@ describe('Options', function()
     end
 
     it('Should add a default key.', function()
-      assert_defaults('key1=new', { key1 = 'default', key2 = 'default' },
+      assert_defaults('key1=new',
+        { key1 = 'default', key2 = 'default' },
         { key1 = 'new', key2 = 'default' })
     end)
 
@@ -142,8 +150,8 @@ describe('Options', function()
 
   describe('Option “format_keys”', function()
     local function assert_format_keys(kv_string, styles, expected)
-      assert.are.same(expected,
-        luakeys.parse(kv_string, { format_keys = styles }))
+      assert.are.same(expected, luakeys.parse(kv_string,
+        { format_keys = styles }))
     end
 
     describe('lower', function()
@@ -239,7 +247,8 @@ describe('Options', function()
           },
         })
 
-        assert.are.same(result, { additional_key = 'value', key = 'value' })
+        assert.are.same(result,
+          { additional_key = 'value', key = 'value' })
       end)
     end)
 
@@ -298,13 +307,13 @@ describe('Options', function()
     end)
 
     it('true', function()
-      assert.are.same({ one = true, two = true, three = true }, luakeys.parse(
-        'one,two,three', { naked_as_value = false }))
+      assert.are.same({ one = true, two = true, three = true },
+        luakeys.parse('one,two,three', { naked_as_value = false }))
     end)
 
     it('false', function()
-      assert.are.same({ 'one', 'two', 'three' },
-        luakeys.parse('one,two,three', { naked_as_value = true }))
+      assert.are.same({ 'one', 'two', 'three' }, luakeys.parse(
+        'one,two,three', { naked_as_value = true }))
     end)
   end)
 
@@ -336,8 +345,10 @@ describe('Options', function()
     end)
 
     it('unpacked: single number', function()
-      assert.are.same({ key = 1 }, luakeys.parse('key={1}', options_true))
-      assert.are.same({ key = { 1 } }, luakeys.parse('key={1}', options_false))
+      assert.are.same({ key = 1 },
+        luakeys.parse('key={1}', options_true))
+      assert.are.same({ key = { 1 } },
+        luakeys.parse('key={1}', options_false))
     end)
 
     it('Not unpacked: two values', function()
@@ -348,9 +359,36 @@ describe('Options', function()
     end)
 
     it('Not unpacked: nested table', function()
-      assert.is.same({ one = true }, luakeys.parse('{{one}}', options_true))
+      assert.is.same({ one = true },
+        luakeys.parse('{{one}}', options_true))
       assert.is.same({ { { one = true } } },
         luakeys.parse('{{one}}', options_false))
     end)
+  end)
+
+  it('Option “group_start”', function()
+    assert.is.same({ l1 = { key = 'value' } }, luakeys.parse(
+      'l1 = ( key = value }', { group_start = '(' }))
+  end)
+
+  it('Option “group_end”', function()
+    assert.is.same({ l1 = { key = 'value' } }, luakeys.parse(
+      'l1 = { key = value )', { group_end = ')' }))
+  end)
+
+  it('Option “list_separator”', function()
+    assert.is.same({ 'one', 'two', 'three' },
+      luakeys.parse('one;two;three',
+        { list_separator = ';', naked_as_value = true }))
+  end)
+
+  it('Option “assignment_operator”', function()
+    assert.is.same({ key = 'value' }, luakeys.parse(
+      'key:=value', { assignment_operator = ':=' }))
+  end)
+
+  it('Option “quotation_mark”', function()
+    assert.is.same({ key = 'value1,value2' }, luakeys.parse(
+      "key = 'value1,value2'", { quotation_mark = '\'' }))
   end)
 end)
