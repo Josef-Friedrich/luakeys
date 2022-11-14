@@ -366,9 +366,9 @@ describe('Options', function()
     end)
   end)
 
-  it('Option “group_start”', function()
+  it('Option “group_begin”', function()
     assert.is.same({ l1 = { key = 'value' } }, luakeys.parse(
-      'l1 = ( key = value }', { group_start = '(' }))
+      'l1 = ( key = value }', { group_begin = '(' }))
   end)
 
   it('Option “group_end”', function()
@@ -388,12 +388,12 @@ describe('Options', function()
     }))
   end)
 
-  describe('Option “quotation_start” and “quotation_end”',
+  describe('Option “quotation_begin” and “quotation_end”',
     function()
       it('single quote', function()
         assert.is.same({ key = 'value1,value2' },
           luakeys.parse('key = \'value1,value2\'', {
-            quotation_start = '\'',
+            quotation_begin = '\'',
             quotation_end = '\'',
           }))
       end)
@@ -401,7 +401,7 @@ describe('Options', function()
       it('two single quotes', function()
         assert.is.same({ key = 'value1,value2' },
           luakeys.parse('key = \'\'value1,value2\'\'', {
-            quotation_start = '\'\'',
+            quotation_begin = '\'\'',
             quotation_end = '\'\'',
           }))
       end)
@@ -409,7 +409,7 @@ describe('Options', function()
       it('unicode', function()
         assert.is.same({ key = 'value1,\\”value2' },
           luakeys.parse('key = “value1,\\”value2”', {
-            quotation_start = '“',
+            quotation_begin = '“',
             quotation_end = '”',
           }))
       end)

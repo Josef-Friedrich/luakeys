@@ -357,7 +357,7 @@ The \lua{parse} function can be called with an options table. This
 options are supported: \catcode`_=12
 \directlua{luakeys.print_names('opts')}
 
-\InputLua[firstline=5,lastline=69]{opts/all-opts.lua}
+\InputLua[firstline=5,lastline=86]{opts/all-opts.lua}
 
 \noindent
 The options can also be set globally using the exported table
@@ -366,6 +366,15 @@ The options can also be set globally using the exported table
 \InputLua[firstline=4,lastline=4]{opts/exported-default-opts.lua}
 
 \InputLua[firstline=10,lastline=11]{opts/exported-default-opts.lua}
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{assignment_operator}”}
+\label{options-delimiter}
+
+\InputLua[firstline=4,lastline=13]{opts/delimiters.lua}
 
 %%
 %
@@ -535,6 +544,20 @@ we can write ...
 %
 %%
 
+\subsubsection{Option “\texttt{group_begin}”}
+See \ref{options-delimiter}
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{group_end}”}
+See \ref{options-delimiter}
+
+%%
+%
+%%
+
 \subsubsection{Option “\texttt{hooks}”}
 
 % Die folgenden Hooks bzw. Callback-Funktionen ermöglichen es in den
@@ -623,6 +646,13 @@ as a parameter.
 %
 %%
 
+\subsubsection{Option “\texttt{list_separator}”}
+See \ref{options-delimiter}
+
+%%
+%
+%%
+
 \subsubsection{Option “\texttt{naked_as_value}”}
 
 % Mit Hilfe der Option \lua{naked_as_value} werden nackte Schlüssel
@@ -660,6 +690,20 @@ If we set the option \lua{no_error} to \lua{true}:
 \InputLua[firstline=9,lastline=10]{opts/no-error.lua}
 
 \DefaultOptDescription{no_error}
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{quotation_start}”}
+See \ref{options-delimiter}
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{quotation_end}”}
+See \ref{options-delimiter}
 
 %%
 %

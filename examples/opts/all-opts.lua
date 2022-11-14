@@ -3,6 +3,9 @@ local luakeys = require('luakeys')
 
 -- Update also in README.md
 local opts = {
+  -- Configure the delimiter that assigns a value to a key.
+  assignment_operator = '=',
+
   -- Automatically convert dimensions into scaled points (1cm -> 1864679).
   convert_dimensions = false,
 
@@ -21,6 +24,12 @@ local opts = {
 
   -- lower, snake, upper
   format_keys = { 'snake' },
+
+  -- Configure the delimiter that marks the beginning of a group.
+  group_begin = '{',
+
+  -- Configure the delimiter that marks the end of a group.
+  group_end = '}',
 
   -- Listed in the order of execution
   hooks = {
@@ -56,12 +65,21 @@ local opts = {
     end,
   },
 
+  -- Configure the delimiter that separates list items from each other.
+  list_separator = ',',
+
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
   naked_as_value = false,
 
   -- Throw no error if there are unknown keys.
   no_error = false,
+
+  -- Configure the delimiter that marks the end of a string.
+  quotation_begin = '"',
+
+  -- Configure the delimiter that marks the beginning of a string.
+  quotation_end = '"',
 
   -- { key = { 'value' } } -> { key = 'value' }
   unpack = false,

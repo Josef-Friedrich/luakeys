@@ -172,22 +172,22 @@ local utils = {
 
 local namespace = {
   opts = {
+    assignment_operator = '=',
     convert_dimensions = false,
     debug = false,
     default = true,
     defaults = false,
     defs = false,
     format_keys = false,
+    group_begin = '{',
+    group_end = '}',
     hooks = {},
+    list_separator = ',',
     naked_as_value = false,
     no_error = false,
+    quotation_begin = '"',
+    quotation_end = '"',
     unpack = true,
-    group_start = '{',
-    group_end = '}',
-    list_separator = ',',
-    assignment_operator = '=',
-    quotation_start = '"',
-    quotation_end = '"'
   },
 
   hooks = {
@@ -495,7 +495,7 @@ local function generate_parser(initial_rule, opts)
 
     -- '{' list '}'
     list_container =
-      ws(opts.group_start) * Variable('list') * ws(opts.group_end),
+      ws(opts.group_begin) * Variable('list') * ws(opts.group_end),
 
     -- ( list_container / key_value_pair / value ) ','?
     list_item =
@@ -592,7 +592,7 @@ local function generate_parser(initial_rule, opts)
 
     -- '"' ('\"' / !'"')* '"'
     string_quoted =
-      white_space^0 * Pattern(opts.quotation_start) *
+      white_space^0 * Pattern(opts.quotation_begin) *
       CaptureSimple((Pattern('\\' .. opts.quotation_end) + 1 - Pattern(opts.quotation_end))^0) *
       Pattern(opts.quotation_end) * white_space^0,
 
@@ -604,7 +604,7 @@ local function generate_parser(initial_rule, opts)
       white_space^0,
 
     word_unquoted = (1 - white_space - Set(
-      opts.group_start ..
+      opts.group_begin ..
       opts.group_end ..
       opts.assignment_operator  ..
       opts.list_separator))^1
