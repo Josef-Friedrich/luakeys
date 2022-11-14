@@ -819,7 +819,10 @@ local function apply_definitions(defs,
           -- integer
         elseif def.data_type == 'integer' then
           if is.number(value) then
-            converted = math.floor(tonumber(value))
+            local n = tonumber(value)
+            if type(n) == 'number' and n ~= nil then
+              converted = math.floor(n)
+            end
           end
           -- number
         elseif def.data_type == 'number' then
@@ -1088,7 +1091,7 @@ end
 ---@return table raw # The unprocessed, raw result of the LPeg parser.
 local function parse(kv_string, opts)
   if kv_string == nil then
-    return {}
+    return {}, {}, {}
   end
 
   opts = normalize_opts(opts)
