@@ -75,10 +75,10 @@ local opts = {
   -- Throw no error if there are unknown keys.
   no_error = false,
 
-  -- Configure the delimiter that marks the end of a string.
+  -- Configure the delimiter that marks the beginning of a string.
   quotation_begin = '"',
 
-  -- Configure the delimiter that marks the beginning of a string.
+  -- Configure the delimiter that marks the end of a string.
   quotation_end = '"',
 
   -- { key = { 'value' } } -> { key = 'value' }

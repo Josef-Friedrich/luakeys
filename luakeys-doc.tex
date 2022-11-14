@@ -372,7 +372,23 @@ The options can also be set globally using the exported table
 %%
 
 \subsubsection{Option “\texttt{assignment_operator}”}
+\label{option:assignment-operator}
 \label{options-delimiter}
+
+The option \lua{assignment_operator} configures the delimiter that
+assigns a value to a key.
+
+The code example below demonstrates all six delimiter related options.
+
+\begin{tabular}{ll}
+\textbf{Delimiter options} & \textbf{Section} \\
+assignment_operator & \ref{option:assignment-operator}\\
+group_begin & \ref{option:group-begin}\\
+group_end & \ref{option:group-end}\\
+list_separator & \ref{option:list-separator}\\
+quotation_begin & \ref{option:quotation-begin}\\
+quotation_end & \ref{option:quotation-end}\\
+\end{tabular}
 
 \InputLua[firstline=4,lastline=13]{opts/delimiters.lua}
 
@@ -545,14 +561,21 @@ we can write ...
 %%
 
 \subsubsection{Option “\texttt{group_begin}”}
-See \ref{options-delimiter}
+\label{option:group-begin}
+
+The option \lua{group_begin} configures the delimiter that marks the beginning of a group.
+A code example can be found in section \ref{options-delimiter}.
 
 %%
 %
 %%
 
 \subsubsection{Option “\texttt{group_end}”}
-See \ref{options-delimiter}
+\label{option:group-end}
+
+The option \lua{group_end} configures the delimiter that
+marks the end of a group.
+A code example can be found in section \ref{options-delimiter}.
 
 %%
 %
@@ -647,7 +670,11 @@ as a parameter.
 %%
 
 \subsubsection{Option “\texttt{list_separator}”}
-See \ref{options-delimiter}
+\label{option:list-separator}
+
+The option \lua{list_separator} configures the delimiter that
+separates list items from each other.
+A code example can be found in section \ref{options-delimiter}.
 
 %%
 %
@@ -695,15 +722,23 @@ If we set the option \lua{no_error} to \lua{true}:
 %
 %%
 
-\subsubsection{Option “\texttt{quotation_start}”}
-See \ref{options-delimiter}
+\subsubsection{Option “\texttt{quotation_begin}”}
+\label{option:quotation-begin}
+
+The option \lua{quotation_begin} configures the delimiter that
+marks the beginning of a string.
+A code example can be found in section \ref{options-delimiter}.
 
 %%
 %
 %%
 
 \subsubsection{Option “\texttt{quotation_end}”}
-See \ref{options-delimiter}
+\label{option:quotation-end}
+
+The option \lua{quotation_end} configures the delimiter that marks
+the end of a string.
+A code example can be found in section \ref{options-delimiter}.
 
 %%
 %
