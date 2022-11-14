@@ -383,12 +383,35 @@ describe('Options', function()
   end)
 
   it('Option “assignment_operator”', function()
-    assert.is.same({ key = 'value' }, luakeys.parse(
-      'key:=value', { assignment_operator = ':=' }))
+    assert.is.same({ key = 'value' }, luakeys.parse('key:=value', {
+      assignment_operator = ':=',
+    }))
   end)
 
-  it('Option “quotation_mark”', function()
-    assert.is.same({ key = 'value1,value2' }, luakeys.parse(
-      "key = 'value1,value2'", { quotation_mark = '\'' }))
-  end)
+  describe('Option “quotation_start” and “quotation_end”',
+    function()
+      it('single quote', function()
+        assert.is.same({ key = 'value1,value2' },
+          luakeys.parse('key = \'value1,value2\'', {
+            quotation_start = '\'',
+            quotation_end = '\'',
+          }))
+      end)
+
+      it('two single quotes', function()
+        assert.is.same({ key = 'value1,value2' },
+          luakeys.parse('key = \'\'value1,value2\'\'', {
+            quotation_start = '\'\'',
+            quotation_end = '\'\'',
+          }))
+      end)
+
+      it('unicode', function()
+        assert.is.same({ key = 'value1,\\”value2' },
+          luakeys.parse('key = “value1,\\”value2”', {
+            quotation_start = '“',
+            quotation_end = '”',
+          }))
+      end)
+    end)
 end)

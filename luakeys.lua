@@ -186,7 +186,8 @@ local namespace = {
     group_end = '}',
     list_separator = ',',
     assignment_operator = '=',
-    quotation_mark = '"'
+    quotation_start = '"',
+    quotation_end = '"'
   },
 
   hooks = {
@@ -591,9 +592,9 @@ local function generate_parser(initial_rule, opts)
 
     -- '"' ('\"' / !'"')* '"'
     string_quoted =
-      white_space^0 * Pattern(opts.quotation_mark) *
-      CaptureSimple((Pattern('\\' .. opts.quotation_mark) + 1 - Pattern(opts.quotation_mark))^0) *
-      Pattern(opts.quotation_mark) * white_space^0,
+      white_space^0 * Pattern(opts.quotation_start) *
+      CaptureSimple((Pattern('\\' .. opts.quotation_end) + 1 - Pattern(opts.quotation_end))^0) *
+      Pattern(opts.quotation_end) * white_space^0,
 
     string_unquoted =
       white_space^0 *
