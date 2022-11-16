@@ -541,19 +541,47 @@ we can write ...
 
 \subsubsection{Option “\texttt{format_keys}”}
 
+% Mit Hilfe der Option \lua{format_keys} können die Schlüssel formatiert
+% werden.
+With the help of the option \lua{format_keys} the keys can be formatted.
+% Die Werte dieser Option müssen in einer Tabelle angegeben werden.
+The values of this option must be specified in a table.
+
 \begin{description}
-\item[lower] \strut
+\item[lower]
+
+% Um alle Schlüssel in \emph{Kleinbuchstaben} umzuwandeln, geben sie in
+% der Optionentabelle \lua{lower} an.
+To convert all keys to \emph{lowercase}, specify \lua{lower} in the
+options table.
 
 \InputLua[firstline=4,lastline=5]{opts/format-keys.lua}
 
-\item[snake] \strut
+\item[snake]
+
+% Um alle Schlüssel in \emph{snake case} (Die Wörter sind durch
+% Unterstriche getrennt) umzuwandeln, geben sie in der Optionentabelle
+% \lua{snake} an.
+To make all keys \emph{snake case} (The words are separated by
+underscores), specify \lua{snake} in the options
+table.
 
 \InputLua[firstline=11,lastline=12]{opts/format-keys.lua}
 
-\item[upper] \strut
+\item[upper]
+
+% Um alle Schlüssel in \emph{Grossbuchstaben} umzuwandeln, geben sie in der
+% Optionentabelle \lua{upper} an.
+To convert all keys to \emph{uppercase}, specify \lua{upper} in the
+options table.
 
 \InputLua[firstline=18,lastline=19]{opts/format-keys.lua}
 \end{description}
+
+% Sie können auch mehrere Formatierungsarten kombinieren.
+You can also combine several types of formatting.
+
+\InputLua[firstline=25,lastline=26]{opts/format-keys.lua}
 
 \DefaultOptDescription{format_keys}
 

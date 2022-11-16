@@ -21,3 +21,10 @@ luakeys.debug(result3) -- { KEY = 'value' }
 it('result3', function()
   assert.are.same({ KEY = 'value' }, result3)
 end)
+
+local result4 = luakeys.parse('Snake Case=value', { format_keys = { 'lower', 'snake' } })
+luakeys.debug(result4) -- { snake_case = 'value' }
+
+it('result4', function()
+  assert.are.same({ snake_case = 'value' }, result4)
+end)
