@@ -299,7 +299,7 @@ describe('Defintions', function()
       end
 
       it('true', function()
-        assert_pick(true, 'first')
+        assert_pick('any', 'first')
       end)
 
       it('boolean', function()
@@ -326,7 +326,7 @@ describe('Defintions', function()
         assert.has_error(function()
           luakeys.parse('key', { defs = { key = { pick = 'xxx' } } })
         end,
-          'Wrong setting. Allowed settings for the attribute “def.pick” are: true, boolean, dimension, integer, number, string. Got “xxx”.')
+          'Wrong data type in the “pick” attribute: xxx. Allowed are: any, boolean, dimension, integer, number, string.')
       end)
     end)
 

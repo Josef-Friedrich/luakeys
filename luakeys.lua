@@ -692,6 +692,10 @@ local is = {
   string = function(value)
     return type(value) == 'string'
   end,
+
+  any = function(value)
+    return true
+  end,
 }
 
 --- Apply the key-value-pair definitions (defs) on an input table in a
@@ -928,34 +932,46 @@ local function apply_definitions(defs,
     end,
 
     pick = function(value, key, def)
+
       if def.pick then
-        if type(def.pick) == 'string' and is[def.pick] == nil then
-          throw_error(
-            'Wrong setting. Allowed settings for the attribute “def.pick” are: true, boolean, dimension, integer, number, string. Got “' ..
-              tostring(def.pick) .. '”.')
+        local pick_types
+        if type(def.pick) == 'table' then
+          pick_types = def.pick
+        else
+          pick_types = { def.pick }
         end
 
+        -- Check if the pick attribute is valid
+        for _, pick_type in ipairs(pick_types) do
+          if type(pick_type) == 'string' and is[pick_type] == nil then
+            throw_error('Wrong data type in the “pick” attribute: ' ..
+                          tostring(pick_type) ..
+                          '. Allowed are: any, boolean, dimension, integer, number, string.')
+          end
+        end
+
+        -- The key has already a value. We leave the function at this
+        -- point to be able to check the pick attribute for errors
+        -- beforehand.
         if value ~= nil then
           return value
         end
-        for i, v in pairs(input) do
-          -- We can not use ipairs here. `ipairs(t)` iterates up to the
-          -- first absent index. Values are deleted from the `input`
-          -- table.
-          if type(i) == 'number' then
-            local picked_value = nil
-            -- Pick a value by type:  boolean, dimension, integer, number, string
-            if is[def.pick] ~= nil then
-              if is[def.pick](v) then
+
+        for _, pick_type in ipairs(pick_types) do
+          for i, v in pairs(input) do
+            -- We can not use ipairs here. `ipairs(t)` iterates up to the
+            -- first absent index. Values are deleted from the `input`
+            -- table.
+            if type(i) == 'number' then
+              local picked_value = nil
+              if is[pick_type](v) then
                 picked_value = v
               end
-              -- Pick every value
-            elseif v ~= nil then
-              picked_value = v
-            end
-            if picked_value ~= nil then
-              input[i] = nil
-              return picked_value
+
+              if picked_value ~= nil then
+                input[i] = nil
+                return picked_value
+              end
             end
           end
         end

@@ -1151,12 +1151,9 @@ recursive data structure.
 % Die Suche nach Werte wird aktiviert, wenn das Attribut \lua{pick} auf
 % \lua{true} gesetzt wird.
 The search for values is activated when the attribute \lua{pick} is set
-to \lua{true}.
-% Die Suche kann eingeschränkt werden, indem ein Datentype angegeben
-% wird.
-The search can be limited by specifying a data type.
-% Nach diesen Datentypen kann gesucht werden:
-These data types can be searched for:
+to a data type.
+% Mit diesen Datentypen kann nach Werten gesucht werden
+These data types can be used to search for values:
 \directlua{
   local types = {}
   for t, fn in pairs(luakeys.is) do
@@ -1164,12 +1161,21 @@ These data types can be searched for:
   end
   tex.print(table.concat(types, ', '))
 }.
-
+% Verwendet den Datentyp any um jeden beliebigen Wert zu akzeptieren.
+Use the data type “any” to accept any value.
 % Wird einem Schlüssel bereits bei der Eingabe ein Wert zugewiesen, dann
 % wird nicht weiter nach Werten gesucht.
 If a value is already assigned to a key when it is entered, then no
 further search for values is performed.
 \InputLua[firstline=4,lastline=8]{defs/attrs/pick/value-set.lua}
+
+\noindent
+% Das Attribut \lua{pick} akzeptiert auch mehrere Datentypen, die in
+% einer Tabelle angegeben werden.
+The \lua{pick} attribute also accepts multiple data types
+specified in a table.
+
+\InputLua[firstline=4,lastline=10]{defs/attrs/pick/multiple-data-types.lua}
 
 %%
 %
