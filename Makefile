@@ -26,10 +26,7 @@ test_lua:
 test_examples: test_examples_lua test_examples_plain test_examples_latex
 
 test_examples_lua:
-	# busted does not recurse in the sub directories
-	# busted -R --lua=/usr/bin/lua5.3 --exclude-tags=skip "examples/*.lua"
-	# find always exists with 0
-	find examples -iname "*.lua" \( -exec busted {} \; -o -quit \)
+	busted --pattern "**/*.lua" examples
 test_examples_plain:
 	find examples -iname "*plain.tex" -exec luatex --output-dir=test/tex/plain {} \;
 test_examples_latex:
