@@ -299,6 +299,10 @@ describe('Defintions', function()
       end
 
       it('true', function()
+        assert_pick(true, 'first')
+      end)
+
+      it('any', function()
         assert_pick('any', 'first')
       end)
 

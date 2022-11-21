@@ -932,10 +932,13 @@ local function apply_definitions(defs,
     end,
 
     pick = function(value, key, def)
-
       if def.pick then
         local pick_types
-        if type(def.pick) == 'table' then
+
+        -- Allow old deprecated attribut pick = true
+        if def.pick == true then
+          pick_types = { 'any' }
+        elseif type(def.pick) == 'table' then
           pick_types = def.pick
         else
           pick_types = { def.pick }
@@ -944,9 +947,10 @@ local function apply_definitions(defs,
         -- Check if the pick attribute is valid
         for _, pick_type in ipairs(pick_types) do
           if type(pick_type) == 'string' and is[pick_type] == nil then
-            throw_error('Wrong data type in the “pick” attribute: ' ..
-                          tostring(pick_type) ..
-                          '. Allowed are: any, boolean, dimension, integer, number, string.')
+            throw_error(
+              'Wrong data type in the “pick” attribute: ' ..
+                tostring(pick_type) ..
+                '. Allowed are: any, boolean, dimension, integer, number, string.')
           end
         end
 
