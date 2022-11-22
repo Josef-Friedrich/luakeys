@@ -4,8 +4,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>560</x>
-      <y>220</y>
+      <x>540</x>
+      <y>0</y>
       <w>210</w>
       <h>40</h>
     </coordinates>
@@ -16,8 +16,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>620</x>
-      <y>310</y>
+      <x>600</x>
+      <y>100</y>
       <w>100</w>
       <h>40</h>
     </coordinates>
@@ -28,8 +28,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>540</x>
-      <y>390</y>
+      <x>520</x>
+      <y>170</y>
       <w>270</w>
       <h>40</h>
     </coordinates>
@@ -40,8 +40,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>550</x>
-      <y>480</y>
+      <x>530</x>
+      <y>260</y>
       <w>270</w>
       <h>40</h>
     </coordinates>
@@ -52,30 +52,30 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>650</x>
-      <y>250</y>
+      <x>630</x>
+      <y>30</y>
       <w>30</w>
-      <h>80</h>
+      <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>650</x>
-      <y>340</y>
+      <x>630</x>
+      <y>130</y>
       <w>30</w>
-      <h>70</h>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>390</x>
-      <y>710</y>
+      <x>370</x>
+      <y>490</y>
       <w>270</w>
       <h>50</h>
     </coordinates>
@@ -86,8 +86,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>550</x>
-      <y>550</y>
+      <x>530</x>
+      <y>330</y>
       <w>270</w>
       <h>40</h>
     </coordinates>
@@ -98,8 +98,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>380</x>
-      <y>790</y>
+      <x>360</x>
+      <y>570</y>
       <w>270</w>
       <h>40</h>
     </coordinates>
@@ -110,8 +110,8 @@
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>680</x>
-      <y>640</y>
+      <x>660</x>
+      <y>420</y>
       <w>40</w>
       <h>40</h>
     </coordinates>
@@ -122,9 +122,9 @@ type=decision</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>690</x>
-      <y>580</y>
-      <w>80</w>
+      <x>670</x>
+      <y>360</y>
+      <w>70</w>
       <h>80</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
@@ -134,8 +134,8 @@ type=decision</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>640</y>
+      <x>510</x>
+      <y>420</y>
       <w>170</w>
       <h>90</h>
     </coordinates>
@@ -146,13 +146,205 @@ type=decision</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>710</x>
-      <y>650</y>
-      <w>160</w>
-      <h>170</h>
+      <x>690</x>
+      <y>420</y>
+      <w>110</w>
+      <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [defs]</panel_attributes>
-    <additional_attributes>90.0;150.0;90.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>90.0;70.0;90.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>700</x>
+      <y>610</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>opts.hooks.result_before_defs
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>690</x>
+      <y>560</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>opts.hooks.keys_before_defs
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>690</x>
+      <y>500</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>opts.format_keys
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>680</x>
+      <y>780</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>def.pick
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>680</x>
+      <y>820</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.always_present
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>680</x>
+      <y>720</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>def.opposite_keys
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>700</x>
+      <y>670</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>def.alias
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>670</x>
+      <y>890</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.required
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>690</x>
+      <y>940</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.data_type
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>680</x>
+      <y>1010</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.choices
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>690</x>
+      <y>1060</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.match
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>700</x>
+      <y>1080</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.exclusive_group
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>730</x>
+      <y>1200</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.process
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>730</x>
+      <y>1150</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.l3_tl_set
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>730</x>
+      <y>1150</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.l3_tl_set
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>720</x>
+      <y>1260</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>def.sub_keys
+</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>
