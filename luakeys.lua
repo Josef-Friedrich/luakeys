@@ -178,6 +178,7 @@ local namespace = {
     default = true,
     defaults = false,
     defs = false,
+    false_aliases = { 'false', 'FALSE', 'False' },
     format_keys = false,
     group_begin = '{',
     group_end = '}',
@@ -187,6 +188,7 @@ local namespace = {
     no_error = false,
     quotation_begin = '"',
     quotation_end = '"',
+    true_aliases = { 'true', 'TRUE', 'True' },
     unpack = true,
   },
 
@@ -439,6 +441,18 @@ local function generate_parser(initial_rule, opts)
     return white_space ^ 0 * Pattern(match) * white_space ^ 0
   end
 
+  local line_up_pattern = function (patterns)
+    local result
+    for _, pattern in ipairs(patterns) do
+      if result == nil then
+        result = Pattern(pattern)
+      else
+        result = result + Pattern(pattern)
+      end
+    end
+    return result
+  end
+
   --- Convert a dimension to an normalized dimension string or an
   --- integer in the scaled points format.
   ---
@@ -534,15 +548,9 @@ local function generate_parser(initial_rule, opts)
         Variable('boolean_false') * CaptureConstant(false)
       ),
 
-    boolean_true =
-      Pattern('true') +
-      Pattern('TRUE') +
-      Pattern('True'),
+    boolean_true = line_up_pattern(opts.true_aliases),
 
-    boolean_false =
-      Pattern('false') +
-      Pattern('FALSE') +
-      Pattern('False'),
+    boolean_false = line_up_pattern(opts.false_aliases),
 
     -- for is.dimension()
     dimension_only = Variable('dimension') * -1,

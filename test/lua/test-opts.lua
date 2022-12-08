@@ -414,4 +414,12 @@ describe('Options', function()
           }))
       end)
     end)
+
+  it('Option “true_aliases” and “false_aliases”', function()
+    assert.is.same({ ['true'] = true, ['false'] = false },
+      luakeys.parse('true = on, false = off', {
+        true_aliases = { 'on', 'yes' },
+        false_aliases = { 'off', 'no' },
+      }))
+  end)
 end)
