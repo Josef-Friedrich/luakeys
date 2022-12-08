@@ -422,4 +422,32 @@ describe('Options', function()
         false_aliases = { 'off', 'no' },
       }))
   end)
+
+  describe('Option “invert_flat”', function()
+    it('default', function()
+      assert.is.same({ key1 = true, key2 = false },
+        luakeys.parse('key1,!key2'))
+    end)
+
+    it('recursive example', function()
+      assert.is.same({ l1 = { key1 = true, key2 = false } },
+        luakeys.parse('l1={key1,!key2}', { invert_flat = '!' }))
+    end)
+
+    it('different symbol', function()
+      assert.is.same({ key1 = true, key2 = false },
+        luakeys.parse('key1,*key2', { invert_flat = '*' }))
+    end)
+
+    it('at the end', function()
+      assert.is.same({ key1 = true, key2 = false },
+        luakeys.parse('key1,key2*', { invert_flat = '*' }))
+    end)
+
+    it('invert false', function()
+      assert.is.same({ key1 = false, key2 = true }, luakeys.parse(
+        'key1,*key2', { invert_flat = '*', default = false }))
+    end)
+  end)
+
 end)

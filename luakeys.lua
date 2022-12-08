@@ -183,6 +183,7 @@ local namespace = {
     group_begin = '{',
     group_end = '}',
     hooks = {},
+    invert_flat = '!',
     list_separator = ',',
     naked_as_value = false,
     no_error = false,
@@ -441,7 +442,7 @@ local function generate_parser(initial_rule, opts)
     return white_space ^ 0 * Pattern(match) * white_space ^ 0
   end
 
-  local line_up_pattern = function (patterns)
+  local line_up_pattern = function(patterns)
     local result
     for _, pattern in ipairs(patterns) do
       if result == nil then
@@ -1199,6 +1200,13 @@ local function parse(kv_string, opts)
         end
         return key, value
       end,
+
+      apply_invert_flag = function(key, value)
+        if type(key) == 'string' and key:find(opts.invert_flat) then
+          return key:gsub(opts.invert_flat, ''), not value
+        end
+        return key, value
+      end,
     }
 
     if opts.unpack then
@@ -1216,6 +1224,10 @@ local function parse(kv_string, opts)
             type(opts.format_keys))
       end
       result = visit_tree(result, callbacks.format_key)
+    end
+
+    if opts.invert_flat ~= nil then
+      result = visit_tree(result, callbacks.apply_invert_flag)
     end
 
     return result
