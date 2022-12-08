@@ -541,6 +541,32 @@ we can write ...
 %
 %%
 
+\subsubsection{Option “\texttt{false_aliases}”}
+\label{option:false-aliases}
+
+% Mit den den Optionen \lua{true_aliases} and \lua{false_aliases} können
+% die Zeichenketten festgelegt werden, die vom Parser als Wahrheitswerte
+% erkannt werden.
+The \lua{true_aliases} and \lua{false_aliases} options can be used to
+specify the strings that will be recognized as boolean values by the
+parser.
+% Standardmäßig sind folgende Zeichenketten konfiguriert
+The following strings are configured by default.
+
+\InputLua[firstline=4,lastline=8]{opts/boolean-aliases.lua}
+
+\InputLua[firstline=14,lastline=18]{opts/boolean-aliases.lua}
+
+\InputLua[firstline=24,lastline=28]{opts/boolean-aliases.lua}
+
+% Siehe Abschnitt \label{option:true-aliases} für die entsprechende
+% Option.
+See section \label{option:true-aliases} for the corresponding option.
+
+%%
+%
+%%
+
 \subsubsection{Option “\texttt{format_keys}”}
 
 % Mit Hilfe der Option \lua{format_keys} können die Schlüssel formatiert
@@ -572,8 +598,8 @@ table.
 
 \item[upper]
 
-% Um alle Schlüssel in \emph{Grossbuchstaben} umzuwandeln, geben sie in der
-% Optionentabelle \lua{upper} an.
+% Um alle Schlüssel in \emph{Grossbuchstaben} umzuwandeln, geben sie in
+% der Optionentabelle \lua{upper} an.
 To convert all keys to \emph{uppercase}, specify \lua{upper} in the
 options table.
 
@@ -774,6 +800,15 @@ The option \lua{quotation_end} configures the delimiter that marks the
 end of a string. The default value of this option is \texttt{'"'}
 (double quotes). A code example can be found in section
 \ref{options-delimiter}.
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{true_aliases}”}
+\label{option:true-aliases}
+
+See section \ref{option:false-aliases}.
 
 %%
 %
