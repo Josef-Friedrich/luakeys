@@ -22,6 +22,9 @@ local opts = {
   -- Key-value pair definitions.
   defs = { key = { default = 'value' } },
 
+  -- Specify the strings that are recognized as boolean false values.
+  false_aliases = { 'false', 'FALSE', 'False' },
+
   -- lower, snake, upper
   format_keys = { 'snake' },
 
@@ -65,6 +68,8 @@ local opts = {
     end,
   },
 
+  invert_flag = '!',
+
   -- Configure the delimiter that separates list items from each other.
   list_separator = ',',
 
@@ -80,6 +85,9 @@ local opts = {
 
   -- Configure the delimiter that marks the end of a string.
   quotation_end = '"',
+
+  -- Specify the strings that are recognized as boolean true values.
+  true_aliases = { 'true', 'TRUE', 'True' },
 
   -- { key = { 'value' } } -> { key = 'value' }
   unpack = false,

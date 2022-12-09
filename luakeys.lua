@@ -183,7 +183,7 @@ local namespace = {
     group_begin = '{',
     group_end = '}',
     hooks = {},
-    invert_flat = '!',
+    invert_flag = '!',
     list_separator = ',',
     naked_as_value = false,
     no_error = false,
@@ -1202,8 +1202,8 @@ local function parse(kv_string, opts)
       end,
 
       apply_invert_flag = function(key, value)
-        if type(key) == 'string' and key:find(opts.invert_flat) then
-          return key:gsub(opts.invert_flat, ''), not value
+        if type(key) == 'string' and key:find(opts.invert_flag) then
+          return key:gsub(opts.invert_flag, ''), not value
         end
         return key, value
       end,
@@ -1226,7 +1226,7 @@ local function parse(kv_string, opts)
       result = visit_tree(result, callbacks.format_key)
     end
 
-    if opts.invert_flat ~= nil then
+    if opts.invert_flag then
       result = visit_tree(result, callbacks.apply_invert_flag)
     end
 

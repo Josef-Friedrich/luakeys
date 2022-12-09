@@ -423,7 +423,7 @@ describe('Options', function()
       }))
   end)
 
-  describe('Option “invert_flat”', function()
+  describe('Option “invert_flag”', function()
     it('default', function()
       assert.is.same({ key1 = true, key2 = false },
         luakeys.parse('key1,!key2'))
@@ -431,22 +431,22 @@ describe('Options', function()
 
     it('recursive example', function()
       assert.is.same({ l1 = { key1 = true, key2 = false } },
-        luakeys.parse('l1={key1,!key2}', { invert_flat = '!' }))
+        luakeys.parse('l1={key1,!key2}', { invert_flag = '!' }))
     end)
 
     it('different symbol', function()
       assert.is.same({ key1 = true, key2 = false },
-        luakeys.parse('key1,*key2', { invert_flat = '*' }))
+        luakeys.parse('key1,*key2', { invert_flag = '*' }))
     end)
 
     it('at the end', function()
       assert.is.same({ key1 = true, key2 = false },
-        luakeys.parse('key1,key2*', { invert_flat = '*' }))
+        luakeys.parse('key1,key2*', { invert_flag = '*' }))
     end)
 
     it('invert false', function()
       assert.is.same({ key1 = false, key2 = true }, luakeys.parse(
-        'key1,*key2', { invert_flat = '*', default = false }))
+        'key1,*key2', { invert_flag = '*', default = false }))
     end)
   end)
 

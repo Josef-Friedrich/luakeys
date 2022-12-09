@@ -359,7 +359,7 @@ The \lua{parse} function can be called with an options table. This
 options are supported: \catcode`_=12
 \directlua{luakeys.print_names('opts')}
 
-\InputLua[firstline=5,lastline=86]{opts/all-opts.lua}
+\InputLua[firstline=5,lastline=94]{opts/all-opts.lua}
 
 \noindent
 The options can also be set globally using the exported table
@@ -561,7 +561,7 @@ The following strings are configured by default.
 
 % Siehe Abschnitt \label{option:true-aliases} für die entsprechende
 % Option.
-See section \label{option:true-aliases} for the corresponding option.
+See section \ref{option:true-aliases} for the corresponding option.
 
 %%
 %
@@ -634,6 +634,45 @@ A code example can be found in section \ref{options-delimiter}.
 The option \lua{group_end} configures the delimiter that marks the end
 of a group. The default value of this option is \texttt{"\}"}. A code
 example can be found in section \ref{options-delimiter}.
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{invert_flag}”}
+
+% Wird ein nackter Schlüssel mit einem vorangestellten Ausrufezeichen versehen, so wird sein Standardwert invertiert.
+If a naked key is prefixed with an exclamation mark, its default value
+is inverted.
+% Statt \lua{true} nimmt der Schlüssel jetzt den Wert \lua{falsch} an.
+Instead of \lua{true} the key now takes the value \lua{false}.
+
+\InputLua[firstline=4,lastline=5]{opts/invert-flat.lua}
+
+\noindent
+% Mit der Option \lua{invert_flag} kann dieses Invertierungszeichen
+% geändert werden.
+The \lua{invert_flag} option can be used to change this inversion
+character.
+
+\InputLua[firstline=11,lastline=12]{opts/invert-flat.lua}
+
+\noindent
+% Ist der Standardwert für nackte Schlüssel beispielweise auf \lua{false}
+% gesetzt, so nehmen die mit dem Umkehrungszeichen versehenen nackten
+% Schlüssel den Wert \lua{true} an.
+For example, if the default value for naked keys is set to \lua{false},
+the naked keys prefixed with the invert flat take the value \lua{true}.
+
+\InputLua[firstline=18,lastline=19]{opts/invert-flat.lua}
+
+\noindent
+% Setzen sie die Option \lua{invert_flag} auf \lua{false}, um diese
+% automatische Wertumkehrung zu deaktivieren.
+Set the \lua{invert_flag} option to \lua{false} to disable this
+automatic boolean value inversion.
+
+\InputLua[firstline=25,lastline=26]{opts/invert-flat.lua}
 
 %%
 %
