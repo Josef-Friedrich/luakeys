@@ -174,8 +174,8 @@ local result = luakeys.parse('one,two,three', opts)
 
 `luakeys` is developed using the
 [Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
-extension in Visual Studio Code. This extension understands the [EmmyLua
-annotations](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations).
+extension in Visual Studio Code. This extension understands the modified
+[EmmyLua annotations](https://github.com/sumneko/lua-language-server/wiki/Annotations).
 The Lua source code documentation is generated with
 [LDoc](https://stevedonovan.github.io/ldoc/manual/doc.md.html).
 
