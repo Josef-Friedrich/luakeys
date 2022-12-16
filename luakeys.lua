@@ -1270,7 +1270,7 @@ local result_store = {}
 -- @section
 
 local export = {
-  version = { 0, 9, 0 },
+  version = { 0, 10, 0 },
 
   namespace = namespace,
 
