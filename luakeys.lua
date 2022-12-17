@@ -1272,6 +1272,16 @@ local result_store = {}
 local export = {
   version = { 0, 10, 0 },
 
+  ---Get a new instance of the luakeys module.
+  ---
+  ---@return table # A new instance of the luakeys module.
+  get_new_instance = function()
+    package.loaded.luakeys = nil
+    local luakeys = require('luakeys')
+    package.loaded.luakeys = nil
+    return luakeys
+  end,
+
   namespace = namespace,
 
   ---This function is used in the documentation.

@@ -85,6 +85,10 @@
 	<td class="name" nowrap><a href="#clone_table">clone_table (orig)</a></td>
 	<td class="summary">Clone a table.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_opts">normalize_opts (opts)</a></td>
+	<td class="summary">Normalize the parse options.</td>
+	</tr>
 </table>
 <h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
 <table class="function_list">
@@ -107,7 +111,7 @@
 <h2><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#generate_parser">generate_parser (initial_rule, convert_dimensions)</a></td>
+	<td class="name" nowrap><a href="#generate_parser">generate_parser (initial_rule, opts)</a></td>
 	<td class="summary">Generate the PEG parser using Lpeg.</td>
 	</tr>
 	<tr>
@@ -142,10 +146,6 @@
 	<td class="summary">Parse a LaTeX/TeX style key-value string into a Lua table.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize_opts">normalize_opts (opts)</a></td>
-	<td class="summary">Normalize the parse options.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#apply_opts">apply_opts (result, opts)</a></td>
 	<td class="summary">Normalize the result table of the LPeg parser.</td>
 	</tr>
@@ -160,28 +160,42 @@
 <h2><a href="#Exports">Exports </a></h2>
 <table class="function_list">
 	<tr>
+	<td class="name" nowrap><a href="#get_new_instance">get_new_instance ()</a></td>
+	<td class="summary">Get a new instance of the luakeys module.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#print_names">print_names (from)</a></td>
 	<td class="summary">This function is used in the documentation.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#opts">opts</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#stringify">stringify</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#parse">parse</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#render">render</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#debug">debug</a></td>
-	<td class="summary"></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#save">save (identifier, result)</a></td>
@@ -330,6 +344,31 @@
 
 
 </dd>
+    <dt>
+    <a name = "normalize_opts"></a>
+    <strong>normalize_opts (opts)</strong>
+    </dt>
+    <dd>
+    Normalize the parse options.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">opts</span>
+        ? table # Options in a raw format. The table may be empty or some keys are not set.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table
+    </ol>
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Convert_back_to_strings"></a>Convert back to strings </h2>
 
@@ -431,21 +470,23 @@
     <dl class="function">
     <dt>
     <a name = "generate_parser"></a>
-    <strong>generate_parser (initial_rule, convert_dimensions)</strong>
+    <strong>generate_parser (initial_rule, opts)</strong>
     </dt>
     <dd>
-    <p>Generate the PEG parser using Lpeg.</p>
+
+<p>Generate the PEG parser using Lpeg. </p>
 
 <p> Explanations of some LPeg notation forms:</p>
 
 <ul>
-<li><code>patt ^ 0</code> = <code>expression *</code></li>
-<li><code>patt ^ 1</code> = <code>expression +</code></li>
-<li><code>patt ^ -1</code> = <code>expression ?</code></li>
-<li><code>patt1 * patt2</code> = <code>expression1 expression2</code>: Sequence</li>
-<li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code>: Ordered choice</p></li>
-<li><p><a href="https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf">TUGboat article: Parsing complex data formats in LuaTEX with LPEG</a></p></li>
+    <li><p><code>patt ^ 0</code> = <code>expression *</code></p></li>
+    <li><p><code>patt ^ 1</code> = <code>expression +</code></p></li>
+    <li><p><code>patt ^ -1</code> = <code>expression ?</code></p></li>
+    <li><p><code>patt1 * patt2</code> = <code>expression1 expression2</code>: Sequence</p></li>
+    <li><p><code>patt1 + patt2</code> = <code>expression1 / expression2</code>: Ordered choice</p></li>
+    <li><p><a href="https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf">TUGboat article: Parsing complex data formats in LuaTEX with LPEG</a></p></li>
 </ul>
+
 
 
 
@@ -454,8 +495,8 @@
         <li><span class="parameter">initial_rule</span>
          string # The name of the first rule of the grammar table passed to the <code>lpeg.P(attern)</code> function (e. g. <code>list</code>, <code>number</code>).
         </li>
-        <li><span class="parameter">convert_dimensions</span>
-        ? boolean # Whether the dimensions should be converted to scaled points (by default <code>false</code>).
+        <li><span class="parameter">opts</span>
+        ? table # Whether the dimensions should be converted to scaled points (by default <code>false</code>).
         </li>
     </ul>
 
@@ -480,6 +521,8 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">match</span>
+
+
 
         </li>
     </ul>
@@ -525,7 +568,7 @@
 <p> Key-value pair:</p>
 
 <p> If <code>arg1</code> and <code>arg2</code> are not nil, then <code>arg1</code> is the key and <code>arg2</code> is the
- value of a new table entry.</p>
+ value of a new table entry. </p>
 
 <p> Indexed value:</p>
 
@@ -625,7 +668,7 @@
          string # A string in the TeX/LaTeX style key-value format as described above.
         </li>
         <li><span class="parameter">opts</span>
-         table # A table containing the settings:
+        ? table # A table containing the settings:
    <code>convert_dimensions</code>, <code>unpack</code>, <code>naked_as_value</code>, <code>converter</code>,
    <a href="index.html#debug">debug</a>, <code>preprocess</code>, <code>postprocess</code>.
         </li>
@@ -639,31 +682,6 @@
         table unknown # A table with unknown, undefinied key-value pairs.</li>
         <li>
         table raw # The unprocessed, raw result of the LPeg parser.</li>
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "normalize_opts"></a>
-    <strong>normalize_opts (opts)</strong>
-    </dt>
-    <dd>
-    Normalize the parse options.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">opts</span>
-         table # Options in a raw format. The table may be empty or some keys are not set.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        table
     </ol>
 
 
@@ -718,6 +736,25 @@
 
     <dl class="function">
     <dt>
+    <a name = "get_new_instance"></a>
+    <strong>get_new_instance ()</strong>
+    </dt>
+    <dd>
+    Get a new instance of the luakeys module.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table # A new instance of the luakeys module.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "print_names"></a>
     <strong>print_names (from)</strong>
     </dt>
@@ -748,6 +785,8 @@
 
 
 
+
+
     <h3>See also:</h3>
     <ul>
          <a href="index.html#default_options">default_options</a>
@@ -760,6 +799,8 @@
     <strong>stringify</strong>
     </dt>
     <dd>
+
+
 
 
 
@@ -784,6 +825,8 @@
 
 
 
+
+
     <h3>See also:</h3>
     <ul>
          <a href="index.html#parse">parse</a>
@@ -802,6 +845,8 @@
 
 
 
+
+
     <h3>See also:</h3>
     <ul>
          <a href="index.html#render">render</a>
@@ -814,6 +859,8 @@
     <strong>debug</strong>
     </dt>
     <dd>
+
+
 
 
 
@@ -886,7 +933,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-07-06 20:50:06 </i>
+<i style="float:right;">Last updated 2022-12-17 23:10:19 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

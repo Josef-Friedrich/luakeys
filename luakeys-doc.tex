@@ -273,7 +273,7 @@ It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 % Das Lua-Modul exportiert diese Funktionen und Tabellen:
 The Lua module exports this functions and tables:
 
-\InputLua[firstline=3,lastline=13]{export.lua}
+\InputLua[firstline=3,lastline=15]{export.lua}
 
 % Diese Dokumentation stellt nur die öffentlichen Funktionen und
 % Tabellen vor.
@@ -328,6 +328,32 @@ A table with unknown, undefinied key-value pairs. \\
 The raw result of the Lpeg grammar parser. \\
 \end{tabular}
 \end{center}
+
+%%
+%
+%%
+
+\subsection{Function “\texttt{get_new_instance(): table}”}
+
+% Über die Tabelle \lua{opts} können die  Standardoptionen global
+% geändert werden.
+The default options can be changed globally via the \lua{opts} table.
+% Um zu verhindern, dass andere Module die Standardeinstellungen
+% ändern, kann mit Hilfe der Funktion \lua{get_new_instance()} eine neue
+% Instanz des Moduls \lua{luakeys} erzeugt werden.
+To prevent another modules from changing the default settings, a new
+instance of the  \lua{luakeys} module can be created using the
+\lua{get_new_instance()} function.
+
+\InputLua[firstline=3,lastline=4]{functions/get-new-instance.lua}
+
+\noindent
+% Die Funktion \lua{require()} gibt standardmäßig beim mehrmaligen
+% Aufruf immer die gleiche Tabelle zurück.
+The \lua{require()} function always returns the same table
+when called multiple times.
+
+\InputLua[firstline=14,lastline=17]{functions/get-new-instance.lua}
 
 %%
 %

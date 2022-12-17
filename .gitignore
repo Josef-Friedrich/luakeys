@@ -281,3 +281,5 @@ __latexindent_temp.tex
 
 *.tar.gz
 *.hd
+
+debug.lua
