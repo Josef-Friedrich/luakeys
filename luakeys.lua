@@ -1270,7 +1270,7 @@ local result_store = {}
 -- @section
 
 local export = {
-  version = { 0, 10, 0 },
+  version = { 0, 11, 0 },
 
   ---Get a new instance of the luakeys module.
   ---
