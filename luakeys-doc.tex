@@ -384,8 +384,11 @@ In plain \TeX:
 \subsection{Options to configure the \texttt{parse} function}
 
 \noindent
-The \lua{parse} function can be called with an options table. This
-options are supported: \catcode`_=12
+% Die Funktion \lua{parse} kann mit einer Optionstabelle aufgerufen
+% werden.
+The \lua{parse} function can be called with an options table.
+% Diese Optionen werden unterstützt:
+This options are supported: \catcode`_=12
 \directlua{luakeys.print_names('opts')}
 
 \InputLua[firstline=5,lastline=94]{opts/all-opts.lua}
@@ -394,8 +397,10 @@ options are supported: \catcode`_=12
 \label{table-opts}
 
 \noindent
+% Die Optionen können auch global über die exportierte Tabelle
+% \lua{opts} gesetzt werden:
 The options can also be set globally using the exported table
-|opts|:
+\lua{opts}:
 
 \InputLua[firstline=4,lastline=4]{opts/exported-default-opts.lua}
 
@@ -929,6 +934,8 @@ key-value pair is then stored under this key.
 \InputLua[firstline=4,lastline=16]{functions/define.lua}
 
 \noindent
+% Bei verschachtelten Definitionen können nur die letzten beiden
+% Möglichkeiten zur Angabe der Schlüsselnamen verwendet werden.
 For nested definitions, only the last two ways of specifying the key
 names can be used.
 
