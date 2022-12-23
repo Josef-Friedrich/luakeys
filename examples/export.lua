@@ -2,7 +2,7 @@ require('busted.runner')()
 
 local luakeys = require('luakeys')
 local version = luakeys.version
-local get_new_instance = luakeys.get_new_instance
+local get_private_instance = luakeys.get_private_instance
 local opts = luakeys.opts
 local stringify = luakeys.stringify
 local define = luakeys.define
@@ -16,7 +16,7 @@ local utils = luakeys.utils
 
 it('Exported', function()
   assert.is.equal(type(version), 'table')
-  assert.is.equal(type(get_new_instance), 'function')
+  assert.is.equal(type(get_private_instance), 'function')
   assert.is.equal(type(opts), 'table')
   assert.is.equal(type(stringify), 'function')
   assert.is.equal(type(define), 'function')

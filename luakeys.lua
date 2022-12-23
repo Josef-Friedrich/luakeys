@@ -1275,7 +1275,7 @@ local export = {
   ---Get a new instance of the luakeys module.
   ---
   ---@return table # A new instance of the luakeys module.
-  get_new_instance = function()
+  get_private_instance = function()
     package.loaded.luakeys = nil
     local luakeys = require('luakeys')
     package.loaded.luakeys = nil

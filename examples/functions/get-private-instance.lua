@@ -1,6 +1,6 @@
 require('busted.runner')()
 
-local my_luakeys = require('luakeys').get_new_instance()
+local my_luakeys = require('luakeys').get_private_instance()
 local result = my_luakeys.parse('key=value')
 
 it('result', function()
@@ -13,8 +13,8 @@ end)
 
 local l1 = require('luakeys') -- table: 0x564ea6ca4160
 local l2 = require('luakeys') -- table: 0x564ea6ca4160
-local l3 = require('luakeys').get_new_instance() -- table: 0x563574d51470
-local l4 = require('luakeys').get_new_instance() -- table: 0x563574d86ac0
+local l3 = require('luakeys').get_private_instance() -- table: 0x563574d51470
+local l4 = require('luakeys').get_private_instance() -- table: 0x563574d86ac0
 
 it('compare the global instance', function()
   assert.is.equal(l1, l2)
