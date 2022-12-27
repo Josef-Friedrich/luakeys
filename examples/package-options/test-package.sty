@@ -1,0 +1,12 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{test-package}[2022/11/27 Test package to access the package options]
+\DeclareOption*{}
+\ProcessOptions\relax
+\directlua{
+  luakeys = require('luakeys')
+  local kv = luakeys.parse('\@ptionlist{\@currname.\@currext}', {
+    convert_dimensions = false,
+    naked_as_value = true
+  })
+  luakeys.debug(kv)
+}
