@@ -20,14 +20,18 @@
 \ProvidesPackage{luakeys}[2022/12/23 0.11.0 Parsing key-value options using Lua.]
 \directlua{luakeys = require('luakeys')}
 
+\def\LuakeysPackageOptions{\luaescapestring{\@ptionlist{\@currname.\@currext}}}
+
 \def\LuakeysSavePackageOptions#1{%
   \directlua{
-    luakeys.save('#1', '\luaescapestring{\@ptionlist{\@currname.\@currext}}')
+    luakeys.save('#1', '\LuakeysPackageOptions')
   }%
 }
 
+\def\LuakeysClassOptions{\luaescapestring{\@raw@classoptionslist}}
+
 \def\LuakeysSaveClassOptions#1{%
   \directlua{
-    luakeys.save('#1', '\luaescapestring{\@classoptionslist}')
+    luakeys.save('#1', '\LuakeysClassOptions')
   }%
 }

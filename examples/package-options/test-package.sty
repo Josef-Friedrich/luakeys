@@ -4,6 +4,11 @@
 \ProcessOptions\relax
 \RequirePackage{luakeys}
 
+% Using the macro \LuakeysPackageOptions
+\directlua{
+  luakeys.debug(luakeys.parse('\LuakeysPackageOptions'))
+}
+
 % Using the macro \LuakeysSavePackageOptions
 \LuakeysSavePackageOptions{test-package}
 \directlua{
@@ -12,5 +17,5 @@
 
 % Low level approach
 \directlua{
-  luakeys.debug(luakeys.parse('\@ptionlist{\@currname.\@currext}'))
+  luakeys.debug(luakeys.parse('\luaescapestring{\@ptionlist{\@currname.\@currext}}'))
 }

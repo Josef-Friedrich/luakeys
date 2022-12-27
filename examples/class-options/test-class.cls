@@ -4,6 +4,11 @@
 \ProcessOptions\relax
 \RequirePackage{luakeys}
 
+% Using the macro \LuakeysClassOptions
+\directlua{
+  luakeys.debug(luakeys.parse('\LuakeysClassOptions'))
+}
+
 % Using the macro \LuakeysSaveClassOptions
 \LuakeysSaveClassOptions{test-class}
 \directlua{
@@ -12,7 +17,7 @@
 
 % Low level approach
 \directlua{
-  luakeys.debug(luakeys.parse('\@classoptionslist'))
+  luakeys.debug(luakeys.parse('\luaescapestring{\@raw@classoptionslist}'))
 }
 
 \LoadClass{article}

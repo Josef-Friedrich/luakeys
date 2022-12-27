@@ -1848,7 +1848,7 @@ In Lua an array is a table with numeric indexes (The first index is 1).
 \InputLatex[firstline=5,lastline=12]{luakeysdebug/naked-keys-latex.tex}
 
 \noindent
-% VAlle erkannten Datentypen können als eigenständige Werte verwendet
+% Alle erkannten Datentypen können als eigenständige Werte verwendet
 % werden.
 All recognized data types can be used as standalone values.
 
@@ -1882,96 +1882,23 @@ between 0 and 1 is allowed and converted into
 
 \subsection{Process document class options}
 
-\latex{\LuakeysSaveClassOptions{<identifier>}}
-
 % Auf die Optionen einer \LaTeX{} Dokumentenklasse kann über das Macro
-% \latex{\@classoptionslist} zu gegriffen werden.
+% \latex{\LuakeysClassOptions} zu gegriffen werden.
 The options of a \LaTeX{} document class can be accessed via the
-\latex{\@classoptionslist} macro.
+\latex{\LuakeysClassOptions} macro.
 %
-% Die Zeichenkette des Makros \latex{\@classoptionslist} ist bereits
-% expandiert und normalisiert.
-The string of the macro \latex{\@classoptionslist} is already expanded
-and normalized.
-%
-% Neben Leerzeichen werden auch die geschweiften Klammern entfernt.
-In addition to spaces, the curly brackets are also removed.
-% Es ist deshalb nicht möglich, in einander geschachtelte hierarische
-% Schlüssel-Wert-Paare über dieses Makro zu verarbeiten.
-It is therefore not possible to process nested hierarchical key-value
-pairs via this macro.
+\latex{\LuakeysClassOptions} is an alias for
+
+\begin{center}
+\latex{\luaescapestring{\@raw@classoptionslist}}.
+\end{center}
+
+The macro \latex{\LuakeysSaveClassOptions{<identifier>}} saves the
+option string in the value store of the luakeys module. Use
+\lua{luakeys.get('<indentifer>')} to access the stored option string.
 
 \InputLatex{class-options/test-class.cls}
 \InputLatex{class-options/use-test-class-latex.tex}
-
-\newpage
-
-\noindent
-% Mit einem kleinen Trick kann anscheinend der LaTeXs
-% Normalisierungsprozess der Optionenzeichenkette umgangen werden,
-% sodass auch verschachtelte Schüsselwertpaar erkannt werden können.
-Apparently, the \LaTeX’s normalization process of the class options
-string can be circumvented with a little trick, so that nested key value
-pairs can also be recognized:
-% Zwischen dem Istgleich-Zeichen und der öffnenden geschweiftenklammern
-% darf keine Leerzeichen stehen:
-There must be no spaces between the equals sign and the opening curly
-braces.
-
-\begin{multicols}{2}
-\begin{minted}{latex}
-\documentclass[
-  test ={ % no whitespace between = and {
-    key1,
-    key2
-  }
-]{test-class}
-\end{minted}
-
-\columnbreak
-
-\noindent
-Result:
-
-\begin{minted}{lua}
-{
-  ['test'] = {
-    ['key1'] = true,
-    ['key2'] = true,
-  },
-}
-\end{minted}
-\end{multicols}
-
-\noindent
-% Steht zwischen dem Istgleich-Zeichen und der geschweiften Klammer ein
-% Leerzeichen, so wird die Zeichkette übersetzt, als wenn überhaupt
-% keine geschweiften Klammer vorhanden wäre.
-If there is a space between the equals sign and the curly brace, the
-string is translated as if there were no curly braces at all
-
-\begin{multicols}{2}
-\begin{minted}{latex}
-\documentclass[
-  test = { % with a whitespace between = and {
-    key1,
-    key2
-  }
-]{test-class}
-\end{minted}
-
-\columnbreak
-
-\noindent
-Result:
-
-\begin{minted}{lua}
-{
-  ['test'] = 'key1',
-  ['key2'] = true,
-}
-\end{minted}
-\end{multicols}
 
 %%
 %
@@ -1979,25 +1906,24 @@ Result:
 
 \subsection{Process package options}
 
-\latex{\LuakeysSavePackageOptions{<identifier>}}
-
 \noindent
 % Auf die Optionen eines \LaTeX{}-Pakets kann über das Macro
-% \latex{\@ptionlist{\@currname.\@currext}} zu gegriffen werden.
+% \latex{\LuakeysPackageOptions} zu gegriffen werden.
 The options of a \LaTeX{} package can be accessed via the
-\latex{\@ptionlist{\@currname.\@currext}}  macro.
+\latex{\LuakeysPackageOptions} macro.
+%
+\latex{\LuakeysPackageOptions} is an alias for
+
+\begin{center}
+\latex{\luaescapestring{\@ptionlist{\@currname.\@currext}}}.
+\end{center}
+
+The macro \latex{\LuakeysSavePackageOptions{<identifier>}} saves the
+option string in the value store of the luakeys module. Use
+\lua{luakeys.get('<indentifer>')} to access the the stored option string.
 
 \InputLatex{package-options/test-package.sty}
 \InputLatex{package-options/use-test-package-latex.tex}
-
-\begin{minted}{lua}
-{
-  ['test'] = {
-    [1] = 'key1',
-    [2] = 'key2',
-  },
-}
-\end{minted}
 
 %-----------------------------------------------------------------------
 %
