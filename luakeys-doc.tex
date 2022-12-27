@@ -1034,8 +1034,8 @@ choices:
 \subsubsection{Attribute “\texttt{data_type}”}
 
 % source: Python argparse documentation.
-The \lua{data_type} attribute allows type-checking and type conversions to
-be performed.
+The \lua{data_type} attribute allows type-checking and type conversions
+to be performed.
 %
 % Folgende Datentypen werden unterstützt:
 The following data types are supported:
@@ -1043,7 +1043,8 @@ The following data types are supported:
 \lua{'dimension'},
 \lua{'integer'},
 \lua{'number'},
-\lua{'string'}.
+\lua{'string'},
+\lua{'list'}.
 %
 % Bei den drei Datentypen integer, number, dimension kann eine
 % Typenumwandlung scheitern.
@@ -1488,9 +1489,9 @@ result store.
 In the table \lua{is} some functions are summarized, which check whether
 an input corresponds to a certain data type.
 %
-% Alle Funktionen akzeptieren nicht nur die entsprechenden Lua-Datentypen,
-% sondern auch Eingaben als Zeichenketten.
-All functions accept not only the corresponding Lua data types, but also
+% Einige Funktionen akzeptieren nicht nur die entsprechenden
+% Lua-Datentypen, sondern auch Eingaben als Zeichenketten.
+Some functions accept not only the corresponding Lua data types, but also
 input as strings.
 %
 % Beispielsweise wird die Zeichenkette \lua{'true'} von der
@@ -1512,6 +1513,9 @@ For example, the string \lua{'true'} is recognized by the
 
 \subsubsection{Function “\texttt{is.string(value): boolean}”}
 \InputLua[firstline=6,lastline=12]{functions/is/string.lua}
+
+\subsubsection{Function “\texttt{is.list(value): boolean}”}
+\InputLua[firstline=6,lastline=16]{functions/is/list.lua}
 
 \subsubsection{Function “\texttt{is.any(value): boolean}”}
 

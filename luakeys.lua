@@ -702,6 +702,19 @@ local is = {
     return type(value) == 'string'
   end,
 
+  list = function(value)
+    if type(value) ~= 'table' then
+      return false
+    end
+
+    for k, _ in pairs(value) do
+      if type(k) ~= 'number' then
+        return false
+      end
+    end
+    return true
+  end,
+
   any = function(value)
     return true
   end,
@@ -845,6 +858,11 @@ local function apply_definitions(defs,
           -- string
         elseif def.data_type == 'string' then
           converted = tostring(value)
+          -- list
+        elseif def.data_type == 'list' then
+          if is.list(value) then
+            converted = value
+          end
         else
           throw_error('Unknown data type: ' .. def.data_type)
         end
