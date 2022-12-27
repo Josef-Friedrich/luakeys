@@ -1,4 +1,9 @@
-\documentclass[12pt,landscape]{test-class}
+\documentclass[
+  test ={ % '={' works '= {' works not
+    key1,
+    key2
+  }
+]{test-class}
 
 \begin{document}
 This document uses the class “test-class”.

@@ -1,12 +1,16 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{test-package}[2022/11/27 Test package to access the package options]
-\DeclareOption*{}
+\DeclareOption*{} % suppresses the error message: ! LaTeX Error: Unknown option
 \ProcessOptions\relax
+\RequirePackage{luakeys}
+
+% Using the macro \LuakeysSavePackageOptions
+\LuakeysSavePackageOptions{test-package}
 \directlua{
-  luakeys = require('luakeys')
-  local kv = luakeys.parse('\@ptionlist{\@currname.\@currext}', {
-    convert_dimensions = false,
-    naked_as_value = true
-  })
-  luakeys.debug(kv)
+  luakeys.debug(luakeys.parse(luakeys.get('test-package')))
+}
+
+% Low level approach
+\directlua{
+  luakeys.debug(luakeys.parse('\@ptionlist{\@currname.\@currext}'))
 }

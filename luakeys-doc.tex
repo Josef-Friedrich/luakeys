@@ -1882,6 +1882,8 @@ between 0 and 1 is allowed and converted into
 
 \subsection{Process document class options}
 
+\latex{\LuakeysSaveClassOptions{<identifier>}}
+
 % Auf die Optionen einer \LaTeX{} Dokumentenklasse kann über das Macro
 % \latex{\@classoptionslist} zu gegriffen werden.
 The options of a \LaTeX{} document class can be accessed via the
@@ -1902,18 +1904,82 @@ pairs via this macro.
 \InputLatex{class-options/test-class.cls}
 \InputLatex{class-options/use-test-class-latex.tex}
 
+\newpage
+
+\noindent
+% Mit einem kleinen Trick kann anscheinend der LaTeXs
+% Normalisierungsprozess der Optionenzeichenkette umgangen werden,
+% sodass auch verschachtelte Schüsselwertpaar erkannt werden können.
+Apparently, the \LaTeX’s normalization process of the class options
+string can be circumvented with a little trick, so that nested key value
+pairs can also be recognized:
+% Zwischen dem Istgleich-Zeichen und der öffnenden geschweiftenklammern
+% darf keine Leerzeichen stehen:
+There must be no spaces between the equals sign and the opening curly
+braces.
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\documentclass[
+  test ={ % no whitespace between = and {
+    key1,
+    key2
+  }
+]{test-class}
+\end{minted}
+
+\columnbreak
+
+\noindent
+Result:
+
 \begin{minted}{lua}
 {
-  [1] = '12pt',
-  [2] = 'landscape',
+  ['test'] = {
+    ['key1'] = true,
+    ['key2'] = true,
+  },
 }
 \end{minted}
+\end{multicols}
+
+\noindent
+% Steht zwischen dem Istgleich-Zeichen und der geschweiften Klammer ein
+% Leerzeichen, so wird die Zeichkette übersetzt, als wenn überhaupt
+% keine geschweiften Klammer vorhanden wäre.
+If there is a space between the equals sign and the curly brace, the
+string is translated as if there were no curly braces at all
+
+\begin{multicols}{2}
+\begin{minted}{latex}
+\documentclass[
+  test = { % with a whitespace between = and {
+    key1,
+    key2
+  }
+]{test-class}
+\end{minted}
+
+\columnbreak
+
+\noindent
+Result:
+
+\begin{minted}{lua}
+{
+  ['test'] = 'key1',
+  ['key2'] = true,
+}
+\end{minted}
+\end{multicols}
 
 %%
 %
 %%
 
 \subsection{Process package options}
+
+\latex{\LuakeysSavePackageOptions{<identifier>}}
 
 \noindent
 % Auf die Optionen eines \LaTeX{}-Pakets kann über das Macro

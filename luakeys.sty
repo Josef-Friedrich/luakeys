@@ -19,3 +19,15 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{luakeys}[2022/12/23 0.11.0 Parsing key-value options using Lua.]
 \directlua{luakeys = require('luakeys')}
+
+\def\LuakeysSavePackageOptions#1{%
+  \directlua{
+    luakeys.save('#1', '\luaescapestring{\@ptionlist{\@currname.\@currext}}')
+  }%
+}
+
+\def\LuakeysSaveClassOptions#1{%
+  \directlua{
+    luakeys.save('#1', '\luaescapestring{\@classoptionslist}')
+  }%
+}
