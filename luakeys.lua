@@ -1067,7 +1067,9 @@ local function apply_definitions(defs,
     end
 
     if type(def) ~= 'table' then
-      throw_error('Key definition must be a table!')
+      throw_error(string.format(
+        'The key definition must be a table! Got “%s” for key “%s”.',
+        tostring(def), index)) -- key is nil
     end
 
     for attr, _ in pairs(def) do
