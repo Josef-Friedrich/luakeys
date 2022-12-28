@@ -15,10 +15,15 @@ local defs = {
     -- Only values listed in the array table are allowed.
     choices = { 'one', 'two', 'three' },
 
-    -- Possible data types: boolean, dimension, integer, number, string
+    -- Possible data types:
+    -- any, boolean, dimension, integer, number, string, list
     data_type = 'string',
 
+    -- To provide a default value for each naked key individually.
     default = true,
+
+    -- Can serve as a comment.
+    description = 'Describe your key-value pair.',
 
     -- The key belongs to a mutually exclusive group of keys.
     exclusive_group = 'name',
@@ -31,16 +36,26 @@ local defs = {
 
     -- The name of the key, can be omitted
     name = 'key',
+
+    -- Convert opposite (naked) keys
+    -- into a boolean value and store this boolean under a target key:
+    --   show -> opposite_keys = true
+    --   hide -> opposite_keys = false
     opposite_keys = { [true] = 'show', [false] = 'hide' },
 
-    -- Pick a value
-    -- boolean
-    pick = false,
+    -- Pick a value by its data type:
+    -- 'any', 'string', 'number', 'dimension', 'integer', 'boolean'.
+    pick = false, -- ’false’ disables the picking.
 
+    -- A function whose return value is passed to the key.
     process = function(value, input, result, unknown)
       return value
     end,
+
+    -- To enforce that a key must be specified.
     required = true,
+
+    -- To build nested key-value pair definitions.
     sub_keys = { key_level_2 = { } },
   }
 }

@@ -969,7 +969,7 @@ These attributes are allowed:
 The code example below lists all the attributes that can be used to
 define key-value pairs.
 
-\InputLua[firstline=5,lastline=46]{defs/all-attrs.lua}
+\InputLua[firstline=5,lastline=61]{defs/all-attrs.lua}
 
 %%
 %
@@ -1081,6 +1081,17 @@ value can be specified for all naked keys.
 %
 %%
 
+\subsubsection{Attribute “\texttt{description}”}
+
+% Dieses Attribut wird momentan nicht weiterverarbeitet.
+This attribute is currently not processed further.
+% Es kann als Kommentar dienen.
+It can serve as a comment.
+
+%%
+%
+%%
+
 \subsubsection{Attribute “\texttt{exclusive_group}”}
 
 % Alle Schlüssel, die der gleichen ausschließenden Gruppe angehören,
@@ -1104,48 +1115,6 @@ If more than one key of the group is specified, an error message is
 thrown.
 
 \InputLua[firstline=21,lastline=23]{defs/attrs/exclusive-group.lua}
-
-%%
-%
-%%
-
-\subsubsection{Attribute “\texttt{opposite_keys}”}
-
-% Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
-% Schlüssel in Wahrheitswerte umzuwandeln und diesen Wahrheitswert unter
-% einem Zielschlüssel zu speichern.
-The \lua{opposite_keys} attribute allows to convert opposite (naked) keys
-into a boolean value and store this boolean under a target key.
-%
-% Lua erlaubt es in Tabellen Wahrheitswerte als Schlüssel zu verwenden.
-% Es müssen jedoch eckige Klammern verwendet werden.
-Lua allows boolean values to be used as keys in tables.
-%
-% Die Wahrheitswerte müssen jedoch in eckige Klammern geschrieben werden.
-However, the boolean values must be written in square brackets, e. g.
-\lua{{ opposite_keys = { [true] = 'show', [false] = 'hide' } }}.
-%
-% Beispiele für gegensätzliche Schlüssel sind:
-Examples of opposing keys are: \lua{show} and \lua{hide}, \lua{dark} and
-\lua{light}, \lua{question} and \lua{solution}.
-%
-% Das untenstehende Beispiel verwendet als gegensätzliches Schlüsselpaar
-% die Schlüssel \lua{show} und \lua{hide}.
-The example below uses the \lua{show} and \lua{hide} keys as the
-opposite key pair.
-%
-% Wird der Schlüssel \lua{show} von der Funktion \lua{parse} gelesen,
-% dann erhält der Zielschlüssel \lua{visibility} den Wert \lua{true}.
-If the key \lua{show} is parsed by the \lua{parse} function, then the
-target key \lua{visibility} receives the value \lua{true}.
-
-\InputLua[firstline=4,lastline=7]{defs/attrs/opposite-keys.lua}
-
-% Wird der Schlüssel \lua{hide} gelesen, dann \lua{falsch}.
-\noindent
-If the key \lua{hide} is parsed, then \lua{false}.
-
-\InputLua[firstline=13,lastline=13]{defs/attrs/opposite-keys.lua}
 
 %%
 %
@@ -1252,6 +1221,48 @@ Instead of ...
 %
 %%
 
+\subsubsection{Attribute “\texttt{opposite_keys}”}
+
+% Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
+% Schlüssel in Wahrheitswerte umzuwandeln und diesen Wahrheitswert unter
+% einem Zielschlüssel zu speichern.
+The \lua{opposite_keys} attribute allows to convert opposite (naked) keys
+into a boolean value and store this boolean under a target key.
+%
+% Lua erlaubt es in Tabellen Wahrheitswerte als Schlüssel zu verwenden.
+% Es müssen jedoch eckige Klammern verwendet werden.
+Lua allows boolean values to be used as keys in tables.
+%
+% Die Wahrheitswerte müssen jedoch in eckige Klammern geschrieben werden.
+However, the boolean values must be written in square brackets, e. g.
+\lua{{ opposite_keys = { [true] = 'show', [false] = 'hide' } }}.
+%
+% Beispiele für gegensätzliche Schlüssel sind:
+Examples of opposing keys are: \lua{show} and \lua{hide}, \lua{dark} and
+\lua{light}, \lua{question} and \lua{solution}.
+%
+% Das untenstehende Beispiel verwendet als gegensätzliches Schlüsselpaar
+% die Schlüssel \lua{show} und \lua{hide}.
+The example below uses the \lua{show} and \lua{hide} keys as the
+opposite key pair.
+%
+% Wird der Schlüssel \lua{show} von der Funktion \lua{parse} gelesen,
+% dann erhält der Zielschlüssel \lua{visibility} den Wert \lua{true}.
+If the key \lua{show} is parsed by the \lua{parse} function, then the
+target key \lua{visibility} receives the value \lua{true}.
+
+\InputLua[firstline=4,lastline=7]{defs/attrs/opposite-keys.lua}
+
+% Wird der Schlüssel \lua{hide} gelesen, dann \lua{falsch}.
+\noindent
+If the key \lua{hide} is parsed, then \lua{false}.
+
+\InputLua[firstline=13,lastline=13]{defs/attrs/opposite-keys.lua}
+
+%%
+%
+%%
+
 \subsubsection{Attribute “\texttt{pick}”}
 
 % Das Attribut \lua{pick} sucht nach einem Wert, der keinem Schlüssel
@@ -1279,13 +1290,7 @@ The search for values is activated when the attribute \lua{pick} is set
 to a data type.
 % Mit diesen Datentypen kann nach Werten gesucht werden
 These data types can be used to search for values:
-\directlua{
-  local types = {}
-  for t, fn in pairs(luakeys.is) do
-    table.insert(types, t)
-  end
-  tex.print(table.concat(types, ', '))
-}.
+string, number, dimension, integer, boolean, any.
 % Verwendet den Datentyp any um jeden beliebigen Wert zu akzeptieren.
 Use the data type “any” to accept any value.
 % Wird einem Schlüssel bereits bei der Eingabe ein Wert zugewiesen, dann

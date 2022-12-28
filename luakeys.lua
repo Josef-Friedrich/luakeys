@@ -209,6 +209,7 @@ local namespace = {
     choices = true,
     data_type = true,
     default = true,
+    description = true,
     exclusive_group = true,
     l3_tl_set = true,
     macro = true,
