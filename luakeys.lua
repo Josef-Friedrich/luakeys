@@ -44,17 +44,18 @@ end
 ---
 ---@param target table
 ---@param source table
+---@param overwrite? boolean # Overwrite the values in the target table if they are present (default false).
 ---
 ---@return table target The modified target table.
-local function merge_tables(target, source)
+local function merge_tables(target, source, overwrite)
+  if overwrite == nil then
+    overwrite = false
+  end
   for key, value in pairs(source) do
-    if type(value) == 'table' then
-      if type(target[key] or false) == 'table' then
-        merge_tables(target[key] or {}, source[key] or {})
-      elseif target[key] == nil then
-        target[key] = value
-      end
-    elseif target[key] == nil then
+    if type(value) == 'table' and type(target[key] or false) == 'table' then
+      merge_tables(target[key] or {}, source[key] or {}, overwrite)
+    elseif (not overwrite and target[key] == nil) or
+      (overwrite and target[key] ~= value) then
       target[key] = value
     end
   end
@@ -179,6 +180,7 @@ local utils = {
 
 local namespace = {
   opts = {
+    accumulated_result = false,
     assignment_operator = '=',
     convert_dimensions = false,
     debug = false,
@@ -1139,10 +1141,8 @@ end
 --- Parse a LaTeX/TeX style key-value string into a Lua table.
 ---
 ---@param kv_string string # A string in the TeX/LaTeX style key-value format as described above.
----@param opts? table # A table containing the settings:
----   `convert_dimensions`, `unpack`, `naked_as_value`, `converter`,
----   `debug`, `preprocess`, `postprocess`.
---
+---@param opts? table # A table containing options.
+---
 ---@return table result # The final result of all individual parsing and normalization steps.
 ---@return table unknown # A table with unknown, undefinied key-value pairs.
 ---@return table raw # The unprocessed, raw result of the LPeg parser.
@@ -1273,11 +1273,16 @@ local function parse(kv_string, opts)
   apply_hooks()
 
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then
-    merge_tables(result, opts.defaults)
+    utils.merge_tables(result, opts.defaults)
   end
 
   if opts.debug then
     debug(result)
+  end
+
+  if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
+    'table' then
+    utils.merge_tables(opts.accumulated_result, result, true)
   end
 
   -- no_error

@@ -98,6 +98,9 @@ local defs = {
 
 ```lua
 local opts = {
+  -- Result table that is filled with each call of the parse function.
+  accumulated_result = accumulated_result,
+
   -- Configure the delimiter that assigns a value to a key.
   assignment_operator = '=',
 

@@ -391,7 +391,7 @@ The \lua{parse} function can be called with an options table.
 This options are supported: \catcode`_=12
 \directlua{luakeys.print_names('opts')}
 
-\InputLua[firstline=5,lastline=94]{opts/all-opts.lua}
+\InputLua[firstline=7,lastline=99]{opts/all-opts.lua}
 
 \subsection{Table “\texttt{opts}”}
 \label{table-opts}
@@ -414,6 +414,23 @@ To avoid interactions with other packages that also use |luakeys| and
 set the options globally, it is recommended to use the
 \lua{get_private_instance()} function
 (\ref{function:get-private-instance}) to load the package.
+
+%%
+%
+%%
+
+\subsubsection{Option “\texttt{accumulated_result}”}
+
+% Streng genommen handelt es sich hier um keine Option
+Strictly speaking, this is not an option.
+%
+% Mit der Option \lua{accumulated_result} kann eine Ergebnistabelle
+% angegeben werden, die bei jedem Aufruf der \lua{parse}-Funktion weiter
+% befüllt wird.
+The \lua{accumulated_result} option can be used to specify a result
+table that is filled with each call of the \lua{parse} function.
+
+\InputLua[firstline=5,lastline=14]{opts/accumulated-result.lua}
 
 %%
 %
