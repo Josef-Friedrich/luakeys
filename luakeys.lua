@@ -36,11 +36,11 @@ if not token then
   }
 end
 
---- Merge two tables in the first specified table.
+--- Merge two tables into the first specified table.
 --- The `merge_tables` function copies all keys from the `source` table
---- to a target table. It returns the modified target table.
+--- to the `target` table. It returns the modified target table.
 ---
----@see https://stackoverflow.com/a/1283608/10193818
+--- https://stackoverflow.com/a/1283608/10193818
 ---
 ---@param target table
 ---@param source table
@@ -63,7 +63,7 @@ end
 
 ---Clone a table.
 ---
----@see http://lua-users.org/wiki/CopyTable
+---http://lua-users.org/wiki/CopyTable
 ---
 ---@param orig table
 ---
@@ -84,24 +84,29 @@ local function clone_table(orig)
 end
 
 local utils = {
-  --- Get the size of an array like table `{ 'one', 'two', 'three' }` = 3.
+
+  merge_tables = merge_tables,
+
+  clone_table = clone_table,
+
+  ---Remove an element from a table.
   ---
-  ---@param value table # A table or any input.
+  ---@param source table
+  ---@param value any
   ---
-  ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
-  get_array_size = function(value)
-    local count = 0
-    if type(value) == 'table' then
-      for _ in ipairs(value) do
-        count = count + 1
+  ---@return any|nil
+  remove_from_table = function(source, value)
+    for index, v in pairs(source) do
+      if value == v then
+        source[index] = nil
+        return value
       end
     end
-    return count
   end,
 
   ---Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
   ---
-  ---@param value table|any # A table or any input.
+  ---@param value any # A table or any input.
   ---
   ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
   get_table_size = function(value)
@@ -114,19 +119,21 @@ local utils = {
     return count
   end,
 
-  merge_tables = merge_tables,
-
-  clone_table = clone_table,
-
-  remove_from_array = function(array, element)
-    for index, value in pairs(array) do
-      if element == value then
-        array[index] = nil
-        return value
+  --- Get the size of an array like table, for example `{ 'one', 'two',
+  ---  'three' }` = 3.
+  ---
+  ---@param value any # A table or any input.
+  ---
+  ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
+  get_array_size = function(value)
+    local count = 0
+    if type(value) == 'table' then
+      for _ in ipairs(value) do
+        count = count + 1
       end
     end
+    return count
   end,
-
   ---Scan for an optional argument.
   ---
   ---@param initial_delimiter? string # The character that marks the beginning of an optional argument (by default `[`).
@@ -766,7 +773,7 @@ local function apply_definitions(defs,
       input[search_key] = nil
       return value
       -- naked keys: values with integer keys
-    elseif utils.remove_from_array(input, search_key) ~= nil then
+    elseif utils.remove_from_table(input, search_key) ~= nil then
       return get_default_value(def)
     end
   end
@@ -942,9 +949,9 @@ local function apply_definitions(defs,
           throw_error(
             'Usage opposite_keys = { [true] = "...", [false] = "..." }')
         end
-        if utils.remove_from_array(input, true_value) ~= nil then
+        if utils.remove_from_table(input, true_value) ~= nil then
           return true
-        elseif utils.remove_from_array(input, false_value) ~= nil then
+        elseif utils.remove_from_table(input, false_value) ~= nil then
           return false
         end
       end

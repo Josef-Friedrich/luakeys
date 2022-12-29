@@ -1535,6 +1535,32 @@ therefore accepts any data type.
 
 \subsection{Table “\texttt{utils}”}
 
+% In der Tabelle \lua{utils} sind einige Hilfsfunktionen gebündelt, die
+% bei der Weiterverarbeitung von Tabellen mit Schlüssel-Werte-Paar
+% eingesetzt werden können.
+The \lua{utils} table bundles some auxiliary functions that can be used
+when processing tables with key-value pairs.
+
+\InputLua[firstline=3,lastline=10]{utils/all.lua}
+
+%%
+%
+%%
+
+\subsubsection{Function “\texttt{utils.merge_tables(target, source): table}”}
+
+% Die Funktion \lua{merge_tables} führt zwei Tabellen in die erste
+% angegebene Tabelle zusammen. Sie kopiert alle Schlüssel aus der
+% `source` Tabelle in die `source`-Tabelle. Sie gibt die geänderte
+% Zieltabelle zurück.
+The function \lua{merge_tables} merges two tables into the first
+specified table. It copies all keys from the `source` table into the
+`target` table. It returns the modified target table.
+
+%%
+%
+%%
+
 \subsubsection{Function “\texttt{utils.scan_oarg(initial_delimiter?, end_delimiter?): string}”}
 
 % Plain \TeX{} kennt keine optionalen Argumente (oarg).
