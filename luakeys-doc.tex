@@ -103,7 +103,7 @@ Result:
 \noindent
 % |luakeys| ist ein Lua-Modul / Lua\TeX package, das wie die Pakete ...
 % Schlüssel-Wert-Optionen analysieren kann.
-|luakeys| is a Lua module / Lua\TeX package that can parse key-value
+|luakeys| is a Lua module / Lua\TeX{} package that can parse key-value
 options like the \TeX{} packages
 \href{https://www.ctan.org/pkg/keyval}{keyval},
 \href{https://www.ctan.org/pkg/kvsetkeys}{kvsetkeys},
@@ -137,6 +137,12 @@ The TUGboat article
 {“Implementing key–value input: An introduction” (Volume 30 (2009), No.
 1)} by \emph{Joseph Wright} and \emph{Christian Feuersänger} gives a
 good overview of the available key-value packages.
+%
+% Dieser Artikel geht auf eine auf tex.stackexchange.com von Will
+% Robertson: gestellte Frage zurück.
+This article is based on a question asked on tex.stackexchange.com by
+Will Robertson:
+\href{https://tex.stackexchange.com/questions/26771}{A big list of every keyval package}.
 
 % Dieses Paket wäre ohne den Artikel
 % \href{https://tug.org/TUGboat/tb40-2/tb125menke-lpeg.pdf}
@@ -154,9 +160,8 @@ No. 2)}.
 % context) analysiert werden.
 \item Key-value pairs can be parsed independently of the macro
 collection (\LaTeX{} or Con\TeX{}t).
-
-% \item Sogar in Plain LuaTex können Schlüssel analysiert werden
-\item Even in plain Lua\TeX{} keys can be parsed.
+% Sogar in Plain LuaTex können Schlüssel analysiert werden
+Even in plain Lua\TeX{} keys can be parsed.
 
 % \item |luakeys| kann mit ineinander verschachtelten listen an
 % Schlüssel-Wert-Paaren umgehen, d. h. es kann mit einer rekursiven
@@ -176,6 +181,7 @@ handle a recursive data structure of keys.
 
 % \item Du musst zwei Sprachen beherrschen: \TeX{} und Lua.
 \item You need to know two languages: \TeX{} and Lua.
+\end{itemize}
 \end{itemize}
 
 %-----------------------------------------------------------------------
