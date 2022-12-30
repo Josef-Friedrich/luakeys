@@ -423,6 +423,26 @@ local namespace = {
     required = true,
     sub_keys = true,
   },
+
+  error_messages = {
+    E1 = 'Unknown parse option: ${unknown}!',
+    E2 = 'Unknown hook: ${unknown}!',
+    E3 = 'Duplicate aliases ${alias1} and ${alias2} for key ${key}!',
+    E4 = 'The value ${value} does not exist in the choices: ${choices}',
+    E5 = 'Unknown data type: ${unknown}',
+    E6 = 'The value ${value} of the key ${key} could not be converted into the data type ${data_type}!',
+    E7 = 'The key ${key} belongs to the mutually exclusive group ${exclusive_group} and another key of the group named ${another_key} is already present!',
+    E8 = 'def.match has to be a string',
+    E9 = 'The value ${value} of the key ${key} does not match ${match}!',
+    E10 = 'Usage opposite_keys = { [true] = "...", [false] = "..." }',
+    E11 = 'Wrong data type in the “pick” attribute: ${unknown}. Allowed are: ${data_types}.',
+    E12 = 'Missing required key ${key}!',
+    E13 = 'The key definition must be a table! Got ${data_type} for key ${key}.',
+    E14 = 'Unknown definition attribute: ${unknown}',
+    E15 = 'Key name couldn’t be detected!',
+    E17 = 'Unknown style to format keys: ${unknown}! Allowed styles are: lower, snake, upper',
+    E18 = 'The option “format_keys” has to be a table not ${data_type}',
+  },
 }
 
 ---@return table # The public interface of the module.
@@ -430,6 +450,34 @@ local function main()
 
   --- The default options.
   local default_opts = utils.clone_table(namespace.opts)
+
+  local error_messages = utils.clone_table(namespace.error_messages)
+
+  ---@param error_code string
+  ---@param args? table
+  local function throw_error_ng(error_code, args)
+    local message = error_messages[error_code]
+
+    if args ~= nil then
+      for key, value in pairs(args) do
+        message = message:gsub('${' .. key .. '}',
+          '“' .. tostring(value) .. '”')
+      end
+    end
+
+    message = 'luakeys error [' .. error_code .. ']: ' .. message
+
+    if type(tex.error) == 'function' then
+      tex.error(message, {
+        'You may be able to find more help in the documentation:',
+        'http://mirrors.ctan.org/macros/luatex/generic/luakeys/luakeys-doc.pdf',
+        'Or ask a question in the issue tracker on Github:',
+        'https://github.com/Josef-Friedrich/luakeys/issues',
+      })
+    else
+      error(message)
+    end
+  end
 
   --- Normalize the parse options.
   ---
@@ -442,7 +490,7 @@ local function main()
     end
     for key, _ in pairs(opts) do
       if namespace.opts[key] == nil then
-        utils.throw_error('Unknown parse option: ' .. tostring(key) .. '!')
+        throw_error_ng('E1', { unknown = key })
       end
     end
     local old_opts = opts
@@ -848,8 +896,8 @@ local function main()
           end
           if not is_in_choices then
             utils.throw_error('The value “' .. value ..
-                          '” does not exist in the choices: ' ..
-                          table.concat(def.choices, ', ') .. '!')
+                                '” does not exist in the choices: ' ..
+                                table.concat(def.choices, ', ') .. '!')
           end
         end
       end,
@@ -897,10 +945,10 @@ local function main()
             utils.throw_error('Unknown data type: ' .. def.data_type)
           end
           if converted == nil then
-            utils.throw_error(
-              'The value “' .. value .. '” of the key “' .. key ..
-                '” could not be converted into the data type “' ..
-                def.data_type .. '”!')
+            utils.throw_error('The value “' .. value ..
+                                '” of the key “' .. key ..
+                                '” could not be converted into the data type “' ..
+                                def.data_type .. '”!')
           else
             return converted
           end
@@ -914,10 +962,11 @@ local function main()
         if def.exclusive_group ~= nil then
           if exclusive_groups[def.exclusive_group] ~= nil then
             utils.throw_error('The key “' .. key ..
-                          '” belongs to a mutually exclusive group “' ..
-                          def.exclusive_group .. '” and the key “' ..
-                          exclusive_groups[def.exclusive_group] ..
-                          '” is already present!')
+                                '” belongs to a mutually exclusive group “' ..
+                                def.exclusive_group ..
+                                '” and the key “' ..
+                                exclusive_groups[def.exclusive_group] ..
+                                '” is already present!')
           else
             exclusive_groups[def.exclusive_group] = key
           end
@@ -954,9 +1003,10 @@ local function main()
           end
           local match = string.match(value, def.match)
           if match == nil then
-            utils.throw_error(
-              'The value “' .. value .. '” of the key “' .. key ..
-                '” does not match “' .. def.match .. '”!')
+            utils.throw_error('The value “' .. value ..
+                                '” of the key “' .. key ..
+                                '” does not match “' .. def.match ..
+                                '”!')
           else
             return match
           end
@@ -1041,8 +1091,8 @@ local function main()
 
       required = function(value, key, def)
         if def.required ~= nil and def.required and value == nil then
-          utils.throw_error(string.format('Missing required key “%s”!',
-            key))
+          utils.throw_error(string.format(
+            'Missing required key “%s”!', key))
         end
       end,
 
@@ -1104,7 +1154,8 @@ local function main()
 
       for attr, _ in pairs(def) do
         if namespace.attrs[attr] == nil then
-          utils.throw_error('Unknown definition attribute: ' .. tostring(attr))
+          utils.throw_error('Unknown definition attribute: ' ..
+                              tostring(attr))
         end
       end
 
@@ -1243,8 +1294,8 @@ local function main()
                 key = key:upper()
               else
                 utils.throw_error('Unknown style to format keys: ' ..
-                              tostring(style) ..
-                              ' Allowed styles are: lower, snake, upper')
+                                    tostring(style) ..
+                                    ' Allowed styles are: lower, snake, upper')
               end
             end
           end
@@ -1310,7 +1361,7 @@ local function main()
     -- no_error
     if not opts.no_error and type(unknown) == 'table' and
       utils.get_table_size(unknown) > 0 then
-        utils.throw_error('Unknown keys: ' .. visualizers.render(unknown))
+      utils.throw_error('Unknown keys: ' .. visualizers.render(unknown))
     end
     return result, unknown, raw
   end
@@ -1325,6 +1376,8 @@ local function main()
     version = { 0, 11, 0 },
 
     namespace = utils.clone_table(namespace),
+
+    error_messages = error_messages,
 
     ---This function is used in the documentation.
     ---

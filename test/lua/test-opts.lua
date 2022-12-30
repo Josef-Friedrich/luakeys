@@ -18,7 +18,7 @@ describe('Options', function()
   it('Unknown options should trigger an error message.', function()
     assert.has_error(function()
       luakeys.parse('key', { xxx = true })
-    end, 'Unknown parse option: xxx!')
+    end, 'luakeys error [E1]: Unknown parse option: “xxx”!')
   end)
 
   it('with underscores', function()
