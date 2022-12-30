@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local kv_string = [[
   without double quotes = no commas and equal signs are allowed,

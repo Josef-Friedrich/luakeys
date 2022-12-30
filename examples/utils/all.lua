@@ -1,6 +1,6 @@
 require('busted.runner')()
 
-local utils = require('luakeys').utils
+local utils = require('luakeys')().utils
 
 local merge_tables = utils.merge_tables
 local clone_table = utils.clone_table

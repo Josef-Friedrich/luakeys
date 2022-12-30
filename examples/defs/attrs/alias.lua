@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 -- a single alias
 local parse = luakeys.define({ key = { alias = 'k' } })

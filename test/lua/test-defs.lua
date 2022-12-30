@@ -1,6 +1,6 @@
 require('busted.runner')()
 
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 describe('Defintions', function()
   it('should throw an error if there is an unknown attribute',

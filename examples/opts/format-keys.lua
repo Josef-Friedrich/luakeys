@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local result = luakeys.parse('KEY=value', { format_keys = { 'lower' } })
 luakeys.debug(result) -- { key = 'value' }

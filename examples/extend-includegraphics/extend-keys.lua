@@ -1,4 +1,4 @@
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local parse = luakeys.define({
   caption = { alias = 'title' },

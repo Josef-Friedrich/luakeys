@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local result = luakeys.parse('one=1,two=2,three=3,')
 local kv_string = luakeys.render(result)

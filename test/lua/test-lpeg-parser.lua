@@ -1,6 +1,6 @@
 require('busted.runner')()
 
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local function assert_result(kv_string, expected, opts)
   local result, unknown, raw = luakeys.parse(kv_string, opts)

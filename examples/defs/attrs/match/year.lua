@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local parse = luakeys.define({ year = { match = '%d%d%d%d' } })
 local result = parse('year=1978') -- { year = '1978' }

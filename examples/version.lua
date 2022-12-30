@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local v = luakeys.version
 local version_string = v[1] .. '.' .. v[2] .. '.' .. v[3]

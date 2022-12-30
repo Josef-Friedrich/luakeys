@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local result = luakeys.parse('x,d1={x,d2={x}}', {
   naked_as_value = true,

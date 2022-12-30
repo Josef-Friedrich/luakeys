@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local result = luakeys.parse('key=yes', {
   true_aliases = { 'true', 'TRUE', 'True' },

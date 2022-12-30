@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local function assert_type(data_type, input_value, expected_value)
   assert.are.same({ key = expected_value },

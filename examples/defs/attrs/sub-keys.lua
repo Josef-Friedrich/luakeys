@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local result, unknown = luakeys.parse('level1={level2,unknown}', {
   no_error = true,

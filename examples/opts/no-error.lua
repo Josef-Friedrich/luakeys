@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 assert.has_error(function()
   luakeys.parse('unknown', { defs = { 'key' } })

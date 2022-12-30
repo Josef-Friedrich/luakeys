@@ -1,6 +1,6 @@
 require('busted.runner')()
 
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 describe('Function “stringify()”', function()
   local function assert_equals(input, expected)

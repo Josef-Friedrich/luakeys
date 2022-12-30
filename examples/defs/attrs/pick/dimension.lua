@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local parse = luakeys.define({ font_size = { pick = 'dimension' } })
 local result = parse('12pt,13pt', { no_error = true })

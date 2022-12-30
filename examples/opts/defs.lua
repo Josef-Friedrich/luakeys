@@ -1,5 +1,5 @@
 require('busted.runner')()
-local luakeys = require('luakeys')
+local luakeys = require('luakeys')()
 
 local parse = luakeys.define({ one = { default = 1 }, two = { default = 2 } })
 local result = parse('one,two') -- { one = 1, two = 2 }
