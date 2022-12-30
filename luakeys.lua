@@ -174,6 +174,50 @@ local function export_utils()
     end
   end
 
+  local function throw_error(message)
+    if type(tex.error) == 'function' then
+      tex.error(message)
+    else
+      error(message)
+    end
+  end
+
+  local function visit_tree(tree, callback_func)
+    if type(tree) ~= 'table' then
+      throw_error('Parameter “tree” has to be a table, got: ' ..
+                    tostring(tree))
+    end
+    local function visit_tree_recursive(tree,
+      current,
+      result,
+      depth,
+      callback_func)
+      for key, value in pairs(current) do
+        if type(value) == 'table' then
+          value = visit_tree_recursive(tree, value, {}, depth + 1,
+            callback_func)
+        end
+
+        key, value = callback_func(key, value, depth, current, tree)
+
+        if key ~= nil and value ~= nil then
+          result[key] = value
+        end
+      end
+      if next(result) ~= nil then
+        return result
+      end
+    end
+
+    local result =
+      visit_tree_recursive(tree, tree, {}, 1, callback_func)
+
+    if result == nil then
+      return {}
+    end
+    return result
+  end
+
   return {
     merge_tables = merge_tables,
     clone_table = clone_table,
@@ -181,6 +225,8 @@ local function export_utils()
     get_table_size = get_table_size,
     get_array_size = get_array_size,
     scan_oarg = scan_oarg,
+    throw_error = throw_error,
+    visit_tree = visit_tree,
   }
 end
 
@@ -385,14 +431,6 @@ local function main()
   --- The default options.
   local default_opts = utils.clone_table(namespace.opts)
 
-  local function throw_error(message)
-    if type(tex.error) == 'function' then
-      tex.error(message)
-    else
-      error(message)
-    end
-  end
-
   --- Normalize the parse options.
   ---
   ---@param opts? table # Options in a raw format. The table may be empty or some keys are not set.
@@ -404,7 +442,7 @@ local function main()
     end
     for key, _ in pairs(opts) do
       if namespace.opts[key] == nil then
-        throw_error('Unknown parse option: ' .. tostring(key) .. '!')
+        utils.throw_error('Unknown parse option: ' .. tostring(key) .. '!')
       end
     end
     local old_opts = opts
@@ -419,7 +457,7 @@ local function main()
 
     for hook in pairs(opts.hooks) do
       if namespace.hooks[hook] == nil then
-        throw_error('Unknown hook: ' .. tostring(hook) .. '!')
+        utils.throw_error('Unknown hook: ' .. tostring(hook) .. '!')
       end
     end
     return opts
@@ -648,42 +686,6 @@ local function main()
 -- LuaFormatter on
   end
 
-  local function visit_tree(tree, callback_func)
-    if type(tree) ~= 'table' then
-      throw_error('Parameter “tree” has to be a table, got: ' ..
-                    tostring(tree))
-    end
-    local function visit_tree_recursive(tree,
-      current,
-      result,
-      depth,
-      callback_func)
-      for key, value in pairs(current) do
-        if type(value) == 'table' then
-          value = visit_tree_recursive(tree, value, {}, depth + 1,
-            callback_func)
-        end
-
-        key, value = callback_func(key, value, depth, current, tree)
-
-        if key ~= nil and value ~= nil then
-          result[key] = value
-        end
-      end
-      if next(result) ~= nil then
-        return result
-      end
-    end
-
-    local result =
-      visit_tree_recursive(tree, tree, {}, 1, callback_func)
-
-    if result == nil then
-      return {}
-    end
-    return result
-  end
-
   local is = {
     boolean = function(value)
       if value == nil then
@@ -814,7 +816,7 @@ local function main()
           local v = find_value(alias, def)
           if v ~= nil then
             if alias_value ~= nil then
-              throw_error(string.format(
+              utils.throw_error(string.format(
                 'Duplicate aliases “%s” and “%s” for key “%s”!',
                 used_alias_key, alias, key))
             end
@@ -845,7 +847,7 @@ local function main()
             end
           end
           if not is_in_choices then
-            throw_error('The value “' .. value ..
+            utils.throw_error('The value “' .. value ..
                           '” does not exist in the choices: ' ..
                           table.concat(def.choices, ', ') .. '!')
           end
@@ -892,10 +894,10 @@ local function main()
               converted = value
             end
           else
-            throw_error('Unknown data type: ' .. def.data_type)
+            utils.throw_error('Unknown data type: ' .. def.data_type)
           end
           if converted == nil then
-            throw_error(
+            utils.throw_error(
               'The value “' .. value .. '” of the key “' .. key ..
                 '” could not be converted into the data type “' ..
                 def.data_type .. '”!')
@@ -911,7 +913,7 @@ local function main()
         end
         if def.exclusive_group ~= nil then
           if exclusive_groups[def.exclusive_group] ~= nil then
-            throw_error('The key “' .. key ..
+            utils.throw_error('The key “' .. key ..
                           '” belongs to a mutually exclusive group “' ..
                           def.exclusive_group .. '” and the key “' ..
                           exclusive_groups[def.exclusive_group] ..
@@ -948,11 +950,11 @@ local function main()
         end
         if def.match ~= nil then
           if type(def.match) ~= 'string' then
-            throw_error('def.match has to be a string')
+            utils.throw_error('def.match has to be a string')
           end
           local match = string.match(value, def.match)
           if match == nil then
-            throw_error(
+            utils.throw_error(
               'The value “' .. value .. '” of the key “' .. key ..
                 '” does not match “' .. def.match .. '”!')
           else
@@ -966,7 +968,7 @@ local function main()
           local true_value = def.opposite_keys[true]
           local false_value = def.opposite_keys[false]
           if true_value == nil or false_value == nil then
-            throw_error(
+            utils.throw_error(
               'Usage opposite_keys = { [true] = "...", [false] = "..." }')
           end
           if utils.remove_from_table(input, true_value) ~= nil then
@@ -1002,7 +1004,7 @@ local function main()
           -- Check if the pick attribute is valid
           for _, pick_type in ipairs(pick_types) do
             if type(pick_type) == 'string' and is[pick_type] == nil then
-              throw_error(
+              utils.throw_error(
                 'Wrong data type in the “pick” attribute: ' ..
                   tostring(pick_type) ..
                   '. Allowed are: any, boolean, dimension, integer, number, string.')
@@ -1039,7 +1041,7 @@ local function main()
 
       required = function(value, key, def)
         if def.required ~= nil and def.required and value == nil then
-          throw_error(string.format('Missing required key “%s”!',
+          utils.throw_error(string.format('Missing required key “%s”!',
             key))
         end
       end,
@@ -1095,19 +1097,19 @@ local function main()
       end
 
       if type(def) ~= 'table' then
-        throw_error(string.format(
+        utils.throw_error(string.format(
           'The key definition must be a table! Got “%s” for key “%s”.',
           tostring(def), index)) -- key is nil
       end
 
       for attr, _ in pairs(def) do
         if namespace.attrs[attr] == nil then
-          throw_error('Unknown definition attribute: ' .. tostring(attr))
+          utils.throw_error('Unknown definition attribute: ' .. tostring(attr))
         end
       end
 
       if key == nil then
-        throw_error('Key name couldn’t be detected!')
+        utils.throw_error('Key name couldn’t be detected!')
       end
 
       local value = find_value(key, def)
@@ -1182,7 +1184,7 @@ local function main()
     local function apply_hook(name)
       if type(opts.hooks[name]) == 'function' then
         if name:match('^keys') then
-          result = visit_tree(result, opts.hooks[name])
+          result = utils.visit_tree(result, opts.hooks[name])
         else
           opts.hooks[name](result)
         end
@@ -1240,7 +1242,7 @@ local function main()
               elseif style == 'upper' then
                 key = key:upper()
               else
-                throw_error('Unknown style to format keys: ' ..
+                utils.throw_error('Unknown style to format keys: ' ..
                               tostring(style) ..
                               ' Allowed styles are: lower, snake, upper')
               end
@@ -1258,24 +1260,24 @@ local function main()
       }
 
       if opts.unpack then
-        result = visit_tree(result, callbacks.unpack)
+        result = utils.visit_tree(result, callbacks.unpack)
       end
 
       if not opts.naked_as_value and opts.defs == false then
-        result = visit_tree(result, callbacks.process_naked)
+        result = utils.visit_tree(result, callbacks.process_naked)
       end
 
       if opts.format_keys then
         if type(opts.format_keys) ~= 'table' then
-          throw_error(
+          utils.throw_error(
             'The option “format_keys” has to be a table not ' ..
               type(opts.format_keys))
         end
-        result = visit_tree(result, callbacks.format_key)
+        result = utils.visit_tree(result, callbacks.format_key)
       end
 
       if opts.invert_flag then
-        result = visit_tree(result, callbacks.apply_invert_flag)
+        result = utils.visit_tree(result, callbacks.apply_invert_flag)
       end
 
       return result
@@ -1308,7 +1310,7 @@ local function main()
     -- no_error
     if not opts.no_error and type(unknown) == 'table' and
       utils.get_table_size(unknown) > 0 then
-      throw_error('Unknown keys: ' .. visualizers.render(unknown))
+        utils.throw_error('Unknown keys: ' .. visualizers.render(unknown))
     end
     return result, unknown, raw
   end
@@ -1319,10 +1321,7 @@ local function main()
   --- A table to store parsed key-value results.
   local result_store = {}
 
-  --- Exports
-  -- @section
-
-  local export = {
+  return {
     version = { 0, 11, 0 },
 
     namespace = utils.clone_table(namespace),
@@ -1410,7 +1409,6 @@ local function main()
     utils = utils,
   }
 
-  return export
 end
 
 return main
