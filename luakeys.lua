@@ -37,19 +37,19 @@ if not token then
 end
 
 --- Merge two tables into the first specified table.
---- The `merge_tables` function copies all keys from the `source` table
---- to the `target` table. It returns the modified target table.
+--- The `merge_tables` function copies keys from the `source` table
+--- to the `target` table. It returns the target table.
 ---
 --- https://stackoverflow.com/a/1283608/10193818
 ---
----@param target table
----@param source table
----@param overwrite? boolean # Overwrite the values in the target table if they are present (default false).
+---@param target table # The target table where all values are copied.
+---@param source table # The source table from which all values are copied.
+---@param overwrite? boolean # Overwrite the values in the target table if they are present (default true).
 ---
 ---@return table target The modified target table.
 local function merge_tables(target, source, overwrite)
   if overwrite == nil then
-    overwrite = false
+    overwrite = true
   end
   for key, value in pairs(source) do
     if type(value) == 'table' and type(target[key] or false) == 'table' then
@@ -62,32 +62,32 @@ local function merge_tables(target, source, overwrite)
   return target
 end
 
----Clone a table.
+---Clone a table, i.e. make a deep copy of the source table.
 ---
 ---http://lua-users.org/wiki/CopyTable
 ---
----@param orig table
+---@param source table # The source table to be cloned.
 ---
----@return table
-local function clone_table(orig)
-  local orig_type = type(orig)
+---@return table # A deep copy of the source table.
+local function clone_table(source)
   local copy
-  if orig_type == 'table' then
+  if type(source) == 'table' then
     copy = {}
-    for orig_key, orig_value in next, orig, nil do
+    for orig_key, orig_value in next, source, nil do
       copy[clone_table(orig_key)] = clone_table(orig_value)
     end
-    setmetatable(copy, clone_table(getmetatable(orig)))
+    setmetatable(copy, clone_table(getmetatable(source)))
   else -- number, string, boolean, etc
-    copy = orig
+    copy = source
   end
   return copy
 end
 
 local utils = {
-
+  ---Cannot be defined in this table because it is a recursive function.
   merge_tables = merge_tables,
 
+  ---Cannot be defined in this table because it is a recursive function.
   clone_table = clone_table,
 
   ---Remove an element from a table.
@@ -135,6 +135,7 @@ local utils = {
     end
     return count
   end,
+
   ---Scan for an optional argument.
   ---
   ---@param initial_delimiter? string # The character that marks the beginning of an optional argument (by default `[`).
@@ -1273,7 +1274,7 @@ local function parse(kv_string, opts)
   apply_hooks()
 
   if opts.defaults ~= nil and type(opts.defaults) == 'table' then
-    utils.merge_tables(result, opts.defaults)
+    utils.merge_tables(result, opts.defaults, false)
   end
 
   if opts.debug then

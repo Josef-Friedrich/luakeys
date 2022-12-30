@@ -1564,15 +1564,30 @@ when processing tables with key-value pairs.
 %
 %%
 
-\subsubsection{Function “\texttt{utils.merge_tables(target, source): table}”}
+\subsubsection{Function “\texttt{utils.merge_tables(target, source, overwrite): table}”}
 
 % Die Funktion \lua{merge_tables} führt zwei Tabellen in die erste
-% angegebene Tabelle zusammen. Sie kopiert alle Schlüssel aus der
-% `source` Tabelle in die `source`-Tabelle. Sie gibt die geänderte
+% angegebene Tabelle zusammen. Sie kopiert Schlüssel aus der
+% `source` Tabelle in die `target`-Tabelle. Sie gibt die geänderte
 % Zieltabelle zurück.
 The function \lua{merge_tables} merges two tables into the first
-specified table. It copies all keys from the `source` table into the
-`target` table. It returns the modified target table.
+specified table. It copies keys from the `source` table into the
+`target` table. It returns the target table.
+
+% Wird der Parameter \lua{overwrite} auf wahr gesetzten, so werden Werte
+% in der Zieltabelle überschrieben
+If the \lua{overwrite} parameter is set to \lua{true}, values in the
+target table are overwritten.
+
+\InputLua[firstline=4,lastline=8]{utils/merge-tables.lua}
+
+\noindent
+% Geben sie dem Parameter \lua{overwrite} den Wert \lua{false}, um Werte
+% in der Zieltabelle zu überschreiben.
+Give the parameter \lua{overwrite} the value \lua{false} to overwrite
+values in the target table.
+
+\InputLua[firstline=14,lastline=18]{utils/merge-tables.lua}
 
 %%
 %
