@@ -186,109 +186,9 @@ end
 
 local utils = export_utils()
 
-local namespace = {
-  opts = {
-    accumulated_result = false,
-    assignment_operator = '=',
-    convert_dimensions = false,
-    debug = false,
-    default = true,
-    defaults = false,
-    defs = false,
-    false_aliases = { 'false', 'FALSE', 'False' },
-    format_keys = false,
-    group_begin = '{',
-    group_end = '}',
-    hooks = {},
-    invert_flag = '!',
-    list_separator = ',',
-    naked_as_value = false,
-    no_error = false,
-    quotation_begin = '"',
-    quotation_end = '"',
-    true_aliases = { 'true', 'TRUE', 'True' },
-    unpack = true,
-  },
-
-  hooks = {
-    kv_string = true,
-    keys_before_opts = true,
-    result_before_opts = true,
-    keys_before_def = true,
-    result_before_def = true,
-    keys = true,
-    result = true,
-  },
-
-  attrs = {
-    alias = true,
-    always_present = true,
-    choices = true,
-    data_type = true,
-    default = true,
-    description = true,
-    exclusive_group = true,
-    l3_tl_set = true,
-    macro = true,
-    match = true,
-    name = true,
-    opposite_keys = true,
-    pick = true,
-    process = true,
-    required = true,
-    sub_keys = true,
-  },
-}
-
-local function main()
-
-  --- The default options.
-  local default_opts = utils.clone_table(namespace.opts)
-
-  local function throw_error(message)
-    if type(tex.error) == 'function' then
-      tex.error(message)
-    else
-      error(message)
-    end
-  end
-
-  --- Normalize the parse options.
-  ---
-  ---@param opts? table # Options in a raw format. The table may be empty or some keys are not set.
-  ---
-  ---@return table
-  local function normalize_opts(opts)
-    if type(opts) ~= 'table' then
-      opts = {}
-    end
-    for key, _ in pairs(opts) do
-      if namespace.opts[key] == nil then
-        throw_error('Unknown parse option: ' .. tostring(key) .. '!')
-      end
-    end
-    local old_opts = opts
-    opts = {}
-    for name, _ in pairs(namespace.opts) do
-      if old_opts[name] ~= nil then
-        opts[name] = old_opts[name]
-      else
-        opts[name] = default_opts[name]
-      end
-    end
-
-    for hook in pairs(opts.hooks) do
-      if namespace.hooks[hook] == nil then
-        throw_error('Unknown hook: ' .. tostring(hook) .. '!')
-      end
-    end
-    return opts
-  end
-
-  local l3_code_cctab = 10
-
-  --- Convert back to strings
-  -- @section
+--- Convert back to strings
+-- @section
+local function export_visualizers()
 
   --- The function `render(tbl)` reverses the function
   --- `parse(kv_string)`. It takes a Lua table and converts this table
@@ -419,6 +319,113 @@ local function main()
   local function debug(result)
     print('\n' .. stringify(result, false))
   end
+
+  return { render = render, stringify = stringify, debug = debug }
+end
+
+local visualizers = export_visualizers()
+
+local namespace = {
+  opts = {
+    accumulated_result = false,
+    assignment_operator = '=',
+    convert_dimensions = false,
+    debug = false,
+    default = true,
+    defaults = false,
+    defs = false,
+    false_aliases = { 'false', 'FALSE', 'False' },
+    format_keys = false,
+    group_begin = '{',
+    group_end = '}',
+    hooks = {},
+    invert_flag = '!',
+    list_separator = ',',
+    naked_as_value = false,
+    no_error = false,
+    quotation_begin = '"',
+    quotation_end = '"',
+    true_aliases = { 'true', 'TRUE', 'True' },
+    unpack = true,
+  },
+
+  hooks = {
+    kv_string = true,
+    keys_before_opts = true,
+    result_before_opts = true,
+    keys_before_def = true,
+    result_before_def = true,
+    keys = true,
+    result = true,
+  },
+
+  attrs = {
+    alias = true,
+    always_present = true,
+    choices = true,
+    data_type = true,
+    default = true,
+    description = true,
+    exclusive_group = true,
+    l3_tl_set = true,
+    macro = true,
+    match = true,
+    name = true,
+    opposite_keys = true,
+    pick = true,
+    process = true,
+    required = true,
+    sub_keys = true,
+  },
+}
+
+---@return table # The public interface of the module.
+local function main()
+
+  --- The default options.
+  local default_opts = utils.clone_table(namespace.opts)
+
+  local function throw_error(message)
+    if type(tex.error) == 'function' then
+      tex.error(message)
+    else
+      error(message)
+    end
+  end
+
+  --- Normalize the parse options.
+  ---
+  ---@param opts? table # Options in a raw format. The table may be empty or some keys are not set.
+  ---
+  ---@return table
+  local function normalize_opts(opts)
+    if type(opts) ~= 'table' then
+      opts = {}
+    end
+    for key, _ in pairs(opts) do
+      if namespace.opts[key] == nil then
+        throw_error('Unknown parse option: ' .. tostring(key) .. '!')
+      end
+    end
+    local old_opts = opts
+    opts = {}
+    for name, _ in pairs(namespace.opts) do
+      if old_opts[name] ~= nil then
+        opts[name] = old_opts[name]
+      else
+        opts[name] = default_opts[name]
+      end
+    end
+
+    for hook in pairs(opts.hooks) do
+      if namespace.hooks[hook] == nil then
+        throw_error('Unknown hook: ' .. tostring(hook) .. '!')
+      end
+    end
+    return opts
+  end
+
+  local l3_code_cctab = 10
 
   --- Parser / Lpeg related
   -- @section
@@ -1290,7 +1297,7 @@ local function main()
     end
 
     if opts.debug then
-      debug(result)
+      visualizers.debug(result)
     end
 
     if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
@@ -1301,7 +1308,7 @@ local function main()
     -- no_error
     if not opts.no_error and type(unknown) == 'table' and
       utils.get_table_size(unknown) > 0 then
-      throw_error('Unknown keys: ' .. render(unknown))
+      throw_error('Unknown keys: ' .. visualizers.render(unknown))
     end
     return result, unknown, raw
   end
@@ -1339,8 +1346,8 @@ local function main()
     --- @see default_opts
     opts = default_opts,
 
-    --- @see stringify
-    stringify = stringify,
+    --- @see visualizers.stringify
+    stringify = visualizers.stringify,
 
     --- @see parse
     parse = parse,
@@ -1367,11 +1374,11 @@ local function main()
       end
     end,
 
-    --- @see render
-    render = render,
+    --- @see visualizers.render
+    render = visualizers.render,
 
-    --- @see debug
-    debug = debug,
+    --- @see visualizers.debug
+    debug = visualizers.debug,
 
     --- The function `save(identifier, result): void` saves a result (a
     --  table from a previous run of `parse`) under an identifier.
