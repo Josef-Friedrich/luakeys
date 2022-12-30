@@ -29,7 +29,6 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
 <li><a href="#Fields">Fields</a></li>
 <li><a href="#Local_Functions">Local Functions</a></li>
 <li><a href="#Convert_back_to_strings">Convert back to strings </a></li>
@@ -50,14 +49,25 @@
 
 <h1>Module <code>luakeys</code></h1>
 <p>Merge two tables into the first specified table.</p>
-<p> The <code>merge_tables</code> function copies all keys from the <code>source</code> table
- to the <code>target</code> table. It returns the modified target table.</p>
+<p> The <code>merge_tables</code> function copies keys from the <code>source</code> table
+ to the <code>target</code> table. It returns the target table.</p>
 
 <p> https://stackoverflow.com/a/1283608/10193818</p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Fields">Fields</a></h2>
 <table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#default_options">default_options</a></td>
+	<td class="summary">The default options.</td>
+	</tr>
+</table>
+<h2><a href="#Local_Functions">Local Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#clone_table">clone_table (source)</a></td>
+	<td class="summary">Clone a table, i.e.</td>
+	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#remove_from_table">remove_from_table (source, value)</a></td>
 	<td class="summary">Remove an element from a table.</td>
@@ -74,20 +84,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#scan_oarg">scan_oarg (initial_delimiter, end_delimiter)</a></td>
 	<td class="summary">Scan for an optional argument.</td>
-	</tr>
-</table>
-<h2><a href="#Fields">Fields</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#default_options">default_options</a></td>
-	<td class="summary">The default options.</td>
-	</tr>
-</table>
-<h2><a href="#Local_Functions">Local Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#clone_table">clone_table (orig)</a></td>
-	<td class="summary">Clone a table.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#normalize_opts">normalize_opts (opts)</a></td>
@@ -164,10 +160,6 @@
 <h2><a href="#Exports">Exports </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#get_private_instance">get_private_instance ()</a></td>
-	<td class="summary">Get a new instance of the luakeys module.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#print_names">print_names (from)</a></td>
 	<td class="summary">This function is used in the documentation.</td>
 	</tr>
@@ -217,9 +209,54 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
 
     <dl class="function">
+    <dt>
+    <a name = "default_options"></a>
+    <strong>default_options</strong>
+    </dt>
+    <dd>
+    The default options.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "clone_table"></a>
+    <strong>clone_table (source)</strong>
+    </dt>
+    <dd>
+    Clone a table, i.e.  make a deep copy of the source table.</p>
+
+<p>http://lua-users.org/wiki/CopyTable
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">source</span>
+         table # The source table to be cloned.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table # A deep copy of the source table.
+    </ol>
+
+
+
+
+</dd>
     <dt>
     <a name = "remove_from_table"></a>
     <strong>remove_from_table (source, value)</strong>
@@ -321,55 +358,6 @@
     <ol>
 
         string|nil # The string that was enclosed by the delimiters. The delimiters themselves are not returned.
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "default_options"></a>
-    <strong>default_options</strong>
-    </dt>
-    <dd>
-    The default options.
-
-
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "clone_table"></a>
-    <strong>clone_table (orig)</strong>
-    </dt>
-    <dd>
-    Clone a table. </p>
-
-<p>http://lua-users.org/wiki/CopyTable
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">orig</span>
-         table
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        table
     </ol>
 
 
@@ -700,9 +688,7 @@
          string # A string in the TeX/LaTeX style key-value format as described above.
         </li>
         <li><span class="parameter">opts</span>
-        ? table # A table containing the settings:
-   <code>convert_dimensions</code>, <code>unpack</code>, <code>naked_as_value</code>, <code>converter</code>,
-   <a href="index.html#debug">debug</a>, <code>preprocess</code>, <code>postprocess</code>.
+        ? table # A table containing options.
         </li>
     </ul>
 
@@ -767,25 +753,6 @@
     <h2 class="section-header "><a name="Exports"></a>Exports </h2>
 
     <dl class="function">
-    <dt>
-    <a name = "get_private_instance"></a>
-    <strong>get_private_instance ()</strong>
-    </dt>
-    <dd>
-    Get a new instance of the luakeys module.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-        table # A new instance of the luakeys module.
-    </ol>
-
-
-
-
-</dd>
     <dt>
     <a name = "print_names"></a>
     <strong>print_names (from)</strong>
@@ -965,7 +932,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-29 21:56:38 </i>
+<i style="float:right;">Last updated 2022-12-30 16:44:45 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

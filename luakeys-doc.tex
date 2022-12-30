@@ -2161,7 +2161,14 @@ An example of how to use the command in \LaTeX:
   version of the luakeys module.
 }
 \changes{0.12.0}{2022/12/30}{
-* Export a function that return the Lua API.
+* Breaking change! Export a function that returns the Lua API instead
+  of a table. Use “require('luakeys')()” instead of
+  “require('luakeys')”.
+* New macros \cmd{\LuakeysPackageOptions}, \cmd{\LuakeysClassOptions}
+  and \cmd{\LuakeysSavePackageOptions}, \cmd{\LuakeysSaveClassOptions}.
+* New option: “accumulated_result”.
+* New data type: “list”.
+* New attribute: “description”.
 }
 
 \pagebreak
