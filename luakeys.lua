@@ -27,16 +27,14 @@ if not tex then
       return 1234567
     end,
   }
-end
 
-if not token then
   token = {
     set_macro = function(csname, content, global)
     end,
   }
 end
 
-local function export_utils()
+local utils = (function()
   --- Merge two tables into the first specified table.
   --- The `merge_tables` function copies keys from the `source` table
   --- to the `target` table. It returns the target table.
@@ -241,13 +239,11 @@ local function export_utils()
     throw_error = throw_error,
     visit_tree = visit_tree,
   }
-end
-
-local utils = export_utils()
+end)()
 
 --- Convert back to strings
 -- @section
-local function export_visualizers()
+local visualizers = (function()
 
   --- The function `render(tbl)` reverses the function
   --- `parse(kv_string)`. It takes a Lua table and converts this table
@@ -380,9 +376,7 @@ local function export_visualizers()
   end
 
   return { render = render, stringify = stringify, debug = debug }
-end
-
-local visualizers = export_visualizers()
+end)()
 
 local namespace = {
   opts = {
