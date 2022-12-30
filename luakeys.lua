@@ -36,59 +36,54 @@ if not token then
   }
 end
 
---- Merge two tables into the first specified table.
---- The `merge_tables` function copies keys from the `source` table
---- to the `target` table. It returns the target table.
----
---- https://stackoverflow.com/a/1283608/10193818
----
----@param target table # The target table where all values are copied.
----@param source table # The source table from which all values are copied.
----@param overwrite? boolean # Overwrite the values in the target table if they are present (default true).
----
----@return table target The modified target table.
-local function merge_tables(target, source, overwrite)
-  if overwrite == nil then
-    overwrite = true
-  end
-  for key, value in pairs(source) do
-    if type(value) == 'table' and type(target[key] or false) == 'table' then
-      merge_tables(target[key] or {}, source[key] or {}, overwrite)
-    elseif (not overwrite and target[key] == nil) or
-      (overwrite and target[key] ~= value) then
-      target[key] = value
+local function export_utils()
+  --- Merge two tables into the first specified table.
+  --- The `merge_tables` function copies keys from the `source` table
+  --- to the `target` table. It returns the target table.
+  ---
+  --- https://stackoverflow.com/a/1283608/10193818
+  ---
+  ---@param target table # The target table where all values are copied.
+  ---@param source table # The source table from which all values are copied.
+  ---@param overwrite? boolean # Overwrite the values in the target table if they are present (default true).
+  ---
+  ---@return table target The modified target table.
+  local function merge_tables(target, source, overwrite)
+    if overwrite == nil then
+      overwrite = true
     end
-  end
-  return target
-end
-
----Clone a table, i.e. make a deep copy of the source table.
----
----http://lua-users.org/wiki/CopyTable
----
----@param source table # The source table to be cloned.
----
----@return table # A deep copy of the source table.
-local function clone_table(source)
-  local copy
-  if type(source) == 'table' then
-    copy = {}
-    for orig_key, orig_value in next, source, nil do
-      copy[clone_table(orig_key)] = clone_table(orig_value)
+    for key, value in pairs(source) do
+      if type(value) == 'table' and type(target[key] or false) ==
+        'table' then
+        merge_tables(target[key] or {}, source[key] or {}, overwrite)
+      elseif (not overwrite and target[key] == nil) or
+        (overwrite and target[key] ~= value) then
+        target[key] = value
+      end
     end
-    setmetatable(copy, clone_table(getmetatable(source)))
-  else -- number, string, boolean, etc
-    copy = source
+    return target
   end
-  return copy
-end
 
-local utils = {
-  ---Cannot be defined in this table because it is a recursive function.
-  merge_tables = merge_tables,
-
-  ---Cannot be defined in this table because it is a recursive function.
-  clone_table = clone_table,
+  ---Clone a table, i.e. make a deep copy of the source table.
+  ---
+  ---http://lua-users.org/wiki/CopyTable
+  ---
+  ---@param source table # The source table to be cloned.
+  ---
+  ---@return table # A deep copy of the source table.
+  local function clone_table(source)
+    local copy
+    if type(source) == 'table' then
+      copy = {}
+      for orig_key, orig_value in next, source, nil do
+        copy[clone_table(orig_key)] = clone_table(orig_value)
+      end
+      setmetatable(copy, clone_table(getmetatable(source)))
+    else -- number, string, boolean, etc
+      copy = source
+    end
+    return copy
+  end
 
   ---Remove an element from a table.
   ---
@@ -96,21 +91,21 @@ local utils = {
   ---@param value any
   ---
   ---@return any|nil
-  remove_from_table = function(source, value)
+  local function remove_from_table(source, value)
     for index, v in pairs(source) do
       if value == v then
         source[index] = nil
         return value
       end
     end
-  end,
+  end
 
   ---Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
   ---
   ---@param value any # A table or any input.
   ---
   ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
-  get_table_size = function(value)
+  local function get_table_size(value)
     local count = 0
     if type(value) == 'table' then
       for _ in pairs(value) do
@@ -118,7 +113,7 @@ local utils = {
       end
     end
     return count
-  end,
+  end
 
   --- Get the size of an array like table, for example `{ 'one', 'two',
   ---  'three' }` = 3.
@@ -126,7 +121,7 @@ local utils = {
   ---@param value any # A table or any input.
   ---
   ---@return number # The size of the array like table. 0 if the input is no table or the table is empty.
-  get_array_size = function(value)
+  local function get_array_size(value)
     local count = 0
     if type(value) == 'table' then
       for _ in ipairs(value) do
@@ -134,7 +129,7 @@ local utils = {
       end
     end
     return count
-  end,
+  end
 
   ---Scan for an optional argument.
   ---
@@ -142,7 +137,8 @@ local utils = {
   ---@param end_delimiter? string # The character that marks the end of an optional argument (by default `]`).
   ---
   ---@return string|nil # The string that was enclosed by the delimiters. The delimiters themselves are not returned.
-  scan_oarg = function(initial_delimiter, end_delimiter)
+  local function scan_oarg(initial_delimiter,
+    end_delimiter)
     if initial_delimiter == nil then
       initial_delimiter = '['
     end
@@ -176,8 +172,19 @@ local utils = {
     else
       token.put_next(t)
     end
-  end,
-}
+  end
+
+  return {
+    merge_tables = merge_tables,
+    clone_table = clone_table,
+    remove_from_table = remove_from_table,
+    get_table_size = get_table_size,
+    get_array_size = get_array_size,
+    scan_oarg = scan_oarg,
+  }
+end
+
+local utils = export_utils()
 
 local namespace = {
   opts = {
@@ -236,7 +243,7 @@ local namespace = {
 local function main()
 
   --- The default options.
-  local default_options = clone_table(namespace.opts)
+  local default_options = utils.clone_table(namespace.opts)
 
   local function throw_error(message)
     if type(tex.error) == 'function' then
@@ -1053,7 +1060,7 @@ local function main()
     --- standalone values are removed.
     -- For some callbacks and the third return value of parse, we
     -- need an unchanged raw result from the parse function.
-    input = clone_table(input)
+    input = utils.clone_table(input)
     if output == nil then
       output = {}
     end
@@ -1163,7 +1170,7 @@ local function main()
     end
 
     local result = generate_parser('list', opts):match(kv_string)
-    local raw = clone_table(result)
+    local raw = utils.clone_table(result)
 
     local function apply_hook(name)
       if type(opts.hooks[name]) == 'function' then
@@ -1273,7 +1280,7 @@ local function main()
     if type(opts.defs) == 'table' then
       apply_hooks('before_defs')
       result, unknown = apply_definitions(opts.defs, opts, result, {},
-        {}, {}, clone_table(result))
+        {}, {}, utils.clone_table(result))
     end
 
     apply_hooks()
@@ -1311,7 +1318,7 @@ local function main()
   local export = {
     version = { 0, 11, 0 },
 
-    namespace = clone_table(namespace),
+    namespace = utils.clone_table(namespace),
 
     ---This function is used in the documentation.
     ---
@@ -1343,7 +1350,7 @@ local function main()
         local options
 
         if inner_opts ~= nil and opts ~= nil then
-          options = merge_tables(opts, inner_opts)
+          options = utils.merge_tables(opts, inner_opts)
         elseif inner_opts ~= nil then
           options = inner_opts
         elseif opts ~= nil then
