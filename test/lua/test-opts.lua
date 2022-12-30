@@ -193,7 +193,7 @@ describe('Options', function()
             end,
           },
         })
-      end, 'Unknown hook: xxx!')
+      end, 'luakeys error [E2]: Unknown hook: “xxx”!')
 
     end)
 

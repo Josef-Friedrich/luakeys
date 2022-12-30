@@ -100,6 +100,18 @@ local function export_utils()
     end
   end
 
+  ---@param source table
+  ---
+  ---@return table # An array table with the sorted key names.
+  local function extract_keys_from_table(source)
+    local keys = {}
+    for key in pairs(source) do
+      table.insert(keys, key)
+    end
+    table.sort(keys)
+    return keys
+  end
+
   ---Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
   ---
   ---@param value any # A table or any input.
@@ -222,6 +234,7 @@ local function export_utils()
     merge_tables = merge_tables,
     clone_table = clone_table,
     remove_from_table = remove_from_table,
+    extract_keys_from_table = extract_keys_from_table,
     get_table_size = get_table_size,
     get_array_size = get_array_size,
     scan_oarg = scan_oarg,
@@ -490,7 +503,7 @@ local function main()
     end
     for key, _ in pairs(opts) do
       if namespace.opts[key] == nil then
-        throw_error_ng('E1', { unknown = key })
+        throw_error_ng('E1', { unknown = key, opt_names = '' })
       end
     end
     local old_opts = opts
@@ -505,7 +518,7 @@ local function main()
 
     for hook in pairs(opts.hooks) do
       if namespace.hooks[hook] == nil then
-        utils.throw_error('Unknown hook: ' .. tostring(hook) .. '!')
+        throw_error_ng('E2', { unknown = hook })
       end
     end
     return opts
@@ -1383,11 +1396,7 @@ local function main()
     ---
     ---@param from string # A key in the namespace table, either `opts`, `hook` or `attrs`.
     print_names = function(from)
-      local names = {}
-      for name in pairs(namespace[from]) do
-        table.insert(names, name)
-      end
-      table.sort(names)
+      local names = utils.extract_keys_from_table(namespace[from])
       tex.print(table.concat(names, ', '))
     end,
 
