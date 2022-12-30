@@ -94,7 +94,7 @@ describe('Defintions', function()
               assert_alias('k = value, ke = value', {},
                 { key = { alias = { 'k', 'ke' } } })
             end,
-              'Duplicate aliases “k” and “ke” for key “key”!')
+              'luakeys error [E3]: Duplicate aliases “k” and “ke” for key “key”!')
           end)
 
         it('should throw an error if the key and an alias are present',
@@ -103,7 +103,7 @@ describe('Defintions', function()
               assert_alias('key = value, k = value', {},
                 { key = { alias = { 'k', 'ke' } } })
             end,
-              'Duplicate aliases “key” and “k” for key “key”!')
+              'luakeys error [E3]: Duplicate aliases “key” and “k” for key “key”!')
           end)
       end)
     end)

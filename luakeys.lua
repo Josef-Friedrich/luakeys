@@ -101,7 +101,7 @@ local utils = (function()
   ---@param source table
   ---
   ---@return table # An array table with the sorted key names.
-  local function extract_keys_from_table(source)
+  local function get_table_keys(source)
     local keys = {}
     for key in pairs(source) do
       table.insert(keys, key)
@@ -232,7 +232,7 @@ local utils = (function()
     merge_tables = merge_tables,
     clone_table = clone_table,
     remove_from_table = remove_from_table,
-    extract_keys_from_table = extract_keys_from_table,
+    get_table_keys = get_table_keys,
     get_table_size = get_table_size,
     get_array_size = get_array_size,
     scan_oarg = scan_oarg,
@@ -432,8 +432,14 @@ local namespace = {
   },
 
   error_messages = {
-    E1 = 'Unknown parse option: ${unknown}!',
-    E2 = 'Unknown hook: ${unknown}!',
+    E1 = {
+      'Unknown parse option: ${unknown}!',
+      { 'The available options are:', '${opt_names}' },
+    },
+    E2 = {
+      'Unknown hook: ${unknown}!',
+      { 'The available hooks are:', '${hook_names}' },
+    },
     E3 = 'Duplicate aliases ${alias1} and ${alias2} for key ${key}!',
     E4 = 'The value ${value} does not exist in the choices: ${choices}',
     E5 = 'Unknown data type: ${unknown}',
@@ -463,24 +469,67 @@ local function main()
   ---@param error_code string
   ---@param args? table
   local function throw_error_ng(error_code, args)
-    local message = error_messages[error_code]
+    local template = error_messages[error_code]
 
-    if args ~= nil then
+    ---@param message string
+    ---@param args table
+    ---
+    ---@return string
+    local function replace_args(message, args)
       for key, value in pairs(args) do
+        if type(value) == 'table' then
+          value = table.concat(value, ', ')
+        end
         message = message:gsub('${' .. key .. '}',
           '“' .. tostring(value) .. '”')
       end
+      return message
+    end
+
+    ---@param list table
+    ---@param args table
+    ---
+    ---@return table
+    local function replace_args_in_list(list, args)
+      for index, message in ipairs(list) do
+        list[index] = replace_args(message, args)
+      end
+      return list
+    end
+
+    ---@type string
+    local message
+    ---@type table
+    local help = {}
+
+    if type(template) == 'table' then
+      message = template[1]
+      if args ~= nil then
+        help = replace_args_in_list(template[2], args)
+      else
+        help = template[2]
+      end
+    else
+      message = template
+    end
+
+    if args ~= nil then
+      message = replace_args(message, args)
     end
 
     message = 'luakeys error [' .. error_code .. ']: ' .. message
 
+    for _, help_message in ipairs({
+      'You may be able to find more help in the documentation:',
+      'http://mirrors.ctan.org/macros/luatex/generic/luakeys/luakeys-doc.pdf',
+      'Or ask a question in the issue tracker on Github:',
+      'https://github.com/Josef-Friedrich/luakeys/issues',
+    }) do
+      table.insert(help, help_message)
+    end
+
     if type(tex.error) == 'function' then
-      tex.error(message, {
-        'You may be able to find more help in the documentation:',
-        'http://mirrors.ctan.org/macros/luatex/generic/luakeys/luakeys-doc.pdf',
-        'Or ask a question in the issue tracker on Github:',
-        'https://github.com/Josef-Friedrich/luakeys/issues',
-      })
+      tex.error(message, help)
     else
       error(message)
     end
@@ -497,7 +546,10 @@ local function main()
     end
     for key, _ in pairs(opts) do
       if namespace.opts[key] == nil then
-        throw_error_ng('E1', { unknown = key, opt_names = '' })
+        throw_error_ng('E1', {
+          unknown = key,
+          opt_names = utils.get_table_keys(namespace.opts),
+        })
       end
     end
     local old_opts = opts
@@ -512,7 +564,10 @@ local function main()
 
     for hook in pairs(opts.hooks) do
       if namespace.hooks[hook] == nil then
-        throw_error_ng('E2', { unknown = hook })
+        throw_error_ng('E2', {
+          unknown = hook,
+          hook_names = utils.get_table_keys(namespace.hooks),
+        })
       end
     end
     return opts
@@ -871,9 +926,11 @@ local function main()
           local v = find_value(alias, def)
           if v ~= nil then
             if alias_value ~= nil then
-              utils.throw_error(string.format(
-                'Duplicate aliases “%s” and “%s” for key “%s”!',
-                used_alias_key, alias, key))
+              throw_error_ng('E3', {
+                alias1 = used_alias_key,
+                alias2 = alias,
+                key = key,
+              })
             end
             used_alias_key = alias
             alias_value = v
@@ -1390,7 +1447,7 @@ local function main()
     ---
     ---@param from string # A key in the namespace table, either `opts`, `hook` or `attrs`.
     print_names = function(from)
-      local names = utils.extract_keys_from_table(namespace[from])
+      local names = utils.get_table_keys(namespace[from])
       tex.print(table.concat(names, ', '))
     end,
 
