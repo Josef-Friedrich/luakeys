@@ -1242,7 +1242,7 @@ local function main()
 
         if opts.debug then
           print('After the execution of the hook: ' .. name)
-          debug(result)
+          visualizers.debug(result)
         end
       end
     end
