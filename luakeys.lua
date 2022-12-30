@@ -243,7 +243,7 @@ local namespace = {
 local function main()
 
   --- The default options.
-  local default_options = utils.clone_table(namespace.opts)
+  local default_opts = utils.clone_table(namespace.opts)
 
   local function throw_error(message)
     if type(tex.error) == 'function' then
@@ -273,7 +273,7 @@ local function main()
       if old_opts[name] ~= nil then
         opts[name] = old_opts[name]
       else
-        opts[name] = default_options[name]
+        opts[name] = default_opts[name]
       end
     end
 
@@ -1336,8 +1336,8 @@ local function main()
       tex.print(tostring(namespace[from][name]))
     end,
 
-    --- @see default_options
-    opts = default_options,
+    --- @see default_opts
+    opts = default_opts,
 
     --- @see stringify
     stringify = stringify,
