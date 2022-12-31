@@ -29,12 +29,11 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Fields">Fields</a></li>
 <li><a href="#Local_Functions">Local Functions</a></li>
 <li><a href="#Convert_back_to_strings">Convert back to strings </a></li>
+<li><a href="#Class_string">Class string </a></li>
 <li><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></li>
 <li><a href="#Store_results">Store results </a></li>
-<li><a href="#Exports">Exports </a></li>
 </ul>
 
 
@@ -55,13 +54,6 @@
 <p> https://stackoverflow.com/a/1283608/10193818</p>
 
 
-<h2><a href="#Fields">Fields</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#default_options">default_options</a></td>
-	<td class="summary">The default options.</td>
-	</tr>
-</table>
 <h2><a href="#Local_Functions">Local Functions</a></h2>
 <table class="function_list">
 	<tr>
@@ -71,6 +63,12 @@
 	<tr>
 	<td class="name" nowrap><a href="#remove_from_table">remove_from_table (source, value)</a></td>
 	<td class="summary">Remove an element from a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_table_keys">get_table_keys (source)</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_table_size">get_table_size (value)</a></td>
@@ -86,8 +84,10 @@
 	<td class="summary">Scan for an optional argument.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize_opts">normalize_opts (opts)</a></td>
-	<td class="summary">Normalize the parse options.</td>
+	<td class="name" nowrap><a href="#throw_error">throw_error (message, help)</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 </table>
 <h2><a href="#Convert_back_to_strings">Convert back to strings </a></h2>
@@ -106,6 +106,41 @@
 	<td class="name" nowrap><a href="#debug">debug (result)</a></td>
 	<td class="summary">The function <code>debug(result)</code> pretty prints a Lua table to standard
    output (stdout).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#main">main ()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#default_opts">default_opts</a></td>
+	<td class="summary">The default options.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#throw_error">throw_error (error_code, args)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#replace_args">replace_args (message, args)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#replace_args_in_list">replace_args_in_list (list, args)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Class_string">Class string </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#string.normalize_opts">string.normalize_opts (opts)</a></td>
+	<td class="summary">Normalize the parse options.</td>
 	</tr>
 </table>
 <h2><a href="#Parser___Lpeg_related">Parser / Lpeg related </a></h2>
@@ -156,9 +191,6 @@
 	<td class="name" nowrap><a href="#result_store">result_store</a></td>
 	<td class="summary">A table to store parsed key-value results.</td>
 	</tr>
-</table>
-<h2><a href="#Exports">Exports </a></h2>
-<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#print_names">print_names (from)</a></td>
 	<td class="summary">This function is used in the documentation.</td>
@@ -209,24 +241,6 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "default_options"></a>
-    <strong>default_options</strong>
-    </dt>
-    <dd>
-    The default options.
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
 
     <dl class="function">
@@ -279,6 +293,33 @@
     <ol>
 
         any|nil
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_table_keys"></a>
+    <strong>get_table_keys (source)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">source</span>
+         table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table # An array table with the sorted key names.
     </ol>
 
 
@@ -365,25 +406,25 @@
 
 </dd>
     <dt>
-    <a name = "normalize_opts"></a>
-    <strong>normalize_opts (opts)</strong>
+    <a name = "throw_error"></a>
+    <strong>throw_error (message, help)</strong>
     </dt>
     <dd>
-    Normalize the parse options.
+
+
+
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">opts</span>
-        ? table # Options in a raw format. The table may be empty or some keys are not set.
+        <li><span class="parameter">message</span>
+         string
+        </li>
+        <li><span class="parameter">help</span>
+        ? table
         </li>
     </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-
-        table
-    </ol>
 
 
 
@@ -479,6 +520,155 @@
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "main"></a>
+    <strong>main ()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table # The public interface of the module.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "default_opts"></a>
+    <strong>default_opts</strong>
+    </dt>
+    <dd>
+    The default options.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "throw_error"></a>
+    <strong>throw_error (error_code, args)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">error_code</span>
+         string
+        </li>
+        <li><span class="parameter">args</span>
+        ? table
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "replace_args"></a>
+    <strong>replace_args (message, args)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">message</span>
+         string
+        </li>
+        <li><span class="parameter">args</span>
+         table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        string
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "replace_args_in_list"></a>
+    <strong>replace_args_in_list (list, args)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+         table
+        </li>
+        <li><span class="parameter">args</span>
+         table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Class_string"></a>Class string </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "string.normalize_opts"></a>
+    <strong>string.normalize_opts (opts)</strong>
+    </dt>
+    <dd>
+    Normalize the parse options.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">opts</span>
+        ? table # Options in a raw format. The table may be empty or some keys are not set.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table
+    </ol>
 
 
 
@@ -749,10 +939,6 @@
 
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Exports"></a>Exports </h2>
-
-    <dl class="function">
     <dt>
     <a name = "print_names"></a>
     <strong>print_names (from)</strong>
@@ -788,7 +974,7 @@
 
     <h3>See also:</h3>
     <ul>
-         <a href="index.html#default_options">default_options</a>
+         <a href="index.html#default_opts">default_opts</a>
     </ul>
 
 
@@ -808,7 +994,6 @@
 
     <h3>See also:</h3>
     <ul>
-         <a href="index.html#stringify">stringify</a>
     </ul>
 
 
@@ -848,7 +1033,6 @@
 
     <h3>See also:</h3>
     <ul>
-         <a href="index.html#render">render</a>
     </ul>
 
 
@@ -868,7 +1052,6 @@
 
     <h3>See also:</h3>
     <ul>
-         <a href="index.html#debug">debug</a>
     </ul>
 
 
@@ -932,7 +1115,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-30 16:44:45 </i>
+<i style="float:right;">Last updated 2022-12-31 09:31:35 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
