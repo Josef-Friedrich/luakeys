@@ -21,23 +21,21 @@ install_quick:
 test: install test_lua test_examples test_tex doc_pdf
 
 test_lua:
-	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip test/lua/test-*.lua
+	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip tests/lua/test-*.lua
 
 test_examples: test_examples_lua test_examples_plain test_examples_latex
-
 test_examples_lua:
 	busted --pattern "**/*.lua" examples
 test_examples_plain:
-	find examples -iname "*plain.tex" -exec luatex --output-dir=test/tex/plain {} \;
+	find examples -iname "*plain.tex" -exec luatex --output-dir=examples {} \;
 test_examples_latex:
-	find examples -iname "*latex.tex" -exec latexmk -lualatex -cd --output-directory=test/tex/latex {} \;
+	find examples -iname "*latex.tex" -exec latexmk -lualatex -cd --output-directory=examples {} \;
 
 test_tex: test_tex_plain test_tex_latex
-
 test_tex_plain:
-	find test/tex/plain -iname "*.tex" -exec luatex --output-dir=test/tex/plain {} \;
+	find tests/tex/plain -iname "*.tex" -exec luatex --output-dir=tests/tex/plain {} \;
 test_tex_latex:
-	find test/tex/latex -iname "*.tex" -exec lualatex --output-dir=test/tex/latex {} \;
+	find tests/tex/latex -iname "*.tex" -exec lualatex --output-dir=tests/tex/latex {} \;
 
 doc: doc_pdf doc_lua
 
