@@ -59,7 +59,7 @@ expands to: “\MyMacro”
 
 \directlua{
   local parser = luakeys.define({key = { macro = 'MyMacro' }})
-  local result = parser('unkown=value', { no_error = true })
+  local result = parser('unknown=value', { no_error = true })
 }
 
 a non-existent key produces a macro that has no content:

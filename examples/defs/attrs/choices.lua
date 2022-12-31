@@ -12,6 +12,6 @@ it('error message.', function()
   assert.has_error(function()
     parse('key=unknown')
     -- error message:
-    --- 'The value “unknown” does not exist in the choices: one, two, three!'
-  end, 'The value “unknown” does not exist in the choices: one, two, three!')
+    --- 'luakeys error [E004]: The value “unknown” does not exist in the choices: “one, two, three”'
+  end, 'luakeys error [E004]: The value “unknown” does not exist in the choices: “one, two, three”')
 end)

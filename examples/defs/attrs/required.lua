@@ -11,8 +11,8 @@ end)
 it('should throw an error if the key is missing', function()
   assert.has_error(function()
     parse('unimportant')
-    -- throws error message: 'Missing required key “important”!'
-  end, 'Missing required key “important”!')
+    -- throws error message: 'luakeys error [E012]: Missing required key “important”!'
+  end, 'luakeys error [E012]: Missing required key “important”!')
 end)
 
 local parse2 = luakeys.define({
@@ -27,8 +27,8 @@ it(
   function()
     assert.has_error(function()
       parse2('important1={unimportant}')
-      -- throws error message: 'Missing required key “important2”!'
-    end, 'Missing required key “important2”!')
+      -- throws error message: 'luakeys error [E012]: Missing required key “important2”!'
+    end, 'luakeys error [E012]: Missing required key “important2”!')
   end)
 
 it(
@@ -36,6 +36,6 @@ it(
   function()
     assert.has_error(function()
       parse2('unimportant')
-      -- throws error message: 'Missing required key “important1”!'
-    end, 'Missing required key “important1”!')
+      -- throws error message: 'luakeys error [E012]: Missing required key “important1”!'
+    end, 'luakeys error [E012]: Missing required key “important1”!')
   end)

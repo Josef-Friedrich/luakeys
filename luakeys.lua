@@ -184,9 +184,11 @@ local utils = (function()
     end
   end
 
-  local function throw_error(message)
+  ---@param message string
+  ---@param help? table
+  local function throw_error(message, help)
     if type(tex.error) == 'function' then
-      tex.error(message)
+      tex.error(message, help)
     else
       error(message)
     end
@@ -432,29 +434,33 @@ local namespace = {
   },
 
   error_messages = {
-    E1 = {
-      'Unknown parse option: ${unknown}!',
-      { 'The available options are:', '${opt_names}' },
+    E001 = {
+      'Unknown parse option: @unknown!',
+      { 'The available options are:', '@opt_names' },
     },
-    E2 = {
-      'Unknown hook: ${unknown}!',
-      { 'The available hooks are:', '${hook_names}' },
+    E002 = {
+      'Unknown hook: @unknown!',
+      { 'The available hooks are:', '@hook_names' },
     },
-    E3 = 'Duplicate aliases ${alias1} and ${alias2} for key ${key}!',
-    E4 = 'The value ${value} does not exist in the choices: ${choices}',
-    E5 = 'Unknown data type: ${unknown}',
-    E6 = 'The value ${value} of the key ${key} could not be converted into the data type ${data_type}!',
-    E7 = 'The key ${key} belongs to the mutually exclusive group ${exclusive_group} and another key of the group named ${another_key} is already present!',
-    E8 = 'def.match has to be a string',
-    E9 = 'The value ${value} of the key ${key} does not match ${match}!',
-    E10 = 'Usage opposite_keys = { [true] = "...", [false] = "..." }',
-    E11 = 'Wrong data type in the “pick” attribute: ${unknown}. Allowed are: ${data_types}.',
-    E12 = 'Missing required key ${key}!',
-    E13 = 'The key definition must be a table! Got ${data_type} for key ${key}.',
-    E14 = 'Unknown definition attribute: ${unknown}',
-    E15 = 'Key name couldn’t be detected!',
-    E17 = 'Unknown style to format keys: ${unknown}! Allowed styles are: lower, snake, upper',
-    E18 = 'The option “format_keys” has to be a table not ${data_type}',
+    E003 = 'Duplicate aliases @alias1 and @alias2 for key @key!',
+    E004 = 'The value @value does not exist in the choices: @choices',
+    E005 = 'Unknown data type: @unknown',
+    E006 = 'The value @value of the key @key could not be converted into the data type @data_type!',
+    E007 = 'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
+    E008 = 'def.match has to be a string',
+    E009 = 'The value @value of the key @key does not match @match!',
+    E010 = 'Usage opposite_keys = { [true] = "...", [false] = "..." ',
+    E011 = 'Wrong data type in the “pick” attribute: @unknown. Allowed are: @data_types.',
+    E012 = 'Missing required key @key!',
+    E013 = 'The key definition must be a table! Got @data_type for key @key.',
+    E014 = {
+      'Unknown definition attribute: @unknown',
+      { 'The available attributes are:', '@attr_names' },
+    },
+    E015 = 'Key name couldn’t be detected!',
+    E017 = 'Unknown style to format keys: @unknown! Allowed styles are: @styles',
+    E018 = 'The option “format_keys” has to be a table not @data_type',
+    E019 = 'Unknown keys: @unknown',
   },
 }
 
@@ -468,7 +474,7 @@ local function main()
 
   ---@param error_code string
   ---@param args? table
-  local function throw_error_ng(error_code, args)
+  local function throw_error(error_code, args)
     local template = error_messages[error_code]
 
     ---@param message string
@@ -480,7 +486,7 @@ local function main()
         if type(value) == 'table' then
           value = table.concat(value, ', ')
         end
-        message = message:gsub('${' .. key .. '}',
+        message = message:gsub('@' .. key,
           '“' .. tostring(value) .. '”')
       end
       return message
@@ -528,11 +534,7 @@ local function main()
       table.insert(help, help_message)
     end
 
-    if type(tex.error) == 'function' then
-      tex.error(message, help)
-    else
-      error(message)
-    end
+    utils.throw_error(message, help)
   end
 
   --- Normalize the parse options.
@@ -546,7 +548,7 @@ local function main()
     end
     for key, _ in pairs(opts) do
       if namespace.opts[key] == nil then
-        throw_error_ng('E1', {
+        throw_error('E001', {
           unknown = key,
           opt_names = utils.get_table_keys(namespace.opts),
         })
@@ -564,7 +566,7 @@ local function main()
 
     for hook in pairs(opts.hooks) do
       if namespace.hooks[hook] == nil then
-        throw_error_ng('E2', {
+        throw_error('E002', {
           unknown = hook,
           hook_names = utils.get_table_keys(namespace.hooks),
         })
@@ -926,7 +928,7 @@ local function main()
           local v = find_value(alias, def)
           if v ~= nil then
             if alias_value ~= nil then
-              throw_error_ng('E3', {
+              throw_error('E003', {
                 alias1 = used_alias_key,
                 alias2 = alias,
                 key = key,
@@ -959,9 +961,7 @@ local function main()
             end
           end
           if not is_in_choices then
-            utils.throw_error('The value “' .. value ..
-                                '” does not exist in the choices: ' ..
-                                table.concat(def.choices, ', ') .. '!')
+            throw_error('E004', { value = value, choices = def.choices })
           end
         end
       end,
@@ -1006,13 +1006,14 @@ local function main()
               converted = value
             end
           else
-            utils.throw_error('Unknown data type: ' .. def.data_type)
+            throw_error('E005', { data_type = def.data_type })
           end
           if converted == nil then
-            utils.throw_error('The value “' .. value ..
-                                '” of the key “' .. key ..
-                                '” could not be converted into the data type “' ..
-                                def.data_type .. '”!')
+            throw_error('E006', {
+              value = value,
+              key = key,
+              data_type = def.data_type,
+            })
           else
             return converted
           end
@@ -1025,12 +1026,11 @@ local function main()
         end
         if def.exclusive_group ~= nil then
           if exclusive_groups[def.exclusive_group] ~= nil then
-            utils.throw_error('The key “' .. key ..
-                                '” belongs to a mutually exclusive group “' ..
-                                def.exclusive_group ..
-                                '” and the key “' ..
-                                exclusive_groups[def.exclusive_group] ..
-                                '” is already present!')
+            throw_error('E007', {
+              key = key,
+              exclusive_group = def.exclusive_group,
+              another_key = exclusive_groups[def.exclusive_group],
+            })
           else
             exclusive_groups[def.exclusive_group] = key
           end
@@ -1063,14 +1063,15 @@ local function main()
         end
         if def.match ~= nil then
           if type(def.match) ~= 'string' then
-            utils.throw_error('def.match has to be a string')
+            throw_error('E008')
           end
           local match = string.match(value, def.match)
           if match == nil then
-            utils.throw_error('The value “' .. value ..
-                                '” of the key “' .. key ..
-                                '” does not match “' .. def.match ..
-                                '”!')
+            throw_error('E009', {
+              value = value,
+              key = key,
+              match = def.match:gsub('%%', '%%%%'),
+            })
           else
             return match
           end
@@ -1082,8 +1083,7 @@ local function main()
           local true_value = def.opposite_keys[true]
           local false_value = def.opposite_keys[false]
           if true_value == nil or false_value == nil then
-            utils.throw_error(
-              'Usage opposite_keys = { [true] = "...", [false] = "..." }')
+            throw_error('E010')
           end
           if utils.remove_from_table(input, true_value) ~= nil then
             return true
@@ -1118,10 +1118,17 @@ local function main()
           -- Check if the pick attribute is valid
           for _, pick_type in ipairs(pick_types) do
             if type(pick_type) == 'string' and is[pick_type] == nil then
-              utils.throw_error(
-                'Wrong data type in the “pick” attribute: ' ..
-                  tostring(pick_type) ..
-                  '. Allowed are: any, boolean, dimension, integer, number, string.')
+              throw_error('E011', {
+                unknown = tostring(pick_type),
+                data_types = {
+                  'any',
+                  'boolean',
+                  'dimension',
+                  'integer',
+                  'number',
+                  'string',
+                },
+              })
             end
           end
 
@@ -1155,8 +1162,7 @@ local function main()
 
       required = function(value, key, def)
         if def.required ~= nil and def.required and value == nil then
-          utils.throw_error(string.format(
-            'Missing required key “%s”!', key))
+          throw_error('E012', { key = key })
         end
       end,
 
@@ -1211,20 +1217,20 @@ local function main()
       end
 
       if type(def) ~= 'table' then
-        utils.throw_error(string.format(
-          'The key definition must be a table! Got “%s” for key “%s”.',
-          tostring(def), index)) -- key is nil
+        throw_error('E013', { data_type = tostring(def), key = index }) -- key is nil
       end
 
       for attr, _ in pairs(def) do
         if namespace.attrs[attr] == nil then
-          utils.throw_error('Unknown definition attribute: ' ..
-                              tostring(attr))
+          throw_error('E014', {
+            unknown = attr,
+            attr_names = utils.get_table_keys(namespace.attrs),
+          })
         end
       end
 
       if key == nil then
-        utils.throw_error('Key name couldn’t be detected!')
+        throw_error('E015')
       end
 
       local value = find_value(key, def)
@@ -1357,9 +1363,10 @@ local function main()
               elseif style == 'upper' then
                 key = key:upper()
               else
-                utils.throw_error('Unknown style to format keys: ' ..
-                                    tostring(style) ..
-                                    ' Allowed styles are: lower, snake, upper')
+                throw_error('E017', {
+                  unknown = style,
+                  styles = { 'lower', 'snake', 'upper' },
+                })
               end
             end
           end
@@ -1384,9 +1391,7 @@ local function main()
 
       if opts.format_keys then
         if type(opts.format_keys) ~= 'table' then
-          utils.throw_error(
-            'The option “format_keys” has to be a table not ' ..
-              type(opts.format_keys))
+          throw_error('E018', { data_type = type(opts.format_keys) })
         end
         result = utils.visit_tree(result, callbacks.format_key)
       end
@@ -1425,7 +1430,7 @@ local function main()
     -- no_error
     if not opts.no_error and type(unknown) == 'table' and
       utils.get_table_size(unknown) > 0 then
-      utils.throw_error('Unknown keys: ' .. visualizers.render(unknown))
+      throw_error('E019', { unknown = visualizers.render(unknown) })
     end
     return result, unknown, raw
   end

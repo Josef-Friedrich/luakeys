@@ -12,6 +12,6 @@ local parse = luakeys.define({
 
 it('Error message', function()
   assert.has_error(function()
-    parse('key=1') -- throws error message: 'Unknown keys: unknown_key=true,'
-  end, 'Unknown keys: unknown_key=true,')
+    parse('key=1') -- throws error message: 'luakeys error [E019]: Unknown keys: “unknown_key=true,”'
+  end, 'luakeys error [E019]: Unknown keys: “unknown_key=true,”')
 end)

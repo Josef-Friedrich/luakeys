@@ -14,8 +14,8 @@ it('should throw an error', function()
   assert.has_error(function()
     parse('birthday=1978-12-XX')
     -- throws error message:
-    -- 'The value “1978-12-XX” of the key “birthday”
+    -- 'luakeys error [E009]: The value “1978-12-XX” of the key “birthday”
     --  does not match “^%d%d%d%d%-%d%d%-%d%d$”!'
   end,
-    'The value “1978-12-XX” of the key “birthday” does not match “^%d%d%d%d%-%d%d%-%d%d$”!')
+    'luakeys error [E009]: The value “1978-12-XX” of the key “birthday” does not match “^%d%d%d%d%-%d%d%-%d%d$”!')
 end)

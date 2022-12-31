@@ -7,7 +7,7 @@ describe('Defintions', function()
     function()
       assert.has_error(function()
         luakeys.parse('', { defs = { key = { xxx = true } } })
-      end, 'Unknown definition attribute: xxx')
+      end, 'luakeys error [E014]: Unknown definition attribute: “xxx”')
     end)
 
   describe('Name of the keys', function()
@@ -94,7 +94,7 @@ describe('Defintions', function()
               assert_alias('k = value, ke = value', {},
                 { key = { alias = { 'k', 'ke' } } })
             end,
-              'luakeys error [E3]: Duplicate aliases “k” and “ke” for key “key”!')
+              'luakeys error [E003]: Duplicate aliases “k” and “ke” for key “key”!')
           end)
 
         it('should throw an error if the key and an alias are present',
@@ -103,7 +103,7 @@ describe('Defintions', function()
               assert_alias('key = value, k = value', {},
                 { key = { alias = { 'k', 'ke' } } })
             end,
-              'luakeys error [E3]: Duplicate aliases “key” and “k” for key “key”!')
+              'luakeys error [E003]: Duplicate aliases “key” and “k” for key “key”!')
           end)
       end)
     end)
@@ -147,7 +147,7 @@ describe('Defintions', function()
         assert.has_error(function()
           luakeys.parse('key = unknown', { defs = defs })
         end,
-          'The value “unknown” does not exist in the choices: one, two, three!')
+          'luakeys error [E004]: The value “unknown” does not exist in the choices: “one, two, three”')
       end)
     end)
 
@@ -330,7 +330,7 @@ describe('Defintions', function()
         assert.has_error(function()
           luakeys.parse('key', { defs = { key = { pick = 'xxx' } } })
         end,
-          'Wrong data type in the “pick” attribute: xxx. Allowed are: any, boolean, dimension, integer, number, string.')
+          'luakeys error [E011]: Wrong data type in the “pick” attribute: “xxx”. Allowed are: “any, boolean, dimension, integer, number, string”.')
       end)
     end)
 

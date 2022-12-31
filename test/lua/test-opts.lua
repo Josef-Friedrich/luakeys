@@ -18,7 +18,7 @@ describe('Options', function()
   it('Unknown options should trigger an error message.', function()
     assert.has_error(function()
       luakeys.parse('key', { xxx = true })
-    end, 'luakeys error [E1]: Unknown parse option: “xxx”!')
+    end, 'luakeys error [E001]: Unknown parse option: “xxx”!')
   end)
 
   it('with underscores', function()
@@ -193,7 +193,7 @@ describe('Options', function()
             end,
           },
         })
-      end, 'luakeys error [E2]: Unknown hook: “xxx”!')
+      end, 'luakeys error [E002]: Unknown hook: “xxx”!')
 
     end)
 
@@ -322,10 +322,10 @@ describe('Options', function()
       luakeys.parse('key', { defs = { 'key' } })
     end)
 
-    it('An non-empty unkown table should throw an error.', function()
+    it('An non-empty unknown table should throw an error.', function()
       assert.has_error(function()
         luakeys.parse('unknown', { defs = { 'key' } })
-      end, 'Unknown keys: unknown,')
+      end, 'luakeys error [E019]: Unknown keys: “unknown,”')
     end)
 
     it('should prevent an error.', function()
