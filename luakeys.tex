@@ -16,4 +16,8 @@
 % This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
 % luakeys-debug.sty and luakeys-debug.tex.
 
-\directlua{luakeys = require('luakeys')()}
+\directlua{
+  if luakeys == nil then
+    luakeys = require('luakeys')()
+  end
+}
