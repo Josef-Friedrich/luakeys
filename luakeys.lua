@@ -15,7 +15,6 @@
 --
 -- This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
 -- luakeys-debug.sty and luakeys-debug.tex.
-
 --- A key-value parser written with Lpeg.
 --
 -- @module luakeys
@@ -450,7 +449,7 @@ local namespace = {
     E007 = 'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
     E008 = 'def.match has to be a string',
     E009 = 'The value @value of the key @key does not match @match!',
-    E010 = 'Usage opposite_keys = { [true] = "...", [false] = "..." ',
+
     E011 = 'Wrong data type in the “pick” attribute: @unknown. Allowed are: @data_types.',
     E012 = 'Missing required key @key!',
     E013 = 'The key definition must be a table! Got @data_type for key @key.',
@@ -462,6 +461,12 @@ local namespace = {
     E017 = 'Unknown style to format keys: @unknown! Allowed styles are: @styles',
     E018 = 'The option “format_keys” has to be a table not @data_type',
     E019 = 'Unknown keys: @unknown',
+
+    --- Input / parsing error
+    E021 = 'Opposite key was specified more than once: @key!',
+    E020 = 'Both opposite keys were given: @true and @false!',
+    --- Config error (wrong configuration of luakeys)
+    E010 = 'Usage: opposite_keys = { "true_key", "false_key" } or { [true] = "true_key", [false] = "false_key" } ',
   },
 }
 
@@ -1081,16 +1086,47 @@ local function main()
 
       opposite_keys = function(value, key, def)
         if def.opposite_keys ~= nil then
-          local true_value = def.opposite_keys[true]
-          local false_value = def.opposite_keys[false]
-          if true_value == nil or false_value == nil then
+          local function get_value(key1, key2)
+            local opposite_name
+            if def.opposite_keys[key1] ~= nil then
+              opposite_name = def.opposite_keys[key1]
+            elseif def.opposite_keys[key2] ~= nil then
+              opposite_name = def.opposite_keys[key2]
+            end
+            return opposite_name
+          end
+          local true_key = get_value(true, 1)
+          local false_key = get_value(false, 2)
+          if true_key == nil or false_key == nil then
             throw_error('E010')
           end
-          if utils.remove_from_table(input, true_value) ~= nil then
-            return true
-          elseif utils.remove_from_table(input, false_value) ~= nil then
-            return false
+
+          ---@param value string
+          local function remove_values(value)
+            local count = 0
+            while utils.remove_from_table(input, value) do
+              count = count + 1
+            end
+            return count
           end
+
+          local true_count = remove_values(true_key)
+          local false_count = remove_values(false_key)
+
+          if true_count > 1 then
+            throw_error('E021', { key = true_key })
+          end
+
+          if false_count > 1 then
+            throw_error('E021', { key = false_key })
+          end
+
+          if true_count > 0 and false_count > 0 then
+            throw_error('E020',
+              { ['true'] = true_key, ['false'] = false_key })
+          end
+
+          return true_count == 1 or false_count == 0
         end
       end,
 

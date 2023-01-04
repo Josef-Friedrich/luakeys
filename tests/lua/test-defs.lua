@@ -7,7 +7,8 @@ describe('Defintions', function()
     function()
       assert.has_error(function()
         luakeys.parse('', { defs = { key = { xxx = true } } })
-      end, 'luakeys error [E014]: Unknown definition attribute: “xxx”')
+      end,
+        'luakeys error [E014]: Unknown definition attribute: “xxx”')
     end)
 
   describe('Name of the keys', function()
@@ -258,16 +259,21 @@ describe('Defintions', function()
     end)
 
     describe('Attribute “opposite_keys”', function()
+      local parse = luakeys.define({
+        visibility = {
+          opposite_keys = { [true] = 'show', [false] = 'hide' },
+        },
+      })
       local function assert_opposite_keys(kv_string, expected)
-        assert.are.same(expected, luakeys.parse(kv_string, {
-          no_error = true,
-          defs = {
-            visibility = {
-              opposite_keys = { [true] = 'show', [false] = 'hide' },
-            },
-          },
-        }))
+        assert.are.same(expected, parse(kv_string))
       end
+
+      it('Specification as a list', function()
+        local result = luakeys.parse('show', {
+          defs = { visibility = { opposite_keys = { 'show', 'hide' } } },
+        })
+        assert.are.same(result, { visibility = true })
+      end)
 
       it('should return true if a truthy string value is given.',
         function()
@@ -278,10 +284,30 @@ describe('Defintions', function()
         assert_opposite_keys('hide', { visibility = false })
       end)
 
-      it(
-        'should return an empty table if a unknown string value is given.',
+      it('should throw an error if both opposite keys were given',
         function()
-          assert_opposite_keys('unknown', {})
+          assert.has_error(function()
+            parse('hide,show')
+          end,
+            'luakeys error [E020]: Both opposite keys were given: “show” and “hide”!')
+        end)
+
+      it(
+        'should throw an error if an opposite key was specified more than once: true',
+        function()
+          assert.has_error(function()
+            parse('show,show')
+          end,
+            'luakeys error [E021]: Opposite key was specified more than once: “show”!')
+        end)
+
+      it(
+        'should throw an error if an opposite key was specified more than once: false',
+        function()
+          assert.has_error(function()
+            parse('hide,hide')
+          end,
+            'luakeys error [E021]: Opposite key was specified more than once: “hide”!')
         end)
     end)
 

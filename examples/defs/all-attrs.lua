@@ -41,6 +41,7 @@ local defs = {
     -- into a boolean value and store this boolean under a target key:
     --   show -> opposite_keys = true
     --   hide -> opposite_keys = false
+    -- Short form: opposite_keys = { 'show', 'hide' }
     opposite_keys = { [true] = 'show', [false] = 'hide' },
 
     -- Pick a value by its data type:

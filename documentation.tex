@@ -969,7 +969,7 @@ These attributes are allowed:
 The code example below lists all the attributes that can be used to
 define key-value pairs.
 
-\InputLua[firstline=5,lastline=61]{defs/all-attrs.lua}
+\InputLua[firstline=5,lastline=62]{defs/all-attrs.lua}
 
 %%
 %
@@ -1226,8 +1226,8 @@ Instead of ...
 % Die Option \lua{opposite_keys} ermöglicht es, gegensätzliche (nackte)
 % Schlüssel in Wahrheitswerte umzuwandeln und diesen Wahrheitswert unter
 % einem Zielschlüssel zu speichern.
-The \lua{opposite_keys} attribute allows to convert opposite (naked) keys
-into a boolean value and store this boolean under a target key.
+The \lua{opposite_keys} attribute allows to convert opposite (naked)
+keys into a boolean value and store this boolean under a target key.
 %
 % Lua erlaubt es in Tabellen Wahrheitswerte als Schlüssel zu verwenden.
 % Es müssen jedoch eckige Klammern verwendet werden.
@@ -1258,6 +1258,17 @@ target key \lua{visibility} receives the value \lua{true}.
 If the key \lua{hide} is parsed, then \lua{false}.
 
 \InputLua[firstline=13,lastline=13]{defs/attrs/opposite-keys.lua}
+
+\noindent
+% Gegensätzliche Schlüsselpaare können in einer Kurzschreibweise
+% angegeben werden, nämlich als Liste
+Opposing key pairs can be specified in a short form, namely as a list:
+% Der gegensätzliche Schlüssel, der den Wahrwert repräsentiert, muss in
+% dieser Liste zuerst angegeben werden, dann folgt der Falschwert.
+The opposite key, which represents the true value, must be specified
+first in this list, followed by the false value.
+
+\InputLua[firstline=19,lastline=21]{defs/attrs/opposite-keys.lua}
 
 %%
 %
