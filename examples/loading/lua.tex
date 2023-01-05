@@ -1,12 +1,11 @@
 \documentclass{article}
 \directlua{
-  luakeys = require('luakeys')()
+  lk = require('luakeys')()
 }
-
 \newcommand{\helloworld}[2][]{
   \directlua{
-    local keys = luakeys.parse('\luaescapestring{\unexpanded{#1}}')
-    luakeys.debug(keys)
+    local keys = lk.parse('\luaescapestring{\unexpanded{#1}}')
+    lk.debug(keys)
     local marg = '#2'
     tex.print(keys.greeting .. ', ' .. marg .. keys.punctuation)
   }

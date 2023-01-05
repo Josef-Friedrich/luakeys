@@ -233,18 +233,10 @@ wrapper files.
 Probably MiK\TeX{} is searching for an occurrence of the \LaTeX{} macro
 “\latex{\usepackage{luakeys}}”.
 %
-% Die mitgelieferte Lua\LaTeX{}-Datei ist recht klein:
-The supplied Lua\LaTeX{} file is quite small:
-
-\begin{minted}{latex}
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{luakeys}
-\directlua{luakeys = require('luakeys')()}
-\end{minted}
-
-\noindent
-% Es lädt das Lua-Modul in die globale Variable \texttt{luakeys}.
-It loads the Lua module into the global variable \texttt{luakeys}.
+% Die Datei \texttt{luakeys.sty} lädt das Lua-Modul in die globale
+% Variable \texttt{luakeys}.
+The \texttt{luakeys.sty} file loads the Lua module into the global
+variable \texttt{luakeys}.
 
 \InputLatex{loading/tex-latex.tex}
 
@@ -256,22 +248,13 @@ It loads the Lua module into the global variable \texttt{luakeys}.
 % \texttt{luakeys.tex}}
 \subsection{Using the plain Lua\TeX{} wrapper \texttt{luakeys.tex}}
 
-% Noch kleiner ist die Datei \texttt{luakeys.tex}.
-Even smaller is the file \texttt{luakeys.tex}.
-%
-% Sie besteht aus nur einer Zeile:
-It consists of only one line:
-
-\begin{minted}{latex}
-\directlua{luakeys = require('luakeys')()}
-\end{minted}
-
 \noindent
 % Es macht dasselbe wie das Lua\LaTeX{}-Hüllpacket und lädt das
 % Lua-Modul \texttt{luakeys.lua} in die globale Variable
 % \texttt{luakeys}.
-It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
-\texttt{luakeys.lua} into the global variable \texttt{luakeys}.
+The file \texttt{luakeys.tex} does the same as the Lua\LaTeX{} wrapper
+and loads the Lua module \texttt{luakeys.lua} into the global variable
+\texttt{luakeys}.
 
 \InputLatex{loading/tex-plain.tex}
 
@@ -281,27 +264,15 @@ It does the same as the Lua\LaTeX{} wrapper and loads the Lua module
 
 \section{Lua interface / API}
 
+% Luakeys exportiert nur eine Funktion, die aufgerufen werden muss, um auf
+% die öffentliche API zuzugreifen
+Luakeys exports only one function that must be called to access the
+public API.
+%
 % Das Lua-Modul exportiert diese Funktionen und Tabellen:
 The Lua module exports this functions and tables:
 
-\InputLua[firstline=3,lastline=14]{export.lua}
-
-\noindent
-% Diese Dokumentation stellt nur die öffentlichen Funktionen und
-% Tabellen vor.
-This documentation presents only the public functions and tables.
-%
-% Um mehr über die privaten, nicht exportierten Funktionen zu erfahren,
-% lesen Sie bitte die
-% \href{https://josef-friedrich.github.io/luakeys/}{Quellcode
-% Dokumentation}, die mit
-% \href{http://stevedonovan.github.io/ldoc/}{LDoc} erstellt wurde.
-To learn more about the private, not exported functions, please
-read the \href{https://josef-friedrich.github.io/luakeys/}{source code
-documentation}, which was created with
-\href{http://stevedonovan.github.io/ldoc/}{LDoc}.
-
-\subsection{Lua indentifier names}
+\InputLua[firstline=3,lastline=16]{export.lua}
 
 % Das Projekt verwendet einige wenige Abkürzungen für Variablennamen,
 % die hoffentlich für externe Leser eindeutig und bekannt sind.
@@ -1944,19 +1915,16 @@ between 0 and 1 is allowed and converted into
 \subsection{Process document class options}
 
 % Auf die Optionen einer \LaTeX{} Dokumentenklasse kann über das Macro
-% \latex{\LuakeysClassOptions} zu gegriffen werden.
+% \latex{\LuakeysGetClassOptions} zu gegriffen werden.
 The options of a \LaTeX{} document class can be accessed via the
-\latex{\LuakeysClassOptions} macro.
+\latex{\LuakeysGetClassOptions} macro.
 %
-\latex{\LuakeysClassOptions} is an alias for
+% \latex{\LuakeysGetClassOptions} ist ein anderer Name für
+\latex{\LuakeysGetClassOptions} is an alias for
 
 \begin{center}
 \latex{\luaescapestring{\@raw@classoptionslist}}.
 \end{center}
-
-The macro \latex{\LuakeysSaveClassOptions{<identifier>}} saves the
-option string in the value store of the luakeys module. Use
-\lua{luakeys.get('<indentifer>')} to access the stored option string.
 
 \InputLatex{class-options/test-class.cls}
 \InputLatex{class-options/use-test-class-latex.tex}
@@ -1969,19 +1937,15 @@ option string in the value store of the luakeys module. Use
 
 \noindent
 % Auf die Optionen eines \LaTeX{}-Pakets kann über das Macro
-% \latex{\LuakeysPackageOptions} zu gegriffen werden.
+% \latex{\LuakeysGetPackageOptions} zu gegriffen werden.
 The options of a \LaTeX{} package can be accessed via the
-\latex{\LuakeysPackageOptions} macro.
-%
-\latex{\LuakeysPackageOptions} is an alias for
+\latex{\LuakeysGetPackageOptions} macro.
+% \latex{\LuakeysGetPackageOptions} ist ein anderer Name für
+\latex{\LuakeysGetPackageOptions} is an alias for
 
 \begin{center}
 \latex{\luaescapestring{\@ptionlist{\@currname.\@currext}}}.
 \end{center}
-
-The macro \latex{\LuakeysSavePackageOptions{<identifier>}} saves the
-option string in the value store of the luakeys module. Use
-\lua{luakeys.get('<indentifer>')} to access the the stored option string.
 
 \InputLatex{package-options/test-package.sty}
 \InputLatex{package-options/use-test-package-latex.tex}
@@ -2175,7 +2139,7 @@ An example of how to use the command in \LaTeX:
 * Breaking change! Export a function that returns the Lua API instead
   of a table. Use “require('luakeys')()” instead of
   “require('luakeys')”.
-* New macros \cmd{\LuakeysPackageOptions}, \cmd{\LuakeysClassOptions}
+* New macros \cmd{\LuakeysGetPackageOptions}, \cmd{\LuakeysGetClassOptions}
   and \cmd{\LuakeysSavePackageOptions}, \cmd{\LuakeysSaveClassOptions}.
 * New option: “accumulated_result”.
 * New data type: “list”.

@@ -8,10 +8,9 @@
   lk = luakeys.new()
 }
 
-% Using the macro \LuakeysClassOptions
+% Using the macro \LuakeysGetClassOptions
 \directlua{
-  lk = luakeys.new()
-  lk.debug(lk.parse('\LuakeysClassOptions'))
+  lk.debug(lk.parse('\LuakeysGetClassOptions'))
 }
 
 % Low level approach

@@ -743,7 +743,7 @@ local namespace = {
     ---Config error (wrong configuration of luakeys)
     E010 = 'Usage: opposite_keys = { "true_key", "false_key" } or { [true] = "true_key", [false] = "false_key" } ',
     E023 = {
-      'Don’t use this function from the global luakeys table. Import a new instance using e. g.: local myluakeys = require(\'luakeys\')()',
+      'Don’t use this function from the global luakeys table. Create a new instance using e. g.: local lk = luakeys.new()',
       {
         'This functions should not be used from the global luakeys table:',
         'parse()',
@@ -1769,38 +1769,13 @@ local function main()
   end
 
   ---
-  ---Store results
-  ---@section
-
-  ---
   ---A table to store parsed key-value results.
   local result_store = {}
 
   return {
+    new = main,
+
     version = { 0, 11, 0 },
-
-    namespace = utils.clone_table(namespace),
-
-    error_messages = error_messages,
-
-    ---
-    ---This function is used in the documentation.
-    ---
-    ---@param from string # A key in the namespace table, either `opts`, `hook` or `attrs`.
-    print_names = function(from)
-      local names = utils.get_table_keys(namespace[from])
-      tex.print(table.concat(names, ', '))
-    end,
-
-    print_default = function(from, name)
-      tex.print(tostring(namespace[from][name]))
-    end,
-
-    ---@see default_opts
-    opts = default_opts,
-
-    ---@see visualizers.stringify
-    stringify = visualizers.stringify,
 
     ---@see parse
     parse = parse,
@@ -1827,8 +1802,16 @@ local function main()
       end
     end,
 
+    ---@see default_opts
+    opts = default_opts,
+
+    error_messages = error_messages,
+
     ---@see visualizers.render
     render = visualizers.render,
+
+    ---@see visualizers.stringify
+    stringify = visualizers.stringify,
 
     ---@see visualizers.debug
     debug = visualizers.debug,
@@ -1863,7 +1846,24 @@ local function main()
 
     utils = utils,
 
-    new = main,
+    ---
+    ---Exported but intentionally undocumented functions
+    ---
+
+    namespace = utils.clone_table(namespace),
+
+    ---
+    ---This function is used in the documentation.
+    ---
+    ---@param from string # A key in the namespace table, either `opts`, `hook` or `attrs`.
+    print_names = function(from)
+      local names = utils.get_table_keys(namespace[from])
+      tex.print(table.concat(names, ', '))
+    end,
+
+    print_default = function(from, name)
+      tex.print(tostring(namespace[from][name]))
+    end,
 
     ---
     ---@param exported_table table

@@ -1,7 +1,7 @@
 \input luakeys.tex
 
 \def\mycmd{\directlua{
-    local lk = require('luakeys')()
+    local lk = luakeys.new()
     local oarg = lk.utils.scan_oarg('[', ']')
     if oarg then
       local keys = lk.parse(oarg)

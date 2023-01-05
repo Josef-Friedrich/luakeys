@@ -37,7 +37,7 @@ test_tex_plain:
 test_tex_latex:
 	find tests/tex/latex -iname "*.tex" -exec lualatex --output-dir=tests/tex/latex {} \;
 
-doc: doc_pdf doc_lua
+doc: doc_pdf
 
 doc_pdf:
 	lualatex --shell-escape documentation.tex
@@ -46,13 +46,6 @@ doc_pdf:
 	lualatex --shell-escape documentation.tex
 	mkdir -p $(texmf)/doc
 	cp documentation.pdf $(texmf)/doc/$(jobname).pdf
-
-doc_lua:
-	ldoc .
-
-doc_lua_open:
-	ldoc .
-	xdg-open docs/index.html
 
 ctan: doc_pdf
 	rm -rf $(jobname).tar.gz

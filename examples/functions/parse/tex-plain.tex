@@ -1,7 +1,7 @@
 \input luakeys.tex
 \def\mykeyvalcmd#1{
   \directlua{
-    local lk = require('luakeys')()
+    local lk = luakeys.new()
     local result = lk.parse('#1')
     tex.print('The key “one” has the value ' .. tostring(result.one) .. '.')
   }
