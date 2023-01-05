@@ -21,7 +21,6 @@ describe('utils', function()
     assert.has_error(function()
       utils.throw_error_message('My error message')
     end, 'My error message')
-
   end)
 
   it('Function “throw_error_code”', function()
