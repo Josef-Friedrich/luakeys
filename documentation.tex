@@ -64,7 +64,7 @@ The default value of the option “\texttt{#1}” is:
   \href{https://github.com/Josef-Friedrich/luakeys}
        {github.com/Josef-Friedrich/luakeys}%
 }
-\date{0.11.0 from 2022/12/23}
+\date{v0.12.0 from 2022/01/05}
 
 \maketitle
 
@@ -2139,15 +2139,19 @@ An example of how to use the command in \LaTeX:
 * Add a new function called “get_private_instance()” to load a private
   version of the luakeys module.
 }
-\changes{0.12.0}{2022/12/30}{
-* Breaking change! Export a function that returns the Lua API instead
-  of a table. Use “require('luakeys')()” instead of
+\changes{0.12.0}{2023/01/05}{
+* Breaking change! luakeys exports now a function instead of a table.
+  Use “require('luakeys')()” or “luakeys.new()” instead of
   “require('luakeys')”.
-* New macros \cmd{\LuakeysGetPackageOptions}, \cmd{\LuakeysGetClassOptions}
-  and \cmd{\LuakeysSavePackageOptions}, \cmd{\LuakeysSaveClassOptions}.
+* Breaking change! “luakeys.parse()”, “luakeys.define()”, “luakeys.save()”
+  and “luakeys.get()” can’t be used anymore from the global variable luakeys.
+* New exported table “errors_message” to be able to set custom messages.
+* New macros \cmd{\LuakeysGetPackageOptions}, \cmd{\LuakeysGetClassOptions}.
 * New option: “accumulated_result”.
 * New data type: “list”.
 * New attribute: “description”.
+* New utils: “utils.log” and “utils.ansi_color”
+* Changed name: “new()” instead of “get_private_instance()"
 }
 
 \pagebreak
