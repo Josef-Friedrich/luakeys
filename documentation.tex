@@ -385,7 +385,7 @@ Strictly speaking, this is not an option.
 % Mit der Option \lua{accumulated_result} kann eine Ergebnistabelle
 % angegeben werden, die bei jedem Aufruf der \lua{parse}-Funktion weiter
 % befüllt wird.
-The \lua{accumulated_result} option can be used to specify a result
+The \lua{accumulated_result} “option” can be used to specify a result
 table that is filled with each call of the \lua{parse} function.
 
 \InputLua[firstline=5,lastline=14]{opts/accumulated-result.lua}
@@ -1521,13 +1521,10 @@ therefore accepts any data type.
 
 \subsection{Table “\texttt{utils}”}
 
-% In der Tabelle \lua{utils} sind einige Hilfsfunktionen gebündelt, die
-% bei der Weiterverarbeitung von Tabellen mit Schlüssel-Werte-Paar
-% eingesetzt werden können.
-The \lua{utils} table bundles some auxiliary functions that can be used
-when processing tables with key-value pairs.
+% In der Tabelle \lua{utils} sind einige Hilfsfunktionen gebündelt.
+The \lua{utils} table bundles some auxiliary functions.
 
-\InputLua[firstline=3,lastline=10]{utils/all.lua}
+\InputLua[firstline=3,lastline=34]{utils/all.lua}
 
 %%
 %
@@ -2140,19 +2137,21 @@ An example of how to use the command in \LaTeX:
   version of the luakeys module.
 }
 \changes{v0.12.0}{2023/01/05}{
+Added
+* Macros \cmd{\LuakeysGetPackageOptions}, \cmd{\LuakeysGetClassOptions}.
+* Option “accumulated_result”.
+* Data type “list” to the attribute “data_type”.
+* Attribute “description”.
+* Tables “utils.log” and “utils.ansi_color”.
+* Table “errors_message” to set custom messages.
+* Short form syntax for the definition attribute “opposite_keys”.
+Changed
 * Breaking change! luakeys exports now a function instead of a table.
   Use “require('luakeys')()” or “luakeys.new()” instead of
   “require('luakeys')”.
 * Breaking change! “luakeys.parse()”, “luakeys.define()”, “luakeys.save()”
   and “luakeys.get()” can’t be used anymore from the global variable luakeys.
-* New exported table “errors_message” to be able to set custom messages.
-* New macros \cmd{\LuakeysGetPackageOptions}, \cmd{\LuakeysGetClassOptions}.
-* New option: “accumulated_result”.
-* New data type: “list”.
-* New attribute: “description”.
-* New utils: “utils.log” and “utils.ansi_color”
-* Changed name: “new()” instead of “get_private_instance()"
-* Short form syntax for the definition attribute “opposite_keys”
+* New name for the function “new()” instead of “get_private_instance()".
 }
 
 \pagebreak

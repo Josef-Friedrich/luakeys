@@ -511,6 +511,7 @@ local utils = (function()
   ---* 5: debug
   ---
   local log = (function()
+    ---@private
     local opts = { level = 0 }
 
     ---@private
@@ -519,47 +520,96 @@ local utils = (function()
     end
 
     ---
+    ---Set the log level.
+    ---
     ---@param level 0|'silent'|1|'error'|2|'warn'|3|'info'|4|'verbose'|5|'debug'
     local function set_log_level(level)
-      if level == 'silent' then
-        opts.level = 0
-      elseif level == 'error' then
-        opts.level = 1
-      elseif level == 'warn' then
-        opts.level = 2
-      elseif level == 'info' then
-        opts.level = 3
-      elseif level == 'verbose' then
-        opts.level = 4
-      elseif level == 'debug' then
-        opts.level = 5
+      if type(level) == 'string' then
+        if level == 'silent' then
+          opts.level = 0
+        elseif level == 'error' then
+          opts.level = 1
+        elseif level == 'warn' then
+          opts.level = 2
+        elseif level == 'info' then
+          opts.level = 3
+        elseif level == 'verbose' then
+          opts.level = 4
+        elseif level == 'debug' then
+          opts.level = 5
+        else
+          throw_error_message(string.format('Unknown log level: %s',
+            level))
+        end
+      else
+        if level > 5 or level < 0 then
+          throw_error_message(string.format(
+            'Log level out of range 0-5: %s', level))
+        end
+        opts.level = level
       end
+
     end
 
+    ---
+    ---Log at level 1 (error).
+    ---
+    ---The other log levels are: 0 (silent), 1 (error), 2 (warn), 3 (info), 4 (verbose), 5 (debug).
+    ---
+    ---@param message string
+    ---@param ... any
     local function error(message, ...)
       if opts.level >= 1 then
         print_message(message, ...)
       end
     end
 
+    ---
+    ---Log at level 2 (warn).
+    ---
+    ---The other log levels are: 0 (silent), 1 (error), 2 (warn), 3 (info), 4 (verbose), 5 (debug).
+    ---
+    ---@param message string
+    ---@param ... any
     local function warn(message, ...)
       if opts.level >= 2 then
         print_message(message, ...)
       end
     end
 
+    ---
+    ---Log at level 3 (info).
+    ---
+    ---The other log levels are: 0 (silent), 1 (error), 2 (warn), 3 (info), 4 (verbose), 5 (debug).
+    ---
+    ---@param message string
+    ---@param ... any
     local function info(message, ...)
       if opts.level >= 3 then
         print_message(message, ...)
       end
     end
 
+    ---
+    ---Log at level 4 (verbose).
+    ---
+    ---The other log levels are: 0 (silent), 1 (error), 2 (warn), 3 (info), 4 (verbose), 5 (debug).
+    ---
+    ---@param message string
+    ---@param ... any
     local function verbose(message, ...)
       if opts.level >= 4 then
         print_message(message, ...)
       end
     end
 
+    ---
+    ---Log at level 5 (debug).
+    ---
+    ---The other log levels are: 0 (silent), 1 (error), 2 (warn), 3 (info), 4 (verbose), 5 (debug).
+    ---
+    ---@param message string
+    ---@param ... any
     local function debug(message, ...)
       if opts.level >= 5 then
         print_message(message, ...)

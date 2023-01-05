@@ -6,12 +6,11 @@ describe('utils', function()
   local color = utils.ansi_color
 
   it('Function “merge_tables”', function()
-    local merge = utils.merge_tables
-    local result = merge({ target = 'target' }, { source = 'source' })
+    local result = utils.merge_tables({ target = 'target' }, { source = 'source' })
     assert.are.same(result, { target = 'target', source = 'source' })
   end)
 
-  it('Function “merge_tables”', function()
+  it('Function “clone_table”', function()
     local result =
       utils.clone_table({ l1 = { l2 = { l3 = 'level3' } } })
     assert.are.same(result, { l1 = { l2 = { l3 = 'level3' } } })
@@ -58,6 +57,21 @@ describe('utils', function()
 
     it('cyan', function()
       assert.are.equal(color.cyan('cyan'), '\27[36mcyan\27[0m')
+    end)
+  end)
+
+  describe('Table “log”', function ()
+    local log = utils.log
+    it('Error', function ()
+      assert.has_error(function ()
+        log.set_log_level('xxx')
+      end, 'Unknown log level: xxx')
+    end)
+
+    it('Error', function ()
+      assert.has_error(function ()
+        log.set_log_level(6)
+      end, 'Log level out of range 0-5: 6')
     end)
   end)
 end)
