@@ -13,9 +13,9 @@
 \usepackage{syntax}
 \usepackage{graphicx}
 
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+
 \usemintedstyle{friendly}
-\BeforeBeginEnvironment{minted}{\begin{mdframed}}
-\AfterEndEnvironment{minted}{\end{mdframed}}
 \setminted{
   breaklines=true,
   fontsize=\footnotesize,
@@ -25,15 +25,20 @@
 \def\latex#1{\mintinline{latex}|#1|}
 
 \NewDocumentCommand { \InputLatex } { O{} m } {
-  \begin{mdframed}
-  \inputminted[linenos=false,#1]{latex}{examples/#2}
+  \inputminted[
+    linenos=false,
+    bgcolor=bg,
+    #1
+  ]{latex}{examples/#2}
   \end{mdframed}
 }
 
 \NewDocumentCommand { \InputLua } { O{} m } {
-  \begin{mdframed}
-  \inputminted[linenos=false,#1]{lua}{examples/#2}
-  \end{mdframed}
+  \inputminted[
+    linenos=false,
+    bgcolor=bg,
+    #1
+  ]{lua}{examples/#2}
 }
 
 \catcode`_=12
