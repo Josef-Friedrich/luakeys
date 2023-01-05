@@ -27,6 +27,7 @@
 
 \newcommand{\mygraphics}[2][]{
   \directlua{
+    local luakeys = require('luakeys')()
     local keys = luakeys.parse('#1')
     keys['scale'] = 3 * keys['scale']
     tex.print(luakeys.render(keys))

@@ -742,6 +742,15 @@ local namespace = {
     E020 = 'Both opposite keys were given: @true and @false!',
     ---Config error (wrong configuration of luakeys)
     E010 = 'Usage: opposite_keys = { "true_key", "false_key" } or { [true] = "true_key", [false] = "false_key" } ',
+    E023 = {
+      'Don’t use this function from the global luakeys table. Import a new instance using e. g.: local myluakeys = require(\'luakeys\')()',
+      {
+        'This functions should not be used from the global luakeys table:',
+        'parse()',
+        'save()',
+        'get()',
+      },
+    },
   },
 }
 
@@ -1853,6 +1862,21 @@ local function main()
     is = is,
 
     utils = utils,
+
+    new = main,
+
+    ---
+    ---@param exported_table table
+    depublish_functions = function(exported_table)
+      local function warn_global_import()
+        throw_error('E023')
+      end
+
+      exported_table.parse = warn_global_import
+      exported_table.define = warn_global_import
+      exported_table.save = warn_global_import
+      exported_table.get = warn_global_import
+    end,
   }
 
 end

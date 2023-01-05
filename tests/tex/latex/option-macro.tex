@@ -1,12 +1,16 @@
 \documentclass{article}
 \usepackage{luakeys}
 
+\directlua{
+  lk = require('luakeys')()
+}
+
 \begin{document}
 
 \section{A macro name consists of letters only}
 
 \directlua{
-  local parser = luakeys.define({key = { macro = 'MyMacro' }})
+  local parser = lk.define({key = { macro = 'MyMacro' }})
   local result = parser('key=The content of a macro with a name containing only letters.')
 }
 
@@ -15,7 +19,7 @@
 \section{A macro name with an @ character}
 
 \directlua{
-  local parser = luakeys.define({key = { macro = 'My@Macro' }})
+  local parser = lk.define({key = { macro = 'My@Macro' }})
   local result = parser('key=The content of a macro with an “at” symbol in it.')
 }
 
@@ -26,7 +30,7 @@
 \section{A macro that expands to numbers}
 
 \directlua{
-  local parser = luakeys.define({key = { macro = 'MyNumberMacro' }})
+  local parser = lk.define({key = { macro = 'MyNumberMacro' }})
   local result = parser('key=123')
   tex.print(type(result.key))
 }
@@ -37,7 +41,7 @@
 \bigskip
 Value: #1 \par Lua datatye:
 \directlua{
-  local parser = luakeys.define({key = { macro = 'MyMacro' }})
+  local parser = lk.define({key = { macro = 'MyMacro' }})
   local result = parser('key=#1')
   tex.print(type(result.key))
 }
@@ -58,7 +62,7 @@ expands to: “\MyMacro”
 \section{non-existent key}
 
 \directlua{
-  local parser = luakeys.define({key = { macro = 'MyMacro' }})
+  local parser = lk.define({key = { macro = 'MyMacro' }})
   local result = parser('unknown=value', { no_error = true })
 }
 

@@ -1,9 +1,10 @@
 \input luakeys.tex
 
 \def\mycmd{\directlua{
-    local oarg = luakeys.utils.scan_oarg('[', ']')
+    local lk = require('luakeys')()
+    local oarg = lk.utils.scan_oarg('[', ']')
     if oarg then
-      local keys = luakeys.parse(oarg)
+      local keys = lk.parse(oarg)
       for key, value in pairs(keys) do
         tex.print('oarg: key: “' .. key .. '” value: “' .. value .. '”;')
       end

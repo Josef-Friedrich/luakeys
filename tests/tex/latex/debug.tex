@@ -2,6 +2,7 @@
 \usepackage{luakeys}
 \begin{document}
 \directlua{
+  local luakeys = require('luakeys')()
   luakeys.parse('one,two,three', { debug = true })
 }
 debug

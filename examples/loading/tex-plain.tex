@@ -1,7 +1,8 @@
 \input luakeys.tex
 
 \directlua{
-  local keys = luakeys.parse('one,two,three', { naked_as_value = true })
+  local lk = luakeys.new()
+  local keys = lk.parse('one,two,three', { naked_as_value = true })
   tex.print(keys[1])
   tex.print(keys[2])
   tex.print(keys[3])

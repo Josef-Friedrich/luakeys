@@ -21,21 +21,10 @@
 \directlua{
   if luakeys == nil then
     luakeys = require('luakeys')()
+    luakeys.depublish_functions(luakeys)
   end
 }
 
 \def\LuakeysPackageOptions{\luaescapestring{\@ptionlist{\@currname.\@currext}}}
 
-\def\LuakeysSavePackageOptions#1{%
-  \directlua{
-    luakeys.save('#1', '\LuakeysPackageOptions')
-  }%
-}
-
 \def\LuakeysClassOptions{\luaescapestring{\@raw@classoptionslist}}
-
-\def\LuakeysSaveClassOptions#1{%
-  \directlua{
-    luakeys.save('#1', '\LuakeysClassOptions')
-  }%
-}

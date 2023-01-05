@@ -19,5 +19,6 @@
 \directlua{
   if luakeys == nil then
     luakeys = require('luakeys')()
+    luakeys.depublish_functions(luakeys)
   end
 }

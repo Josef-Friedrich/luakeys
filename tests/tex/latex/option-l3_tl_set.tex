@@ -1,10 +1,14 @@
 \documentclass{article}
 \usepackage{luakeys}
 
+\directlua{
+  lk = require('luakeys')()
+}
+
 \begin{document}
 
 \directlua{
-  local parser = luakeys.define({ key = { l3_tl_set = 'my_var' }})
+  local parser = lk.define({ key = { l3_tl_set = 'my_var' }})
   local result = parser('key=The content of a token list variable.')
 }
 

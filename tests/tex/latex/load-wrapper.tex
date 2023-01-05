@@ -3,9 +3,11 @@
 
 \begin{document}
   \directlua{
+    local luakeys = require('luakeys')()
     local keys = luakeys.parse('one,two,three')
     tex.print(keys[1])
     tex.print(keys[2])
     tex.print(keys[3])
   }
+Test
 \end{document}

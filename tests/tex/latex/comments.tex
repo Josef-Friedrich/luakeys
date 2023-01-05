@@ -4,7 +4,10 @@
 \begin{document}
 
 \def\tmp#1{
-\directlua{local keys = luakeys.parse('#1', { debug = true })}}
+\directlua{
+  local luakeys = require('luakeys')()
+  local keys = luakeys.parse('#1', { debug = true })}
+}
 
 \section{Comments should be removed}
 

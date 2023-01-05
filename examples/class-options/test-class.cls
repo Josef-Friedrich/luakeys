@@ -4,20 +4,19 @@
 \ProcessOptions\relax
 \RequirePackage{luakeys}
 
-% Using the macro \LuakeysClassOptions
 \directlua{
-  luakeys.debug(luakeys.parse('\LuakeysClassOptions'))
+  lk = luakeys.new()
 }
 
-% Using the macro \LuakeysSaveClassOptions
-\LuakeysSaveClassOptions{test-class}
+% Using the macro \LuakeysClassOptions
 \directlua{
-  luakeys.debug(luakeys.parse(luakeys.get('test-class')))
+  lk = luakeys.new()
+  lk.debug(lk.parse('\LuakeysClassOptions'))
 }
 
 % Low level approach
 \directlua{
-  luakeys.debug(luakeys.parse('\luaescapestring{\@raw@classoptionslist}'))
+  lk.debug(lk.parse('\luaescapestring{\@raw@classoptionslist}'))
 }
 
 \LoadClass{article}

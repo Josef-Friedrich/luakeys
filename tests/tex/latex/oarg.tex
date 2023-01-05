@@ -1,12 +1,16 @@
 \documentclass{article}
 \usepackage{luakeys}
 
+\directlua{
+  lk = require('luakeys')()
+}
+
 \begin{document}
 
 \newcommand{\cmdoarg}[2][]{
   \directlua{
     kv_string = '#1'
-    local result = luakeys.parse('#1')
+    local result = lk.parse('#1')
   }
   oarg: \directlua{tex.print(kv_string)}
   marg: #2
@@ -17,7 +21,7 @@
 \NewDocumentCommand{ \cmdoargLthree } { O{} m } {
   \directlua{
     kv_string = '#1'
-    local result = luakeys.parse('#1')
+    local result = lk.parse('#1')
   }
   oarg: \directlua{tex.print(kv_string)}
   marg: #2

@@ -2,7 +2,8 @@
 \usepackage{luakeys}
 \begin{document}
 \directlua{
-  luakeys.parse('one,two,three', { debug = true })
+  lk = luakeys.new()
+  lk.parse('one,two,three', { debug = true })
 }
 Lorem ipsum
 \end{document}
