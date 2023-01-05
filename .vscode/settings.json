@@ -24,5 +24,6 @@
     // https://github.com/Josef-Friedrich/LuaTeX_Lua-API
     "~/repos/tex/lua-api/library",
     "~/texmf/tex",
-  ]
+  ],
+  "Lua.workspace.checkThirdParty": false
 }

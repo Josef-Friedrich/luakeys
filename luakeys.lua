@@ -230,6 +230,266 @@ local utils = (function()
     return result
   end
 
+  ---@alias ColorName 'black'|'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'white'|'reset'
+  ---@alias ColorMode 'bright'|'dim'
+
+  ---
+  ---Small library to surround strings with ANSI color codes.
+  --
+  ---[SGR (Select Graphic Rendition) Parameters](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters)
+  ---
+  ---__attributes__
+  ---
+  ---| color      |code|
+  ---|------------|----|
+  ---| reset      |  0 |
+  ---| clear      |  0 |
+  ---| bright     |  1 |
+  ---| dim        |  2 |
+  ---| underscore |  4 |
+  ---| blink      |  5 |
+  ---| reverse    |  7 |
+  ---| hidden     |  8 |
+  ---
+  ---__foreground__
+  ---
+  ---| color      |code|
+  ---|------------|----|
+  ---| black      | 30 |
+  ---| red        | 31 |
+  ---| green      | 32 |
+  ---| yellow     | 33 |
+  ---| blue       | 34 |
+  ---| magenta    | 35 |
+  ---| cyan       | 36 |
+  ---| white      | 37 |
+  ---
+  ---__background__
+  ---
+  ---| color      |code|
+  ---|------------|----|
+  ---| onblack    | 40 |
+  ---| onred      | 41 |
+  ---| ongreen    | 42 |
+  ---| onyellow   | 43 |
+  ---| onblue     | 44 |
+  ---| onmagenta  | 45 |
+  ---| oncyan     | 46 |
+  ---| onwhite    | 47 |
+  local ansi_color = (function()
+
+    ---
+    ---@param code integer
+    ---
+    ---@return string
+    local function format_color_code(code)
+      return string.char(27) .. '[' .. tostring(code) .. 'm'
+    end
+
+    ---
+    ---@private
+    ---
+    ---@param color ColorName # A color name.
+    ---@param mode? ColorMode
+    ---@param background? boolean # Colorize the background not the text.
+    ---
+    ---@return string
+    local function get_color_code(color, mode, background)
+      local output = ''
+      local code
+
+      if mode == 'bright' then
+        output = format_color_code(1)
+      elseif mode == 'dim' then
+        output = format_color_code(2)
+      end
+
+      if not background then
+        if color == 'reset' then
+          code = 0
+        elseif color == 'black' then
+          code = 30
+        elseif color == 'red' then
+          code = 31
+        elseif color == 'green' then
+          code = 32
+        elseif color == 'yellow' then
+          code = 33
+        elseif color == 'blue' then
+          code = 34
+        elseif color == 'magenta' then
+          code = 35
+        elseif color == 'cyan' then
+          code = 36
+        elseif color == 'white' then
+          code = 37
+        else
+          code = 37
+        end
+      else
+        if color == 'black' then
+          code = 40
+        elseif color == 'red' then
+          code = 41
+        elseif color == 'green' then
+          code = 42
+        elseif color == 'yellow' then
+          code = 43
+        elseif color == 'blue' then
+          code = 44
+        elseif color == 'magenta' then
+          code = 45
+        elseif color == 'cyan' then
+          code = 46
+        elseif color == 'white' then
+          code = 47
+        else
+          code = 40
+        end
+      end
+      return output .. format_color_code(code)
+    end
+
+    ---@param text any
+    ---@param color ColorName # A color name.
+    ---@param mode? ColorMode
+    ---@param background? boolean # Colorize the background not the text.
+    ---
+    ---@return string
+    local function colorize(text, color, mode, background)
+      return string.format('%s%s%s',
+        get_color_code(color, mode, background), text,
+        get_color_code('reset'))
+    end
+
+    return {
+      colorize = colorize,
+
+      ---
+      ---@param text any
+      ---
+      ---@return string
+      red = function(text)
+        return colorize(text, 'red')
+      end,
+
+      ---
+      ---@param text any
+      ---
+      ---@return string
+      green = function(text)
+        return colorize(text, 'green')
+      end,
+
+      ---@return string
+      yellow = function(text)
+        return colorize(text, 'yellow')
+      end,
+
+      ---
+      ---@param text any
+      ---
+      ---@return string
+      blue = function(text)
+        return colorize(text, 'blue')
+      end,
+
+      ---
+      ---@param text any
+      ---
+      ---@return string
+      magenta = function(text)
+        return colorize(text, 'magenta')
+      end,
+
+      ---
+      ---@param text any
+      ---
+      ---@return string
+      cyan = function(text)
+        return colorize(text, 'cyan')
+      end,
+    }
+  end)()
+
+  ---
+  ---A small logging library.
+  ---
+  ---Log levels:
+  ---
+  ---* 0: silent
+  ---* 1: error
+  ---* 2: warn
+  ---* 3: info
+  ---* 4: verbose
+  ---* 5: debug
+  ---
+  local log = (function()
+    local opts = { level = 0 }
+
+    ---@private
+    local function print_message(message, ...)
+      print(string.format(message, ...))
+    end
+
+    ---
+    ---@param level 0|'silent'|1|'error'|2|'warn'|3|'info'|4|'verbose'|5|'debug'
+    local function set_log_level(level)
+      if level == 'silent' then
+        opts.level = 0
+      elseif level == 'error' then
+        opts.level = 1
+      elseif level == 'warn' then
+        opts.level = 2
+      elseif level == 'info' then
+        opts.level = 3
+      elseif level == 'verbose' then
+        opts.level = 4
+      elseif level == 'debug' then
+        opts.level = 5
+      end
+    end
+
+    local function error(message, ...)
+      if opts.level >= 1 then
+        print_message(message, ...)
+      end
+    end
+
+    local function warn(message, ...)
+      if opts.level >= 2 then
+        print_message(message, ...)
+      end
+    end
+
+    local function info(message, ...)
+      if opts.level >= 3 then
+        print_message(message, ...)
+      end
+    end
+
+    local function verbose(message, ...)
+      if opts.level >= 4 then
+        print_message(message, ...)
+      end
+    end
+
+    local function debug(message, ...)
+      if opts.level >= 5 then
+        print_message(message, ...)
+      end
+    end
+
+    return {
+      set_log_level = set_log_level,
+      error = error,
+      warn = warn,
+      info = info,
+      verbose = verbose,
+      debug = debug,
+    }
+  end)()
+
   return {
     merge_tables = merge_tables,
     clone_table = clone_table,
@@ -240,6 +500,8 @@ local utils = (function()
     scan_oarg = scan_oarg,
     throw_error = throw_error,
     visit_tree = visit_tree,
+    log = log,
+    ansi_color = ansi_color,
   }
 end)()
 
