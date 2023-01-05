@@ -192,9 +192,11 @@ local utils = (function()
   end
 
   ---
+  ---Throw a single error message.
+  ---
   ---@param message string
   ---@param help? table
-  local function throw_error(message, help)
+  local function throw_error_message(message, help)
     if type(tex.error) == 'function' then
       tex.error(message, help)
     else
@@ -202,10 +204,85 @@ local utils = (function()
     end
   end
 
+  ---
+  ---Throw an error by specifying an error code.
+  ---
+  ---@param error_messages table
+  ---@param error_code string
+  ---@param args? table
+  local function throw_error_code(error_messages,
+    error_code,
+    args)
+    local template = error_messages[error_code]
+
+    ---
+    ---@param message string
+    ---@param a table
+    ---
+    ---@return string
+    local function replace_args(message, a)
+      for key, value in pairs(a) do
+        if type(value) == 'table' then
+          value = table.concat(value, ', ')
+        end
+        message = message:gsub('@' .. key,
+          '“' .. tostring(value) .. '”')
+      end
+      return message
+    end
+
+    ---
+    ---@param list table
+    ---@param a table
+    ---
+    ---@return table
+    local function replace_args_in_list(list, a)
+      for index, message in ipairs(list) do
+        list[index] = replace_args(message, a)
+      end
+      return list
+    end
+
+    ---
+    ---@type string
+    local message
+    ---@type table
+    local help = {}
+
+    if type(template) == 'table' then
+      message = template[1]
+      if args ~= nil then
+        help = replace_args_in_list(template[2], args)
+      else
+        help = template[2]
+      end
+    else
+      message = template
+    end
+
+    if args ~= nil then
+      message = replace_args(message, args)
+    end
+
+    message = 'luakeys error [' .. error_code .. ']: ' .. message
+
+    for _, help_message in ipairs({
+      'You may be able to find more help in the documentation:',
+      'http://mirrors.ctan.org/macros/luatex/generic/luakeys/luakeys-doc.pdf',
+      'Or ask a question in the issue tracker on Github:',
+      'https://github.com/Josef-Friedrich/luakeys/issues',
+    }) do
+      table.insert(help, help_message)
+    end
+
+    throw_error_message(message, help)
+  end
+
   local function visit_tree(tree, callback_func)
     if type(tree) ~= 'table' then
-      throw_error('Parameter “tree” has to be a table, got: ' ..
-                    tostring(tree))
+      throw_error_message(
+        'Parameter “tree” has to be a table, got: ' ..
+          tostring(tree))
     end
     local function visit_tree_recursive(tree,
       current,
@@ -506,9 +583,10 @@ local utils = (function()
     get_table_keys = get_table_keys,
     get_table_size = get_table_size,
     get_array_size = get_array_size,
-    scan_oarg = scan_oarg,
-    throw_error = throw_error,
     visit_tree = visit_tree,
+    scan_oarg = scan_oarg,
+    throw_error_message = throw_error_message,
+    throw_error_code = throw_error_code,
     log = log,
     ansi_color = ansi_color,
   }
@@ -767,69 +845,7 @@ local function main()
   ---@param error_code string
   ---@param args? table
   local function throw_error(error_code, args)
-    local template = error_messages[error_code]
-
-    ---
-    ---@param message string
-    ---@param args table
-    ---
-    ---@return string
-    local function replace_args(message, args)
-      for key, value in pairs(args) do
-        if type(value) == 'table' then
-          value = table.concat(value, ', ')
-        end
-        message = message:gsub('@' .. key,
-          '“' .. tostring(value) .. '”')
-      end
-      return message
-    end
-
-    ---
-    ---@param list table
-    ---@param args table
-    ---
-    ---@return table
-    local function replace_args_in_list(list, args)
-      for index, message in ipairs(list) do
-        list[index] = replace_args(message, args)
-      end
-      return list
-    end
-
-    ---
-    ---@type string
-    local message
-    ---@type table
-    local help = {}
-
-    if type(template) == 'table' then
-      message = template[1]
-      if args ~= nil then
-        help = replace_args_in_list(template[2], args)
-      else
-        help = template[2]
-      end
-    else
-      message = template
-    end
-
-    if args ~= nil then
-      message = replace_args(message, args)
-    end
-
-    message = 'luakeys error [' .. error_code .. ']: ' .. message
-
-    for _, help_message in ipairs({
-      'You may be able to find more help in the documentation:',
-      'http://mirrors.ctan.org/macros/luatex/generic/luakeys/luakeys-doc.pdf',
-      'Or ask a question in the issue tracker on Github:',
-      'https://github.com/Josef-Friedrich/luakeys/issues',
-    }) do
-      table.insert(help, help_message)
-    end
-
-    utils.throw_error(message, help)
+    utils.throw_error_code(error_messages, error_code, args)
   end
 
   ---
