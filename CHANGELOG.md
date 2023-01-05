@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ...
+- `utils.log.get()`
+
+### Changed
+
+- `utils.log.set_log_level()` -> `utils.log.set()`
 
 ### Fixed
 

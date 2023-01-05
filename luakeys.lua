@@ -548,7 +548,12 @@ local utils = (function()
         end
         opts.level = level
       end
+    end
 
+    ---
+    ---@return integer
+    local function get_log_level()
+      return opts.level
     end
 
     ---
@@ -617,7 +622,8 @@ local utils = (function()
     end
 
     return {
-      set_log_level = set_log_level,
+      set = set_log_level,
+      get = get_log_level,
       error = error,
       warn = warn,
       info = info,
