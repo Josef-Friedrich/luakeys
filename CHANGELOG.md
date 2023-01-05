@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- ...
+- Keys with the attribute `opposite_keys` always got a value, even if
+  the key wasn't set.
 
 ## [0.12.0] - 2023-01-05
 

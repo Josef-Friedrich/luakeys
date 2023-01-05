@@ -26,7 +26,8 @@ local magenta = utils.ansi_color.magenta
 local cyan = utils.ansi_color.cyan
 
 ---log
-local set_log_level = utils.log.set_log_level
+local set = utils.log.set
+local get = utils.log.set
 local err = utils.log.error
 local warn = utils.log.warn
 local info = utils.log.info
@@ -57,7 +58,8 @@ it('Exported', function()
   assert_function(magenta)
   assert_function(cyan)
 
-  assert_function(set_log_level)
+  assert_function(set)
+  assert_function(get)
   assert_function(err)
   assert_function(warn)
   assert_function(info)

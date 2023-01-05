@@ -268,6 +268,13 @@ describe('Defintions', function()
         assert.are.same(expected, parse(kv_string))
       end
 
+      it('Empty string', function()
+        local result = luakeys.parse('', {
+          defs = { visibility = { opposite_keys = { 'show', 'hide' } } },
+        })
+        assert.are.same(result, {})
+      end)
+
       it('Specification as a list', function()
         local result = luakeys.parse('show', {
           defs = { visibility = { opposite_keys = { 'show', 'hide' } } },

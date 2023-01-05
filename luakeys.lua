@@ -1467,10 +1467,10 @@ local function main()
             throw_error('E010')
           end
 
-          ---@param value string
-          local function remove_values(value)
+          ---@param v string
+          local function remove_values(v)
             local count = 0
-            while utils.remove_from_table(input, value) do
+            while utils.remove_from_table(input, v) do
               count = count + 1
             end
             return count
@@ -1491,7 +1491,9 @@ local function main()
             throw_error('E020',
               { ['true'] = true_key, ['false'] = false_key })
           end
-
+          if true_count == 0 and false_count == 0 then
+            return
+          end
           return true_count == 1 or false_count == 0
         end
       end,
@@ -1693,11 +1695,22 @@ local function main()
   ---@return table unknown # A table with unknown, undefinied key-value pairs.
   ---@return table raw # The unprocessed, raw result of the LPeg parser.
   local function parse(kv_string, opts)
+    opts = normalize_opts(opts)
+
+    local function log_result(caption, result)
+      utils.log
+        .debug('%s: \n%s', caption, visualizers.stringify(result))
+    end
+
     if kv_string == nil then
       return {}, {}, {}
     end
 
-    opts = normalize_opts(opts)
+    if opts.debug then
+      utils.log.set('debug')
+    end
+
+    utils.log.debug('kv_string: “%s”', kv_string)
 
     if type(opts.hooks.kv_string) == 'function' then
       kv_string = opts.hooks.kv_string(kv_string)
@@ -1705,6 +1718,8 @@ local function main()
 
     local result = generate_parser('list', opts):match(kv_string)
     local raw = utils.clone_table(result)
+
+    log_result('result after Lpeg Parsing', result)
 
     local function apply_hook(name)
       if type(opts.hooks[name]) == 'function' then
@@ -1732,6 +1747,8 @@ local function main()
     end
 
     apply_hooks('before_opts')
+
+    log_result('after hooks before_opts', result)
 
     ---
     ---Normalize the result table of the LPeg parser. This normalization
@@ -1809,6 +1826,8 @@ local function main()
     end
     result = apply_opts(result, opts)
 
+    log_result('after apply opts', result)
+
     ---All unknown keys are stored in this table
     local unknown = nil
     if type(opts.defs) == 'table' then
@@ -1817,15 +1836,15 @@ local function main()
         {}, {}, utils.clone_table(result))
     end
 
+    log_result('after apply_definitions', result)
+
     apply_hooks()
 
     if opts.defaults ~= nil and type(opts.defaults) == 'table' then
       utils.merge_tables(result, opts.defaults, false)
     end
 
-    if opts.debug then
-      visualizers.debug(result)
-    end
+    log_result('End result', result)
 
     if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
       'table' then
