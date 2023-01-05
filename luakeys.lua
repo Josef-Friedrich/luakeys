@@ -1,28 +1,28 @@
--- luakeys.lua
--- Copyright 2021-2022 Josef Friedrich
---
--- This work may be distributed and/or modified under the
--- conditions of the LaTeX Project Public License, either version 1.3c
--- of this license or (at your option) any later version.
--- The latest version of this license is in
---   http://www.latex-project.org/lppl.txt
--- and version 1.3c or later is part of all distributions of LaTeX
--- version 2008/05/04 or later.
---
--- This work has the LPPL maintenance status `maintained'.
---
--- The Current Maintainer of this work is Josef Friedrich.
---
--- This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
--- luakeys-debug.sty and luakeys-debug.tex.
---- A key-value parser written with Lpeg.
---
--- @module luakeys
+---luakeys.lua
+---Copyright 2021-2022 Josef Friedrich
+---
+---This work may be distributed and/or modified under the
+---conditions of the LaTeX Project Public License, either version 1.3c
+---of this license or (at your option) any later version.
+---The latest version of this license is in
+---http://www.latex-project.org/lppl.txt
+---and version 1.3c or later is part of all distributions of LaTeX
+---version 2008/05/04 or later.
+---
+---This work has the LPPL maintenance status `maintained'.
+---
+---The Current Maintainer of this work is Josef Friedrich.
+---
+---This work consists of the files luakeys.lua, luakeys.sty, luakeys.tex
+---luakeys-debug.sty and luakeys-debug.tex.
+----A key-value parser written with Lpeg.
+---
+---@module luakeys
 local lpeg = require('lpeg')
 
 if not tex then
+  ---Dummy functions for the tests.
   tex = {
-    -- Dummy function for the tests.
     sp = function(input)
       return 1234567
     end,
@@ -35,11 +35,12 @@ if not tex then
 end
 
 local utils = (function()
-  --- Merge two tables into the first specified table.
-  --- The `merge_tables` function copies keys from the `source` table
-  --- to the `target` table. It returns the target table.
   ---
-  --- https://stackoverflow.com/a/1283608/10193818
+  ---Merge two tables into the first specified table.
+  ---The `merge_tables` function copies keys from the `source` table
+  ---to the `target` table. It returns the target table.
+  ---
+  ---https://stackoverflow.com/a/1283608/10193818
   ---
   ---@param target table # The target table where all values are copied.
   ---@param source table # The source table from which all values are copied.
@@ -62,6 +63,7 @@ local utils = (function()
     return target
   end
 
+  ---
   ---Clone a table, i.e. make a deep copy of the source table.
   ---
   ---http://lua-users.org/wiki/CopyTable
@@ -77,12 +79,13 @@ local utils = (function()
         copy[clone_table(orig_key)] = clone_table(orig_value)
       end
       setmetatable(copy, clone_table(getmetatable(source)))
-    else -- number, string, boolean, etc
+    else ---number, string, boolean, etc
       copy = source
     end
     return copy
   end
 
+  ---
   ---Remove an element from a table.
   ---
   ---@param source table
@@ -98,6 +101,7 @@ local utils = (function()
     end
   end
 
+  ---
   ---@param source table
   ---
   ---@return table # An array table with the sorted key names.
@@ -110,6 +114,7 @@ local utils = (function()
     return keys
   end
 
+  ---
   ---Get the size of a table `{ one = 'one', 'two', 'three' }` = 3.
   ---
   ---@param value any # A table or any input.
@@ -125,8 +130,9 @@ local utils = (function()
     return count
   end
 
-  --- Get the size of an array like table, for example `{ 'one', 'two',
-  ---  'three' }` = 3.
+  ---
+  ---Get the size of an array like table, for example `{ 'one', 'two',
+  ---'three' }` = 3.
   ---
   ---@param value any # A table or any input.
   ---
@@ -141,6 +147,7 @@ local utils = (function()
     return count
   end
 
+  ---
   ---Scan for an optional argument.
   ---
   ---@param initial_delimiter? string # The character that marks the beginning of an optional argument (by default `[`).
@@ -184,6 +191,7 @@ local utils = (function()
     end
   end
 
+  ---
   ---@param message string
   ---@param help? table
   local function throw_error(message, help)
@@ -350,6 +358,7 @@ local utils = (function()
       return output .. format_color_code(code)
     end
 
+    ---
     ---@param text any
     ---@param color ColorName # A color name.
     ---@param mode? ColorMode
@@ -505,16 +514,18 @@ local utils = (function()
   }
 end)()
 
---- Convert back to strings
--- @section
+---
+---Convert back to strings
+---@section
 local visualizers = (function()
 
-  --- The function `render(tbl)` reverses the function
-  --- `parse(kv_string)`. It takes a Lua table and converts this table
-  --- into a key-value string. The resulting string usually has a
-  --- different order as the input table. In Lua only tables with
-  --- 1-based consecutive integer keys (a.k.a. array tables) can be
-  --- parsed in order.
+  ---
+  ---The function `render(tbl)` reverses the function
+  ---`parse(kv_string)`. It takes a Lua table and converts this table
+  ---into a key-value string. The resulting string usually has a
+  ---different order as the input table. In Lua only tables with
+  ---1-based consecutive integer keys (a.k.a. array tables) can be
+  ---parsed in order.
   ---
   ---@param result table # A table to be converted into a key-value string.
   ---
@@ -547,13 +558,14 @@ local visualizers = (function()
     return render_inner(result)
   end
 
-  --- The function `stringify(tbl, for_tex)` converts a Lua table into a
-  --- printable string. Stringify a table means to convert the table into
-  --- a string. This function is used to realize the `debug` function.
-  --- `stringify(tbl, true)` (`for_tex = true`) generates a string which
-  --- can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
-  --- this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
-  --- string suitable for the terminal.
+  ---
+  ---The function `stringify(tbl, for_tex)` converts a Lua table into a
+  ---printable string. Stringify a table means to convert the table into
+  ---a string. This function is used to realize the `debug` function.
+  ---`stringify(tbl, true)` (`for_tex = true`) generates a string which
+  ---can be embeded into TeX documents. The macro `\luakeysdebug{}` uses
+  ---this option. `stringify(tbl, false)` or `stringify(tbl)` generate a
+  ---string suitable for the terminal.
   ---
   ---@see https://stackoverflow.com/a/54593224/10193818
   ---
@@ -628,12 +640,13 @@ local visualizers = (function()
              line_break .. end_bracket
   end
 
-  --- The function `debug(result)` pretty prints a Lua table to standard
-  --   output (stdout). It is a utility function that can be used to
-  --   debug and inspect the resulting Lua table of the function
-  --   `parse`. You have to compile your TeX document in a console to
-  --   see the terminal output.
-  --
+  ---
+  ---The function `debug(result)` pretty prints a Lua table to standard
+  ---output (stdout). It is a utility function that can be used to
+  ---debug and inspect the resulting Lua table of the function
+  ---`parse`. You have to compile your TeX document in a console to
+  ---see the terminal output.
+  ---
   ---@param result table # A table to be printed to standard output for debugging purposes.
   local function debug(result)
     print('\n' .. stringify(result, false))
@@ -724,27 +737,30 @@ local namespace = {
     E018 = 'The option “format_keys” has to be a table not @data_type',
     E019 = 'Unknown keys: @unknown',
 
-    --- Input / parsing error
+    ---Input / parsing error
     E021 = 'Opposite key was specified more than once: @key!',
     E020 = 'Both opposite keys were given: @true and @false!',
-    --- Config error (wrong configuration of luakeys)
+    ---Config error (wrong configuration of luakeys)
     E010 = 'Usage: opposite_keys = { "true_key", "false_key" } or { [true] = "true_key", [false] = "false_key" } ',
   },
 }
 
+---
 ---@return table # The public interface of the module.
 local function main()
 
-  --- The default options.
+  ---The default options.
   local default_opts = utils.clone_table(namespace.opts)
 
   local error_messages = utils.clone_table(namespace.error_messages)
 
+  ---
   ---@param error_code string
   ---@param args? table
   local function throw_error(error_code, args)
     local template = error_messages[error_code]
 
+    ---
     ---@param message string
     ---@param args table
     ---
@@ -760,6 +776,7 @@ local function main()
       return message
     end
 
+    ---
     ---@param list table
     ---@param args table
     ---
@@ -771,6 +788,7 @@ local function main()
       return list
     end
 
+    ---
     ---@type string
     local message
     ---@type table
@@ -805,7 +823,8 @@ local function main()
     utils.throw_error(message, help)
   end
 
-  --- Normalize the parse options.
+  ---
+  ---Normalize the parse options.
   ---
   ---@param opts? table # Options in a raw format. The table may be empty or some keys are not set.
   ---
@@ -845,20 +864,21 @@ local function main()
 
   local l3_code_cctab = 10
 
-  --- Parser / Lpeg related
-  -- @section
+  ---
+  ---Parser / Lpeg related
+  ---@section
 
-  --- Generate the PEG parser using Lpeg.
+  ---Generate the PEG parser using Lpeg.
   ---
-  --- Explanations of some LPeg notation forms:
+  ---Explanations of some LPeg notation forms:
   ---
-  --- * `patt ^ 0` = `expression *`
-  --- * `patt ^ 1` = `expression +`
-  --- * `patt ^ -1` = `expression ?`
-  --- * `patt1 * patt2` = `expression1 expression2`: Sequence
-  --- * `patt1 + patt2` = `expression1 / expression2`: Ordered choice
+  ---* `patt ^ 0` = `expression *`
+  ---* `patt ^ 1` = `expression +`
+  ---* `patt ^ -1` = `expression ?`
+  ---* `patt1 * patt2` = `expression1 expression2`: Sequence
+  ---* `patt1 + patt2` = `expression1 / expression2`: Ordered choice
   ---
-  --- * [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf)
+  ---* [TUGboat article: Parsing complex data formats in LuaTEX with LPEG](https://tug.or-g/TUGboat/tb40-2/tb125menke-Patterndf)
   ---
   ---@param initial_rule string # The name of the first rule of the grammar table passed to the `lpeg.P(attern)` function (e. g. `list`, `number`).
   ---@param opts? table # Whether the dimensions should be converted to scaled points (by default `false`).
@@ -879,10 +899,10 @@ local function main()
     local CaptureConstant = lpeg.Cc
     local CaptureSimple = lpeg.C
 
-    -- Optional whitespace
+    ---Optional whitespace
     local white_space = Set(' \t\n\r')
 
-    --- Match literal string surrounded by whitespace
+    ---Match literal string surrounded by whitespace
     local ws = function(match)
       return white_space ^ 0 * Pattern(match) * white_space ^ 0
     end
@@ -899,16 +919,17 @@ local function main()
       return result
     end
 
-    --- Convert a dimension to an normalized dimension string or an
-    --- integer in the scaled points format.
+    ---
+    ---Convert a dimension to an normalized dimension string or an
+    ---integer in the scaled points format.
     ---
     ---@param input string
     ---
     ---@return integer|string # A dimension as an integer or a dimension string.
     local capture_dimension = function(input)
-      -- Remove all whitespaces
+      ---Remove all whitespaces
       input = input:gsub('%s+', '')
-      -- Convert the unit string into lowercase.
+      ---Convert the unit string into lowercase.
       input = input:lower()
       if opts.convert_dimensions then
         return tex.sp(input)
@@ -917,18 +938,19 @@ local function main()
       end
     end
 
-    --- Add values to a table in two modes:
-    --
-    -- Key-value pair:
-    --
-    -- If `arg1` and `arg2` are not nil, then `arg1` is the key and `arg2` is the
-    -- value of a new table entry.
-    --
-    -- Indexed value:
-    --
-    -- If `arg2` is nil, then `arg1` is the value and is added as an indexed
-    -- (by an integer) value.
-    --
+    ---
+    ---Add values to a table in two modes:
+    ---
+    ---Key-value pair:
+    ---
+    ---If `arg1` and `arg2` are not nil, then `arg1` is the key and `arg2` is the
+    ---value of a new table entry.
+    ---
+    ---Indexed value:
+    ---
+    ---If `arg2` is nil, then `arg1` is the value and is added as an indexed
+    ---(by an integer) value.
+    ---
     ---@param result table # The result table to which an additional key-value pair or value should to be added
     ---@param arg1 any # The key or the value.
     ---@param arg2? any # Always the value.
@@ -947,17 +969,17 @@ local function main()
     return Pattern({
       [1] = initial_rule,
 
-      -- list_item*
+      ---list_item*
       list = CaptureFolding(
         CaptureTable('') * Variable('list_item')^0,
         add_to_table
       ),
 
-      -- '{' list '}'
+      ---'{' list '}'
       list_container =
         ws(opts.group_begin) * Variable('list') * ws(opts.group_end),
 
-      -- ( list_container / key_value_pair / value ) ','?
+      ---( list_container / key_value_pair / value ) ','?
       list_item =
         CaptureGroup(
           Variable('list_container') +
@@ -965,18 +987,18 @@ local function main()
           Variable('value')
         ) * ws(opts.list_separator)^-1,
 
-      -- key '=' (list_container / value)
+      ---key '=' (list_container / value)
       key_value_pair =
         (Variable('key') * ws(opts.assignment_operator)) * (Variable('list_container') + Variable('value')),
 
-      -- number / string_quoted / string_unquoted
+      ---number / string_quoted / string_unquoted
       key =
         Variable('number') +
         Variable('string_quoted') +
         Variable('string_unquoted'),
 
-      -- boolean !value / dimension !value / number !value / string_quoted !value / string_unquoted
-      -- !value -> Not-predicate -> * -Variable('value')
+      ---boolean !value / dimension !value / number !value / string_quoted !value / string_unquoted
+      ---!value -> Not-predicate -> * -Variable('value')
       value =
         Variable('boolean') * -Variable('value') +
         Variable('dimension') * -Variable('value') +
@@ -984,10 +1006,10 @@ local function main()
         Variable('string_quoted') * -Variable('value') +
         Variable('string_unquoted'),
 
-      -- for is.boolean()
+      ---for is.boolean()
       boolean_only = Variable('boolean') * -1,
 
-      -- boolean_true / boolean_false
+      ---boolean_true / boolean_false
       boolean =
         (
           Variable('boolean_true') * CaptureConstant(true) +
@@ -998,7 +1020,7 @@ local function main()
 
       boolean_false = line_up_pattern(opts.false_aliases),
 
-      -- for is.dimension()
+      ---for is.dimension()
       dimension_only = Variable('dimension') * -1,
 
       dimension = (
@@ -1006,13 +1028,13 @@ local function main()
         Variable('unit')
       ) / capture_dimension,
 
-      -- for is.number()
+      ---for is.number()
       number_only = Variable('number') * -1,
 
-      -- capture number
+      ---capture number
       number = Variable('tex_number') / tonumber,
 
-      -- sign? white_space? (integer+ fractional? / fractional)
+      ---sign? white_space? (integer+ fractional? / fractional)
       tex_number =
         Variable('sign')^0 * white_space^0 *
         (Variable('integer')^1 * Variable('fractional')^0) +
@@ -1024,9 +1046,9 @@ local function main()
 
       integer = Range('09')^1,
 
-      -- 'bp' / 'BP' / 'cc' / etc.
-      -- https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
-      -- https://github.com/TeX-Live/luatex/blob/51db1985f5500dafd2393aa2e403fefa57d3cb76/source/texk/web2c/luatexdir/lua/ltexlib.c#L434-L625
+      ---'bp' / 'BP' / 'cc' / etc.
+      ---https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
+      ---https://github.com/TeX-Live/luatex/blob/51db1985f5500dafd2393aa2e403fefa57d3cb76/source/texk/web2c/luatexdir/lua/ltexlib.c#L434-L625
       unit =
         Pattern('bp') + Pattern('BP') +
         Pattern('cc') + Pattern('CC') +
@@ -1044,7 +1066,7 @@ local function main()
         Pattern('px') + Pattern('PX') +
         Pattern('sp') + Pattern('SP'),
 
-      -- '"' ('\"' / !'"')* '"'
+      ---'"' ('\"' / !'"')* '"'
       string_quoted =
         white_space^0 * Pattern(opts.quotation_begin) *
         CaptureSimple((Pattern('\\' .. opts.quotation_end) + 1 - Pattern(opts.quotation_end))^0) *
@@ -1130,8 +1152,9 @@ local function main()
     end,
   }
 
-  --- Apply the key-value-pair definitions (defs) on an input table in a
-  --- recursive fashion.
+  ---
+  ---Apply the key-value-pair definitions (defs) on an input table in a
+  ---recursive fashion.
   ---
   ---@param defs table # A table containing all definitions.
   ---@param opts table # The parse options table.
@@ -1174,7 +1197,7 @@ local function main()
         local value = input[search_key]
         input[search_key] = nil
         return value
-        -- naked keys: values with integer keys
+        ---naked keys: values with integer keys
       elseif utils.remove_from_table(input, search_key) ~= nil then
         return get_default_value(def)
       end
@@ -1187,7 +1210,7 @@ local function main()
         end
         local alias_value
         local used_alias_key
-        -- To get an error if the key and an alias is present
+        ---To get an error if the key and an alias is present
         if value ~= nil then
           alias_value = value
           used_alias_key = key
@@ -1240,19 +1263,19 @@ local function main()
         end
         if def.data_type ~= nil then
           local converted
-          -- boolean
+          ---boolean
           if def.data_type == 'boolean' then
             if value == 0 or value == '' or not value then
               converted = false
             else
               converted = true
             end
-            -- dimension
+            ---dimension
           elseif def.data_type == 'dimension' then
             if is.dimension(value) then
               converted = value
             end
-            -- integer
+            ---integer
           elseif def.data_type == 'integer' then
             if is.number(value) then
               local n = tonumber(value)
@@ -1260,15 +1283,15 @@ local function main()
                 converted = math.floor(n)
               end
             end
-            -- number
+            ---number
           elseif def.data_type == 'number' then
             if is.number(value) then
               converted = tonumber(value)
             end
-            -- string
+            ---string
           elseif def.data_type == 'string' then
             converted = tostring(value)
-            -- list
+            ---list
           elseif def.data_type == 'list' then
             if is.list(value) then
               converted = value
@@ -1405,7 +1428,7 @@ local function main()
         if def.pick then
           local pick_types
 
-          -- Allow old deprecated attribut pick = true
+          ---Allow old deprecated attribut pick = true
           if def.pick == true then
             pick_types = { 'any' }
           elseif type(def.pick) == 'table' then
@@ -1414,7 +1437,7 @@ local function main()
             pick_types = { def.pick }
           end
 
-          -- Check if the pick attribute is valid
+          ---Check if the pick attribute is valid
           for _, pick_type in ipairs(pick_types) do
             if type(pick_type) == 'string' and is[pick_type] == nil then
               throw_error('E011', {
@@ -1431,18 +1454,18 @@ local function main()
             end
           end
 
-          -- The key has already a value. We leave the function at this
-          -- point to be able to check the pick attribute for errors
-          -- beforehand.
+          ---The key has already a value. We leave the function at this
+          ---point to be able to check the pick attribute for errors
+          ---beforehand.
           if value ~= nil then
             return value
           end
 
           for _, pick_type in ipairs(pick_types) do
             for i, v in pairs(input) do
-              -- We can not use ipairs here. `ipairs(t)` iterates up to the
-              -- first absent index. Values are deleted from the `input`
-              -- table.
+              ---We can not use ipairs here. `ipairs(t)` iterates up to the
+              ---first absent index. Values are deleted from the `input`
+              ---table.
               if type(i) == 'number' then
                 local picked_value = nil
                 if is[pick_type](v) then
@@ -1468,7 +1491,7 @@ local function main()
       sub_keys = function(value, key, def)
         if def.sub_keys ~= nil then
           local v
-          -- To get keys defined with always_present
+          ---To get keys defined with always_present
           if value == nil then
             v = {}
           elseif type(value) == 'string' then
@@ -1485,9 +1508,9 @@ local function main()
       end,
     }
 
-    --- standalone values are removed.
-    -- For some callbacks and the third return value of parse, we
-    -- need an unchanged raw result from the parse function.
+    ---standalone values are removed.
+    ---For some callbacks and the third return value of parse, we
+    ---need an unchanged raw result from the parse function.
     input = utils.clone_table(input)
     if output == nil then
       output = {}
@@ -1500,23 +1523,23 @@ local function main()
     end
 
     for index, def in pairs(defs) do
-      -- Find key and def
+      ---Find key and def
       local key
-      -- `{ key1 = { }, key2 = { } }`
+      ---`{ key1 = { }, key2 = { } }`
       if type(def) == 'table' and def.name == nil and type(index) ==
         'string' then
         key = index
-        -- `{ { name = 'key1' }, { name = 'key2' } }`
+        ---`{ { name = 'key1' }, { name = 'key2' } }`
       elseif type(def) == 'table' and def.name ~= nil then
         key = def.name
-        -- Definitions as strings in an array: `{ 'key1', 'key2' }`
+        ---Definitions as strings in an array: `{ 'key1', 'key2' }`
       elseif type(index) == 'number' and type(def) == 'string' then
         key = def
         def = { default = get_default_value({}) }
       end
 
       if type(def) ~= 'table' then
-        throw_error('E013', { data_type = tostring(def), key = index }) -- key is nil
+        throw_error('E013', { data_type = tostring(def), key = index }) ---key is nil
       end
 
       for attr, _ in pairs(def) do
@@ -1561,7 +1584,7 @@ local function main()
     end
 
     if utils.get_table_size(input) > 0 then
-      -- Move to the current unknown table.
+      ---Move to the current unknown table.
       local current_unknown = unknown
       for _, key in ipairs(key_path) do
         if current_unknown[key] == nil then
@@ -1570,7 +1593,7 @@ local function main()
         current_unknown = current_unknown[key]
       end
 
-      -- Copy all unknown key-value-pairs to the current unknown table.
+      ---Copy all unknown key-value-pairs to the current unknown table.
       for key, value in pairs(input) do
         current_unknown[key] = value
       end
@@ -1579,7 +1602,8 @@ local function main()
     return output, unknown
   end
 
-  --- Parse a LaTeX/TeX style key-value string into a Lua table.
+  ---
+  ---Parse a LaTeX/TeX style key-value string into a Lua table.
   ---
   ---@param kv_string string # A string in the TeX/LaTeX style key-value format as described above.
   ---@param opts? table # A table containing options.
@@ -1628,9 +1652,10 @@ local function main()
 
     apply_hooks('before_opts')
 
-    --- Normalize the result table of the LPeg parser. This normalization
-    --  tasks are performed on the raw input table coming directly from
-    --  the PEG parser:
+    ---
+    ---Normalize the result table of the LPeg parser. This normalization
+    ---tasks are performed on the raw input table coming directly from
+    ---the PEG parser:
     --
     ---@param result table # The raw input table coming directly from the PEG parser
     ---@param opts table # Some options.
@@ -1703,7 +1728,7 @@ local function main()
     end
     result = apply_opts(result, opts)
 
-    -- All unknown keys are stored in this table
+    ---All unknown keys are stored in this table
     local unknown = nil
     if type(opts.defs) == 'table' then
       apply_hooks('before_defs')
@@ -1726,7 +1751,7 @@ local function main()
       utils.merge_tables(opts.accumulated_result, result, true)
     end
 
-    -- no_error
+    ---no_error
     if not opts.no_error and type(unknown) == 'table' and
       utils.get_table_size(unknown) > 0 then
       throw_error('E019', { unknown = visualizers.render(unknown) })
@@ -1734,10 +1759,12 @@ local function main()
     return result, unknown, raw
   end
 
-  --- Store results
-  -- @section
+  ---
+  ---Store results
+  ---@section
 
-  --- A table to store parsed key-value results.
+  ---
+  ---A table to store parsed key-value results.
   local result_store = {}
 
   return {
@@ -1747,6 +1774,7 @@ local function main()
 
     error_messages = error_messages,
 
+    ---
     ---This function is used in the documentation.
     ---
     ---@param from string # A key in the namespace table, either `opts`, `hook` or `attrs`.
@@ -1759,13 +1787,13 @@ local function main()
       tex.print(tostring(namespace[from][name]))
     end,
 
-    --- @see default_opts
+    ---@see default_opts
     opts = default_opts,
 
-    --- @see visualizers.stringify
+    ---@see visualizers.stringify
     stringify = visualizers.stringify,
 
-    --- @see parse
+    ---@see parse
     parse = parse,
 
     define = function(defs, opts)
@@ -1790,34 +1818,35 @@ local function main()
       end
     end,
 
-    --- @see visualizers.render
+    ---@see visualizers.render
     render = visualizers.render,
 
-    --- @see visualizers.debug
+    ---@see visualizers.debug
     debug = visualizers.debug,
 
-    --- The function `save(identifier, result): void` saves a result (a
-    --  table from a previous run of `parse`) under an identifier.
-    --  Therefore, it is not necessary to pollute the global namespace to
-    --  store results for the later usage.
-    --
+    ---
+    ---The function `save(identifier, result): void` saves a result (a
+    ---table from a previous run of `parse`) under an identifier.
+    ---Therefore, it is not necessary to pollute the global namespace to
+    ---store results for the later usage.
+    ---
     ---@param identifier string # The identifier under which the result is saved.
-    --
+    ---
     ---@param result table # A result to be stored and that was created by the key-value parser.
     save = function(identifier, result)
       result_store[identifier] = result
     end,
 
-    --- The function `get(identifier): table` retrieves a saved result
-    --  from the result store.
-    --
+    ---The function `get(identifier): table` retrieves a saved result
+    ---from the result store.
+    ---
     ---@param identifier string # The identifier under which the result was saved.
     ---
     ---@return table
     get = function(identifier)
-      -- if result_store[identifier] == nil then
-      --   throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
-      -- end
+      ---if result_store[identifier] == nil then
+      ---  throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
+      ---end
       return result_store[identifier]
     end,
 
