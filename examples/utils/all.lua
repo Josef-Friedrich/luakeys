@@ -10,6 +10,8 @@ local get_table_keys = utils.get_table_keys
 local get_table_size = utils.get_table_size
 local get_array_size = utils.get_array_size
 
+local tex_printf = utils.tex_printf
+
 ---error
 local throw_error_message = utils.throw_error_message
 local throw_error_code = utils.throw_error_code
@@ -44,6 +46,8 @@ it('Exported', function()
   assert_function(get_table_keys)
   assert_function(get_table_size)
   assert_function(get_array_size)
+
+  assert_function(tex_printf)
 
   assert_function(throw_error_message)
   assert_function(throw_error_code)

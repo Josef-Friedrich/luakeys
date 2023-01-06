@@ -148,47 +148,31 @@ local utils = (function()
   end
 
   ---
-  ---Scan for an optional argument.
+  ---Print a formatted string.
   ---
-  ---@param initial_delimiter? string # The character that marks the beginning of an optional argument (by default `[`).
-  ---@param end_delimiter? string # The character that marks the end of an optional argument (by default `]`).
+  ---* %d or %i: Signed decimal integer
+  ---* %u: Unsigned decimal integer
+  ---* %o: Unsigned octal
+  ---* %x: Unsigned hexadecimal integer
+  ---* %X: Unsigned hexadecimal integer (uppercase)
+  ---* %f: Decimal floating point, lowercase
+  ---* %e: Scientific notation (mantissa/exponent), lowercase
+  ---* %E: Scientific notation (mantissa/exponent), uppercase
+  ---* %g: Use the shortest representation: %e or %f
+  ---* %G: Use the shortest representation: %E or %F
+  ---* %a: Hexadecimal floating point, lowercase
+  ---* %A: Hexadecimal floating point, uppercase
+  ---* %c: Character
+  ---* %s: String of characters
+  ---* %p: Pointer address	b8000000
+  ---* %%: A `%` followed by another `%` character will write a single `%` to the stream.
   ---
-  ---@return string|nil # The string that was enclosed by the delimiters. The delimiters themselves are not returned.
-  local function scan_oarg(initial_delimiter,
-    end_delimiter)
-    if initial_delimiter == nil then
-      initial_delimiter = '['
-    end
-
-    if end_delimiter == nil then
-      end_delimiter = ']'
-    end
-
-    local function convert_token(t)
-      if t.index ~= nil then
-        return utf8.char(t.index)
-      else
-        return '\\' .. t.csname
-      end
-    end
-
-    local function get_next_char()
-      local t = token.get_next()
-      return convert_token(t), t
-    end
-
-    local char, t = get_next_char()
-    if char == initial_delimiter then
-      local oarg = {}
-      char = get_next_char()
-      while char ~= end_delimiter do
-        table.insert(oarg, char)
-        char = get_next_char()
-      end
-      return table.concat(oarg, '')
-    else
-      token.put_next(t)
-    end
+  ---http://www.lua.org/source/5.3/lstrlib.c.html#str_format
+  ---
+  ---@param format string # A string in the printf format
+  ---@param ... any # A sequence of additional arguments, each containing a value to be used to replace a format specifier in the format string.
+  local function tex_printf(format, ...)
+    tex.print(string.format(format, ...))
   end
 
   ---
@@ -276,6 +260,50 @@ local utils = (function()
     end
 
     throw_error_message(message, help)
+  end
+
+  ---
+  ---Scan for an optional argument.
+  ---
+  ---@param initial_delimiter? string # The character that marks the beginning of an optional argument (by default `[`).
+  ---@param end_delimiter? string # The character that marks the end of an optional argument (by default `]`).
+  ---
+  ---@return string|nil # The string that was enclosed by the delimiters. The delimiters themselves are not returned.
+  local function scan_oarg(initial_delimiter,
+    end_delimiter)
+    if initial_delimiter == nil then
+      initial_delimiter = '['
+    end
+
+    if end_delimiter == nil then
+      end_delimiter = ']'
+    end
+
+    local function convert_token(t)
+      if t.index ~= nil then
+        return utf8.char(t.index)
+      else
+        return '\\' .. t.csname
+      end
+    end
+
+    local function get_next_char()
+      local t = token.get_next()
+      return convert_token(t), t
+    end
+
+    local char, t = get_next_char()
+    if char == initial_delimiter then
+      local oarg = {}
+      char = get_next_char()
+      while char ~= end_delimiter do
+        table.insert(oarg, char)
+        char = get_next_char()
+      end
+      return table.concat(oarg, '')
+    else
+      token.put_next(t)
+    end
   end
 
   local function visit_tree(tree, callback_func)
@@ -640,11 +668,12 @@ local utils = (function()
     get_table_size = get_table_size,
     get_array_size = get_array_size,
     visit_tree = visit_tree,
-    scan_oarg = scan_oarg,
+    tex_printf = tex_printf,
     throw_error_message = throw_error_message,
     throw_error_code = throw_error_code,
-    log = log,
+    scan_oarg = scan_oarg,
     ansi_color = ansi_color,
+    log = log,
   }
 end)()
 
