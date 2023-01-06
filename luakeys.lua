@@ -918,7 +918,9 @@ local namespace = {
 }
 
 ---
----@return table # The public interface of the module.
+---Main entry point of the module.
+---
+---The return value is intentional not documented so the Lua language server can figure out the types.
 local function main()
 
   ---The default options.
