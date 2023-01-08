@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `utils.log.get()`
 - `utils.tex_printf()`
+- More type annotations for better syntax highlighting when used with
+  the [lua-language-server](https://github.com/sumneko/lua-language-server)
+- Documentation for the `error_messages` table.
 
 ### Changed
 

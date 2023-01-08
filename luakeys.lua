@@ -857,6 +857,8 @@ end)()
 
 ---@alias ProcessFunction fun(value: any, input: table, result: table, unknown: table): any
 
+---@alias PickDataType 'string'|'number'|'dimension'|'integer'|'boolean'|'any'
+
 ---@class Definition
 ---@field alias? string|table
 ---@field always_present? boolean
@@ -870,7 +872,7 @@ end)()
 ---@field match? string
 ---@field name? string
 ---@field opposite_keys? table
----@field pick? 'string'|'number'|'dimension'|'integer'|'boolean'|'any'
+---@field pick? PickDataType|PickDataType[]
 ---@field process? ProcessFunction
 ---@field required? boolean
 ---@field sub_keys? table<string, Definition>
