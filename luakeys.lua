@@ -17,7 +17,6 @@
 ---luakeys-debug.sty and luakeys-debug.tex.
 ----A key-value parser written with Lpeg.
 ---
----@module luakeys
 local lpeg = require('lpeg')
 
 if not tex then
@@ -34,6 +33,7 @@ if not tex then
   }
 end
 
+---
 local utils = (function()
   ---
   ---Merge two tables into the first specified table.
@@ -686,7 +686,7 @@ end)()
 local visualizers = (function()
 
   ---
-  ---The function `render(tbl)` reverses the function
+  ---Reverse the function
   ---`parse(kv_string)`. It takes a Lua table and converts this table
   ---into a key-value string. The resulting string usually has a
   ---different order as the input table. In Lua only tables with
@@ -821,6 +821,62 @@ local visualizers = (function()
   return { render = render, stringify = stringify, debug = debug }
 end)()
 
+---@class OptionCollection
+---@field accumulated_result? table
+---@field assignment_operator? string # default `=`
+---@field convert_dimensions? boolean # default `false`
+---@field debug? boolean # default `false`
+---@field default? boolean # default `true`
+---@field defaults? table
+---@field defs? DefinitionCollection
+---@field false_aliases? table default `{ 'false', 'FALSE', 'False' }`,
+---@field format_keys? boolean # default `false`,
+---@field group_begin? string default `{`,
+---@field group_end? string default `}`,
+---@field hooks? HookCollection
+---@field invert_flag? string default `!`
+---@field list_separator? string default `,`
+---@field naked_as_value? boolean # default `false`
+---@field no_error? boolean # default `false`
+---@field quotation_begin? string `"`
+---@field quotation_end? string `"`
+---@field true_aliases? table `{ 'true', 'TRUE', 'True' }`
+---@field unpack? boolean # default `true`
+
+---@alias KeysHook fun(key: string, value: any, depth: integer, current: table, result: table): string, any
+---@alias ResultHook fun(result: table): nil
+
+---@class HookCollection
+---@field kv_string? fun(kv_string: string): string
+---@field keys_before_opts? KeysHook
+---@field result_before_opts? ResultHook
+---@field keys_before_def? KeysHook
+---@field result_before_def? ResultHook
+---@field keys? KeysHook
+---@field result? ResultHook
+
+---@alias ProcessFunction fun(value: any, input: table, result: table, unknown: table): any
+
+---@class Definition
+---@field alias? string|table
+---@field always_present? boolean
+---@field choices? table
+---@field data_type? 'boolean'|'dimension'|'integer'|'number'|'string'|'list'
+---@field default? any
+---@field description? string
+---@field exclusive_group? string
+---@field l3_tl_set? string
+---@field macro? string
+---@field match? string
+---@field name? string
+---@field opposite_keys? table
+---@field pick? 'string'|'number'|'dimension'|'integer'|'boolean'|'any'
+---@field process? ProcessFunction
+---@field required? boolean
+---@field sub_keys? table<string, Definition>
+
+---@alias DefinitionCollection table<string|number, Definition>
+
 local namespace = {
   opts = {
     accumulated_result = false,
@@ -927,6 +983,7 @@ local namespace = {
 local function main()
 
   ---The default options.
+  ---@type OptionCollection
   local default_opts = utils.clone_table(namespace.opts)
 
   local error_messages = utils.clone_table(namespace.error_messages)
@@ -941,9 +998,9 @@ local function main()
   ---
   ---Normalize the parse options.
   ---
-  ---@param opts? table # Options in a raw format. The table may be empty or some keys are not set.
+  ---@param opts? OptionCollection|unknown # Options in a raw format. The table may be empty or some keys are not set.
   ---
-  ---@return table
+  ---@return OptionCollection
   local function normalize_opts(opts)
     if type(opts) ~= 'table' then
       opts = {}
@@ -1723,7 +1780,7 @@ local function main()
   ---Parse a LaTeX/TeX style key-value string into a Lua table.
   ---
   ---@param kv_string string # A string in the TeX/LaTeX style key-value format as described above.
-  ---@param opts? table # A table containing options.
+  ---@param opts? OptionCollection # A table containing options.
   ---
   ---@return table result # The final result of all individual parsing and normalization steps.
   ---@return table unknown # A table with unknown, undefinied key-value pairs.
@@ -1905,6 +1962,9 @@ local function main()
     ---@see parse
     parse = parse,
 
+    ---
+    ---@param defs DefinitionCollection
+    ---@param opts? OptionCollection
     define = function(defs, opts)
       return function(kv_string, inner_opts)
         local options
@@ -1942,24 +2002,25 @@ local function main()
     debug = visualizers.debug,
 
     ---
-    ---The function `save(identifier, result): void` saves a result (a
+    ---Save a result (a
     ---table from a previous run of `parse`) under an identifier.
     ---Therefore, it is not necessary to pollute the global namespace to
     ---store results for the later usage.
     ---
     ---@param identifier string # The identifier under which the result is saved.
     ---
-    ---@param result table # A result to be stored and that was created by the key-value parser.
+    ---@param result table|any # A result to be stored and that was created by the key-value parser.
     save = function(identifier, result)
       result_store[identifier] = result
     end,
 
+    ---
     ---The function `get(identifier): table` retrieves a saved result
     ---from the result store.
     ---
     ---@param identifier string # The identifier under which the result was saved.
     ---
-    ---@return table
+    ---@return table|any
     get = function(identifier)
       ---if result_store[identifier] == nil then
       ---  throw_error('No stored result was found for the identifier \'' .. identifier .. '\'')
@@ -2002,7 +2063,8 @@ local function main()
         else
           msg_text = msg
         end
-        utils.tex_printf('\\item[\\texttt{%s}]: \\texttt{%s}', key, msg_text)
+        utils.tex_printf('\\item[\\texttt{%s}]: \\texttt{%s}', key,
+          msg_text)
       end
     end,
 
