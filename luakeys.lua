@@ -88,10 +88,10 @@ local utils = (function()
   ---
   ---Remove an element from a table.
   ---
-  ---@param source table
-  ---@param value any
+  ---@param source table # The source table.
+  ---@param value any # The value to be removed from the table.
   ---
-  ---@return any|nil
+  ---@return any|nil # If the value was found, then this value, otherwise nil.
   local function remove_from_table(source, value)
     for index, v in pairs(source) do
       if value == v then
@@ -102,7 +102,9 @@ local utils = (function()
   end
 
   ---
-  ---@param source table
+  ---Return the keys of a table as a sorted list (array like table).
+  ---
+  ---@param source table # The source table.
   ---
   ---@return table # An array table with the sorted key names.
   local function get_table_keys(source)
@@ -150,26 +152,27 @@ local utils = (function()
   ---
   ---Print a formatted string.
   ---
-  ---* %d or %i: Signed decimal integer
-  ---* %u: Unsigned decimal integer
-  ---* %o: Unsigned octal
-  ---* %x: Unsigned hexadecimal integer
-  ---* %X: Unsigned hexadecimal integer (uppercase)
-  ---* %f: Decimal floating point, lowercase
-  ---* %e: Scientific notation (mantissa/exponent), lowercase
-  ---* %E: Scientific notation (mantissa/exponent), uppercase
-  ---* %g: Use the shortest representation: %e or %f
-  ---* %G: Use the shortest representation: %E or %F
-  ---* %a: Hexadecimal floating point, lowercase
-  ---* %A: Hexadecimal floating point, uppercase
-  ---* %c: Character
-  ---* %s: String of characters
-  ---* %p: Pointer address	b8000000
-  ---* %%: A `%` followed by another `%` character will write a single `%` to the stream.
+  ---* `%d` or `%i`: Signed decimal integer
+  ---* `%u`: Unsigned decimal integer
+  ---* `%o`: Unsigned octal
+  ---* `%x`: Unsigned hexadecimal integer
+  ---* `%X`: Unsigned hexadecimal integer (uppercase)
+  ---* `%f`: Decimal floating point, lowercase
+  ---* `%e`: Scientific notation (mantissa/exponent), lowercase
+  ---* `%E`: Scientific notation (mantissa/exponent), uppercase
+  ---* `%g`: Use the shortest representation: %e or %f
+  ---* `%G`: Use the shortest representation: %E or %F
+  ---* `%a`: Hexadecimal floating point, lowercase
+  ---* `%A`: Hexadecimal floating point, uppercase
+  ---* `%c`: Character
+  ---* `%s`: String of characters
+  ---* `%p`: Pointer address	b8000000
+  ---* `%%`: A `%` followed by another `%` character will write a single `%` to the stream.
+  ---* `%q`: formats `booleans`, `nil`, `numbers`, and `strings` in a way that the result is a valid constant in Lua source code.
   ---
   ---http://www.lua.org/source/5.3/lstrlib.c.html#str_format
   ---
-  ---@param format string # A string in the printf format
+  ---@param format string # A string in the `printf` format
   ---@param ... any # A sequence of additional arguments, each containing a value to be used to replace a format specifier in the format string.
   local function tex_printf(format, ...)
     tex.print(string.format(format, ...))
