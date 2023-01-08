@@ -1990,6 +1990,22 @@ local function main()
       tex.print(tostring(namespace[from][name]))
     end,
 
+    print_error_messages = function()
+      local msgs = namespace.error_messages
+      local keys = utils.get_table_keys(namespace.error_messages)
+      for _, key in ipairs(keys) do
+        local msg = msgs[key]
+        ---@type string
+        local msg_text
+        if type(msg) == 'table' then
+          msg_text = msg[1]
+        else
+          msg_text = msg
+        end
+        utils.tex_printf('\\item[\\texttt{%s}]: \\texttt{%s}', key, msg_text)
+      end
+    end,
+
     ---
     ---@param exported_table table
     depublish_functions = function(exported_table)
