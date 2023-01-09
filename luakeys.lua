@@ -535,19 +535,29 @@ local utils = (function()
   ---Log levels:
   ---
   ---* 0: silent
-  ---* 1: error
-  ---* 2: warn
-  ---* 3: info
-  ---* 4: verbose
-  ---* 5: debug
+  ---* 1: error (red)
+  ---* 2: warn (yellow)
+  ---* 3: info (green)
+  ---* 4: verbose (blue)
+  ---* 5: debug (magenta)
   ---
   local log = (function()
     ---@private
     local opts = { level = 0 }
 
+    local function colorize_not(s)
+      return s
+    end
+
+    local colorize = colorize_not
+
     ---@private
     local function print_message(message, ...)
-      print(string.format(message, ...))
+      local args = {...}
+      for index, value in ipairs(args) do
+        args[index] = colorize(value)
+      end
+      print(string.format(message, table.unpack(args)))
     end
 
     ---
@@ -596,7 +606,9 @@ local utils = (function()
     ---@param ... any
     local function error(message, ...)
       if opts.level >= 1 then
+        colorize = ansi_color.red
         print_message(message, ...)
+        colorize = colorize_not
       end
     end
 
@@ -609,7 +621,9 @@ local utils = (function()
     ---@param ... any
     local function warn(message, ...)
       if opts.level >= 2 then
+        colorize = ansi_color.yellow
         print_message(message, ...)
+        colorize = colorize_not
       end
     end
 
@@ -622,7 +636,9 @@ local utils = (function()
     ---@param ... any
     local function info(message, ...)
       if opts.level >= 3 then
+        colorize = ansi_color.green
         print_message(message, ...)
+        colorize = colorize_not
       end
     end
 
@@ -635,7 +651,9 @@ local utils = (function()
     ---@param ... any
     local function verbose(message, ...)
       if opts.level >= 4 then
+        colorize = ansi_color.blue
         print_message(message, ...)
+        colorize = colorize_not
       end
     end
 
@@ -648,7 +666,9 @@ local utils = (function()
     ---@param ... any
     local function debug(message, ...)
       if opts.level >= 5 then
+        colorize = ansi_color.magenta
         print_message(message, ...)
+        colorize = colorize_not
       end
     end
 
