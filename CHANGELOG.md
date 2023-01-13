@@ -5,24 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.13.0] - 2023-01-13
 
 ### Added
 
-- `utils.log.get()`
-- `utils.tex_printf()`
+- New function `utils.log.get()` to get the current log level.
+- New function `utils.tex_printf()`: Combines `tex.print()` and Lua’s
+  `string.format()`.
 - More type annotations for better syntax highlighting when used with
   the [lua-language-server](https://github.com/sumneko/lua-language-server)
 - Documentation for the `error_messages` table.
 
 ### Changed
 
-- `utils.log.set_log_level()` -> `utils.log.set()`
+- Rename the function `utils.log.set_log_level()` into `utils.log.set()`
 
 ### Fixed
 
 - Keys with the attribute `opposite_keys` always got a value, even if
-  the key wasn't set.
+  the key wasn’t set.
 
 ## [0.12.0] - 2023-01-05
 

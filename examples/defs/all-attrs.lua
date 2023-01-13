@@ -2,6 +2,7 @@ require('busted.runner')()
 local luakeys = require('luakeys')()
 
 -- Update this code example in the README.md
+---@type DefinitionCollection
 local defs = {
   key = {
     -- Allow different key names.
@@ -54,7 +55,7 @@ local defs = {
     end,
 
     -- To enforce that a key must be specified.
-    required = true,
+    required = false,
 
     -- To build nested key-value pair definitions.
     sub_keys = { key_level_2 = { } },

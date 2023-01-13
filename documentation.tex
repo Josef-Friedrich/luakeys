@@ -273,11 +273,14 @@ and loads the Lua module \texttt{luakeys.lua} into the global variable
 Luakeys exports only one function that must be called to access the
 public API.
 %
-% Das Lua-Modul exportiert diese Funktionen und Tabellen:
-The Lua module exports this functions and tables:
+% Diese Exportfunktion gibt eine Tabelle zurück, die die öffentlichen
+% Funktionen und weiteren Tabellen enthält:
+This export function returns a table containing the public functions and
+additional tables:
 
 \InputLua[firstline=3,lastline=16]{export.lua}
 
+\noindent
 % Das Projekt verwendet einige wenige Abkürzungen für Variablennamen,
 % die hoffentlich für externe Leser eindeutig und bekannt sind.
 The project uses a few abbreviations for variable names that are
@@ -315,6 +318,19 @@ A table with unknown, undefinied key-value pairs. \\
 The raw result of the Lpeg grammar parser. \\
 \end{tabular}
 \end{center}
+
+\noindent
+% Es wird empfohlen, beim Entwickeln im Texteditor luakeys zusammen mit
+% dem Lua-Language-Server zu verwenden.
+It is recommended to use luakeys together with the
+\href{https://github.com/sumneko/lua-language-server}{github.com/sumneko/lua-language-server}
+when developing in a text editor.
+%
+% Luakeys unterstützt nämlich das vom Server angeboten Annotationsformat
+luakeys supports the annotation format offered by the server.
+% Sie sollten dann Warnungen erhalten, wenn Sie die mittlerweile
+% ziemlich große API von luakeys falsch verwenden.
+You should then get warnings if you misuse luakeys’ now rather large API.
 
 %%
 %

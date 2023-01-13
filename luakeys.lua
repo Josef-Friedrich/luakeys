@@ -282,6 +282,10 @@ local utils = (function()
       end_delimiter = ']'
     end
 
+    ---
+    ---@param t Token
+    ---
+    ---@return string
     local function convert_token(t)
       if t.index ~= nil then
         return utf8.char(t.index)
@@ -892,7 +896,7 @@ end)()
 ---@field match? string
 ---@field name? string
 ---@field opposite_keys? table
----@field pick? PickDataType|PickDataType[]
+---@field pick? PickDataType|PickDataType[]|false
 ---@field process? ProcessFunction
 ---@field required? boolean
 ---@field sub_keys? table<string, Definition>
