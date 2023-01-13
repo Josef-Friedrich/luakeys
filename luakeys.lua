@@ -1983,7 +1983,7 @@ local function main()
   return {
     new = main,
 
-    version = { 0, 12, 0 },
+    version = { 0, 13, 0 },
 
     ---@see parse
     parse = parse,
