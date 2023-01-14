@@ -88,6 +88,16 @@ describe('Defintions', function()
           })
       end)
 
+      it('should allow the key name as the alias name', function()
+        local defs = { key = { alias = { 'k', 'key' } } }
+        local parse = luakeys.define(defs)
+        local result = parse('key=value')
+        assert.is.equal(result.key, 'value')
+
+        local result2 = parse('k=value')
+        assert.is.equal(result2.key, 'value')
+      end)
+
       describe('Error messages', function()
         it('should throw an error if two aliases are present',
           function()

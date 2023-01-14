@@ -2005,7 +2005,10 @@ local function main()
   ---@alias KeySpec KeySelection[]
 
   local DefinitionManager = (function()
+    ---@class DefinitionManager
     DefinitionManager = {}
+
+    ---@private
     DefinitionManager.__index = DefinitionManager
 
     ---
@@ -2049,6 +2052,9 @@ local function main()
       return define(self:select(key_selection))
     end
 
+    ---@param defs DefinitionCollection
+    ---
+    ---@return DefinitionManager
     return function(defs)
       local manager = {}
       setmetatable(manager, DefinitionManager)
