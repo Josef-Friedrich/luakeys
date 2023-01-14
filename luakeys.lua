@@ -557,7 +557,7 @@ local utils = (function()
 
     ---@private
     local function print_message(message, ...)
-      local args = {...}
+      local args = { ... }
       for index, value in ipairs(args) do
         args[index] = colorize(value)
       end
@@ -1977,6 +1977,87 @@ local function main()
   end
 
   ---
+  ---@param defs DefinitionCollection
+  ---@param opts? OptionCollection
+  local function define(defs, opts)
+    return function(kv_string, inner_opts)
+      local options
+
+      if inner_opts ~= nil and opts ~= nil then
+        options = utils.merge_tables(opts, inner_opts)
+      elseif inner_opts ~= nil then
+        options = inner_opts
+      elseif opts ~= nil then
+        options = opts
+      end
+
+      if options == nil then
+        options = {}
+      end
+
+      options.defs = defs
+
+      return parse(kv_string, options)
+    end
+  end
+
+  ---@alias KeySelection string|string[]
+  ---@alias KeySpec KeySelection[]
+
+  local DefinitionManager = (function()
+    DefinitionManager = {}
+    DefinitionManager.__index = DefinitionManager
+
+    ---
+    ---@param key string
+    ---
+    ---@return Definition
+    function DefinitionManager:get(key)
+      return self.defs[key]
+    end
+
+    ---
+    ---@param key_selection KeySpec
+    ---
+    ---@return DefinitionCollection
+    function DefinitionManager:select(key_selection)
+      local selection = {}
+      for _, key in ipairs(key_selection) do
+        local src
+        local dest
+        if type(key) == 'table' then
+          src = key[1]
+          dest = key[2]
+        else
+          src = key
+          dest = key
+        end
+        selection[dest] = self.defs[src]
+      end
+      return selection
+    end
+
+    ---
+    ---@param key_selection KeySpec
+    function DefinitionManager:parse(kv_string, key_selection)
+      return parse(kv_string, { defs = self:select(key_selection) })
+    end
+
+    ---
+    ---@param key_selection KeySpec
+    function DefinitionManager:define(key_selection)
+      return define(self:select(key_selection))
+    end
+
+    return function(defs)
+      local manager = {}
+      setmetatable(manager, DefinitionManager)
+      manager.defs = defs
+      return manager
+    end
+  end)()
+
+  ---
   ---A table to store parsed key-value results.
   local result_store = {}
 
@@ -1985,33 +2066,11 @@ local function main()
 
     version = { 0, 13, 0 },
 
-    ---@see parse
     parse = parse,
 
-    ---
-    ---@param defs DefinitionCollection
-    ---@param opts? OptionCollection
-    define = function(defs, opts)
-      return function(kv_string, inner_opts)
-        local options
+    define = define,
 
-        if inner_opts ~= nil and opts ~= nil then
-          options = utils.merge_tables(opts, inner_opts)
-        elseif inner_opts ~= nil then
-          options = inner_opts
-        elseif opts ~= nil then
-          options = opts
-        end
-
-        if options == nil then
-          options = {}
-        end
-
-        options.defs = defs
-
-        return parse(kv_string, options)
-      end
-    end,
+    DefinitionManager = DefinitionManager,
 
     ---@see default_opts
     opts = default_opts,
