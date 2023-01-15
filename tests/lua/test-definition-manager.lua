@@ -25,7 +25,7 @@ describe(':parse', function()
   end)
 
   it('rename key', function()
-    local result = manager:parse('new3', { { 'key3', 'new3' } })
+    local result = manager:parse('new3', { key3 = 'new3' })
     assert.is.equal(result.new3, 3)
   end)
 

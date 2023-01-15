@@ -2021,21 +2021,26 @@ local function main()
 
     ---
     ---@param key_selection KeySpec
+    ---@param clone? boolean
     ---
     ---@return DefinitionCollection
-    function DefinitionManager:select(key_selection)
+    function DefinitionManager:select(key_selection, clone)
       local selection = {}
-      for _, key in ipairs(key_selection) do
+      for key, value in pairs(key_selection) do
         local src
         local dest
-        if type(key) == 'table' then
-          src = key[1]
-          dest = key[2]
+        if type(key) == 'number' then
+          src = value
+          dest = value
         else
           src = key
-          dest = key
+          dest = value
         end
-        selection[dest] = self.defs[src]
+        if clone then
+          selection[dest] = utils.clone_table(self.defs[src])
+        else
+          selection[dest] = self.defs[src]
+        end
       end
       return selection
     end
