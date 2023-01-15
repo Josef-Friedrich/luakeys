@@ -2001,8 +2001,7 @@ local function main()
     end
   end
 
-  ---@alias KeySelection string|string[]
-  ---@alias KeySpec KeySelection[]
+  ---@alias KeySpec table<integer|string, string>
 
   local DefinitionManager = (function()
     ---@class DefinitionManager
@@ -2024,7 +2023,7 @@ local function main()
     ---@param clone? boolean
     ---
     ---@return DefinitionCollection
-    function DefinitionManager:select(key_selection, clone)
+    function DefinitionManager:include(key_selection, clone)
       local selection = {}
       for key, value in pairs(key_selection) do
         local src
@@ -2048,13 +2047,13 @@ local function main()
     ---
     ---@param key_selection KeySpec
     function DefinitionManager:parse(kv_string, key_selection)
-      return parse(kv_string, { defs = self:select(key_selection) })
+      return parse(kv_string, { defs = self:include(key_selection) })
     end
 
     ---
     ---@param key_selection KeySpec
     function DefinitionManager:define(key_selection)
-      return define(self:select(key_selection))
+      return define(self:include(key_selection))
     end
 
     ---@param defs DefinitionCollection

@@ -14,11 +14,15 @@ it('result', function()
   assert.is.equal(manager.defs.key2.default, 2)
 end)
 
-it(':get', function()
+it('Method “:get()”', function()
   assert.is.equal(manager:get('key3').default, 3)
 end)
 
-describe(':parse', function()
+it('Method “:include()”', function()
+  assert.is.equal(manager:include({ 'key3' }).key3.default, 3)
+end)
+
+describe('Method “:parse()”', function()
   it('default', function()
     local result = manager:parse('key3', { 'key3' })
     assert.is.equal(result.key3, 3)
