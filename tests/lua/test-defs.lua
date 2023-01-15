@@ -371,6 +371,7 @@ describe('Defintions', function()
 
       it('Error: unknown data type', function()
         assert.has_error(function()
+          ---@diagnostic disable-next-line: assign-type-mismatch
           luakeys.parse('key', { defs = { key = { pick = 'xxx' } } })
         end,
           'luakeys error [E011]: Wrong data type in the “pick” attribute: “xxx”. Allowed are: “any, boolean, dimension, integer, number, string”.')

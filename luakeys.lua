@@ -2019,13 +2019,13 @@ local function main()
     end
 
     ---
-    ---@param key_selection KeySpec
+    ---@param key_spec KeySpec
     ---@param clone? boolean
     ---
     ---@return DefinitionCollection
-    function DefinitionManager:include(key_selection, clone)
+    function DefinitionManager:include(key_spec, clone)
       local selection = {}
-      for key, value in pairs(key_selection) do
+      for key, value in pairs(key_spec) do
         local src
         local dest
         if type(key) == 'number' then
@@ -2039,6 +2039,34 @@ local function main()
           selection[dest] = utils.clone_table(self.defs[src])
         else
           selection[dest] = self.defs[src]
+        end
+      end
+      return selection
+    end
+
+    ---
+    ---@param key_spec KeySpec
+    ---@param clone? boolean
+    ---
+    ---@return DefinitionCollection
+    function DefinitionManager:exclude(key_spec, clone)
+      local spec = {}
+      for key, value in pairs(key_spec) do
+        if type(key) == 'number' then
+          spec[value] = value
+        else
+          spec[key] = value
+        end
+      end
+
+      local selection = {}
+      for key, def in pairs(self.defs) do
+        if spec[key] == nil then
+          if clone then
+            selection[key] = utils.clone_table(def)
+          else
+            selection[key] = def
+          end
         end
       end
       return selection
