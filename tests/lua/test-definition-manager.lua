@@ -17,6 +17,18 @@ describe('class “DefinitionManager()”', function()
     assert.is.equal(manager.defs.key2.default, 2)
   end)
 
+  it('Constructor', function()
+    local m = DefinitionManager({
+      { name = 'named1', default = 1 },
+      { name = 'named2', default = 2 },
+      unnamed = { default = 0 },
+
+    })
+    assert.is.equal(m:get('named1').default, 1)
+    assert.is.equal(m:get('named2').default, 2)
+    assert.is.equal(m:get('unnamed').default, 0)
+  end)
+
   it('Method “:get()”', function()
     assert.is.equal(manager:get('key3').default, 3)
   end)

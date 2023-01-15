@@ -2089,6 +2089,14 @@ local function main()
     ---@return DefinitionManager
     return function(defs)
       local manager = {}
+
+      for key, def in pairs(defs) do
+        if def.name ~= nil and type(key) == 'number' then
+          defs[def.name] = def
+          defs[key] = nil
+        end
+      end
+
       setmetatable(manager, DefinitionManager)
       manager.defs = defs
       return manager
