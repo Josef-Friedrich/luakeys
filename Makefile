@@ -40,12 +40,12 @@ test_tex_latex:
 doc: doc_pdf
 
 doc_pdf:
-	lualatex --shell-escape documentation.tex
-	makeindex -s gglo.ist -o documentation.gls documentation.glo
-	makeindex -s gind.ist -o documentation.ind documentation.idx
-	lualatex --shell-escape documentation.tex
+	lualatex --shell-escape luakeys-doc.tex
+	makeindex -s gglo.ist -o luakeys-doc.gls luakeys-doc.glo
+	makeindex -s gind.ist -o luakeys-doc.ind luakeys-doc.idx
+	lualatex --shell-escape luakeys-doc.tex
 	mkdir -p $(texmf)/doc
-	cp documentation.pdf $(texmf)/doc/$(jobname).pdf
+	cp luakeys-doc.pdf $(texmf)/doc/$(jobname).pdf
 
 ctan: doc_pdf
 	rm -rf $(jobname).tar.gz
@@ -55,8 +55,8 @@ ctan: doc_pdf
 	cp -f $(jobname).lua $(jobname)/
 	cp -f $(jobname).sty $(jobname)/
 	cp -f $(jobname).tex $(jobname)/
-	cp -f documentation.tex $(jobname)/
-	cp -f documentation.pdf $(jobname)/$(jobname).pdf
+	cp -f luakeys-doc.tex $(jobname)/
+	cp -f luakeys-doc.pdf $(jobname)/$(jobname).pdf
 	cp -f $(jobname)-debug.tex $(jobname)/
 	cp -f $(jobname)-debug.sty $(jobname)/
 	tar cvfz $(jobname).tar.gz $(jobname)
