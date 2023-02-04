@@ -19,14 +19,16 @@
 \directlua
 {
   luakeys = require('luakeys')()
+  if lparse == nil then
+    lparse = require('lparse')
+  end
 }
 
 \def\luakeysdebug%
 {%
   \directlua%
   {
-    local oarg = luakeys.utils.scan_oarg()
-    local marg = token.scan_argument(false)
+    local oarg, marg = lparse.scan('o v')
     local opts
     if oarg then
       opts = luakeys.parse(oarg, { format_keys = { 'snake', 'lower' } })

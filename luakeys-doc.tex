@@ -1540,7 +1540,7 @@ therefore accepts any data type.
 % In der Tabelle \lua{utils} sind einige Hilfsfunktionen gebündelt.
 The \lua{utils} table bundles some auxiliary functions.
 
-\InputLua[firstline=3,lastline=37]{utils/all.lua}
+\InputLua[firstline=3,lastline=35]{utils/all.lua}
 
 %%
 %
@@ -1570,52 +1570,6 @@ Give the parameter \lua{overwrite} the value \lua{false} to overwrite
 values in the target table.
 
 \InputLua[firstline=14,lastline=18]{utils/merge-tables.lua}
-
-%%
-%
-%%
-
-\subsubsection{Function “\texttt{utils.scan_oarg(initial_delimiter?, end_delimiter?): string}”}
-
-% Plain \TeX{} kennt keine optionalen Argumente (oarg).
-Plain \TeX{} does not know optional arguments (oarg).
-%
-% Die Funktion ermöglicht es nicht nur in \LaTeX{}, sondern auch in
-% Plain \TeX{} nach optionalen Argumenten zu suchen.
-The function \\ \lua{utils.scan_oarg(initial_delimiter?,
-end_delimiter?): string} allows to search for optional arguments not only
-in \LaTeX{} but also in Plain \TeX.
-%
-% Die Funktion basiert auf der Token-Bibliothek.
-The function uses the token library built into Lua\TeX{}.
-%
-% Die beiden Parameter \lua{initial_delimiter} und \lua{end_delimiter}
-% können weggelassen werden.
-The two parameters \lua{initial_delimiter} and \lua{end_delimiter} can
-be omitted.
-%
-% Dann werden eckige Klammern als Begrenzungszeichen angenommen.
-Then square brackets are assumed to be delimiters.
-%
-% Dieser Lua-Code \lua{utils.scan_oarg('(', ')')} sucht beispielsweise
-% nach an einem optionalen Argument in runden Klammern.
-For example, this Lua code \lua{utils.scan_oarg('(', ')')} searches for
-an optional argument in round brackets
-%
-% Die Funktion gibt die Zeichenkette zwischen den Begrenzungszeichen
-% zurück, oder nil wenn Begrenzungszeichen gefunden werden konnten.
-The function returns the string between the delimiters or \lua{nil} if
-no delimiters could be found.
-%
-% Die Begrenzungszeichen sind im Ergebnis nicht enthalten.
-The delimiters themselves are not included in the result.
-%
-% Nach dem \latex{\directlua{}} darf das Makro, indem
-% \lua{utils.scan_oarg} eingesetzt wird, zu keinen Zeichen expandieren.
-After the \latex{\directlua{}}, the macro using \lua{utils.scan_oarg}
-must not expand to any characters.
-
-\InputLatex{utils/scan-oarg-plain.tex}
 
 %%
 %

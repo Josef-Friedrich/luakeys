@@ -16,8 +16,6 @@ local tex_printf = utils.tex_printf
 local throw_error_message = utils.throw_error_message
 local throw_error_code = utils.throw_error_code
 
-local scan_oarg = utils.scan_oarg
-
 ---ansi_color
 local colorize = utils.ansi_color.colorize
 local red = utils.ansi_color.red
@@ -51,8 +49,6 @@ it('Exported', function()
 
   assert_function(throw_error_message)
   assert_function(throw_error_code)
-
-  assert_function(scan_oarg)
 
   assert_function(colorize)
   assert_function(red)
