@@ -1489,6 +1489,24 @@ result store.
 %
 %%
 
+\subsection{Class “\texttt{DefinitionManager()}”}
+
+% Die Klasse DefinitionManager ermöglicht es Schlüssel-Wert-Definitionen
+% in einem Objekt abzulegen.
+The DefinitionManager class makes it possible to store key-value
+definitions in a central location.
+% Über die Methoden \lua{include} und \lue{exclude} können auf Basis der
+% gespeicherten Definitionen neue Teilmengen an Definitionen gebildet
+% werden.
+New subsets of definitions can be formed based on the saved definitions
+using the \lua{include} and \lua{exclude} methods.
+
+\InputLua[firstline=4]{definition-manager.lua}
+
+%%
+%
+%%
+
 \subsection{Table “\texttt{is}”}
 
 % In der Tabelle \lua{is} werden einige Funktionen zusammengefasst, die

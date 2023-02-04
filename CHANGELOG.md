@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add Class `DefinitionManager`.
+
 ### Removed
 
 - Remove helper function `utils.scan_oarg()`, use [lparse](https://www.ctan.org/pkg/lparse) instead.
