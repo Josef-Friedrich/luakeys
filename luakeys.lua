@@ -1173,27 +1173,29 @@ local function main()
       dimension_only = Variable('dimension') * -1,
 
       dimension = (
-        Variable('tex_number') * white_space^0 *
+        Variable('decimal') * white_space^0 *
         Variable('unit')
       ) / capture_dimension,
+
+      sign = Set('-+'),
+
+      digit = Range('09'),
+
+      integer = (Set('-+') ^ -1) * (Variable('digit') ^ 1),
+
+      fractional = (Pattern('.') ) * (Variable('digit')^1),
+
+      ---sign? white_space? (integer fractional?) / (sign? white_space? fractional)
+      decimal = Variable('sign') ^ 0 * white_space ^ 0 *
+              (Variable('integer') *
+              (Variable('fractional') ^ -1)) +
+              ((Variable('sign') ^ -1) * Variable('fractional')),
 
       ---for is.number()
       number_only = Variable('number') * -1,
 
       ---capture number
-      number = Variable('tex_number') / tonumber,
-
-      ---sign? white_space? (integer+ fractional? / fractional)
-      tex_number =
-        Variable('sign')^0 * white_space^0 *
-        (Variable('integer')^1 * Variable('fractional')^0) +
-        Variable('fractional'),
-
-      sign = Set('-+'),
-
-      fractional = Pattern('.') * Variable('integer')^1,
-
-      integer = Range('09')^1,
+      number = Variable('decimal') / tonumber,
 
       ---'bp' / 'BP' / 'cc' / etc.
       ---https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
