@@ -9,6 +9,24 @@ local function assert_deep_equals(actual, expected, opts)
 end
 
 describe('Real world examples', function()
+  describe('gitinfo-lua', function()
+    it('Manual page ?: 0.0.1,flags={no-merges}', function()
+        local parse_commit_opts = luakeys.define({
+            rev_spec = { data_type = 'string', pick = 'string' },
+            files = { data_type = 'list' },
+            cwd = { data_type = 'string' },
+            flags = {
+                sub_keys = {
+                    merges = { data_type='boolean', exclusive_group='merges' },
+                    ['no-merges'] = { data_type='boolean', exclusive_group='merges' }
+                }
+            }
+        })
+        local actual = '0.0.1,flags={no-merges}'
+        local expected = {flags = {['no-merges'] = true}, rev_spec = '0.0.1'}
+        assert.are.same(expected, parse_commit_opts(actual))
+      end)
+    end)
   describe('hyperref', function()
     it('Manual page 6: pdfborder={0 0 0}', function()
       assert_deep_equals('pdfborder={0 0 0}', { pdfborder = '0 0 0' })
