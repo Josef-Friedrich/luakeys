@@ -14,7 +14,7 @@ mechanism should be pretty robust.
 
 ## License
 
-Copyright 2021-2023 Josef Friedrich
+Copyright 2021-2024 Josef Friedrich
 
 This work may be distributed and/or modified under the
 conditions of the LaTeX Project Public License, either version 1.3c
@@ -233,7 +233,7 @@ This project uses [semantic versioning](https://semver.org).
 
 Update version in:
 
-* documentation.tex
+* luakeys-doc.tex
 * luakeys-debug.sty
 * luakeys.sty
 * luakeys.lua

@@ -1,5 +1,5 @@
 ---luakeys.lua
----Copyright 2021-2023 Josef Friedrich
+---Copyright 2021-2024 Josef Friedrich
 ---
 ---This work may be distributed and/or modified under the
 ---conditions of the LaTeX Project Public License, either version 1.3c
@@ -2061,7 +2061,7 @@ local function main()
   return {
     new = main,
 
-    version = { 0, 13, 0 },
+    version = { 0, 14, 0 },
 
     parse = parse,
 
