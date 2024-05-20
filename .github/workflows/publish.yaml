@@ -19,7 +19,7 @@ jobs:
           image: maclotsen/texlive:latest
           shell: bash
           options: --rm -i -v ${{ github.workspace }}/texmf:/root/texmf -v ${{ github.workspace }}:/build
-          run: make -C luakeys ctan
+          run: make ctan
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -38,7 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/luakeys/luakeys.tar.gz
+          asset_path: ${{ github.workspace }}/luakeys.tar.gz
           asset_name: luakeys.tar.gz
           asset_content_type: application/gzip
       - name: 'Upload Release Asset: Manual'
@@ -48,6 +48,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/luakeys/doc/luakeys-doc.pdf
+          asset_path: ${{ github.workspace }}/doc/luakeys-doc.pdf
           asset_name: luakeys-doc.pdf
           asset_content_type: application/pdf

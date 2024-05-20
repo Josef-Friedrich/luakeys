@@ -16,9 +16,9 @@ jobs:
           image: maclotsen/texlive:latest
           shell: bash
           options: --rm -i -v ${{ github.workspace }}/texmf:/root/texmf -v ${{ github.workspace }}:/build
-          run: make -C luakeys test ctan
+          run: make test ctan
       - name: Archive Documentation
         uses: actions/upload-artifact@v3
         with:
           name: build
-          path: ${{ github.workspace }}/luakeys
+          path: ${{ github.workspace }}
