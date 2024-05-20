@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
-        with:
-          path: luakeys
       - name: Run the build process with Docker
         uses: addnab/docker-run-action@v3
         with:
