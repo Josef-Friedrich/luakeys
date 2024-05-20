@@ -33,9 +33,9 @@ test_examples_latex:
 
 test_tex: test_tex_plain test_tex_latex
 test_tex_plain:
-	find tests/tex/plain -iname "*.tex" -exec luatex --output-dir=tests/tex/plain {} \;
+	find tests/tex/plain -iname "*.tex" -exec luatex --interaction=nonstopmode --output-dir=tests/tex/plain {} \;
 test_tex_latex:
-	find tests/tex/latex -iname "*.tex" -exec lualatex --output-dir=tests/tex/latex {} \;
+	find tests/tex/latex -iname "*.tex" -exec lualatex --interaction=nonstopmode --output-dir=tests/tex/latex {} \;
 
 doc: doc_pdf
 
