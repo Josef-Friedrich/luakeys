@@ -3,22 +3,19 @@ texmf = $(HOME)/texmf
 texmftex = $(texmf)/tex/luatex
 installdir = $(texmftex)/$(jobname)
 
-all: install doc_lua
+all: install
 
-install: uninstall_texlive install_quick
-
-uninstall_texlive:
-	-tlmgr uninstall --force luakeys
-
-install_quick:
+install: doc_pdf
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
 	cp -f $(jobname).sty $(installdir)
 	cp -f $(jobname).tex $(installdir)
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
+	mkdir -p $(texmf)/doc
+	cp luakeys-doc.pdf $(texmf)/doc/$(jobname).pdf
 
-test: install test_lua test_examples test_tex doc_pdf
+test: test_lua test_examples test_tex doc_pdf
 
 test_lua:
 	busted --lua=/usr/bin/lua5.3 --exclude-tags=skip tests/lua/test-*.lua
@@ -33,9 +30,9 @@ test_examples_latex:
 
 test_tex: test_tex_plain test_tex_latex
 test_tex_plain:
-	find tests/tex/plain -iname "*.tex" -exec luatex --output-dir=tests/tex/plain {} \;
+	find tests/tex/plain -iname "*.tex" -exec luatex --interaction=nonstopmode --output-dir=tests/tex/plain {} \;
 test_tex_latex:
-	find tests/tex/latex -iname "*.tex" -exec lualatex --output-dir=tests/tex/latex {} \;
+	find tests/tex/latex -iname "*.tex" -exec lualatex --interaction=nonstopmode --output-dir=tests/tex/latex {} \;
 
 doc: doc_pdf
 
@@ -44,8 +41,6 @@ doc_pdf:
 	makeindex -s gglo.ist -o luakeys-doc.gls luakeys-doc.glo
 	makeindex -s gind.ist -o luakeys-doc.ind luakeys-doc.idx
 	lualatex --shell-escape luakeys-doc.tex
-	mkdir -p $(texmf)/doc
-	cp luakeys-doc.pdf $(texmf)/doc/$(jobname).pdf
 
 ctan: doc_pdf
 	rm -rf $(jobname).tar.gz

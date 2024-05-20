@@ -1,0 +1,24 @@
+name: build
+
+on:
+  pull_request:
+    types: [ opened,synchronize ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Run the build process with Docker
+        uses: addnab/docker-run-action@v3
+        with:
+          image: maclotsen/texlive:latest
+          shell: bash
+          options: --rm -i -v ${{ github.workspace }}/texmf:/root/texmf -v ${{ github.workspace }}:/build
+          run: make test ctan
+      - name: Archive Documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: ${{ github.workspace }}
