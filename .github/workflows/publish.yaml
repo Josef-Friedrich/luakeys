@@ -1,0 +1,53 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          path: luakeys
+      - name: Run the build process with Docker
+        uses: addnab/docker-run-action@v3
+        with:
+          image: maclotsen/texlive:latest
+          shell: bash
+          options: --rm -i -v ${{ github.workspace }}/texmf:/root/texmf -v ${{ github.workspace }}:/build
+          run: make -C luakeys ctan
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
+          draft: true
+          body: |
+            Release for version ${{ github.ref_name }}
+      - name: 'Upload Release Asset: CTAN Upload'
+        id: upload_release_asset_ctan_upload
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/luakeys/luakeys.tar.gz
+          asset_name: luakeys.tar.gz
+          asset_content_type: application/gzip
+      - name: 'Upload Release Asset: Manual'
+        id: upload_release_asset_manual
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/luakeys/doc/luakeys-doc.pdf
+          asset_name: luakeys-doc.pdf
+          asset_content_type: application/pdf
