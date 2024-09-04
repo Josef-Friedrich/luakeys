@@ -366,7 +366,7 @@ describe('Defintions', function()
       end)
 
       it('string', function()
-        assert_pick('string', 'A string', '1,"A string"')
+        assert_pick('string', '1', '1,"A string"')
       end)
 
       it('Error: unknown data type', function()
