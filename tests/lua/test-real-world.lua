@@ -10,7 +10,7 @@ end
 
 describe('Real world examples', function()
   describe('gitinfo-lua', function()
-    it('Manual page ?: 0.0.1,flags={no-merges}', function()
+    it('Manual page ?: 0.1,flags={no-merges}', function()
       local parse_commit_opts = luakeys.define({
         rev_spec = { data_type = 'string', pick = 'string' },
         files = { data_type = 'list' },
@@ -22,8 +22,8 @@ describe('Real world examples', function()
           }
         }
       })
-      local actual = '0.0.1,flags={no-merges}'
-      local expected = { flags = { ['no-merges'] = true }, rev_spec = '0.0.1' }
+      local actual = '0.1,flags={no-merges}'
+      local expected = { flags = { ['no-merges'] = true }, rev_spec = '0.1' }
       assert.are.same(expected, parse_commit_opts(actual))
     end)
   end)

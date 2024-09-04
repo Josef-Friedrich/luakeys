@@ -1621,6 +1621,8 @@ local function main()
                 local picked_value = nil
                 if is[pick_type](v) then
                   picked_value = v
+                elseif pick_type == 'string' and is.number(v) then
+                  picked_value = tostring(v)
                 end
 
                 if picked_value ~= nil then
