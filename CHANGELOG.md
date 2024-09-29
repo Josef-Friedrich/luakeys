@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2024-09-29
+
+### Changed
+
+- Change pick string behavior (also accepting number) (by Erik Nijenhuis)
+
 ## [0.14.0] - 2024-04-09
 
 ### Added
