@@ -1762,7 +1762,7 @@ local function main()
   ---@param opts? OptionCollection # A table containing options.
   ---
   ---@return table result # The final result of all individual parsing and normalization steps.
-  ---@return table unknown # A table with unknown, undefinied key-value pairs.
+  ---@return table unknown # A table with unknown, undefined key-value pairs.
   ---@return table raw # The unprocessed, raw result of the LPeg parser.
   local function parse(kv_string, opts)
     opts = normalize_opts(opts)
