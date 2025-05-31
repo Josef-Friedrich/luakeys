@@ -12,23 +12,27 @@ TeX engine LuaTeX. Since `luakeys` uses
 [LPeg](http://www.inf.puc-rio.br/~roberto/lpeg/), the parsing
 mechanism should be pretty robust.
 
+## Current version
+
+2024/09/29 v0.15
+
 ## License
 
-Copyright 2021-2024 Josef Friedrich
+Copyright (C) 2021-2025 by Josef Friedrich <josef@friedrich.rocks>
+------------------------------------------------------------------------
+This work may be distributed and/or modified under the conditions of
+the LaTeX Project Public License, either version 1.3c of this license
+or (at your option) any later version.  The latest version of this
+license is in:
 
-This work may be distributed and/or modified under the
-conditions of the LaTeX Project Public License, either version 1.3c
-of this license or (at your option) any later version.
-The latest version of this license is in
-
-http://www.latex-project.org/lppl.txt
+  http://www.latex-project.org/lppl.txt
 
 and version 1.3c or later is part of all distributions of LaTeX
 version 2008/05/04 or later.
 
-This work has the LPPL maintenance status `maintained`.
+## Maintainer
 
-The Current Maintainer of this work is Josef Friedrich.
+Josef Friedrich <josef@friedrich.rocks>
 
 ## Documentation
 
