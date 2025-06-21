@@ -34,6 +34,37 @@ version 2008/05/04 or later.
 
 Josef Friedrich <josef@friedrich.rocks>
 
+## Packaging
+
+### CTAN
+
+The `luakeys` package has been included in the Comprehensive TeX Archive
+Network (CTAN) since January 2021.
+
+* [Package page](https://www.ctan.org/pkg/luakeys)
+* [Sources](https://www.ctan.org/tex-archive/macros/luatex/generic/luakeys)
+
+### Distributions
+
+* TeX Live:
+  * run files:
+    * [tex/luatex/luakeys/luakeys.lua](https://tug.org/svn/texlive/trunk/Master/texmf-dist/tex/luatex/luakeys/luakeys.lua)
+    * [tex/luatex/luakeys/luakeys.sty](https://tug.org/svn/texlive/trunk/Master/texmf-dist/tex/luatex/luakeys/luakeys.sty)
+    * [tex/luatex/luakeys/luakeys.tex](https://tug.org/svn/texlive/trunk/Master/texmf-dist/tex/luatex/luakeys/luakeys.tex)
+    * [tex/luatex/luakeys/luakeys-debug.tex](https://tug.org/svn/texlive/trunk/Master/texmf-dist/tex/luatex/luakeys/luakeys-debug.tex)
+    * [tex/luatex/luakeys/luakeys-debug.sty](https://tug.org/svn/texlive/trunk/Master/texmf-dist/tex/luatex/luakeys/luakeys-debug.sty)
+  * doc files:
+    * [doc/luatex/luakeys/luakeys-doc.tex](https://tug.org/svn/texlive/trunk/Master/texmf-dist/doc/luatex/luakeys/luakeys-doc.tex)
+    * [doc/luatex/luakeys/luakeys.pdf](https://tug.org/svn/texlive/trunk/Master/texmf-dist/doc/luatex/luakeys/luakeys.pdf)
+    * [doc/luatex/luakeys/README.md](https://tug.org/svn/texlive/trunk/Master/texmf-dist/doc/luatex/luakeys/README.md)
+* [MiKTeX](https://miktex.org/packages/luakeys)
+
+### Repository
+
+The [Git repository](https://github.com/Josef-Friedrich/luakeys) in
+which the development takes place is hosted on
+[GitHub](https://github.com).
+
 ## Documentation
 
 ### Key-value pair definitions
