@@ -383,11 +383,22 @@ The options can also be set globally using the exported table
 \noindent
 % Damit es zu keinen Wechselwirkungen mit anderen Paketen kommt, die auch
 % |luakeys| verwenden und die Optionen global setzen, ist es anzuraten,
-% die Funktion \lua{get_private_instance()} zum Laden das Paket verwenden.
+% die Funktion \lua{new()} zum Laden das Paket verwenden.
 To avoid interactions with other packages that also use |luakeys| and
 set the options globally, it is recommended to use the
-\lua{get_private_instance()} function
-(\ref{function:get-private-instance}) to load the package.
+\lua{new()} function
+(\ref{function:new}) to load the package.
+
+% Der Aufruf der Funktion \lua{luakeys.new()} der globalen Tabelle
+% |luakeys| hat die gleiche Wirkung wie dieser Ausdruck:
+% \lua{require('luakeys')()}. Lua module von luakyes exportiert nämlich genau eine
+% Funktion, nämlich die new Funktion.
+Calling the function \lua{luakeys.new()} of the global table |luakeys| has
+the same effect as this expression: \lua{require(‘luakeys’)()}.
+% Das Lua-Modul von |luakeys| exportiert genau eine Funktion, nämlich die
+% new Funktion.
+The Lua module from |luakeys| exports exactly one function, namely the
+\lua{new()} function.
 
 %%
 %
@@ -635,7 +646,7 @@ table.
 
 \item[upper]
 
-% Um alle Schlüssel in \emph{Grossbuchstaben} umzuwandeln, geben sie in
+% Um alle Schlüssel in \emph{Großbuchstaben} umzuwandeln, geben sie in
 % der Optionentabelle \lua{upper} an.
 To convert all keys to \emph{uppercase}, specify \lua{upper} in the
 options table.
