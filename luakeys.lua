@@ -348,6 +348,13 @@ local utils = (function()
   ---| onmagenta  | 45 |
   ---| oncyan     | 46 |
   ---| onwhite    | 47 |
+  ---
+  ---## Other ansi color modules
+  ---
+  ---* ansicolors:
+  ---  [Github 143⋆](https://github.com/kikito/ansicolors.lua),
+  ---  [LuaRocks 945k](https://luarocks.org/modules/kikito/ansicolors)
+  ---* Lunacolors: [Github 12⋆](https://github.com/Rosettea/Lunacolors)
   local ansi_color = (function()
 
     ---
@@ -496,6 +503,17 @@ local utils = (function()
   ---* 3: info (green)
   ---* 4: verbose (blue)
   ---* 5: debug (magenta)
+  ---
+  ---## Other logging libraries:
+  ---
+  ---* lualogging:
+  ---  [Github 59⋆](https://github.com/lunarmodules/lualogging),
+  ---  [LuaRocks 1000k](https://luarocks.org/modules/tieske/lualogging)
+  ---* lua-logger:
+  ---  [LuaRocks 0.7k](https://luarocks.org/modules/alissasquared/lua-logger)
+  ---* log.lua:
+  ---  [Github 331⋆](https://github.com/rxi/log.lua),
+  ---  [LuaRocks 0.3k](https://luarocks.org/modules/stephencathcart/log.lua)
   ---
   local log = (function()
     ---@private
