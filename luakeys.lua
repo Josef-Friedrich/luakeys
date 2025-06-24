@@ -1301,6 +1301,15 @@ local function main()
       return type(value) == 'string'
     end,
 
+    ---Check if the given value is a list or an array.
+    ---
+    ---As we all know, there is no such thing as a list or array in Lua.
+    ---A list is nothing more than a table that uses an ascending
+    ---sequence of numbers as its keys.
+    ---
+    ---@param value any # Any value to be checked.
+    ---
+    ---@return boolean
     list = function(value)
       if type(value) ~= 'table' then
         return false

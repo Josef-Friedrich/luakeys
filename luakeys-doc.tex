@@ -1551,6 +1551,15 @@ For example, the string \lua{'true'} is recognized by the
 \InputLua[firstline=6,lastline=12]{functions/is/string.lua}
 
 \subsubsection{Function “\texttt{is.list(value): boolean}”}
+
+Check if the given value is a list or an array.
+% Wie wir alle wissen gibt es in Lua keine Liste oder ein Array. Eine
+% Liste ist nichts anderes wie eine Tabelle, die als Schlüssel eine
+% aufsteigende Zahlenreihe verwendet.
+As we all know, there is no such thing as a list or array in Lua. A list
+is nothing more than a table that uses an ascending sequence of integers
+as its keys.
+
 \InputLua[firstline=6,lastline=16]{functions/is/list.lua}
 
 \subsubsection{Function “\texttt{is.any(value): boolean}”}
