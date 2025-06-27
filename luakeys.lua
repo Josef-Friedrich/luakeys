@@ -1985,6 +1985,7 @@ local function main()
 
   local DefinitionManager = (function()
     ---@class DefinitionManager
+    ---@field defs DefinitionCollection
     DefinitionManager = {}
 
     ---@private
@@ -2053,9 +2054,24 @@ local function main()
     end
 
     ---
-    ---@param key_selection KeySpec
+    ---Parse a LaTeX/TeX style key-value string into a Lua table using
+    ---all the definitions of this manager or a subset of the definitions.
+    ---
+    ---@param key_selection? KeySpec A selection of key-value pair
+    ---  definitions to include. If not specified all definitions are
+    ---  used.
+    ---
+    ---@return table result # The final result of all individual parsing and normalization steps.
+    ---@return table unknown # A table with unknown, undefined key-value pairs.
+    ---@return table raw # The unprocessed, raw result of the LPeg parser.
     function DefinitionManager:parse(kv_string, key_selection)
-      return parse(kv_string, { defs = self:include(key_selection) })
+      local d
+      if key_selection == nil then
+        d = self.defs
+      else
+        d = self:include(key_selection)
+      end
+      return parse(kv_string, { defs = d })
     end
 
     ---
