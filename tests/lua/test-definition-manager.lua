@@ -76,6 +76,13 @@ describe('class “DefinitionManager()”', function()
       assert.is.equal(result.new3, 3)
     end)
 
+    it('key_selection=nil: use all defintions ', function()
+      local result = manager:parse('key1')
+      assert.are.same(result, {
+        key1 = 1 }
+      )
+    end)
+
     it('exception', function()
       assert.has_error(function()
         manager:parse('key1', { 'key3' })
