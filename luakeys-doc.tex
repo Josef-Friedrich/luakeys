@@ -911,8 +911,17 @@ only a single naked key or a single standalone value are unpacked.
 \subsection{Function “\texttt{define(defs, opts): parse}”}
 \label{define}
 
+% Die \lua{define} Funktion definiert eine neue \lua{parse}-Funktion.
+The \lua{define} function definies a new \lua{parse} function.
+% Die Funktion \lua{define} gibt eine Funktion \lua{parse} zurück (siehe
+% \ref{parse}).
 The \lua{define} function returns a \lua{parse} function (see
 \ref{parse}).
+% Diese erstellte „parse“-Funktion ist mit den angegebenen
+% Schlüssel-Wert-Definitionen konfiguriert.
+This created \lua{parse} function is configured with the specified
+key-value defintions.
+
 The name of a key can be specified in three ways:
 
 \begin{enumerate}
@@ -1509,8 +1518,12 @@ result store.
 
 % Die Klasse DefinitionManager ermöglicht es Schlüssel-Wert-Definitionen
 % in einem Objekt abzulegen.
-The DefinitionManager class makes it possible to store key-value
-definitions in a central location.
+The |DefinitionManager| class allows you to store key-value definitions
+in an object.
+% Die Klasse stellt eine \lua{parse}-Methode bereit, die mit diesen
+% Definitionen konfiguriert ist.
+The class provides a \lua{parse} method that is configured with these
+definitions.
 % Über die Methoden \lua{include} und \lue{exclude} können auf Basis der
 % gespeicherten Definitionen neue Teilmengen an Definitionen gebildet
 % werden.

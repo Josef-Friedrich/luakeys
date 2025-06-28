@@ -1958,6 +1958,12 @@ local function new()
   end
 
   ---
+  ---Define a new `parse` function.
+  ---
+  ---The `define` function returns a `parse` function. This created
+  ---`parse` function is configured with the specified key-value
+  ---defintions.
+  ---
   ---@param defs DefinitionCollection
   ---@param opts? OptionCollection
   local function define(defs, opts)
@@ -1985,6 +1991,9 @@ local function new()
   ---@alias KeySpec table<integer|string, string>
 
   local DefinitionManager = (function()
+    ---The `DefinitionManager` class allows you to store key-value
+    ---definitions in an object. The class provides a `parse` method
+    ---that is configured with these definitions.
     ---@class DefinitionManager
     ---@field defs DefinitionCollection
     DefinitionManager = {}
