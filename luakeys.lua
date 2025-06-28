@@ -975,7 +975,7 @@ local namespace = {
 ---Main entry point of the module.
 ---
 ---The return value is intentional not documented so the Lua language server can figure out the types.
-local function main()
+local function new()
 
   ---The default options.
   ---@type OptionCollection
@@ -2105,7 +2105,7 @@ local function main()
   local result_store = {}
 
   return {
-    new = main,
+    new = new,
 
     version = { 0, 15, 0 },
 
@@ -2212,4 +2212,4 @@ local function main()
 
 end
 
-return main
+return new
