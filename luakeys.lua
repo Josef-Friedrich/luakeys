@@ -2011,7 +2011,7 @@ local function new()
     ---@param defs DefinitionCollection # A collection of key-value pair definitions.
     ---
     ---@return DefinitionManager manager # A new instance of the `DefinitionManager` class.
-    function constructor(defs)
+    local function constructor(defs)
       local manager = {}
       for key, def in pairs(defs) do
         if def.name ~= nil and type(key) == 'number' then
@@ -2042,6 +2042,14 @@ local function new()
     ---@return Definition def # A key-value pair definition.
     function DefinitionManager:get(key)
       return self.defs[key]
+    end
+
+    ---
+    ---Return all key names of the corresponding definitions as an array.
+    ---
+    ---@return string[] key_names # key names of the corresponding definitions as an array.
+    function DefinitionManager:key_names()
+      return utils.get_table_keys(self.defs)
     end
 
     ---
@@ -2117,6 +2125,31 @@ local function new()
       return selection
     end
 
+    ---@class DefinitionManagerCloneOptions
+    ---@field exclude? KeySpec
+    ---@field include? KeySpec
+
+    ---
+    ---Create a new instance of the `DefinitionManager` class and add a deep copy of
+    ---the key-value pair definitions to it.
+    ---
+    ---@param opts? DefinitionManagerCloneOptions # Exclude or include some
+    ---  key-value pair definitions. If `nil` all definitions are cloned.
+    ---
+    ---@return DefinitionManager manager # A new instance of the `DefinitionManager` class.
+    function DefinitionManager:clone(opts)
+      if opts == nil then
+        opts = {}
+      end
+      if opts.exclude ~= nil then
+        return self:new(self:exclude(opts.exclude, true))
+      end
+      if opts.include ~= nil then
+        return self:new(self:include(opts.include, true))
+      end
+      return self:new(self:include(nil, true))
+    end
+
     ---
     ---Parse a LaTeX/TeX style key-value string into a Lua table using
     ---all the definitions of this manager or a subset of the definitions.
@@ -2139,7 +2172,9 @@ local function new()
     end
 
     ---
-    ---@param key_selection KeySpec
+    ---@param key_selection? KeySpec A selection of key-value pair
+    ---  definitions to include. If not specified all definitions are
+    ---  used.
     function DefinitionManager:define(key_selection)
       return define(self:include(key_selection))
     end
