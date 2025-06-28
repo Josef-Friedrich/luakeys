@@ -1332,7 +1332,7 @@ local function new()
   }
 
   ---
-  ---Apply the key-value-pair definitions (defs) on an input table in a
+  ---Apply the key-value-pair definitions (`defs`) on an input table in a
   ---recursive fashion.
   ---
   ---@param defs table # A table containing all definitions.
@@ -1967,7 +1967,7 @@ local function new()
   ---defintions.
   ---
   ---@param defs DefinitionCollection # A collection of key-value pair definitions.
-  ---@param opts? OptionCollection
+  ---@param opts? OptionCollection # Options to configured the parse function with.
   local function define(defs, opts)
     return function(kv_string, inner_opts)
       local options
@@ -1995,6 +1995,7 @@ local function new()
   ---@alias KeySpec table<integer|string, string>
 
   local DefinitionManager = (function()
+    ---
     ---The `DefinitionManager` class allows you to store key-value
     ---definitions in an object. The class provides a `parse` method
     ---that is configured with these definitions.
@@ -2053,6 +2054,8 @@ local function new()
     end
 
     ---
+    ---Return all key names if the key specification is not provided.
+    ---
     ---@private
     ---
     ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
@@ -2060,7 +2063,7 @@ local function new()
     ---@return KeySpec key_spec A collection of key-value pair definitions.
     function DefinitionManager:normalize_key_spec(key_spec)
       if key_spec == nil then
-        return  utils.get_table_keys(self.defs)
+        return utils.get_table_keys(self.defs)
       end
       return key_spec
     end
@@ -2171,6 +2174,12 @@ local function new()
       return parse(kv_string, { defs = d })
     end
 
+    ---
+    ---Define a new `parse` function.
+    ---
+    ---The `define` method returns a `parse` function. This created
+    ---`parse` function is configured with key-value
+    ---defintions of this instance or a subset, if a key selection is specified.
     ---
     ---@param key_selection? KeySpec A selection of key-value pair
     ---  definitions to include. If not specified all definitions are
