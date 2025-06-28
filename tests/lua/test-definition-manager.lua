@@ -29,6 +29,17 @@ describe('class “DefinitionManager()”', function()
     assert.is.equal(m:get('unnamed').default, 0)
   end)
 
+  it('Method :new()', function()
+    local m1 = DefinitionManager({
+      key1 = { default = 'value1' }
+    })
+    assert.is.equal(m1:get('key1').default, 'value1')
+    local m2 = m1:new({
+      key2 = { default = 'value2' }
+    })
+    assert.is.equal(m2:get('key2').default, 'value2')
+  end)
+
   it('Method “:get()”', function()
     assert.is.equal(manager:get('key3').default, 3)
   end)
@@ -45,6 +56,15 @@ describe('class “DefinitionManager()”', function()
       local defs = manager:include({ 'key3' }, true)
       ---@diagnostic disable-next-line: undefined-field
       assert.is_not.equal(defs.key3, manager.defs.key3)
+    end)
+
+    it('key_spec = nil -> all definitions are returned', function()
+      local defs = manager:include()
+      assert.are.same(defs, {
+        key1 = { default = 1 },
+        key2 = { default = 2 },
+        key3 = { default = 3 },
+      })
     end)
   end)
 

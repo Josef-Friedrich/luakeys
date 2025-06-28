@@ -53,10 +53,10 @@ local utils = (function()
     end
     for key, value in pairs(source) do
       if type(value) == 'table' and type(target[key] or false) ==
-        'table' then
+          'table' then
         merge_tables(target[key] or {}, source[key] or {}, overwrite)
       elseif (not overwrite and target[key] == nil) or
-        (overwrite and target[key] ~= value) then
+          (overwrite and target[key] ~= value) then
         target[key] = value
       end
     end
@@ -198,8 +198,8 @@ local utils = (function()
   ---@param error_code string
   ---@param args? table
   local function throw_error_code(error_messages,
-    error_code,
-    args)
+                                  error_code,
+                                  args)
     local template = error_messages[error_code]
 
     ---
@@ -269,13 +269,13 @@ local utils = (function()
     if type(tree) ~= 'table' then
       throw_error_message(
         'Parameter “tree” has to be a table, got: ' ..
-          tostring(tree))
+        tostring(tree))
     end
     local function visit_tree_recursive(tree,
-      current,
-      result,
-      depth,
-      callback_func)
+                                        current,
+                                        result,
+                                        depth,
+                                        callback_func)
       for key, value in pairs(current) do
         if type(value) == 'table' then
           value = visit_tree_recursive(tree, value, {}, depth + 1,
@@ -294,7 +294,7 @@ local utils = (function()
     end
 
     local result =
-      visit_tree_recursive(tree, tree, {}, 1, callback_func)
+        visit_tree_recursive(tree, tree, {}, 1, callback_func)
 
     if result == nil then
       return {}
@@ -356,7 +356,6 @@ local utils = (function()
   ---  [LuaRocks 945k](https://luarocks.org/modules/kikito/ansicolors)
   ---* Lunacolors: [Github 12⋆](https://github.com/Rosettea/Lunacolors)
   local ansi_color = (function()
-
     ---
     ---@param code integer
     ---
@@ -677,7 +676,6 @@ end)()
 ---Convert back to strings
 ---@section
 local visualizers = (function()
-
   ---
   ---Reverse the function
   ---`parse(kv_string)`. It takes a Lua table and converts this table
@@ -796,7 +794,7 @@ local visualizers = (function()
     end
 
     return start_bracket .. line_break .. stringify_inner(result, 1) ..
-             line_break .. end_bracket
+        line_break .. end_bracket
   end
 
   ---
@@ -852,6 +850,8 @@ end)()
 
 ---@alias PickDataType 'string'|'number'|'dimension'|'integer'|'boolean'|'any'
 
+---
+---A key-value pair definition
 ---@class Definition
 ---@field alias? string|table
 ---@field always_present? boolean
@@ -870,6 +870,8 @@ end)()
 ---@field required? boolean
 ---@field sub_keys? table<string, Definition>
 
+---
+---A collection of key-value pair definitions.
 ---@alias DefinitionCollection table<string|number, Definition>
 
 local namespace = {
@@ -938,7 +940,8 @@ local namespace = {
     E004 = 'The value @value does not exist in the choices: @choices',
     E005 = 'Unknown data type: @unknown',
     E006 = 'The value @value of the key @key could not be converted into the data type @data_type!',
-    E007 = 'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
+    E007 =
+    'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
     E008 = 'def.match has to be a string',
     E009 = 'The value @value of the key @key does not match @match!',
 
@@ -976,7 +979,6 @@ local namespace = {
 ---
 ---The return value is intentional not documented so the Lua language server can figure out the types.
 local function new()
-
   ---The default options.
   ---@type OptionCollection
   local default_opts = utils.clone_table(namespace.opts)
@@ -1138,50 +1140,50 @@ local function new()
 
       ---list_item*
       list = CaptureFolding(
-        CaptureTable('') * Variable('list_item')^0,
+        CaptureTable('') * Variable('list_item') ^ 0,
         add_to_table
       ),
 
       ---'{' list '}'
       list_container =
-        ws(opts.group_begin) * Variable('list') * ws(opts.group_end),
+          ws(opts.group_begin) * Variable('list') * ws(opts.group_end),
 
       ---( list_container / key_value_pair / value ) ','?
       list_item =
-        CaptureGroup(
-          Variable('list_container') +
-          Variable('key_value_pair') +
-          Variable('value')
-        ) * ws(opts.list_separator)^-1,
+          CaptureGroup(
+            Variable('list_container') +
+            Variable('key_value_pair') +
+            Variable('value')
+          ) * ws(opts.list_separator) ^ -1,
 
       ---key '=' (list_container / value)
       key_value_pair =
-        (Variable('key') * ws(opts.assignment_operator)) * (Variable('list_container') + Variable('value')),
+          (Variable('key') * ws(opts.assignment_operator)) * (Variable('list_container') + Variable('value')),
 
       ---number / string_quoted / string_unquoted
       key =
-        Variable('number') +
-        Variable('string_quoted') +
-        Variable('string_unquoted'),
+          Variable('number') +
+          Variable('string_quoted') +
+          Variable('string_unquoted'),
 
       ---boolean !value / dimension !value / number !value / string_quoted !value / string_unquoted
       ---!value -> Not-predicate -> * -Variable('value')
       value =
-        Variable('boolean') * -Variable('value') +
-        Variable('dimension') * -Variable('value') +
-        Variable('number') * -Variable('value')  +
-        Variable('string_quoted') * -Variable('value') +
-        Variable('string_unquoted'),
+          Variable('boolean') * -Variable('value') +
+          Variable('dimension') * -Variable('value') +
+          Variable('number') * -Variable('value') +
+          Variable('string_quoted') * -Variable('value') +
+          Variable('string_unquoted'),
 
       ---for is.boolean()
       boolean_only = Variable('boolean') * -1,
 
       ---boolean_true / boolean_false
       boolean =
-        (
-          Variable('boolean_true') * CaptureConstant(true) +
-          Variable('boolean_false') * CaptureConstant(false)
-        ),
+          (
+            Variable('boolean_true') * CaptureConstant(true) +
+            Variable('boolean_false') * CaptureConstant(false)
+          ),
 
       boolean_true = line_up_pattern(opts.true_aliases),
 
@@ -1191,7 +1193,7 @@ local function new()
       dimension_only = Variable('dimension') * -1,
 
       dimension = (
-        Variable('tex_number') * white_space^0 *
+        Variable('tex_number') * white_space ^ 0 *
         Variable('unit')
       ) / capture_dimension,
 
@@ -1199,13 +1201,13 @@ local function new()
 
       digit = Range('09'),
 
-      integer = (Variable('sign')^-1) * white_space^0 * (Variable('digit')^1),
+      integer = (Variable('sign') ^ -1) * white_space ^ 0 * (Variable('digit') ^ 1),
 
-      fractional = (Pattern('.') ) * (Variable('digit')^1),
+      fractional = (Pattern('.')) * (Variable('digit') ^ 1),
 
       ---(integer fractional?) / (sign? white_space? fractional)
-      tex_number = (Variable('integer') * (Variable('fractional')^-1)) +
-                   ((Variable('sign')^-1) * white_space^0 * Variable('fractional')),
+      tex_number = (Variable('integer') * (Variable('fractional') ^ -1)) +
+          ((Variable('sign') ^ -1) * white_space ^ 0 * Variable('fractional')),
 
       ---for is.number()
       number_only = Variable('number') * -1,
@@ -1217,42 +1219,42 @@ local function new()
       ---https://raw.githubusercontent.com/latex3/lualibs/master/lualibs-util-dim.lua
       ---https://github.com/TeX-Live/luatex/blob/51db1985f5500dafd2393aa2e403fefa57d3cb76/source/texk/web2c/luatexdir/lua/ltexlib.c#L434-L625
       unit =
-        Pattern('bp') + Pattern('BP') +
-        Pattern('cc') + Pattern('CC') +
-        Pattern('cm') + Pattern('CM') +
-        Pattern('dd') + Pattern('DD') +
-        Pattern('em') + Pattern('EM') +
-        Pattern('ex') + Pattern('EX') +
-        Pattern('in') + Pattern('IN') +
-        Pattern('mm') + Pattern('MM') +
-        Pattern('mu') + Pattern('MU') +
-        Pattern('nc') + Pattern('NC') +
-        Pattern('nd') + Pattern('ND') +
-        Pattern('pc') + Pattern('PC') +
-        Pattern('pt') + Pattern('PT') +
-        Pattern('px') + Pattern('PX') +
-        Pattern('sp') + Pattern('SP'),
+          Pattern('bp') + Pattern('BP') +
+          Pattern('cc') + Pattern('CC') +
+          Pattern('cm') + Pattern('CM') +
+          Pattern('dd') + Pattern('DD') +
+          Pattern('em') + Pattern('EM') +
+          Pattern('ex') + Pattern('EX') +
+          Pattern('in') + Pattern('IN') +
+          Pattern('mm') + Pattern('MM') +
+          Pattern('mu') + Pattern('MU') +
+          Pattern('nc') + Pattern('NC') +
+          Pattern('nd') + Pattern('ND') +
+          Pattern('pc') + Pattern('PC') +
+          Pattern('pt') + Pattern('PT') +
+          Pattern('px') + Pattern('PX') +
+          Pattern('sp') + Pattern('SP'),
 
       ---'"' ('\"' / !'"')* '"'
       string_quoted =
-        white_space^0 * Pattern(opts.quotation_begin) *
-        CaptureSimple((Pattern('\\' .. opts.quotation_end) + 1 - Pattern(opts.quotation_end))^0) *
-        Pattern(opts.quotation_end) * white_space^0,
+          white_space ^ 0 * Pattern(opts.quotation_begin) *
+          CaptureSimple((Pattern('\\' .. opts.quotation_end) + 1 - Pattern(opts.quotation_end)) ^ 0) *
+          Pattern(opts.quotation_end) * white_space ^ 0,
 
       string_unquoted =
-        white_space^0 *
-        CaptureSimple(
-          Variable('word_unquoted')^1 *
-          (Set(' \t')^1 * Variable('word_unquoted')^1)^0) *
-        white_space^0,
+          white_space ^ 0 *
+          CaptureSimple(
+            Variable('word_unquoted') ^ 1 *
+            (Set(' \t') ^ 1 * Variable('word_unquoted') ^ 1) ^ 0) *
+          white_space ^ 0,
 
       word_unquoted = (1 - white_space - Set(
         opts.group_begin ..
         opts.group_end ..
-        opts.assignment_operator  ..
-        opts.list_separator))^1
+        opts.assignment_operator ..
+        opts.list_separator)) ^ 1
     })
--- LuaFormatter on
+    -- LuaFormatter on
   end
 
   local is = {
@@ -1341,12 +1343,12 @@ local function new()
   ---@param key_path table # An array of key names leading to the current
   ---@param input_root table # The root input table input and output table.
   local function apply_definitions(defs,
-    opts,
-    input,
-    output,
-    unknown,
-    key_path,
-    input_root)
+                                   opts,
+                                   input,
+                                   output,
+                                   unknown,
+                                   key_path,
+                                   input_root)
     local exclusive_groups = {}
 
     local function add_to_key_path(key_path, key)
@@ -1708,7 +1710,7 @@ local function new()
       local key
       ---`{ key1 = { }, key2 = { } }`
       if type(def) == 'table' and def.name == nil and type(index) ==
-        'string' then
+          'string' then
         key = index
         ---`{ { name = 'key1' }, { name = 'key2' } }`
       elseif type(def) == 'table' and def.name ~= nil then
@@ -1797,7 +1799,7 @@ local function new()
 
     local function log_result(caption, result)
       utils.log
-        .debug('%s: \n%s', caption, visualizers.stringify(result))
+          .debug('%s: \n%s', caption, visualizers.stringify(result))
     end
 
     if kv_string == nil then
@@ -1859,8 +1861,8 @@ local function new()
       local callbacks = {
         unpack = function(key, value)
           if type(value) == 'table' and utils.get_array_size(value) == 1 and
-            utils.get_table_size(value) == 1 and type(value[1]) ~=
-            'table' then
+              utils.get_table_size(value) == 1 and type(value[1]) ~=
+              'table' then
             return key, value[1]
           end
           return key, value
@@ -1945,13 +1947,13 @@ local function new()
     log_result('End result', result)
 
     if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
-      'table' then
+        'table' then
       utils.merge_tables(opts.accumulated_result, result, true)
     end
 
     ---no_error
     if not opts.no_error and type(unknown) == 'table' and
-      utils.get_table_size(unknown) > 0 then
+        utils.get_table_size(unknown) > 0 then
       throw_error('E019', { unknown = visualizers.render(unknown) })
     end
     return result, unknown, raw
@@ -1964,7 +1966,7 @@ local function new()
   ---`parse` function is configured with the specified key-value
   ---defintions.
   ---
-  ---@param defs DefinitionCollection
+  ---@param defs DefinitionCollection # A collection of key-value pair definitions.
   ---@param opts? OptionCollection
   local function define(defs, opts)
     return function(kv_string, inner_opts)
@@ -1988,6 +1990,8 @@ local function new()
     end
   end
 
+  ---
+  ---An array/list of key names or a mapping of source key names to target key names.
   ---@alias KeySpec table<integer|string, string>
 
   local DefinitionManager = (function()
@@ -1995,28 +1999,75 @@ local function new()
     ---definitions in an object. The class provides a `parse` method
     ---that is configured with these definitions.
     ---@class DefinitionManager
-    ---@field defs DefinitionCollection
+    ---@field defs DefinitionCollection # A collection of key-value pair definitions.
     DefinitionManager = {}
 
     ---@private
     DefinitionManager.__index = DefinitionManager
 
     ---
-    ---@param key string
+    ---Create a new instance of the `DefinitionManager` class.
     ---
-    ---@return Definition
+    ---@param defs DefinitionCollection # A collection of key-value pair definitions.
+    ---
+    ---@return DefinitionManager manager # A new instance of the `DefinitionManager` class.
+    function constructor(defs)
+      local manager = {}
+      for key, def in pairs(defs) do
+        if def.name ~= nil and type(key) == 'number' then
+          defs[def.name] = def
+          defs[key] = nil
+        end
+      end
+      setmetatable(manager, DefinitionManager)
+      manager.defs = defs
+      return manager
+    end
+
+    ---
+    ---Create a new instance of the `DefinitionManager` class.
+    ---
+    ---@param defs DefinitionCollection # A collection of key-value pair definitions.
+    ---
+    ---@return DefinitionManager manager # A new instance of the `DefinitionManager` class.
+    function DefinitionManager:new(defs)
+      return constructor(defs)
+    end
+
+    ---
+    ---Get a key-value pair definition by its key name.
+    ---
+    ---@param key string # The name of key.
+    ---
+    ---@return Definition def # A key-value pair definition.
     function DefinitionManager:get(key)
       return self.defs[key]
     end
 
     ---
-    ---@param key_spec KeySpec
-    ---@param clone? boolean
+    ---@private
     ---
-    ---@return DefinitionCollection
+    ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
+    ---
+    ---@return KeySpec key_spec A collection of key-value pair definitions.
+    function DefinitionManager:normalize_key_spec(key_spec)
+      if key_spec == nil then
+        return  utils.get_table_keys(self.defs)
+      end
+      return key_spec
+    end
+
+    ---
+    ---Include a subset of the key-value definitions or if key_spec is not specified
+    ---all definitions.
+    ---
+    ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
+    ---@param clone? boolean # Make a deep copy of the key-value pair definition tables.
+    ---
+    ---@return DefinitionCollection defs A collection of key-value pair definitions.
     function DefinitionManager:include(key_spec, clone)
       local selection = {}
-      for key, value in pairs(key_spec) do
+      for key, value in pairs(self:normalize_key_spec(key_spec)) do
         local src
         local dest
         if type(key) == 'number' then
@@ -2036,13 +2087,16 @@ local function new()
     end
 
     ---
-    ---@param key_spec KeySpec
-    ---@param clone? boolean
+    ---Exclude a subset of the key-value definitions or if key_spec is not specified
+    ---return all definitions.
     ---
-    ---@return DefinitionCollection
+    ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
+    ---@param clone? boolean # Make a deep copy of the key-value pair definition tables.
+    ---
+    ---@return DefinitionCollection defs A collection of key-value pair definitions.
     function DefinitionManager:exclude(key_spec, clone)
       local spec = {}
-      for key, value in pairs(key_spec) do
+      for key, value in pairs(self:normalize_key_spec(key_spec)) do
         if type(key) == 'number' then
           spec[value] = value
         else
@@ -2090,23 +2144,7 @@ local function new()
       return define(self:include(key_selection))
     end
 
-    ---@param defs DefinitionCollection
-    ---
-    ---@return DefinitionManager
-    return function(defs)
-      local manager = {}
-
-      for key, def in pairs(defs) do
-        if def.name ~= nil and type(key) == 'number' then
-          defs[def.name] = def
-          defs[key] = nil
-        end
-      end
-
-      setmetatable(manager, DefinitionManager)
-      manager.defs = defs
-      return manager
-    end
+    return constructor
   end)()
 
   ---
@@ -2218,7 +2256,6 @@ local function new()
       exported_table.get = warn_global_import
     end,
   }
-
 end
 
 return new
