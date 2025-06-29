@@ -10,7 +10,7 @@ local manager = DefinitionManager({
 })
 
 describe('class “DefinitionManager()”', function()
-  it('result', function()
+  it('Field “defs“', function()
     ---@diagnostic disable-next-line: undefined-field
     assert.is.equal(manager.defs.key1.default, 1)
     ---@diagnostic disable-next-line: undefined-field
@@ -22,14 +22,13 @@ describe('class “DefinitionManager()”', function()
       { name = 'named1', default = 1 },
       { name = 'named2', default = 2 },
       unnamed = { default = 0 },
-
     })
     assert.is.equal(m:get('named1').default, 1)
     assert.is.equal(m:get('named2').default, 2)
     assert.is.equal(m:get('unnamed').default, 0)
   end)
 
-  it('Method :new()', function()
+  it('Method “:new()”', function()
     local m1 = DefinitionManager({
       key1 = { default = 'value1' }
     })
@@ -40,8 +39,21 @@ describe('class “DefinitionManager()”', function()
     assert.is.equal(m2:get('key2').default, 'value2')
   end)
 
+  it('Method “:set()”', function()
+    local m = manager:clone()
+    m:set('key4', { default = 4 })
+    assert.is.equal(m:get('key4').default, 4)
+  end)
+
   it('Method “:get()”', function()
     assert.is.equal(manager:get('key3').default, 3)
+  end)
+
+  it('Method “:key_names()”', function()
+    assert.is.same(manager:key_names(), {
+      'key1',
+      'key2',
+      'key3' })
   end)
 
   describe('Method “:include()”', function()

@@ -2036,6 +2036,15 @@ local function new()
     end
 
     ---
+    ---Set a key-value pair definition by its key name.
+    ---
+    ---@param key string # The name of key.
+    ---@param def Definition # A key-value pair definition.
+    function DefinitionManager:set(key, def)
+      self.defs[key] = def
+    end
+
+    ---
     ---Get a key-value pair definition by its key name.
     ---
     ---@param key string # The name of key.
