@@ -2078,7 +2078,7 @@ local function new()
     end
 
     ---
-    ---Include a subset of the key-value definitions or if key_spec is not specified
+    ---Include a subset of the key-value definitions or if `key_spec` is not specified
     ---all definitions.
     ---
     ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
@@ -2107,7 +2107,7 @@ local function new()
     end
 
     ---
-    ---Exclude a subset of the key-value definitions or if key_spec is not specified
+    ---Exclude a subset of the key-value definitions or if `key_spec` is not specified
     ---return all definitions.
     ---
     ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
@@ -2116,14 +2116,16 @@ local function new()
     ---@return DefinitionCollection defs A collection of key-value pair definitions.
     function DefinitionManager:exclude(key_spec, clone)
       local spec = {}
-      for key, value in pairs(self:normalize_key_spec(key_spec)) do
+      if key_spec == nil then
+        key_spec = {}
+      end
+      for key, value in pairs(key_spec) do
         if type(key) == 'number' then
           spec[value] = value
         else
           spec[key] = value
         end
       end
-
       local selection = {}
       for key, def in pairs(self.defs) do
         if spec[key] == nil then
@@ -2163,6 +2165,20 @@ local function new()
     end
 
     ---
+    ---Define a new `parse` function.
+    ---
+    ---The `define` method returns a `parse` function. This created
+    ---`parse` function is configured with key-value
+    ---defintions of this instance or a subset, if a key selection is specified.
+    ---
+    ---@param key_selection? KeySpec A selection of key-value pair
+    ---  definitions to include. If not specified all definitions are
+    ---  used.
+    function DefinitionManager:define(key_selection)
+      return define(self:include(key_selection))
+    end
+
+    ---
     ---Parse a LaTeX/TeX style key-value string into a Lua table using
     ---all the definitions of this manager or a subset of the definitions.
     ---
@@ -2181,20 +2197,6 @@ local function new()
         d = self:include(key_selection)
       end
       return parse(kv_string, { defs = d })
-    end
-
-    ---
-    ---Define a new `parse` function.
-    ---
-    ---The `define` method returns a `parse` function. This created
-    ---`parse` function is configured with key-value
-    ---defintions of this instance or a subset, if a key selection is specified.
-    ---
-    ---@param key_selection? KeySpec A selection of key-value pair
-    ---  definitions to include. If not specified all definitions are
-    ---  used.
-    function DefinitionManager:define(key_selection)
-      return define(self:include(key_selection))
     end
 
     return constructor

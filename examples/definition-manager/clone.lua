@@ -3,26 +3,22 @@ local luakeys = require('luakeys')()
 
 local DefinitionManager = luakeys.DefinitionManager
 
-local manager = DefinitionManager({
-  key1 = { default = 1 },
-  key2 = { default = 2 },
-  key3 = { default = 3 },
-})
+it('Method clone', function()
+  local manager = DefinitionManager({
+    key1 = { default = 1 },
+    key2 = { default = 2 },
+    key3 = { default = 3 },
+  })
 
-describe('Method “:clone()”', function()
-  it('clone all definitions', function()
-    local m = manager:clone()
-    assert.is_not.equal(m, manager)
-    assert.are.same(m:key_names(), { 'key1', 'key2', 'key3' })
-  end)
+  local clone1 = manager:clone()
+  assert.is_not.equal(clone1, manager)
+  assert.are.same(clone1:key_names(), { 'key1', 'key2', 'key3' })
 
-  it('Option include', function()
-    local m = manager:clone({ include = { 'key1', 'key2' } })
-    assert.are.same(m:key_names(), { 'key1', 'key2' })
-  end)
+  -- option include
+  local clone2 = manager:clone({ include = { 'key1' } })
+  assert.are.same(clone2:key_names(), { 'key1' })
 
-  it('Option exclude', function()
-    local m = manager:clone({ exclude = { 'key1', 'key2' } })
-    assert.are.same(m:key_names(), { 'key3' })
-  end)
+  -- option exclude
+  local clone3 = manager:clone({ exclude = { 'key1' } })
+  assert.are.same(clone3:key_names(), { 'key2', 'key3' })
 end)

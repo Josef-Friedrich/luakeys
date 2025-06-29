@@ -1532,6 +1532,36 @@ using the \lua{include} and \lua{exclude} methods.
 
 \InputLua[firstline=4]{definition-manager.lua}
 
+\subsection{Field “\texttt{.defs}”}
+
+\subsection{Method “\texttt{:set(def)}”}
+
+\InputLua[firstline=13,lastline=14]{definition-manager/set.lua}
+
+\subsection{Method “\texttt{:get(): Definition}”}
+
+\InputLua[firstline=13,lastline=13]{definition-manager/set.lua}
+
+\subsection{Method “\texttt{:key_names(): string[]}”}
+
+\InputLua[firstline=13,lastline=16]{definition-manager/key_names.lua}
+
+\subsection{Method “\texttt{:include(key_spec, clone): Defs}”}
+
+\InputLua[firstline=13,lastline=28]{definition-manager/include.lua}
+
+\subsection{Method “\texttt{:exclude(key_spec, clone): Defs}”}
+
+\InputLua[firstline=13,lastline=30]{definition-manager/exclude.lua}
+
+\subsection{Method “\texttt{:clone(opts): DefinitionManager}”}
+
+\InputLua[firstline=7,lastline=23]{definition-manager/clone.lua}
+
+\subsection{Method “\texttt{:define(key_selection): parse}”}
+
+\subsection{Method “\texttt{:parse(kv_string, key_selection): result, unknown, raw}”}
+
 %%
 %
 %%

@@ -10,7 +10,6 @@ local manager = DefinitionManager({
 })
 
 it('Method “:set()”', function()
-  local m = manager:clone()
-  m:set('key4', { default = 4 })
-  assert.is.equal(m:get('key4').default, 4)
+  manager:set('key4', { default = 4 })
+  assert.is.equal(manager:get('key4').default, 4)
 end)
