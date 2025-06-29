@@ -9,8 +9,6 @@ local manager = DefinitionManager({
   key3 = { default = 3 },
 })
 
-
-
-  it('Method “:get()”', function()
-    assert.is.equal(manager:get('key3').default, 3)
-  end)
+it('Method “:get()”', function()
+  assert.is.equal(manager:get('key3').default, 3)
+end)

@@ -9,9 +9,9 @@ local manager = DefinitionManager({
   key3 = { default = 3 },
 })
 
-  it('Method “:key_names()”', function()
-    assert.is.same(manager:key_names(), {
-      'key1',
-      'key2',
-      'key3' })
-  end)
+it('Method “:key_names()”', function()
+  assert.is.same(manager:key_names(), {
+    'key1',
+    'key2',
+    'key3' })
+end)
