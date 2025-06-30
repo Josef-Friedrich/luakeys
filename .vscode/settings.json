@@ -26,6 +26,11 @@
   "Lua.workspace.checkThirdParty": false,
   "latex-workshop.latex.autoBuild.run": "never",
   "[lua]": {
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "editor.rulers": [80]
+  },
+  "[latex]": {
+    "editor.tabSize": 2,
+    "editor.rulers": [72]
   }
 }

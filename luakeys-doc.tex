@@ -1534,19 +1534,43 @@ using the \lua{include} and \lua{exclude} methods.
 
 \subsection{Field “\texttt{.defs}”}
 
-\subsection{Method “\texttt{:set(def)}”}
+\subsection{Method “\texttt{:set(key, def)}”}
+
+% Die Methode \lua{DefinitionManager:set(key, def)} fügt eine
+% Schlüssel-Wert-Paar-Definition unter einem angegeben Schlüsselnamen
+% der Definitionsammlung hinzu.
+The \lua{DefinitionManager:set(key, def)} method adds a key-value pair
+definition under a specified key name to the definition collection.
 
 \InputLua[firstline=13,lastline=14]{definition-manager/set.lua}
 
-\subsection{Method “\texttt{:get(): Definition}”}
+\subsection{Method “\texttt{:get(key): Definition}”}
+
+% Die Methode \lua{DefinitionManager:get(key)} ruft anhand ihres
+% Schlüsselnamens ein Schlüssel-Wert-Paar-Definition ab.
+The \lua{DefinitionManager:get(key)} method retrieves a key-value pair
+definition based on its key name.
 
 \InputLua[firstline=13,lastline=13]{definition-manager/set.lua}
 
 \subsection{Method “\texttt{:key_names(): string[]}”}
 
+% Die Methode \lua{DefinitionManager:key_names()} gibt alle
+% Schlüsselnamen der entsprechenden Definitionen als Array zurück.
+The \lua{DefinitionManager:key_names()} method returns all key names
+of the corresponding definitions as an array.
+
 \InputLua[firstline=13,lastline=16]{definition-manager/key_names.lua}
 
 \subsection{Method “\texttt{:include(key_spec, clone): Defs}”}
+
+% Die Methode \lua{DefinitionManager:include(key_spec, clone)} nimmt
+% eine Teilmenge der Schlüssel-Wert-Definitionen in den Rückgabesammlung
+% an Definition auf oder, wenn \lua{key_spec} nicht angegeben ist, alle
+% Definitionen.
+The \lua{DefinitionManager:include(key_spec, clone)} method includes a
+subset of the key-value definitions in the return collection of
+definitions or, if \lua{key_spec} is not specified, all definitions.
 
 \InputLua[firstline=13,lastline=28]{definition-manager/include.lua}
 

@@ -2036,7 +2036,8 @@ local function new()
     end
 
     ---
-    ---Set a key-value pair definition by its key name.
+    ---Add a key-value pair definition under a specified key name to the
+    ---definition collection.
     ---
     ---@param key string # The name of key.
     ---@param def Definition # A key-value pair definition.
@@ -2045,7 +2046,7 @@ local function new()
     end
 
     ---
-    ---Get a key-value pair definition by its key name.
+    ---Retrieve a key-value pair definition based on its key name.
     ---
     ---@param key string # The name of key.
     ---
