@@ -1534,13 +1534,15 @@ using the \lua{include} and \lua{exclude} methods.
 
 \subsection{Field “\texttt{.defs}”}
 
+\InputLua[firstline=7,lastline=17]{definition-manager/defs.lua}
+
 \subsection{Method “\texttt{:set(def)}”}
 
 \InputLua[firstline=13,lastline=14]{definition-manager/set.lua}
 
 \subsection{Method “\texttt{:get(): Definition}”}
 
-\InputLua[firstline=13,lastline=13]{definition-manager/set.lua}
+\InputLua[firstline=13,lastline=13]{definition-manager/get.lua}
 
 \subsection{Method “\texttt{:key_names(): string[]}”}
 
@@ -1560,7 +1562,12 @@ using the \lua{include} and \lua{exclude} methods.
 
 \subsection{Method “\texttt{:define(key_selection): parse}”}
 
+\InputLua[firstline=13,lastline=25]{definition-manager/define.lua}
+
 \subsection{Method “\texttt{:parse(kv_string, key_selection): result, unknown, raw}”}
+
+\InputLua[firstline=13,lastline=30]{definition-manager/parse.lua}
+
 
 %%
 %
