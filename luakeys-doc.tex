@@ -1588,6 +1588,21 @@ definitions or, if \lua{key_spec} is not specified, all definitions.
 
 \subsection{Method “\texttt{:parse(kv_string, key_selection): result, unknown, raw}”}
 
+% Die Methode parse übersetzt einer Schlüssel-Wert-Zeichenkette im
+% LaTeX/TeX-Stil in eine Lua-Tabelle unter Verwendung aller Definitionen
+% dieses Managers oder einer Teilmenge der Definitionen.
+The \lua{DefinitionManager:parse(kv_string, key_selection)} method
+translates a key-value string in LaTeX/TeX style into a Lua table using
+all definitions of this manager or a subset of the definitions.
+% Diese Methode ist verwandt mit der Funktion \lua{parse} (siehe
+% \ref{parse}), jedoch mit dem Unterschied, dass die Methode \lua{parse}
+% bereits mit den Schlüssel-Wert-Paar-Definitionen der übergeordneten
+% Klasse DefintionManager konfiguriert ist.
+This method is related to the \lua{parse} function (see \ref{parse}),
+but with the difference that the \lua{parse} method is already
+configured with the key-value pair definitions of the parent
+\lua{DefintionManager} class.
+
 \InputLua[firstline=13,lastline=30]{definition-manager/parse.lua}
 
 %%
