@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.16.0] - 2025-07-01
 
 ### Changed
 
@@ -73,14 +73,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   luakeys.
 - New name for the function `new()` instead of `get_private_instance()".
 
-## [v0.11.0] - 2022-12-23
+## [0.11.0] - 2022-12-23
 
 ### Added
 
 - Add a new function called `get_private_instance()` to load a private
   version of the luakeys module.
 
-## [v0.10.0] - 2022-12-16
+## [0.10.0] - 2022-12-16
 
 ### Added
 
@@ -88,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add new options to specify which strings are recognized as Boolean
   values.
 
-## [v0.9.0] - 2022-11-21
+## [0.9.0] - 2022-11-21
 
 ### Added
 
@@ -105,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The attribute value `true` for the attribute `pick` is deprecated.
 
-## [v0.8.0] - 2022-11-17
+## [0.8.0] - 2022-11-17
 
 ### Added
 
@@ -114,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `quotation_end`.
 - Extend the documentation about the option `format_keys`.
 
-## [v0.7.0] - 2022-07-06
+## [0.7.0] - 2022-07-06
 
 ### Added
 
@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The project now uses semantic versioning.
 - Extend and improve the documentation.
 
-## [v0.6.0] - 2022-06-09
+## [0.6.0] - 2022-06-09
 
 ### Added
 
@@ -150,7 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove option `case_insensitive_keys`. Use
   `format_keys = { lower }` to achieve the same effect.
 
-## [v0.5.0] - 2022-04-04
+## [0.5.0] - 2022-04-04
 
 ### Added
 
@@ -159,7 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a recursive converter callback / hook to process the parse tree.
 - New option: case_insensitive_keys.
 
-## [v0.4.0] - 2021-12-31
+## [0.4.0] - 2021-12-31
 
 ### Added
 
@@ -174,7 +174,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Parser: Remove support from Lua numbers with exponents (for example '5e+20').
 
-## [v0.3.0] - 2021-11-05
+## [0.3.0] - 2021-11-05
 
 ### Added
 
@@ -185,7 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rename the previous documentation file `luakeys.tex` to luakeys-doc.tex`.
 
-## [v0.2.0] - 2021-09-19
+## [0.2.0] - 2021-09-19
 
 ### Added
 
@@ -196,8 +196,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow all recognized data types as keys.
 - Allow TeX macros in the values.
 
-## [v0.1.0] - 2021-01-18
+## [0.1.0] - 2021-01-18
 
 ### Added
 
 - Inital release
+
+[0.16.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.15.0..v0.16.0
+[0.15.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.14.0..v0.15.0
+[0.14.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.13.0..v0.14.0
+[0.13.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.12.0..v0.13.0
+[0.12.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.11.0..v0.12.0
+[0.11.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.10.0..v0.11.0
+[0.10.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.9.0..v0.10.0
+[0.9.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.8.0..v0.9.0
+[0.8.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.7.0..v0.8.0
+[0.7.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.6.0..v0.7.0
+[0.6.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.5.0..v0.6.0
+[0.5.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.4.0..v0.5.0
+[0.4.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.3.0..v0.4.0
+[0.3.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.2.0..v0.3.0
+[0.2.0]: https://github.com/Josef-Friedrich/luakeys/compare/v0.1.0..v0.2.0
