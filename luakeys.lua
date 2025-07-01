@@ -2079,8 +2079,8 @@ local function new()
     end
 
     ---
-    ---Include a subset of the key-value definitions or if `key_spec` is not specified
-    ---all definitions.
+    ---Include a subset of the key-value definitions in the return collection
+    ---of definitions or, if `key_spec` is not specified, all definitions.
     ---
     ---@param key_spec? KeySpec # An array/list of key names or a mapping of source key names to target key names.
     ---@param clone? boolean # Make a deep copy of the key-value pair definition tables.
@@ -2170,7 +2170,7 @@ local function new()
     ---
     ---The `define` method returns a `parse` function. This created
     ---`parse` function is configured with key-value
-    ---defintions of this instance or a subset, if a key selection is specified.
+    ---definitions of this instance, or a subset if a key selection is specified.
     ---
     ---@param key_selection? KeySpec A selection of key-value pair
     ---  definitions to include. If not specified all definitions are

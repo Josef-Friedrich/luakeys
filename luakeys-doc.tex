@@ -1520,9 +1520,9 @@ result store.
 % in einem Objekt abzulegen.
 The |DefinitionManager| class allows you to store key-value definitions
 in an object.
-% Die Klasse stellt eine \lua{parse}-Methode bereit, die mit diesen
+% Diese Klasse stellt eine \lua{parse}-Methode bereit, die mit diesen
 % Definitionen konfiguriert ist.
-The class provides a \lua{parse} method that is configured with these
+This class provides a \lua{parse} method that is configured with these
 definitions.
 % Über die Methoden \lua{include} und \lue{exclude} können auf Basis der
 % gespeicherten Definitionen neue Teilmengen an Definitionen gebildet
@@ -1533,6 +1533,13 @@ using the \lua{include} and \lua{exclude} methods.
 \InputLua[firstline=4]{definition-manager.lua}
 
 \subsection{Field “\texttt{.defs}”}
+
+% Das defs-Feld kann für den Zugriff auf die Sammlung von
+% Schlüssel-Wert-Paar-Definitionen einer Instanz verwendet werden.
+The \lua{defs} field can be used to access the collection of key-value
+pair definitions on an instance.
+
+\InputLua[firstline=7,lastline=17]{definition-manager/defs.lua}
 
 \subsection{Method “\texttt{:set(key, def)}”}
 
@@ -1576,13 +1583,50 @@ definitions or, if \lua{key_spec} is not specified, all definitions.
 
 \subsection{Method “\texttt{:exclude(key_spec, clone): Defs}”}
 
+% Diese Methode schließt eine Teilmenge der Schlüssel-Wert-Definitionen
+% aus oder gibt, wenn `key_spec` nicht angegeben ist, alle Definitionen
+% zurück.
+This method excludes a subset of the key-value definitions or, if
+\lua{key_spec} is not specified, returns all definitions.
+
 \InputLua[firstline=13,lastline=30]{definition-manager/exclude.lua}
 
 \subsection{Method “\texttt{:clone(opts): DefinitionManager}”}
 
+% Diese Methode erstellt eine neue Instanz der Klasse
+% \lua{DefinitionManager} und fügt ihr eine tiefe Kopie der
+% Schlüssel-Wert-Paar-Definitionen hinzu.
+This method creates a new instance of the \lua{DefinitionManager} class
+and adds a deep copy of the key-value pair definitions to it.
+
+% Um Schlüssel-Wert-Paar-Definitionen auszuschließen oder
+% einzuschließen, kann eine Optionstabelle verwendet werden.
+An options table can be used to exclude or include key-value pair
+definitions.
+% Werden keinen Option bzw  `nil` übergeben , werden alle Definitionen
+% geklont.
+If no option or \lua{nil} is passed, all definitions are cloned.
+
 \InputLua[firstline=7,lastline=23]{definition-manager/clone.lua}
 
 \subsection{Method “\texttt{:define(key_selection): parse}”}
+
+% Die Methode \lua{DefinitionManager:define(key_selection)} erstellt
+% eine neue \lua{parse}-Funktion. Diese erstellte \lua{parse}-Funktion
+% wird mit Schlüssel-Wert-Definitionen dieser Instanz oder einer
+% Teilmenge konfiguriert, wenn eine Schlüsselauswahl angegeben ist.
+The \lua{DefinitionManager:define(key_selection)} method creates a new
+\lua{parse} function. This created \lua{parse} function is configured
+with key-value defintions of this instance or a subset, if a key
+selection is specified.
+% Diese Methode ist verwandt mit der Funktion \lua{define} (siehe
+% \ref{define}), jedoch mit dem Unterschied, dass die Methode
+% \lua{define} bereits mit den Schlüssel-Wert-Paar-Definitionen der
+% übergeordneten Klasse DefintionManager konfiguriert ist.
+This method is related to the \lua{define} function (see \ref{define}),
+but with the difference that the \lua{define} method is already
+configured with the key-value pair definitions of the parent
+\lua{DefintionManager} class.
 
 \InputLua[firstline=13,lastline=25]{definition-manager/define.lua}
 
