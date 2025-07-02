@@ -275,7 +275,6 @@ Update version in:
 
 Update copyright in:
 
-* LICENSE
 * luakeys-debug.sty
 * luakeys-debug.tex
 * luakeys.lua
