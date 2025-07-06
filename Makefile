@@ -6,6 +6,7 @@ installdir = $(texmftex)/$(jobname)
 all: install
 
 install: doc_pdf
+	-tlmgr remove --force luakeys
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
 	cp -f $(jobname).sty $(installdir)
