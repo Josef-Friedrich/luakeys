@@ -802,10 +802,14 @@ local visualizers = (function()
   ---@field start_bracket? string
   ---@field end_bracket? string
   ---@field indent? string
+  ---@field start_key_bracket? string
+  ---@field end_key_bracket? string
+  ---@field assignment? string
+  ---@field separator? string
 
   ---
   ---@param result any
-  ---@param opts? any
+  ---@param opts? StringifyOptions
   ---@return string
   local function stringify_ng(result, opts)
     if opts == nil then
@@ -817,7 +821,21 @@ local visualizers = (function()
       start_bracket = '{',
       end_bracket = '}',
       indent = '  ',
+      start_key_bracket = '[',
+      end_key_bracket = ']',
+      assignment = ' = ',
+      separator = ',',
     }
+
+    ---
+    ---True if a key string can be notated without square brackets.
+    ---
+    ---@param identifer string
+    ---@return boolean
+    local function is_valid_lua_identifier(identifer)
+      identifer = string.gsub(identifer, '_', '')
+      return string.match(identifer, '^%w+$') ~= nil
+    end
 
     utils.merge_tables(opts, default_opts, false)
 
@@ -831,28 +849,38 @@ local visualizers = (function()
 
       local function format_key(key)
         if (type(key) == 'number') then
-          return string.format('[%s]', key)
+          key = string.format('%s', key)
         else
-          return string.format('[\'%s\']', key)
+          key = string.format('\'%s\'', key)
         end
+        return opts.start_key_bracket .. key .. opts.end_key_bracket
       end
 
       if type(input) ~= 'table' then
         return tostring(input)
       end
 
+      local counter = 1
       for key, value in pairs(input) do
         if (key and type(key) == 'number' or type(key) == 'string') then
-          key = format_key(key)
+          -- is array ... consecutive integers ...
+          if type(key) == 'number' and counter == key then
+            counter = counter + 1
+            key = ''
+          else
+            key = format_key(key)
+            key = key .. opts.assignment
+          end
 
           if (type(value) == 'table') then
             if (next(value)) then
-              add(depth, key .. ' = ' .. opts.start_bracket)
+              add(depth, key .. opts.start_bracket)
               add(0, stringify_inner(value, depth + 1))
-              add(depth, opts.end_bracket .. ',');
+              add(depth, opts.end_bracket .. opts.separator);
             else
-              add(depth, key .. ' = ' .. opts.start_bracket ..
-                opts.end_bracket .. ',')
+              add(depth,
+                key .. opts.start_bracket .. opts.end_bracket ..
+                  opts.separator)
             end
           else
             if (type(value) == 'string') then
@@ -861,7 +889,7 @@ local visualizers = (function()
               value = tostring(value)
             end
 
-            add(depth, key .. ' = ' .. value .. ',')
+            add(depth, key .. value .. opts.separator)
           end
         end
       end
