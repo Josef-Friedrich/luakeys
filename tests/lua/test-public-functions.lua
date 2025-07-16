@@ -25,6 +25,34 @@ describe('Function “stringify()”', function()
   end)
 end)
 
+describe('Function “stringify_ng()”', function()
+  local function assert_equals(input, expected)
+    assert.are.equal(expected, luakeys.stringify_ng(input))
+  end
+
+  it('integer indexes', function()
+    assert_equals({ 'one' }, '{\n  [1] = \'one\',\n}')
+  end)
+
+  it('string indexes', function()
+    assert_equals({ ['one'] = 1 }, '{\n  [\'one\'] = 1,\n}')
+  end)
+
+  it('nested', function()
+    assert_equals({ { 1 } }, '{\n  [1] = {\n    [1] = 1,\n  },\n}')
+  end)
+
+  it('option for_tex = true', function()
+    assert.are.equal('$\\{$\\par\\ \\ [1] = \'one\',\\par$\\}$',
+      luakeys.stringify_ng({ 'one' }, {
+        line_break = '\\par',
+        start_bracket = '$\\{$',
+        end_bracket = '$\\}$',
+        indent = '\\ \\ ',
+      }))
+  end)
+end)
+
 describe('Function “render()”', function()
   local function assert_render(input, expected)
     assert.are.equal(expected, luakeys.render(
@@ -77,8 +105,7 @@ describe('Function “define()”', function()
   it(
     'specify “opts” in both the “define” and the “parse” function',
     function()
-      local parse = luakeys.define({ 'key' },
-        { default = 'value' })
+      local parse = luakeys.define({ 'key' }, { default = 'value' })
       local result, unknown = parse('key,unknown', { no_error = true })
       assert.are.same(result, { key = 'value' })
       assert.are.same(unknown, { [2] = 'unknown' })
