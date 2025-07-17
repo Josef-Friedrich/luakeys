@@ -5,6 +5,15 @@ local utils = require('luakeys')().utils
 describe('utils', function()
   local color = utils.ansi_color
 
+  it('Function “is_lua_identifier”', function()
+    assert.is_true(utils.is_lua_identifier('valid'))
+    assert.is_true(utils.is_lua_identifier('under_score'))
+    assert.is_true(utils.is_lua_identifier('UPPERCASE'))
+    assert.is_false(utils.is_lua_identifier('da-sh'))
+    assert.is_false(utils.is_lua_identifier('s p a c e'))
+    assert.is_false(utils.is_lua_identifier('Umlauteäöü'))
+  end)
+
   it('Function “merge_tables”', function()
     local result = utils.merge_tables({ target = 'target' }, { source = 'source' })
     assert.are.same(result, { target = 'target', source = 'source' })

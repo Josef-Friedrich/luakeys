@@ -61,12 +61,23 @@ describe('Function “render_ng()”', function()
     assert.are.equal(expected, luakeys.render_ng(input, opts))
   end
 
-  it('key=value', function()
-    assert_render({ key = 'value' }, 'key=value')
-  end)
+  describe('key=value', function()
+    it('style=tex', function()
+      assert_render({ key = 'value' }, 'key=value')
+    end)
 
-  it('Multiple key value pairs', function()
-    assert_render({ key1 = 'value1' }, 'key1=value1')
+    describe('style=lua', function()
+      it('identifier', function()
+        assert_render({ key = 'value' }, '{key=\'value\'}',
+          { style = 'lua' })
+      end)
+
+      it('no identifier as key', function()
+        assert_render({ ['key 1'] = 'value' },
+          '{[\'key 1\']=\'value\'}', { style = 'lua' })
+      end)
+    end)
+
   end)
 
   describe('Nesting', function()
@@ -74,6 +85,11 @@ describe('Function “render_ng()”', function()
 
     it('inline=true', function()
       assert_render(input, 'level1={level2={level3=value}}')
+    end)
+
+    it('style=lua', function()
+      assert_render(input, '{level1={level2={level3=\'value\'}}}',
+        { style = 'lua' })
     end)
 
     it('inline=false', function()
@@ -104,9 +120,23 @@ describe('Function “render_ng()”', function()
     assert_render({ true }, 'true')
   end)
 
-  it('A list of standalone values', function()
-    assert_render({ 'one', 'two', 'three' }, 'one,two,three')
+  describe('A list of standalone values', function()
+    it('style=tex', function()
+      assert_render({ 'one', 'two', 'three' }, 'one,two,three')
+    end)
+
+    it('inline=false', function()
+      assert_render({ 'one', 'two', 'three' },
+        '\n' .. '  one,\n' .. '  two,\n' .. '  three\n',
+        { inline = false })
+    end)
+
+    it('style=lua', function()
+      assert_render({ 'one', 'two', 'three' },
+        '{\'one\',\'two\',\'three\'}', { style = 'lua' })
+    end)
   end)
+
 end)
 
 describe('Function “define()”', function()

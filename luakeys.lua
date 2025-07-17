@@ -35,6 +35,17 @@ end
 
 ---
 local utils = (function()
+    ---
+    ---True if a key string can be notated without square brackets.
+    ---
+    ---@param identifer string
+    ---
+    ---@return boolean
+    local function is_lua_identifier(identifer)
+      identifer = string.gsub(identifer, '_', '')
+      return string.match(identifer, '^%w+$') ~= nil
+    end
+
   ---
   ---Merge two tables into the first specified table.
   ---The `merge_tables` function copies keys from the `source` table
@@ -657,6 +668,7 @@ local utils = (function()
   end)()
 
   return {
+    is_lua_identifier = is_lua_identifier,
     merge_tables = merge_tables,
     clone_table = clone_table,
     remove_from_table = remove_from_table,
@@ -814,7 +826,7 @@ local visualizers = (function()
   ---
   ---The low-level function for the render function
   ---
-  ---@param result any
+  ---@param result unknown
   ---@param opts? StringifyOptions
   ---@return string
   local function stringify_ng(result, opts)
@@ -836,7 +848,7 @@ local visualizers = (function()
       separator_last = false,
       quotation = '\'',
       format_key = function(key, o)
-        if (type(key) == 'number') then
+        if type(key) == 'number' then
           key = string.format('%s', key)
         else
           key = string.format('\'%s\'', key)
@@ -844,7 +856,7 @@ local visualizers = (function()
         return o.begin_key .. key .. o.end_key
       end,
       format_value = function(value)
-        if (type(value) == 'string') then
+        if type(value) == 'string' then
           return string.format('\'%s\'', value)
         else
           return tostring(value)
@@ -852,18 +864,13 @@ local visualizers = (function()
       end,
     }
 
-    ---
-    ---True if a key string can be notated without square brackets.
-    ---
-    ---@param identifer string
-    ---@return boolean
-    local function is_valid_lua_identifier(identifer)
-      identifer = string.gsub(identifer, '_', '')
-      return string.match(identifer, '^%w+$') ~= nil
-    end
-
     utils.merge_tables(opts, default_opts, false)
 
+    ---
+    ---@param input unknown
+    ---@param depth integer
+    ---
+    ---@return string
     local function stringify_inner(input, depth)
       local output = {}
       depth = depth or 0
@@ -938,7 +945,7 @@ local visualizers = (function()
 
   ---@class RenderOptions
   ---@field inline? boolean # Render the input in one line without line breaks. Default `true`.
-  ---@field style? 'luakeys'|'lua' # Render the input as a `lua` table or in the `luakeys` style. Default `luakeys`
+  ---@field style? 'tex'|'lua' # Render the input as a `lua` table or in the `luakeys` style. Default `luakeys`
   ---@field for_tex? boolean # Stringify the table into a text string that can be embeded inside a TeX document via `tex.print()`. Curly braces and whites spaces are escaped. Default `false`.
 
   return {
@@ -958,43 +965,72 @@ local visualizers = (function()
       ---@type RenderOptions
       local default_opts = {
         inline = true,
-        style = 'luakeys',
+        style = 'tex',
         for_tex = false,
       }
 
       utils.merge_tables(opts, default_opts, false)
 
       ---@type StringifyOptions
-      local stringify_opts = {
+      local o = {
         line_break = '',
         indent = '',
         assignment = '=',
-        format_key = function(key, o)
-          key = tostring(key)
-          return key
-        end,
-        format_value = function(value, o)
-          value = tostring(value)
-          if string.find(value, ',') then
-            return o.quotation .. value .. o.quotation
-          end
-          return value
-        end,
       }
 
-      if opts.inline then
+      if opts.style == 'lua' then
+        -- lua
+        o.format_key = function(key, o)
+          if type(key) == 'string' and utils.is_lua_identifier(key) then
+            return key
+          end
+
+          if type(key) == 'string'  then
+            key = o.quotation .. tostring(key) .. o.quotation
+          end
+          return o.begin_key .. key .. o.end_key
+        end
+
+        o.format_value =
+          function(value, o)
+            if type(value) == 'string' then
+              value = o.quotation .. value .. o.quotation
+            end
+            return tostring(value)
+          end
+        o.table_delimiters_first_depth = true
       else
-        stringify_opts.assignment = ' = '
+        -- tex
+        o.format_key = function(key, o)
+          key = tostring(key)
+          return key
+        end
+
+        o.format_value =
+          function(value, o)
+            value = tostring(value)
+            if string.find(value, ',') then
+              return o.quotation .. value .. o.quotation
+            end
+            return value
+          end
+      end
+
+      if opts.inline then
+        -- inline
+      else
+        -- multiline
+        o.assignment = ' = '
         if opts.for_tex then
-          stringify_opts.line_break = '\n\\par'
-          stringify_opts.indent = '\\ \\ '
+          o.line_break = '\n\\par'
+          o.indent = '\\ \\ '
         else
-          stringify_opts.line_break = '\n'
-          stringify_opts.indent = '  '
+          o.line_break = '\n'
+          o.indent = '  '
         end
       end
 
-      return stringify_ng(result, stringify_opts)
+      return stringify_ng(result, o)
     end,
 
     stringify = stringify,
