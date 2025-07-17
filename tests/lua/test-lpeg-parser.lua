@@ -221,9 +221,10 @@ describe('LPeg Parser', function()
           assert_type(' 1 test ', 'string')
         end)
 
-      it('Number followed by a string is a string: “ 1 test”', function()
-        assert_type('1 test', 'string')
-      end)
+      it('Number followed by a string is a string: “ 1 test”',
+        function()
+          assert_type('1 test', 'string')
+        end)
 
       it('Version number', function()
         assert_type('0.0.1', 'string')
@@ -284,18 +285,22 @@ describe('Whitespaces', function()
   end)
 
   it('Two keys with whitespaces', function()
-    assert_result('integer=1 , boolean=false', { integer = 1, boolean = false })
+    assert_result('integer=1 , boolean=false',
+      { integer = 1, boolean = false })
   end)
 
   it('Two keys with whitespaces, tabs, newlines', function()
-    assert_result('integer \t\n= \t\n1 \t\n, \t\nboolean \t\n= \t\nfalse',
+    assert_result(
+      'integer \t\n= \t\n1 \t\n, \t\nboolean \t\n= \t\nfalse',
       { integer = 1, boolean = false })
   end)
 end)
 
 describe('Multiple keys', function()
-  assert_result('integer=1,boolean=false', { integer = 1, boolean = false })
-  assert_result('integer=1 , boolean=false', { integer = 1, boolean = false })
+  assert_result('integer=1,boolean=false',
+    { integer = 1, boolean = false })
+  assert_result('integer=1 , boolean=false',
+    { integer = 1, boolean = false })
 end)
 
 describe('Edge cases', function()
@@ -354,6 +359,18 @@ describe('All features', function()
       { string = 'without \'quotes\'' })
   end)
 
+  it('quoted key', function()
+    assert_result('"key 1" = value 1', { ['key 1'] = 'value 1' })
+  end)
+
+  it('Key with special characters', function()
+    assert_result('"key,{}1" = value 1', { ['key,{}1'] = 'value 1' })
+  end)
+
+  it('Key with double quotes', function()
+    assert_result('"key\\"1" = value 1', { ['key\\"1'] = 'value 1' })
+  end)
+
   it('String with quotes', function()
     assert_result('string = "with quotes: ,={}"',
       { string = 'with quotes: ,={}' })
@@ -366,8 +383,10 @@ end)
 
 describe('Array', function()
   it('Key with nested tables', function()
-    assert_result('t={a,b},z={{a,b},{c,d}}',
-      { t = { 'a', 'b' }, z = { { 'a', 'b' }, { 'c', 'd' } } })
+    assert_result('t={a,b},z={{a,b},{c,d}}', {
+      t = { 'a', 'b' },
+      z = { { 'a', 'b' }, { 'c', 'd' } },
+    })
   end)
 
   it('Nested list of strings', function()

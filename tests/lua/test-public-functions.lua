@@ -108,8 +108,14 @@ describe('Function “render_ng()”', function()
     assert_render({ 'key' }, 'key')
   end)
 
-  it('standalone value as a number', function()
-    assert_render({ 1 }, '1')
+  describe('standalone value as a number', function()
+    it('style=tex', function()
+      assert_render({ 1 }, '1')
+    end)
+
+    it('style=lua', function()
+      assert_render({ 1 }, '{1}', { style = 'lua' })
+    end)
   end)
 
   it('standalone value as a dimension', function()

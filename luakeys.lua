@@ -35,16 +35,16 @@ end
 
 ---
 local utils = (function()
-    ---
-    ---True if a key string can be notated without square brackets.
-    ---
-    ---@param identifer string
-    ---
-    ---@return boolean
-    local function is_lua_identifier(identifer)
-      identifer = string.gsub(identifer, '_', '')
-      return string.match(identifer, '^%w+$') ~= nil
-    end
+  ---
+  ---True if a key string can be notated without square brackets.
+  ---
+  ---@param identifer string
+  ---
+  ---@return boolean
+  local function is_lua_identifier(identifer)
+    identifer = string.gsub(identifer, '_', '')
+    return string.match(identifer, '^%w+$') ~= nil
+  end
 
   ---
   ---Merge two tables into the first specified table.
@@ -808,129 +808,6 @@ local visualizers = (function()
              line_break .. end_table
   end
 
-  ---@class StringifyOptions
-  ---@field line_break? string # default `\n` for terminal, `\par` for TeX
-  ---@field begin_table? string # default `{`
-  ---@field end_table? string # default `}`
-  ---@field table_delimiters_first_depth? boolean # default `false`
-  ---@field indent? string # default `  `
-  ---@field begin_key? string # default `[`
-  ---@field end_key? string  # default `]`
-  ---@field assignment? string # default ` = `
-  ---@field separator? string # default `,`
-  ---@field separator_last? boolean # Append a separator after the last element, default `false`
-  ---@field quotation? string # default `'`
-  ---@field format_key? fun(key: unknown, opts: StringifyOptions): string
-  ---@field format_value? fun(value: unknown, opts: StringifyOptions): string
-
-  ---
-  ---The low-level function for the render function
-  ---
-  ---@param result unknown
-  ---@param opts? StringifyOptions
-  ---@return string
-  local function stringify_ng(result, opts)
-    if opts == nil then
-      opts = {}
-    end
-
-    ---@type StringifyOptions
-    local default_opts = {
-      line_break = '\n',
-      begin_table = '{',
-      end_table = '}',
-      table_delimiters_first_depth = false,
-      indent = '  ',
-      begin_key = '[',
-      end_key = ']',
-      assignment = ' = ',
-      separator = ',',
-      separator_last = false,
-      quotation = '\'',
-      format_key = function(key, o)
-        if type(key) == 'number' then
-          key = string.format('%s', key)
-        else
-          key = string.format('\'%s\'', key)
-        end
-        return o.begin_key .. key .. o.end_key
-      end,
-      format_value = function(value)
-        if type(value) == 'string' then
-          return string.format('\'%s\'', value)
-        else
-          return tostring(value)
-        end
-      end,
-    }
-
-    utils.merge_tables(opts, default_opts, false)
-
-    ---
-    ---@param input unknown
-    ---@param depth integer
-    ---
-    ---@return string
-    local function stringify_inner(input, depth)
-      local output = {}
-      depth = depth or 0
-
-      local function add(depth, text)
-        table.insert(output, string.rep(opts.indent, depth) .. text)
-      end
-
-      if type(input) ~= 'table' then
-        return tostring(input)
-      end
-
-      local counter = 1
-      for key, value in pairs(input) do
-        if (key and type(key) == 'number' or type(key) == 'string') then
-          local separator = opts.separator
-          if not opts.separator_last and next(input, key) == nil then
-            separator = ''
-          end
-          -- is array ... consecutive integers ...
-          if type(key) == 'number' and counter == key then
-            counter = counter + 1
-            key = ''
-          else
-            key = opts.format_key(key, opts)
-            key = key .. opts.assignment
-          end
-
-          if (type(value) == 'table') then
-            if (next(value)) then
-              add(depth, key .. opts.begin_table)
-              add(0, stringify_inner(value, depth + 1))
-              add(depth, opts.end_table .. separator);
-            else
-              add(depth, key .. opts.begin_table .. opts.end_table ..
-                separator)
-            end
-          else
-            value = opts.format_value(value, opts)
-            add(depth, key .. value .. separator)
-          end
-        end
-      end
-
-      return table.concat(output, opts.line_break)
-    end
-
-    local begin_table = ''
-    local end_table = ''
-
-    if opts.table_delimiters_first_depth then
-      begin_table = opts.begin_table
-      end_table = opts.end_table
-    end
-
-    return
-      begin_table .. opts.line_break .. stringify_inner(result, 1) ..
-        opts.line_break .. end_table
-  end
-
   ---
   ---The function `debug(result)` pretty prints a Lua table to standard
   ---output (stdout). It is a utility function that can be used to
@@ -947,95 +824,192 @@ local visualizers = (function()
   ---@field inline? boolean # Render the input in one line without line breaks. Default `true`.
   ---@field style? 'tex'|'lua' # Render the input as a `lua` table or in the `luakeys` style. Default `luakeys`
   ---@field for_tex? boolean # Stringify the table into a text string that can be embeded inside a TeX document via `tex.print()`. Curly braces and whites spaces are escaped. Default `false`.
+  ---Low Level options
+  ---@field line_break? string # default `\n` for terminal, `\par` for TeX
+  ---@field begin_table? string # default `{`
+  ---@field end_table? string # default `}`
+  ---@field table_delimiters_first_depth? boolean # Instead of `{ key1,key2={value2} }` render `key1,key2={value2}`, default `false`.
+  ---@field indent? string # default ``
+  ---@field begin_key? string # default `[`
+  ---@field end_key? string  # default `]`
+  ---@field assignment? string # default `=`
+  ---@field separator? string # default `,`
+  ---@field separator_last? boolean # Append a separator after the last element, default `false`
+  ---@field quotation? string # default `'`
+  ---@field format_key? fun(key: unknown, opts: RenderOptions): string
+  ---@field format_value? fun(value: unknown, opts: RenderOptions): string
 
   return {
     render = render,
 
     ---
     ---@param result any
-    ---@param opts? RenderOptions
+    ---@param options? RenderOptions
     ---
     ---@return string
-    render_ng = function(result, opts)
-
-      if opts == nil then
-        opts = {}
+    render_ng = function(result, options)
+      if options == nil then
+        options = {}
       end
 
+      ---style=tex inline=true for_tex=false
       ---@type RenderOptions
       local default_opts = {
         inline = true,
         style = 'tex',
         for_tex = false,
-      }
-
-      utils.merge_tables(opts, default_opts, false)
-
-      ---@type StringifyOptions
-      local o = {
+        --- Low level
         line_break = '',
+        begin_table = '{',
+        end_table = '}',
+        table_delimiters_first_depth = false,
         indent = '',
+        begin_key = '[',
+        end_key = ']',
         assignment = '=',
+        separator = ',',
+        separator_last = false,
+        quotation = '\'',
+        format_key = function(key, o)
+          key = tostring(key)
+          return key
+        end,
+        format_value = function(value, o)
+          value = tostring(value)
+          if string.find(value, ',') then
+            return o.quotation .. value .. o.quotation
+          end
+          return value
+        end,
       }
+
+      local opts = utils.clone_table(options)
+      utils.merge_tables(opts, default_opts, false)
 
       if opts.style == 'lua' then
         -- lua
-        o.format_key = function(key, o)
+        opts.format_key = function(key, o)
           if type(key) == 'string' and utils.is_lua_identifier(key) then
             return key
           end
 
-          if type(key) == 'string'  then
+          if type(key) == 'string' then
             key = o.quotation .. tostring(key) .. o.quotation
           end
           return o.begin_key .. key .. o.end_key
         end
 
-        o.format_value =
-          function(value, o)
-            if type(value) == 'string' then
-              value = o.quotation .. value .. o.quotation
-            end
-            return tostring(value)
+        opts.format_value = function(value, o)
+          if type(value) == 'string' then
+            value = o.quotation .. value .. o.quotation
           end
-        o.table_delimiters_first_depth = true
-      else
-        -- tex
-        o.format_key = function(key, o)
-          key = tostring(key)
-          return key
+          return tostring(value)
         end
-
-        o.format_value =
-          function(value, o)
-            value = tostring(value)
-            if string.find(value, ',') then
-              return o.quotation .. value .. o.quotation
-            end
-            return value
-          end
+        opts.table_delimiters_first_depth = true
       end
 
-      if opts.inline then
-        -- inline
-      else
+      if not opts.inline then
         -- multiline
-        o.assignment = ' = '
+        opts.assignment = ' = '
         if opts.for_tex then
-          o.line_break = '\n\\par'
-          o.indent = '\\ \\ '
+          opts.line_break = '\n\\par'
+          opts.indent = '\\ \\ '
         else
-          o.line_break = '\n'
-          o.indent = '  '
+          opts.line_break = '\n'
+          opts.indent = '  '
         end
       end
 
-      return stringify_ng(result, o)
+      -- overwrite merged options with low level options from the function argument
+
+      local low_level_options = {
+        'line_break',
+        'begin_table',
+        'end_table',
+        'table_delimiters_first_depth',
+        'indent',
+        'begin_key',
+        'end_key',
+        'assignment',
+        'separator',
+        'separator_last',
+        'quotation',
+        'format_key',
+        'format_value',
+      }
+
+      for _, option in ipairs(low_level_options) do
+        if options[option] ~= nil then
+          opts[option] = options[option]
+        end
+      end
+
+      ---
+      ---@param input unknown
+      ---@param depth integer
+      ---
+      ---@return string
+      local function stringify_inner(input, depth)
+        local output = {}
+        depth = depth or 0
+
+        local function add(depth, text)
+          table.insert(output, string.rep(opts.indent, depth) .. text)
+        end
+
+        if type(input) ~= 'table' then
+          return tostring(input)
+        end
+
+        local counter = 1
+        for key, value in pairs(input) do
+          if (key and type(key) == 'number' or type(key) == 'string') then
+            local separator = opts.separator
+            if not opts.separator_last and next(input, key) == nil then
+              separator = ''
+            end
+            -- is array ... consecutive integers ...
+            if type(key) == 'number' and counter == key then
+              counter = counter + 1
+              key = ''
+            else
+              key = opts.format_key(key, opts)
+              key = key .. opts.assignment
+            end
+
+            if (type(value) == 'table') then
+              if (next(value)) then
+                add(depth, key .. opts.begin_table)
+                add(0, stringify_inner(value, depth + 1))
+                add(depth, opts.end_table .. separator);
+              else
+                add(depth, key .. opts.begin_table .. opts.end_table ..
+                  separator)
+              end
+            else
+              value = opts.format_value(value, opts)
+              add(depth, key .. value .. separator)
+            end
+          end
+        end
+
+        return table.concat(output, opts.line_break)
+      end
+
+      local begin_table = ''
+      local end_table = ''
+
+      if opts.table_delimiters_first_depth then
+        begin_table = opts.begin_table
+        end_table = opts.end_table
+      end
+
+      return begin_table .. opts.line_break ..
+               stringify_inner(result, 1) .. opts.line_break ..
+               end_table
     end,
 
     stringify = stringify,
-
-    stringify_ng = stringify_ng,
 
     debug = debug,
   }
