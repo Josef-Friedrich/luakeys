@@ -80,6 +80,33 @@ describe('Function “render()”', function()
   end)
 end)
 
+describe('Function “render_ng()”', function()
+  local function assert_render(input, expected)
+    assert.are.equal(expected, luakeys.render_ng(
+      luakeys.parse(input, { naked_as_value = true })))
+  end
+
+  it('standalone value as a string', function()
+    assert_render('key', 'key,')
+  end)
+
+  it('standalone value as a number', function()
+    assert_render('1', '1,')
+  end)
+
+  it('standalone value as a dimension', function()
+    assert_render('1cm', '1cm,')
+  end)
+
+  it('standalone value as a boolean', function()
+    assert_render('TRUE', 'true,')
+  end)
+
+  it('A list of standalone values', function()
+    assert_render('one,two,three', 'one,two,three,')
+  end)
+end)
+
 describe('Function “define()”', function()
   it('returns a parse function', function()
     local parse = luakeys.define({ { name = 'key1' } })
