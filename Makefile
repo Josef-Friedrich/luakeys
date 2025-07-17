@@ -5,7 +5,7 @@ installdir = $(texmftex)/$(jobname)
 
 all: install
 
-install: doc_pdf
+install:
 	-tlmgr remove --force luakeys
 	mkdir -p $(installdir)
 	cp -f $(jobname).lua $(installdir)
@@ -13,8 +13,6 @@ install: doc_pdf
 	cp -f $(jobname).tex $(installdir)
 	cp -f $(jobname)-debug.tex $(installdir)
 	cp -f $(jobname)-debug.sty $(installdir)
-	mkdir -p $(texmf)/doc
-	cp luakeys-doc.pdf $(texmf)/doc/$(jobname).pdf
 
 test: test_lua test_examples test_tex doc_pdf
 

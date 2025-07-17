@@ -806,11 +806,13 @@ local visualizers = (function()
   ---@field end_key? string  # default `]`
   ---@field assignment? string # default ` = `
   ---@field separator? string # default `,`
-  ---@field quotation? string # default `'`
   ---@field separator_last? boolean # Append a separator after the last element, default `false`
+  ---@field quotation? string # default `'`
   ---@field format_key? fun(key: unknown, opts: StringifyOptions): string
   ---@field format_value? fun(value: unknown, opts: StringifyOptions): string
 
+  ---
+  ---The low-level function for the render function
   ---
   ---@param result any
   ---@param opts? StringifyOptions
@@ -831,8 +833,8 @@ local visualizers = (function()
       end_key = ']',
       assignment = ' = ',
       separator = ',',
-      quotation = "'",
       separator_last = false,
+      quotation = '\'',
       format_key = function(key, o)
         if (type(key) == 'number') then
           key = string.format('%s', key)
@@ -934,10 +936,36 @@ local visualizers = (function()
     print('\n' .. stringify(result, false))
   end
 
+  ---@class RenderOptions
+  ---@field inline? boolean # Render the input in one line without line breaks. Default `true`.
+  ---@field style? 'luakeys'|'lua' # Render the input as a `lua` table or in the `luakeys` style. Default `luakeys`
+  ---@field for_tex? boolean # Stringify the table into a text string that can be embeded inside a TeX document via `tex.print()`. Curly braces and whites spaces are escaped. Default `false`.
+
   return {
     render = render,
-    render_ng = function(result)
-      return stringify_ng(result, {
+
+    ---
+    ---@param result any
+    ---@param opts? RenderOptions
+    ---
+    ---@return string
+    render_ng = function(result, opts)
+
+      if opts == nil then
+        opts = {}
+      end
+
+      ---@type RenderOptions
+      local default_opts = {
+        inline = true,
+        style = 'luakeys',
+        for_tex = false,
+      }
+
+      utils.merge_tables(opts, default_opts, false)
+
+      ---@type StringifyOptions
+      local stringify_opts = {
         line_break = '',
         indent = '',
         assignment = '=',
@@ -952,8 +980,23 @@ local visualizers = (function()
           end
           return value
         end,
-      })
+      }
+
+      if opts.inline then
+      else
+        stringify_opts.assignment = ' = '
+        if opts.for_tex then
+          stringify_opts.line_break = '\n\\par'
+          stringify_opts.indent = '\\ \\ '
+        else
+          stringify_opts.line_break = '\n'
+          stringify_opts.indent = '  '
+        end
+      end
+
+      return stringify_ng(result, stringify_opts)
     end,
+
     stringify = stringify,
 
     stringify_ng = stringify_ng,
