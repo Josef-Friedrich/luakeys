@@ -82,28 +82,44 @@ end)
 
 describe('Function “render_ng()”', function()
   local function assert_render(input, expected)
-    assert.are.equal(expected, luakeys.render_ng(
-      luakeys.parse(input, { naked_as_value = true })))
+    assert.are.equal(expected, luakeys.render_ng(input))
   end
 
+  it('key=value', function()
+    assert_render({ key = 'value' }, 'key=value')
+  end)
+
+  it('Multiple key value pairs', function()
+    assert_render({ key1 = 'value1' }, 'key1=value1')
+  end)
+
+  it('Nesting', function()
+    assert_render({ level1 = { level2 = { level3 = 'value' } } },
+      'level1={level2={level3=value}}')
+  end)
+
+  it('Empty table', function()
+    assert_render({ {}, {}, {} }, '{},{},{}')
+  end)
+
   it('standalone value as a string', function()
-    assert_render('key', 'key,')
+    assert_render({ 'key' }, 'key')
   end)
 
   it('standalone value as a number', function()
-    assert_render('1', '1,')
+    assert_render({ 1 }, '1')
   end)
 
   it('standalone value as a dimension', function()
-    assert_render('1cm', '1cm,')
+    assert_render({ '1cm' }, '1cm')
   end)
 
   it('standalone value as a boolean', function()
-    assert_render('TRUE', 'true,')
+    assert_render({ true }, 'true')
   end)
 
   it('A list of standalone values', function()
-    assert_render('one,two,three', 'one,two,three,')
+    assert_render({ 'one', 'two', 'three' }, 'one,two,three')
   end)
 end)
 

@@ -53,10 +53,10 @@ local utils = (function()
     end
     for key, value in pairs(source) do
       if type(value) == 'table' and type(target[key] or false) ==
-          'table' then
+        'table' then
         merge_tables(target[key] or {}, source[key] or {}, overwrite)
       elseif (not overwrite and target[key] == nil) or
-          (overwrite and target[key] ~= value) then
+        (overwrite and target[key] ~= value) then
         target[key] = value
       end
     end
@@ -198,8 +198,8 @@ local utils = (function()
   ---@param error_code string
   ---@param args? table
   local function throw_error_code(error_messages,
-                                  error_code,
-                                  args)
+    error_code,
+    args)
     local template = error_messages[error_code]
 
     ---
@@ -269,13 +269,13 @@ local utils = (function()
     if type(tree) ~= 'table' then
       throw_error_message(
         'Parameter “tree” has to be a table, got: ' ..
-        tostring(tree))
+          tostring(tree))
     end
     local function visit_tree_recursive(tree,
-                                        current,
-                                        result,
-                                        depth,
-                                        callback_func)
+      current,
+      result,
+      depth,
+      callback_func)
       for key, value in pairs(current) do
         if type(value) == 'table' then
           value = visit_tree_recursive(tree, value, {}, depth + 1,
@@ -294,7 +294,7 @@ local utils = (function()
     end
 
     local result =
-        visit_tree_recursive(tree, tree, {}, 1, callback_func)
+      visit_tree_recursive(tree, tree, {}, 1, callback_func)
 
     if result == nil then
       return {}
@@ -731,17 +731,17 @@ local visualizers = (function()
   ---
   ---@return string
   local function stringify(result, for_tex)
-    local line_break, start_bracket, end_bracket, indent
+    local line_break, begin_table, end_table, indent
 
     if for_tex then
       line_break = '\\par'
-      start_bracket = '$\\{$'
-      end_bracket = '$\\}$'
+      begin_table = '$\\{$'
+      end_table = '$\\}$'
       indent = '\\ \\ '
     else
       line_break = '\n'
-      start_bracket = '{'
-      end_bracket = '}'
+      begin_table = '{'
+      end_table = '}'
       indent = '  '
     end
 
@@ -771,12 +771,11 @@ local visualizers = (function()
 
           if (type(value) == 'table') then
             if (next(value)) then
-              add(depth, key .. ' = ' .. start_bracket)
+              add(depth, key .. ' = ' .. begin_table)
               add(0, stringify_inner(value, depth + 1))
-              add(depth, end_bracket .. ',');
+              add(depth, end_table .. ',');
             else
-              add(depth,
-                key .. ' = ' .. start_bracket .. end_bracket .. ',')
+              add(depth, key .. ' = ' .. begin_table .. end_table .. ',')
             end
           else
             if (type(value) == 'string') then
@@ -793,19 +792,21 @@ local visualizers = (function()
       return table.concat(output, line_break)
     end
 
-    return start_bracket .. line_break .. stringify_inner(result, 1) ..
-        line_break .. end_bracket
+    return begin_table .. line_break .. stringify_inner(result, 1) ..
+             line_break .. end_table
   end
 
   ---@class StringifyOptions
   ---@field line_break? string # default `\n` for terminal, `\par` for TeX
-  ---@field start_bracket? string # default `{`
-  ---@field end_bracket? string # default `}`
+  ---@field begin_table? string # default `{`
+  ---@field end_table? string # default `}`
+  ---@field table_delimiters_first_depth? boolean # default `false`
   ---@field indent? string # default `  `
-  ---@field start_key_bracket? string # default `[`
-  ---@field end_key_bracket? string  # default `]`
+  ---@field begin_key? string # default `[`
+  ---@field end_key? string  # default `]`
   ---@field assignment? string # default ` = `
   ---@field separator? string # default `,`
+  ---@field quotation? string # default `'`
   ---@field separator_last? boolean # Append a separator after the last element, default `false`
   ---@field format_key? fun(key: unknown, opts: StringifyOptions): string
   ---@field format_value? fun(value: unknown, opts: StringifyOptions): string
@@ -822,13 +823,15 @@ local visualizers = (function()
     ---@type StringifyOptions
     local default_opts = {
       line_break = '\n',
-      start_bracket = '{',
-      end_bracket = '}',
+      begin_table = '{',
+      end_table = '}',
+      table_delimiters_first_depth = false,
       indent = '  ',
-      start_key_bracket = '[',
-      end_key_bracket = ']',
+      begin_key = '[',
+      end_key = ']',
       assignment = ' = ',
       separator = ',',
+      quotation = "'",
       separator_last = false,
       format_key = function(key, o)
         if (type(key) == 'number') then
@@ -836,15 +839,15 @@ local visualizers = (function()
         else
           key = string.format('\'%s\'', key)
         end
-        return o.start_key_bracket .. key .. o.end_key_bracket
+        return o.begin_key .. key .. o.end_key
       end,
-      format_value = function(value, o)
+      format_value = function(value)
         if (type(value) == 'string') then
           return string.format('\'%s\'', value)
         else
           return tostring(value)
         end
-      end
+      end,
     }
 
     ---
@@ -866,7 +869,6 @@ local visualizers = (function()
       local function add(depth, text)
         table.insert(output, string.rep(opts.indent, depth) .. text)
       end
-
 
       if type(input) ~= 'table' then
         return tostring(input)
@@ -890,12 +892,11 @@ local visualizers = (function()
 
           if (type(value) == 'table') then
             if (next(value)) then
-              add(depth, key .. opts.start_bracket)
+              add(depth, key .. opts.begin_table)
               add(0, stringify_inner(value, depth + 1))
-              add(depth, opts.end_bracket .. separator);
+              add(depth, opts.end_table .. separator);
             else
-              add(depth,
-                key .. opts.start_bracket .. opts.end_bracket ..
+              add(depth, key .. opts.begin_table .. opts.end_table ..
                 separator)
             end
           else
@@ -908,9 +909,17 @@ local visualizers = (function()
       return table.concat(output, opts.line_break)
     end
 
-    return opts.start_bracket .. opts.line_break ..
-        stringify_inner(result, 1) .. opts.line_break ..
-        opts.end_bracket
+    local begin_table = ''
+    local end_table = ''
+
+    if opts.table_delimiters_first_depth then
+      begin_table = opts.begin_table
+      end_table = opts.end_table
+    end
+
+    return
+      begin_table .. opts.line_break .. stringify_inner(result, 1) ..
+        opts.line_break .. end_table
   end
 
   ---
@@ -932,9 +941,21 @@ local visualizers = (function()
         line_break = '',
         indent = '',
         assignment = '=',
+        format_key = function(key, o)
+          key = tostring(key)
+          return key
+        end,
+        format_value = function(value, o)
+          value = tostring(value)
+          if string.find(value, ',') then
+            return o.quotation .. value .. o.quotation
+          end
+          return value
+        end,
       })
     end,
     stringify = stringify,
+
     stringify_ng = stringify_ng,
 
     debug = debug,
@@ -1069,8 +1090,7 @@ local namespace = {
     E004 = 'The value @value does not exist in the choices: @choices',
     E005 = 'Unknown data type: @unknown',
     E006 = 'The value @value of the key @key could not be converted into the data type @data_type!',
-    E007 =
-    'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
+    E007 = 'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
     E008 = 'def.match has to be a string',
     E009 = 'The value @value of the key @key does not match @match!',
 
@@ -1472,12 +1492,12 @@ local function new()
   ---@param key_path table # An array of key names leading to the current
   ---@param input_root table # The root input table input and output table.
   local function apply_definitions(defs,
-                                   opts,
-                                   input,
-                                   output,
-                                   unknown,
-                                   key_path,
-                                   input_root)
+    opts,
+    input,
+    output,
+    unknown,
+    key_path,
+    input_root)
     local exclusive_groups = {}
 
     local function add_to_key_path(key_path, key)
@@ -1839,7 +1859,7 @@ local function new()
       local key
       ---`{ key1 = { }, key2 = { } }`
       if type(def) == 'table' and def.name == nil and type(index) ==
-          'string' then
+        'string' then
         key = index
         ---`{ { name = 'key1' }, { name = 'key2' } }`
       elseif type(def) == 'table' and def.name ~= nil then
@@ -1928,7 +1948,7 @@ local function new()
 
     local function log_result(caption, result)
       utils.log
-          .debug('%s: \n%s', caption, visualizers.stringify(result))
+        .debug('%s: \n%s', caption, visualizers.stringify(result))
     end
 
     if kv_string == nil then
@@ -1990,8 +2010,8 @@ local function new()
       local callbacks = {
         unpack = function(key, value)
           if type(value) == 'table' and utils.get_array_size(value) == 1 and
-              utils.get_table_size(value) == 1 and type(value[1]) ~=
-              'table' then
+            utils.get_table_size(value) == 1 and type(value[1]) ~=
+            'table' then
             return key, value[1]
           end
           return key, value
@@ -2076,13 +2096,13 @@ local function new()
     log_result('End result', result)
 
     if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
-        'table' then
+      'table' then
       utils.merge_tables(opts.accumulated_result, result, true)
     end
 
     ---no_error
     if not opts.no_error and type(unknown) == 'table' and
-        utils.get_table_size(unknown) > 0 then
+      utils.get_table_size(unknown) > 0 then
       throw_error('E019', { unknown = visualizers.render(unknown) })
     end
     return result, unknown, raw
