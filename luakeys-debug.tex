@@ -65,8 +65,8 @@
       '{' ..
         '\string\\tt' ..
         '\string\\parindent=0pt' ..
-        luakeys.render(result, { for_tex = true }) ..
-      '}'
-    )
+        luakeys.render(result, { style = 'tex', inline = false, for_tex = true }) ..
+    '}')
+
   }%
 }

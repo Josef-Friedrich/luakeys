@@ -64,10 +64,10 @@ local utils = (function()
     end
     for key, value in pairs(source) do
       if type(value) == 'table' and type(target[key] or false) ==
-        'table' then
+          'table' then
         merge_tables(target[key] or {}, source[key] or {}, overwrite)
       elseif (not overwrite and target[key] == nil) or
-        (overwrite and target[key] ~= value) then
+          (overwrite and target[key] ~= value) then
         target[key] = value
       end
     end
@@ -213,8 +213,8 @@ local utils = (function()
   ---@param error_code string
   ---@param args? table
   local function throw_error_code(error_messages,
-    error_code,
-    args)
+                                  error_code,
+                                  args)
     local template = error_messages[error_code]
 
     ---
@@ -284,13 +284,13 @@ local utils = (function()
     if type(tree) ~= 'table' then
       throw_error_message(
         'Parameter “tree” has to be a table, got: ' ..
-          tostring(tree))
+        tostring(tree))
     end
     local function visit_tree_recursive(tree,
-      current,
-      result,
-      depth,
-      callback_func)
+                                        current,
+                                        result,
+                                        depth,
+                                        callback_func)
       for key, value in pairs(current) do
         if type(value) == 'table' then
           value = visit_tree_recursive(tree, value, {}, depth + 1,
@@ -309,7 +309,7 @@ local utils = (function()
     end
 
     local result =
-      visit_tree_recursive(tree, tree, {}, 1, callback_func)
+        visit_tree_recursive(tree, tree, {}, 1, callback_func)
 
     if result == nil then
       return {}
@@ -692,7 +692,6 @@ end)()
 ---Convert back to strings
 ---@section
 local visualizers = (function()
-
   ---
   ---A collection of options to configure the `render` function.
   ---
@@ -754,9 +753,12 @@ local visualizers = (function()
       assignment = '=',
       separator = ',',
       separator_last = false,
-      quotation = '\'',
+      quotation = '"',
       format_key = function(key, o)
         key = tostring(key)
+        if string.find(key, ',') then
+          return o.quotation .. key .. o.quotation
+        end
         return key
       end,
       format_value = function(value, o)
@@ -768,11 +770,13 @@ local visualizers = (function()
       end,
     }
 
+    ---@type RenderOptions
     local opts = utils.clone_table(options)
     utils.merge_tables(opts, default_opts, false)
 
     if opts.style == 'lua' then
       -- lua
+      opts.quotation = "'"
       opts.format_key = function(key, o)
         if type(key) == 'string' and utils.is_lua_identifier(key) then
           return key
@@ -803,6 +807,8 @@ local visualizers = (function()
     if opts.for_tex then
       opts.line_break = '\\par\n'
       opts.indent = '\\ \\ '
+      opts.begin_table = '\\{'
+      opts.end_table = '\\}'
       opts.table_delimiters_first_depth = true
     end
 
@@ -850,17 +856,20 @@ local visualizers = (function()
       end
 
       local keys = utils.get_table_keys(input)
-      local counter = 1
+      local element_sum = utils.get_table_size(keys)
+      local consecutive_numbers_counter = 1
+      local element_counter = 0
       for _, key in pairs(keys) do
+        element_counter = element_counter + 1
         local value = input[key]
         if (key and type(key) == 'number' or type(key) == 'string') then
           local separator = opts.separator
-          if not opts.separator_last and next(input, key) == nil then
+          if not opts.separator_last and element_sum == element_counter then
             separator = ''
           end
           -- is array ... consecutive integers ...
-          if type(key) == 'number' and counter == key then
-            counter = counter + 1
+          if type(key) == 'number' and consecutive_numbers_counter == key then
+            consecutive_numbers_counter = consecutive_numbers_counter + 1
             key = ''
           else
             key = opts.format_key(key, opts)
@@ -895,7 +904,7 @@ local visualizers = (function()
     end
 
     return begin_table .. opts.line_break .. stringify(result, 1) ..
-             opts.line_break .. end_table
+        opts.line_break .. end_table
   end
 
   ---
@@ -1041,7 +1050,8 @@ local namespace = {
     E004 = 'The value @value does not exist in the choices: @choices',
     E005 = 'Unknown data type: @unknown',
     E006 = 'The value @value of the key @key could not be converted into the data type @data_type!',
-    E007 = 'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
+    E007 =
+    'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
     E008 = 'def.match has to be a string',
     E009 = 'The value @value of the key @key does not match @match!',
 
@@ -1443,12 +1453,12 @@ local function new()
   ---@param key_path table # An array of key names leading to the current
   ---@param input_root table # The root input table input and output table.
   local function apply_definitions(defs,
-    opts,
-    input,
-    output,
-    unknown,
-    key_path,
-    input_root)
+                                   opts,
+                                   input,
+                                   output,
+                                   unknown,
+                                   key_path,
+                                   input_root)
     local exclusive_groups = {}
 
     local function add_to_key_path(key_path, key)
@@ -1810,7 +1820,7 @@ local function new()
       local key
       ---`{ key1 = { }, key2 = { } }`
       if type(def) == 'table' and def.name == nil and type(index) ==
-        'string' then
+          'string' then
         key = index
         ---`{ { name = 'key1' }, { name = 'key2' } }`
       elseif type(def) == 'table' and def.name ~= nil then
@@ -1960,8 +1970,8 @@ local function new()
       local callbacks = {
         unpack = function(key, value)
           if type(value) == 'table' and utils.get_array_size(value) == 1 and
-            utils.get_table_size(value) == 1 and type(value[1]) ~=
-            'table' then
+              utils.get_table_size(value) == 1 and type(value[1]) ~=
+              'table' then
             return key, value[1]
           end
           return key, value
@@ -2046,13 +2056,13 @@ local function new()
     log_result('End result', result)
 
     if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
-      'table' then
+        'table' then
       utils.merge_tables(opts.accumulated_result, result, true)
     end
 
     ---no_error
     if not opts.no_error and type(unknown) == 'table' and
-      utils.get_table_size(unknown) > 0 then
+        utils.get_table_size(unknown) > 0 then
       throw_error('E019', { unknown = visualizers.render(unknown) })
     end
     return result, unknown, raw
