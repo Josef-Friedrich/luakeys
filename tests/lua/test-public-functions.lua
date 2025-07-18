@@ -4,17 +4,17 @@ local luakeys = require('luakeys')()
 
 describe('Function “render()”', function()
   local big_input = {
-    ["level 1"] = {
+    ['level 1'] = {
       level_2 = {
         nil_value = nil,
         string_value = 'string',
         number_value = 1.23,
-        boolean_value = true
-      }
+        boolean_value = true,
+      },
     },
-    "Array element 1",
-    "Array element 2",
-    ["Key with a , (comma)"] = "Value with a , (comma)"
+    'Array element 1',
+    'Array element 2',
+    ['Key with a , (comma)'] = 'Value with a , (comma)',
   }
 
   ---
@@ -58,7 +58,7 @@ describe('Function “render()”', function()
     it('inline=false', function()
       assert_render(input,
         '\n' .. '  level1 = {\n' .. '    level2 = {\n' ..
-        '      level3 = value\n' .. '    }\n' .. '  }\n',
+          '      level3 = value\n' .. '    }\n' .. '  }\n',
         { inline = false })
     end)
   end)
@@ -108,18 +108,13 @@ describe('Function “render()”', function()
 
   it('option for_tex = true', function()
     assert_render({ l1 = { l2 = 'value' } },
-      '{\\par\n' ..
-      '\\ \\ l1={\\par\n' ..
-      '\\ \\ \\ \\ l2=value\\par\n' ..
-      '\\ \\ }\\par\n' ..
-      '}',
-      { for_tex = true })
+      '{\\par\n' .. '\\ \\ l1={\\par\n' .. '\\ \\ \\ \\ l2=value\\par\n' ..
+        '\\ \\ }\\par\n' .. '}', { for_tex = true })
   end)
 
   describe('Big input table', function()
     it('tex', function()
-      assert_render(big_input,
-        [[
+      assert_render(big_input, [[
 
   Array element 1,
   Array element 2,
@@ -131,13 +126,11 @@ describe('Function “render()”', function()
       string_value = string
     }
   }
-]],
-        { inline = false })
+]], { inline = false })
     end)
 
     it('lua', function()
-      assert_render(big_input,
-        [[
+      assert_render(big_input, [[
 {
   'Array element 1',
   'Array element 2',
@@ -149,8 +142,78 @@ describe('Function “render()”', function()
       string_value = 'string'
     }
   }
-}]],
-        { inline = false, style = 'lua' })
+}]], { inline = false, style = 'lua' })
+    end)
+  end)
+
+  describe('Options', function()
+    it('line_break', function()
+      assert_render({ 'one', 'two' }, '+one,+two+', { line_break = '+' })
+    end)
+
+    it('begin_table', function()
+      assert_render({ key = { 'value' } }, 'key=(value}',
+        { begin_table = '(' })
+    end)
+
+    it('end_table', function()
+      assert_render({ key = { 'value' } }, 'key={value)',
+        { end_table = ')' })
+    end)
+
+    it('table_delimiters_first_depth', function()
+      assert_render({ key = { 'value' } }, '{key={value}}',
+        { table_delimiters_first_depth = true })
+    end)
+
+    it('indent', function()
+      assert_render({ key = { 'value' } }, '++key={++++value++}',
+        { indent = '++' })
+    end)
+
+    it('begin_key', function()
+      assert_render({ ['key 1'] = { 'value' } },
+        '{#\'key 1\']={\'value\'}}', { begin_key = '#', style = 'lua' })
+    end)
+
+    it('end_key', function()
+      assert_render({ ['key 1'] = { 'value' } },
+        '{[\'key 1\'#={\'value\'}}', { end_key = '#', style = 'lua' })
+    end)
+
+    it('assignment', function()
+      assert_render({ key = 'value' }, 'key::value',
+        { assignment = '::' })
+    end)
+
+    it('separator', function()
+      assert_render({ 'one', 'two' }, 'one;two', { separator = ';' })
+    end)
+
+    it('separator_last', function()
+      assert_render({ 'one', 'two' }, 'one,two,',
+        { separator_last = true })
+    end)
+
+    it('quotation', function()
+      assert_render({ 'one 1' }, '{"one 1"}',
+        { quotation = '"', style = 'lua' })
+    end)
+
+    it('format_key', function()
+      assert_render({ key = 'value' }, 'xxx=value', {
+        format_key = function(key)
+          return 'xxx'
+        end,
+      })
+    end)
+
+    it('format_value', function()
+      assert_render({ key = 'value' }, 'key=xxx', {
+        format_value = function(key)
+          return 'xxx'
+        end,
+      })
     end)
   end)
 end)
@@ -199,8 +262,8 @@ describe('Function “parse()”', function()
       it('should be a non-empty table if some keys are not defined',
         function()
           local _, unknown =
-              luakeys.parse('key=value,unknown=unknown',
-                { defs = { 'key' }, no_error = true })
+            luakeys.parse('key=value,unknown=unknown',
+              { defs = { 'key' }, no_error = true })
           assert.are.same(unknown, { unknown = 'unknown' })
         end)
 

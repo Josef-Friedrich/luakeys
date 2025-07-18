@@ -19,9 +19,9 @@
     "**/*.toc": true
   },
   "Lua.workspace.library": [
-    "~/repos/tex/lua-api/library",
     "${addons}/busted/module/library",
-    "${3rd}/luassert/library"
+    "${addons}/luassert/module/library",
+    "${addons}/tex-luatex/module/library"
   ],
   "Lua.workspace.checkThirdParty": false,
   "latex-workshop.latex.autoBuild.run": "never",
