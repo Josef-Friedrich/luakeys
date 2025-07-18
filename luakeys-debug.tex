@@ -39,7 +39,7 @@
       '{' ..
         '\string\\tt' ..
         '\string\\parindent=0pt' ..
-        luakeys.stringify(result, true) ..
+        luakeys.render(result, { for_tex = true }) ..
       '}'
     )
   }%

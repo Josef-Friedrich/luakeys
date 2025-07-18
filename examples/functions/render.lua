@@ -14,8 +14,8 @@ it('result', function()
 end)
 
 local result2 = luakeys.parse('one,two,three', { naked_as_value = true })
-local kv_string2 = luakeys.render(result2) --- one,two,three, (always)
+local kv_string2 = luakeys.render(result2) --- one,two,three (always)
 
 it('kv_string2', function()
-  assert.is.same(kv_string2, 'one,two,three,')
+  assert.is.same(kv_string2, 'one,two,three')
 end)

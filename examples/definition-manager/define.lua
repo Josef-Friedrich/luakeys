@@ -22,5 +22,5 @@ it('Method: define', function()
   -- exception
   assert.has_error(function()
     parse('key1')
-  end, 'luakeys error [E019]: Unknown keys: “key1,”')
+  end, 'luakeys error [E019]: Unknown keys: “key1”')
 end)

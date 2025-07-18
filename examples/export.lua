@@ -8,7 +8,6 @@ local define = luakeys.define
 local opts = luakeys.opts
 local error_messages = luakeys.error_messages
 local render = luakeys.render
-local stringify = luakeys.stringify
 local debug = luakeys.debug
 local save = luakeys.save
 local get = luakeys.get
@@ -23,7 +22,6 @@ it('Exported', function()
   assert.is.equal(type(opts), 'table')
   assert.is.equal(type(error_messages), 'table')
   assert.is.equal(type(render), 'function')
-  assert.is.equal(type(stringify), 'function')
   assert.is.equal(type(debug), 'function')
   assert.is.equal(type(save), 'function')
   assert.is.equal(type(get), 'function')

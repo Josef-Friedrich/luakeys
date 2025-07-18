@@ -2,63 +2,13 @@ require('busted.runner')()
 
 local luakeys = require('luakeys')()
 
-describe('Function “stringify()”', function()
-  local function assert_equals(input, expected)
-    assert.are.equal(expected, luakeys.stringify(input))
-  end
-
-  it('integer indexes', function()
-    assert_equals({ 'one' }, '{\n  [1] = \'one\',\n}')
-  end)
-
-  it('string indexes', function()
-    assert_equals({ ['one'] = 1 }, '{\n  [\'one\'] = 1,\n}')
-  end)
-
-  it('nested', function()
-    assert_equals({ { 1 } }, '{\n  [1] = {\n    [1] = 1,\n  },\n}')
-  end)
-
-  it('option for_tex = true', function()
-    assert.are.equal('$\\{$\\par\\ \\ [1] = \'one\',\\par$\\}$',
-      luakeys.stringify({ 'one' }, true))
-  end)
-end)
-
 describe('Function “render()”', function()
-  local function assert_render(input, expected)
-    assert.are.equal(expected, luakeys.render(
-      luakeys.parse(input, { naked_as_value = true })))
-  end
-
-  it('standalone value as a string', function()
-    assert_render('key', 'key,')
-  end)
-
-  it('standalone value as a number', function()
-    assert_render('1', '1,')
-  end)
-
-  it('standalone value as a dimension', function()
-    assert_render('1cm', '1cm,')
-  end)
-
-  it('standalone value as a boolean', function()
-    assert_render('TRUE', 'true,')
-  end)
-
-  it('A list of standalone values', function()
-    assert_render('one,two,three', 'one,two,three,')
-  end)
-end)
-
-describe('Function “render_ng()”', function()
   ---
   ---@param input table
   ---@param expected string
   ---@param opts? RenderOptions
   local function assert_render(input, expected, opts)
-    assert.are.equal(expected, luakeys.render_ng(input, opts))
+    assert.are.equal(expected, luakeys.render(input, opts))
   end
 
   describe('key=value', function()
@@ -77,7 +27,6 @@ describe('Function “render_ng()”', function()
           '{[\'key 1\']=\'value\'}', { style = 'lua' })
       end)
     end)
-
   end)
 
   describe('Nesting', function()
@@ -95,7 +44,7 @@ describe('Function “render_ng()”', function()
     it('inline=false', function()
       assert_render(input,
         '\n' .. '  level1 = {\n' .. '    level2 = {\n' ..
-          '      level3 = value\n' .. '    }\n' .. '  }\n',
+        '      level3 = value\n' .. '    }\n' .. '  }\n',
         { inline = false })
     end)
   end)
@@ -143,6 +92,15 @@ describe('Function “render_ng()”', function()
     end)
   end)
 
+  it('option for_tex = true', function()
+    assert_render({ l1 = { l2 = 'value' } },
+      '{\\par\n' ..
+      '\\ \\ l1={\\par\n' ..
+      '\\ \\ \\ \\ l2=value\\par\n' ..
+      '\\ \\ }\\par\n' ..
+      '}',
+      { for_tex = true })
+  end)
 end)
 
 describe('Function “define()”', function()
@@ -174,7 +132,6 @@ describe('Function “define()”', function()
       local result, unknown = parse('key,unknown', { no_error = true })
       assert.are.same(result, { key = 'value' })
       assert.are.same(unknown, { [2] = 'unknown' })
-
     end)
 end)
 
@@ -190,8 +147,8 @@ describe('Function “parse()”', function()
       it('should be a non-empty table if some keys are not defined',
         function()
           local _, unknown =
-            luakeys.parse('key=value,unknown=unknown',
-              { defs = { 'key' }, no_error = true })
+              luakeys.parse('key=value,unknown=unknown',
+                { defs = { 'key' }, no_error = true })
           assert.are.same(unknown, { unknown = 'unknown' })
         end)
 

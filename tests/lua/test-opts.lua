@@ -325,7 +325,7 @@ describe('Options', function()
     it('An non-empty unknown table should throw an error.', function()
       assert.has_error(function()
         luakeys.parse('unknown', { defs = { 'key' } })
-      end, 'luakeys error [E019]: Unknown keys: “unknown,”')
+      end, 'luakeys error [E019]: Unknown keys: “unknown”')
     end)
 
     it('should prevent an error.', function()

@@ -27,5 +27,5 @@ it('Method: parse', function()
   -- exception
   assert.has_error(function()
     manager:parse('key1', { 'key3' })
-  end, 'luakeys error [E019]: Unknown keys: “key1,”')
+  end, 'luakeys error [E019]: Unknown keys: “key1”')
 end)
