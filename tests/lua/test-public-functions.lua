@@ -3,6 +3,20 @@ require('busted.runner')()
 local luakeys = require('luakeys')()
 
 describe('Function “render()”', function()
+  local big_input = {
+    ["level 1"] = {
+      level_2 = {
+        nil_value = nil,
+        string_value = 'string',
+        number_value = 1.23,
+        boolean_value = true
+      }
+    },
+    "Array element 1",
+    "Array element 2",
+    ["Key with a , (comma)"] = "Value with a , (comma)"
+  }
+
   ---
   ---@param input table
   ---@param expected string
@@ -100,6 +114,44 @@ describe('Function “render()”', function()
       '\\ \\ }\\par\n' ..
       '}',
       { for_tex = true })
+  end)
+
+  describe('Big input table', function()
+    it('tex', function()
+      assert_render(big_input,
+        [[
+
+  Array element 1,
+  Array element 2,
+  "Key with a , (comma)" = "Value with a , (comma)",
+  level 1 = {
+    level_2 = {
+      boolean_value = true,
+      number_value = 1.23,
+      string_value = string
+    }
+  }
+]],
+        { inline = false })
+    end)
+
+    it('lua', function()
+      assert_render(big_input,
+        [[
+{
+  'Array element 1',
+  'Array element 2',
+  ['Key with a , (comma)'] = 'Value with a , (comma)',
+  ['level 1'] = {
+    level_2 = {
+      boolean_value = true,
+      number_value = 1.23,
+      string_value = 'string'
+    }
+  }
+}]],
+        { inline = false, style = 'lua' })
+    end)
   end)
 end)
 
