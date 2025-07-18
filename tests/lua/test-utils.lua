@@ -15,7 +15,8 @@ describe('utils', function()
   end)
 
   it('Function “merge_tables”', function()
-    local result = utils.merge_tables({ target = 'target' }, { source = 'source' })
+    local result = utils.merge_tables({ target = 'target' },
+      { source = 'source' })
     assert.are.same(result, { target = 'target', source = 'source' })
   end)
 
@@ -23,6 +24,11 @@ describe('utils', function()
     local result =
       utils.clone_table({ l1 = { l2 = { l3 = 'level3' } } })
     assert.are.same(result, { l1 = { l2 = { l3 = 'level3' } } })
+  end)
+
+  it('Function “get_table_keys”', function()
+    assert.are.same({ 1, 2, 3, 'key' },
+      utils.get_table_keys({ 1, 2, key = 'value', 3 }))
   end)
 
   it('Function “throw_error_message”', function()
@@ -69,16 +75,16 @@ describe('utils', function()
     end)
   end)
 
-  describe('Table “log”', function ()
+  describe('Table “log”', function()
     local log = utils.log
-    it('Error', function ()
-      assert.has_error(function ()
+    it('Error', function()
+      assert.has_error(function()
         log.set('xxx')
       end, 'Unknown log level: xxx')
     end)
 
-    it('Error', function ()
-      assert.has_error(function ()
+    it('Error', function()
+      assert.has_error(function()
         log.set(6)
       end, 'Log level out of range 0-5: 6')
     end)
