@@ -47,6 +47,18 @@ local utils = (function()
   end
 
   ---
+  ---@param content string
+  ---
+  ---@return table
+  local function split_lines(content)
+    local lines = {}
+    for line in content:gmatch('([^\n]*)\n?') do
+      table.insert(lines, line)
+    end
+    return lines
+  end
+
+  ---
   ---Merge two tables into the first specified table.
   ---The `merge_tables` function copies keys from the `source` table
   ---to the `target` table. It returns the target table.
@@ -64,10 +76,10 @@ local utils = (function()
     end
     for key, value in pairs(source) do
       if type(value) == 'table' and type(target[key] or false) ==
-          'table' then
+        'table' then
         merge_tables(target[key] or {}, source[key] or {}, overwrite)
       elseif (not overwrite and target[key] == nil) or
-          (overwrite and target[key] ~= value) then
+        (overwrite and target[key] ~= value) then
         target[key] = value
       end
     end
@@ -213,8 +225,8 @@ local utils = (function()
   ---@param error_code string
   ---@param args? table
   local function throw_error_code(error_messages,
-                                  error_code,
-                                  args)
+    error_code,
+    args)
     local template = error_messages[error_code]
 
     ---
@@ -284,13 +296,13 @@ local utils = (function()
     if type(tree) ~= 'table' then
       throw_error_message(
         'Parameter “tree” has to be a table, got: ' ..
-        tostring(tree))
+          tostring(tree))
     end
     local function visit_tree_recursive(tree,
-                                        current,
-                                        result,
-                                        depth,
-                                        callback_func)
+      current,
+      result,
+      depth,
+      callback_func)
       for key, value in pairs(current) do
         if type(value) == 'table' then
           value = visit_tree_recursive(tree, value, {}, depth + 1,
@@ -309,7 +321,7 @@ local utils = (function()
     end
 
     local result =
-        visit_tree_recursive(tree, tree, {}, 1, callback_func)
+      visit_tree_recursive(tree, tree, {}, 1, callback_func)
 
     if result == nil then
       return {}
@@ -673,6 +685,7 @@ local utils = (function()
 
   return {
     is_lua_identifier = is_lua_identifier,
+    split_lines = split_lines,
     merge_tables = merge_tables,
     clone_table = clone_table,
     remove_from_table = remove_from_table,
@@ -702,8 +715,6 @@ local visualizers = (function()
   ---@class RenderOptions
   ---@field inline? boolean # Render the input on one line without line breaks, default `true`.
   ---@field style? 'tex'|'lua' # Render the input as a `lua` table or in the `tex` style, default `tex`
-  ---@field for_tex? boolean # Stringify the table into a text string that can be embedded in a TeX document using `tex.print()`. Curly braces and whites spaces are escaped. Default `false`.
-  ---Low Level options
   ---@field line_break? string # For example, use `\n` for terminal output  or `\par` for TeX rendering, default ``.
   ---@field begin_table? string # default `{`
   ---@field end_table? string # default `}`
@@ -736,12 +747,11 @@ local visualizers = (function()
       options = {}
     end
 
-    ---style=tex inline=true for_tex=false
+    ---style=tex inline=true
     ---@type RenderOptions
     local default_opts = {
       inline = true,
       style = 'tex',
-      for_tex = false,
       --- Low level
       line_break = '',
       begin_table = '{',
@@ -776,7 +786,7 @@ local visualizers = (function()
 
     if opts.style == 'lua' then
       -- lua
-      opts.quotation = "'"
+      opts.quotation = '\''
       opts.format_key = function(key, o)
         if type(key) == 'string' and utils.is_lua_identifier(key) then
           return key
@@ -802,14 +812,6 @@ local visualizers = (function()
       opts.assignment = ' = '
       opts.line_break = '\n'
       opts.indent = '  '
-    end
-
-    if opts.for_tex then
-      opts.line_break = '\\par\n'
-      opts.indent = '\\ \\ '
-      opts.begin_table = '\\{'
-      opts.end_table = '\\}'
-      opts.table_delimiters_first_depth = true
     end
 
     -- Override the merged options with lower-level options from the function
@@ -868,8 +870,10 @@ local visualizers = (function()
             separator = ''
           end
           -- is array ... consecutive integers ...
-          if type(key) == 'number' and consecutive_numbers_counter == key then
-            consecutive_numbers_counter = consecutive_numbers_counter + 1
+          if type(key) == 'number' and consecutive_numbers_counter ==
+            key then
+            consecutive_numbers_counter =
+              consecutive_numbers_counter + 1
             key = ''
           else
             key = opts.format_key(key, opts)
@@ -904,7 +908,7 @@ local visualizers = (function()
     end
 
     return begin_table .. opts.line_break .. stringify(result, 1) ..
-        opts.line_break .. end_table
+             opts.line_break .. end_table
   end
 
   ---
@@ -1050,8 +1054,7 @@ local namespace = {
     E004 = 'The value @value does not exist in the choices: @choices',
     E005 = 'Unknown data type: @unknown',
     E006 = 'The value @value of the key @key could not be converted into the data type @data_type!',
-    E007 =
-    'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
+    E007 = 'The key @key belongs to the mutually exclusive group @exclusive_group and another key of the group named @another_key is already present!',
     E008 = 'def.match has to be a string',
     E009 = 'The value @value of the key @key does not match @match!',
 
@@ -1453,12 +1456,12 @@ local function new()
   ---@param key_path table # An array of key names leading to the current
   ---@param input_root table # The root input table input and output table.
   local function apply_definitions(defs,
-                                   opts,
-                                   input,
-                                   output,
-                                   unknown,
-                                   key_path,
-                                   input_root)
+    opts,
+    input,
+    output,
+    unknown,
+    key_path,
+    input_root)
     local exclusive_groups = {}
 
     local function add_to_key_path(key_path, key)
@@ -1820,7 +1823,7 @@ local function new()
       local key
       ---`{ key1 = { }, key2 = { } }`
       if type(def) == 'table' and def.name == nil and type(index) ==
-          'string' then
+        'string' then
         key = index
         ---`{ { name = 'key1' }, { name = 'key2' } }`
       elseif type(def) == 'table' and def.name ~= nil then
@@ -1970,8 +1973,8 @@ local function new()
       local callbacks = {
         unpack = function(key, value)
           if type(value) == 'table' and utils.get_array_size(value) == 1 and
-              utils.get_table_size(value) == 1 and type(value[1]) ~=
-              'table' then
+            utils.get_table_size(value) == 1 and type(value[1]) ~=
+            'table' then
             return key, value[1]
           end
           return key, value
@@ -2056,13 +2059,13 @@ local function new()
     log_result('End result', result)
 
     if opts.accumulated_result ~= nil and type(opts.accumulated_result) ==
-        'table' then
+      'table' then
       utils.merge_tables(opts.accumulated_result, result, true)
     end
 
     ---no_error
     if not opts.no_error and type(unknown) == 'table' and
-        utils.get_table_size(unknown) > 0 then
+      utils.get_table_size(unknown) > 0 then
       throw_error('E019', { unknown = visualizers.render(unknown) })
     end
     return result, unknown, raw
@@ -2403,6 +2406,26 @@ local function new()
         utils.tex_printf('\\item[\\texttt{%s}]: \\texttt{%s}', key,
           msg_text)
       end
+    end,
+
+    ---
+    ---@param marg string
+    ---@param oarg? string
+    print_debug = function(marg, oarg)
+      local opts
+      if oarg then
+        opts = parse(oarg, { format_keys = { 'snake', 'lower' } })
+      end
+      local result = parse(marg, opts)
+      tex.print('\\bgroup\\parindent=0pt \\tt')
+      local rendered = visualizers.render(result, {
+        style = 'tex',
+        inline = false,
+        table_delimiters_first_depth = true,
+      })
+      visualizers.debug(result)
+      tex.print(31278, utils.split_lines(rendered))
+      tex.print('\\egroup')
     end,
 
     ---

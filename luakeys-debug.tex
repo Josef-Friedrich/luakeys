@@ -37,36 +37,21 @@
 \catcode`\ =13
 \catcode`\~=12
 \catcode`\%=12
-\catcode`\ =13
 \savecatcodetable 31278
 \egroup}
 \createcatcodes
 
 \def\Space{ }
 \bgroup
-\catcode`\^^M=13\gdef^^M{\quitvmode\par}%
-\catcode`\ = 13\gdef {\quitvmode\Space}%
+  \catcode`\^^M=13\gdef^^M{\quitvmode\par}%
+  \catcode`\ = 13\gdef {\quitvmode\Space}%
 \egroup
-
 
 \def\luakeysdebug%
 {%
   \directlua%
   {
     local oarg, marg = lparse.scan('o v')
-    local opts
-    if oarg then
-      opts = luakeys.parse(oarg, { format_keys = { 'snake', 'lower' } })
-    end
-    local result = luakeys.parse(marg, opts)
-    luakeys.debug(result)
-    tex.print()
-    tex.print(
-      '{' ..
-        '\string\\tt' ..
-        '\string\\parindent=0pt' ..
-        luakeys.render(result, { style = 'tex', inline = false, for_tex = true }) ..
-    '}')
-
+    luakeys.print_debug(marg, oarg)
   }%
 }

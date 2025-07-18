@@ -106,12 +106,6 @@ describe('Function “render()”', function()
     end)
   end)
 
-  it('option for_tex = true', function()
-    assert_render({ l1 = { l2 = 'value' } },
-      '{\\par\n' .. '\\ \\ l1={\\par\n' .. '\\ \\ \\ \\ l2=value\\par\n' ..
-        '\\ \\ }\\par\n' .. '}', { for_tex = true })
-  end)
-
   describe('Big input table', function()
     it('tex', function()
       assert_render(big_input, [[
