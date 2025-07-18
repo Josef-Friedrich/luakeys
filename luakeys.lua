@@ -807,6 +807,8 @@ local visualizers = (function()
     if opts.for_tex then
       opts.line_break = '\\par\n'
       opts.indent = '\\ \\ '
+      opts.begin_table = '\\{'
+      opts.end_table = '\\}'
       opts.table_delimiters_first_depth = true
     end
 
