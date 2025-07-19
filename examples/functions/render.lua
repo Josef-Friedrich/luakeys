@@ -3,14 +3,10 @@ local luakeys = require('luakeys')()
 
 local result = luakeys.parse('one=1,two=2,three=3,')
 local kv_string = luakeys.render(result)
---- one=1,two=2,tree=3,
---- or:
---- two=2,one=1,tree=3,
---- or:
---- ...
+--- one=1,three=3,two=2
 
 it('result', function()
-  assert.is.same(result, { one = 1, two = 2, three = 3 })
+  assert.is.same(kv_string, 'one=1,three=3,two=2')
 end)
 
 local result2 = luakeys.parse('one,two,three', { naked_as_value = true })

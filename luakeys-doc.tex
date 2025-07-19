@@ -1449,46 +1449,153 @@ The Lua module from |luakeys| exports exactly one function, namely the
 \lua{new()} function.
 
 
-\subsection{Function “\texttt{render(result): string}”}
+\subsection{Function “\texttt{render(value, config): string}”}
+\label{function:render}
 
-The function \lua{render(result)} reverses the function
-\lua{parse(kv_string)}. It takes a Lua table and converts this table
-into a key-value string. The resulting string usually has a different
-order as the input table.
+% Die Funktion \lua{render(value)} rendert oder serialisiert einen
+% Lua-Wert jeglicher Art in eine Zeichenkette.
+The \lua{render(value)} function renders or serialises a Lua value of
+any kind into a string.
+% Diese Funktion kann verwendet werden, um die Funktion
+% \lua{parse(kv_string)} umzukehren.
+This function can be used to reverse the function \lua{parse(kv_string)}.
+% Die Schlüssel der resultierenden serialisierten Tabelle sind
+% alphabetisch sortiert.
+The keys of the resulting serialized table are sorted alpabetically.
 
-\InputLua[firstline=4,lastline=10]{functions/render.lua}
+\InputLua[firstline=4,lastline=6]{functions/render.lua}
 
 \noindent
+% In Lua können nur Tabellen mit 1-basierten, aufeinanderfolgenden
+% Integer-Schlüsseln (auch bekannt als Array Tabellen) der Reihe nach
+% geparst werden.
 In Lua only tables with 1-based consecutive integer keys (a.k.a. array
 tables) can be parsed in order.
 
-\InputLua[firstline=16,lastline=17]{functions/render.lua}
+\InputLua[firstline=12,lastline=13]{functions/render.lua}
+
+\subsubsection{High level configuration options}
+
+\begin{description}
+\item[|style|]
+% Rendert die Eingabe als \lua{'lua'}-Tabelle oder im \lua{'tex'}-Stil,
+% Standard \lua{‚tex‘}.
+Render the input as a \lua{'lua'} table or in the \lua{'tex'} style,
+default \lua{'tex'}.
+
+\item[|inline|]
+% Gibt die Eingabe in einer Zeile ohne Zeilenumbrüche wieder,
+% Standardwert \lua{true}.
+Render the input on one line without line breaks, default \lua{true}.
+\end{description}
+
+\subsubsection{Low level configuration options}
+
+
+\begin{description}
+\item[|line_break|]
+% Das Zeichen für einen Zeilenumbruch, z. B. |\n| für die
+% Terminalausgabe oder |\par| für die TeX-Darstellung, Standard
+% \lua{''}.
+The character for a line break, for example, use |\n| for terminal
+output or |\par| for TeX rendering, default \lua{''}.
+
+\item[|begin_table|]
+
+% Das Anfangstrennzeichen für eine Tabelle, Standardwert |{|.
+The starting delimiter for a table, default |{|.
+
+\item[|end_table|]
+
+% Das abschließende Begrenzungszeichen für eine Tabelle, Standardwert
+% |}|.
+The final delimiter for a table, default |}|.
+
+\item[|table_delimiters_first_depth|]
+% Ob Tabellen-Begrenzungszeichen der 1. Ebene angezeigt werden sollen.
+Whether table delimiters of the 1st level should be displayed.
+% Anstelle von \lua{'{key1,key2={value2}}'} wird
+% \lua{'key1,key2={value2}'} wiedergegeben, Standardwert “False".
+Instead of \lua{'{key1,key2={value2}}'} render
+\lua{'key1,key2={value2}'}, default `false`.
+
+\item[|indent|]
+% Für die Einrückung verwendete Zeichen, standardmäßig \lua{''}.
+Characters used for indentation, default \lua{''}.
+
+\item[|begin_key|]
+% Das Anfangstrennzeichen für einen Schlüssel, Standardwert \lua{‚[‘}.
+The starting delimiter for a key, default \lua{'['}.
+
+\item[|end_key|]
+% Das abschließende Begrenzungszeichen für einen Schlüssel, Standardwert
+% \lua{‚]‘}.
+The final delimiter for a key, default \lua{']'}.
+
+\item[|assignment|]
+% Das Symbol für den Zuweisungsoperator, default \lua{'='}.
+The symbol for the assignment operator, default \lua{'='}.
+
+\item[|separator|]
+% Das Trennzeichen für die einzelnen Tabellenelemente, Standardwert \lua{','}.
+The separator for the individual table elements, default \lua{','}.
+
+\item[|separator_last|]
+% Ein Trennzeichen nach dem letzten Element hinzufügen, Standardwert
+% \lua{false}.
+Append a separator after the last element, default \lua{false}.
+
+\item[|quotation|]
+% Das Symbol, das eine Zeichenkette abgrenzt, Standardwert \lua{"'"}.
+The symbol that delimits a string, default \lua{"'"}.
+
+\item[|format_key|]
+% Eine Funktion, die den Schlüssel formatiert.
+A function that formats the key.
+
+\item[|format_value|]
+% Eine Funktion, die den Wert formatiert.
+A function that formats the value.
+\end{description}
+
 
 %%
 %
 %%
 
-\subsection{Function “\texttt{debug(result): void}”}
+\subsection{Function “\texttt{debug(result, config): void}”}
 
-The function \lua{debug(result)} pretty prints a Lua table to standard
-output (stdout). It is a utility function that can be used to debug and
-inspect the resulting Lua table of the function \lua{parse}. You have to
-compile your \TeX{} document in a console to see the terminal output.
+% Die Funktion \lua{debug(result, config)} gibt auf hübsche Weise einen
+% Lua-Wert auf die Standardausgabe (stdout) aus.
+The function \lua{debug(result, config)} pretty prints a Lua value to
+standard output (stdout).
+% Es ist eine Hilfsfunktion, die zum Debuggen verwendet werden kann und um
+% die resultierende Lua-Tabelle der Funktion \lua{parse} zu untersuchen.
+It is a utility function that can be used to
+debug and inspect the resulting Lua table of the function \lua{parse}.
+% Sie müssen Ihr \TeX{}-Dokument in einer Konsole kompilieren, um die
+% Terminalausgabe zu sehen.
+You have to compile your \TeX{} document in a console to see the
+terminal output.
+% Als zweites Argument kann die Konfiguration für die eingebettete
+% Renderfunktion angegeben werden.
+The configuration for the embedded render function can be specified as
+the second argument (see \ref{function:render}).
 
 \InputLua[firstline=4,lastline=5]{functions/debug.lua}
 
 \noindent
 The output should look like this:
 
-\begin{minted}{md}
+\begin{verbatim}
 {
-  ['level1'] = {
-      ['level2'] = {
-        ['key'] = 'value',
-    },
+  level1 = {
+    level2 = {
+      key = value
+    }
   }
 }
-\end{minted}
+\end{verbatim}
 
 %%
 %

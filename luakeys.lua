@@ -47,12 +47,14 @@ local utils = (function()
   end
 
   ---
-  ---@param content string
+  ---Split a string into lines.
   ---
-  ---@return table
+  ---@param content string The content to be split into individual lines.
+  ---
+  ---@return string[] The individual lines as a array of strings.
   local function split_lines(content)
     local lines = {}
-    for line in content:gmatch('([^\n]*)\n?') do
+    for line in content:gmatch('[^\r\n]+') do
       table.insert(lines, line)
     end
     return lines
@@ -709,49 +711,49 @@ local visualizers = (function()
   ---A collection of options to configure the `render` function.
   ---
   ---This collection combines high level and low level options.
+  ---@class RenderConfiguration
   ---
-  ---
-  ---
-  ---@class RenderOptions
+  ---High level options
+  ---@field style? 'tex'|'lua' # Render the input as a `lua` table or in the `tex` style, default `tex`.
   ---@field inline? boolean # Render the input on one line without line breaks, default `true`.
-  ---@field style? 'tex'|'lua' # Render the input as a `lua` table or in the `tex` style, default `tex`
-  ---@field line_break? string # For example, use `\n` for terminal output  or `\par` for TeX rendering, default ``.
-  ---@field begin_table? string # default `{`
-  ---@field end_table? string # default `}`
-  ---@field table_delimiters_first_depth? boolean # Instead of `{ key1,key2={value2} }` render `key1,key2={value2}`, default `false`.
+  ---
+  ---Low level options
+  ---@field line_break? string # The character for a line break, for example, use `\n` for terminal output or `\par` for TeX rendering, default ``.
+  ---@field begin_table? string # The starting delimiter for a table, default `{`.
+  ---@field end_table? string # The final delimiter for a table, default `}`.
+  ---@field table_delimiters_first_depth? boolean # Whether table delimiters of the 1st level should be displayed. Instead of `{ key1,key2={value2} }` render `key1,key2={value2}`, default `false`.
   ---@field indent? string # Characters used for indentation, default ``.
   ---@field begin_key? string # The starting delimiter for a key, default `[`.
-  ---@field end_key? string  # The termination delimiter for a key, default `]`.
-  ---@field assignment? string # The symbol for the assignment operator, default `=`,
+  ---@field end_key? string  # The final delimiter for a key, default `]`.
+  ---@field assignment? string # The symbol for the assignment operator, default `=`.
   ---@field separator? string # The separator for the individual table elements, default `,`.
-  ---@field separator_last? boolean # Append a separator after the last element, default `false`
-  ---@field quotation? string # The symbol that delimits a string, default `'`
-  ---@field format_key? fun(key: unknown, opts: RenderOptions): string # A function that formats the key.
-  ---@field format_value? fun(value: unknown, opts: RenderOptions): string # A function that formats the value.
+  ---@field separator_last? boolean # Append a separator after the last element, default `false`.
+  ---@field quotation? string # The symbol that delimits a string, default `'`.
+  ---@field format_key? fun(key: unknown, conf: RenderConfiguration): string # A function that formats the key.
+  ---@field format_value? fun(value: unknown, conf: RenderConfiguration): string # A function that formats the value.
 
   ---
-  ---Reverse the function
-  ---`parse(kv_string)`. It takes a Lua value and converts this value
-  ---into a string. The resulting string usually has a
-  ---different order as the input table. In Lua only tables with
-  ---1-based consecutive integer keys (a.k.a. array tables) can be
-  ---parsed in order.
+  ---Render or serialize a Lua value into a string.
   ---
-  ---@see https://stackoverflow.com/a/54593224/10193818
-  ---@param result unknown # A lua value to render.
-  ---@param options? RenderOptions
+  ---This function can be used to reverse the function `parse(kv_string)`. It takes a Lua value and converts this value
+  ---into a string. The keys of the resulting serialized table are sorted alpabetically.
+  ---
+  ---Source: https://stackoverflow.com/a/54593224/10193818
+  ---
+  ---@param value unknown # A lua value to render.
+  ---@param config? RenderConfiguration # A collection of options to configure the `render` function.
   ---
   ---@return string
-  local function render(result, options)
-    if options == nil then
-      options = {}
+  local function render(value, config)
+    if config == nil then
+      config = {}
     end
 
     ---style=tex inline=true
-    ---@type RenderOptions
-    local default_opts = {
-      inline = true,
+    ---@type RenderConfiguration
+    local default_conf = {
       style = 'tex',
+      inline = true,
       --- Low level
       line_break = '',
       begin_table = '{',
@@ -764,54 +766,54 @@ local visualizers = (function()
       separator = ',',
       separator_last = false,
       quotation = '"',
-      format_key = function(key, o)
+      format_key = function(key, conf)
         key = tostring(key)
         if string.find(key, ',') then
-          return o.quotation .. key .. o.quotation
+          return conf.quotation .. key .. conf.quotation
         end
         return key
       end,
-      format_value = function(value, o)
+      format_value = function(value, conf)
         value = tostring(value)
         if string.find(value, ',') then
-          return o.quotation .. value .. o.quotation
+          return conf.quotation .. value .. conf.quotation
         end
         return value
       end,
     }
 
-    ---@type RenderOptions
-    local opts = utils.clone_table(options)
-    utils.merge_tables(opts, default_opts, false)
+    ---@type RenderConfiguration
+    local conf = utils.clone_table(config)
+    utils.merge_tables(conf, default_conf, false)
 
-    if opts.style == 'lua' then
+    if conf.style == 'lua' then
       -- lua
-      opts.quotation = '\''
-      opts.format_key = function(key, o)
+      conf.quotation = '\''
+      conf.format_key = function(key, conf)
         if type(key) == 'string' and utils.is_lua_identifier(key) then
           return key
         end
 
         if type(key) == 'string' then
-          key = o.quotation .. tostring(key) .. o.quotation
+          key = conf.quotation .. tostring(key) .. conf.quotation
         end
-        return o.begin_key .. key .. o.end_key
+        return conf.begin_key .. key .. conf.end_key
       end
 
-      opts.format_value = function(value, o)
+      conf.format_value = function(value, opts)
         if type(value) == 'string' then
-          value = o.quotation .. value .. o.quotation
+          value = opts.quotation .. value .. opts.quotation
         end
         return tostring(value)
       end
-      opts.table_delimiters_first_depth = true
+      conf.table_delimiters_first_depth = true
     end
 
-    if not opts.inline then
+    if not conf.inline then
       -- multiline
-      opts.assignment = ' = '
-      opts.line_break = '\n'
-      opts.indent = '  '
+      conf.assignment = ' = '
+      conf.line_break = '\n'
+      conf.indent = '  '
     end
 
     -- Override the merged options with lower-level options from the function
@@ -835,8 +837,8 @@ local visualizers = (function()
     }
 
     for _, option in ipairs(low_level_options) do
-      if options[option] ~= nil then
-        opts[option] = options[option]
+      if config[option] ~= nil then
+        conf[option] = config[option]
       end
     end
 
@@ -850,7 +852,7 @@ local visualizers = (function()
       depth = depth or 0
 
       local function add(depth, text)
-        table.insert(output, string.rep(opts.indent, depth) .. text)
+        table.insert(output, string.rep(conf.indent, depth) .. text)
       end
 
       if type(input) ~= 'table' then
@@ -865,8 +867,8 @@ local visualizers = (function()
         element_counter = element_counter + 1
         local value = input[key]
         if (key and type(key) == 'number' or type(key) == 'string') then
-          local separator = opts.separator
-          if not opts.separator_last and element_sum == element_counter then
+          local separator = conf.separator
+          if not conf.separator_last and element_sum == element_counter then
             separator = ''
           end
           -- is array ... consecutive integers ...
@@ -876,51 +878,56 @@ local visualizers = (function()
               consecutive_numbers_counter + 1
             key = ''
           else
-            key = opts.format_key(key, opts)
-            key = key .. opts.assignment
+            key = conf.format_key(key, conf)
+            key = key .. conf.assignment
           end
 
           if (type(value) == 'table') then
             if (next(value)) then
-              add(depth, key .. opts.begin_table)
+              add(depth, key .. conf.begin_table)
               add(0, stringify(value, depth + 1))
-              add(depth, opts.end_table .. separator);
+              add(depth, conf.end_table .. separator);
             else
-              add(depth, key .. opts.begin_table .. opts.end_table ..
+              add(depth, key .. conf.begin_table .. conf.end_table ..
                 separator)
             end
           else
-            value = opts.format_value(value, opts)
+            value = conf.format_value(value, conf)
             add(depth, key .. value .. separator)
           end
         end
       end
 
-      return table.concat(output, opts.line_break)
+      return table.concat(output, conf.line_break)
     end
 
     local begin_table = ''
     local end_table = ''
 
-    if opts.table_delimiters_first_depth then
-      begin_table = opts.begin_table
-      end_table = opts.end_table
+    if conf.table_delimiters_first_depth then
+      begin_table = conf.begin_table
+      end_table = conf.end_table
     end
 
-    return begin_table .. opts.line_break .. stringify(result, 1) ..
-             opts.line_break .. end_table
+    return begin_table .. conf.line_break .. stringify(value, 1) ..
+             conf.line_break .. end_table
   end
 
   ---
-  ---The function `debug(result)` pretty prints a Lua table to standard
-  ---output (stdout). It is a utility function that can be used to
+  ---Pretty print a Lua value to standard output (stdout).
+  ---
+  ---It is a utility function that can be used to
   ---debug and inspect the resulting Lua table of the function
   ---`parse`. You have to compile your TeX document in a console to
   ---see the terminal output.
   ---
-  ---@param result table # A table to be printed to standard output for debugging purposes.
-  local function debug(result)
-    print('\n' .. render(result, { inline = false }))
+  ---@param value unknown # A value to be printed to standard output for debugging purposes.
+  ---@param config? RenderConfiguration # A collection of options to configure the `render` function.
+  local function debug(value, config)
+    if not config then
+      config = { inline = false, table_delimiters_first_depth = true }
+    end
+    print('\n' .. render(value, config))
   end
 
   return { render = render, debug = debug }

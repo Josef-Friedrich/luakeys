@@ -18,9 +18,9 @@ describe('Function “render()”', function()
   }
 
   ---
-  ---@param input table
+  ---@param input unknown
   ---@param expected string
-  ---@param opts? RenderOptions
+  ---@param opts? RenderConfiguration
   local function assert_render(input, expected, opts)
     assert.are.equal(expected, luakeys.render(input, opts))
   end
@@ -208,6 +208,24 @@ describe('Function “render()”', function()
           return 'xxx'
         end,
       })
+    end)
+  end)
+
+  describe('Different input data types', function()
+    it('boolean', function()
+      assert_render(true, 'true')
+    end)
+
+    it('number', function()
+      assert_render(1.23, '1.23')
+    end)
+
+    it('nil', function()
+      assert_render(nil, 'nil')
+    end)
+
+    it('string', function()
+      assert_render('string', 'string')
     end)
   end)
 end)

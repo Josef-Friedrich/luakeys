@@ -14,6 +14,33 @@ describe('utils', function()
     assert.is_false(utils.is_lua_identifier('Umlauteäöü'))
   end)
 
+  describe('Function “split_lines”', function()
+    it('\\n', function()
+      assert.are.same(utils.split_lines('a\nb\nc'), { 'a', 'b', 'c' })
+    end)
+
+    it('\\r', function()
+      assert.are.same(utils.split_lines('a\rb\rc'), { 'a', 'b', 'c' })
+    end)
+
+
+    it('\\r\\n', function()
+      assert.are.same(utils.split_lines('a\r\nb\r\nc'), { 'a', 'b', 'c' })
+    end)
+
+    it('\\n\\r', function()
+      assert.are.same(utils.split_lines('a\n\rb\n\rc'), { 'a', 'b', 'c' })
+    end)
+
+    it('multiple \\n s', function()
+      assert.are.same(utils.split_lines('a\n\nb'), { 'a', 'b' })
+    end)
+
+    it('Empty string', function()
+      assert.are.same(utils.split_lines(''), {})
+    end)
+  end)
+
   it('Function “merge_tables”', function()
     local result = utils.merge_tables({ target = 'target' },
       { source = 'source' })
