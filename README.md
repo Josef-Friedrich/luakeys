@@ -14,7 +14,7 @@ mechanism should be pretty robust.
 
 ## Current version
 
-2025/07/01 v0.16
+2025/07/19 v0.17.0
 
 ## License
 
