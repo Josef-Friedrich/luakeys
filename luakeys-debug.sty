@@ -19,4 +19,19 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{luakeys-debug}[2025/07/01 v0.16.0 Debug package for luakeys.]
 
-\input luakeys-debug.tex
+\directlua
+{
+  luakeys = require('luakeys')()
+  if lparse == nil then
+    lparse = require('lparse')
+  end
+}
+
+\def\luakeysdebug%
+{%
+  \directlua%
+  {
+    local oarg, marg = lparse.scan('o v')
+    luakeys.print_debug(marg, oarg, true)
+  }%
+}

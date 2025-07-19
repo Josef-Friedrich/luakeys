@@ -7,7 +7,7 @@
 \usepackage{mdframed}
 \usepackage{minted}
 \usepackage{luakeys}
-% \usepackage{luakeys-debug} TODO re add fix
+\usepackage{luakeys-debug}
 \usepackage{multicol}
 \usepackage{luacode}
 \usepackage{syntax}
@@ -2126,15 +2126,8 @@ can be used in \LaTeX{} (luakeys-debug.sty) and one can be used in plain
 Then the following output should appear in the document:
 \bigskip
 
-% \luakeysdebug{one,two,three} TODO re-add FIX
+\luakeysdebug{one,two,three}
 
-\begin{minted}{md}
-{
-  one = true,
-  three = true,
-  two = true
-}
-\end{minted}
 
 
 

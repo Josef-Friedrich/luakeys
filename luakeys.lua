@@ -2409,23 +2409,36 @@ local function new()
     end,
 
     ---
-    ---@param marg string
-    ---@param oarg? string
-    print_debug = function(marg, oarg)
+    ---Print the TeX markup for the command sequence `\luakeysdebug`.
+    ---of the luakeys-debug package.
+    ---
+    ---@param marg string # The mandatory argument of the `\luakeysdebug` command.
+    ---@param oarg? string # The optional argument of the `\luakeysdebug` command.
+    ---@param is_latex? boolean # If true, the markup is printed into verbatim environment.
+    print_debug = function(marg, oarg, is_latex)
       local opts
       if oarg then
         opts = parse(oarg, { format_keys = { 'snake', 'lower' } })
       end
       local result = parse(marg, opts)
-      tex.print('\\bgroup\\parindent=0pt \\tt')
+      visualizers.debug(result)
       local rendered = visualizers.render(result, {
         style = 'tex',
         inline = false,
         table_delimiters_first_depth = true,
       })
-      visualizers.debug(result)
-      tex.print(31278, utils.split_lines(rendered))
-      tex.print('\\egroup')
+      local lines = utils.split_lines(rendered)
+      if is_latex then
+        -- https://tug.org/TUGboat/tb32-1/tb100isambert.pdf
+        -- Not working in the LaTeX ltxdoc class! Why?
+        tex.print('\\begin{verbatim}')
+        tex.print(lines)
+        tex.print('\\end{verbatim}')
+      else
+        tex.print('\\bgroup\\parindent=0pt \\tt')
+        tex.print(31278, lines)
+        tex.print('\\egroup')
+      end
     end,
 
     ---
