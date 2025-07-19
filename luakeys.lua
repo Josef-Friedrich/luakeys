@@ -926,6 +926,8 @@ local visualizers = (function()
   return { render = render, debug = debug }
 end)()
 
+---@alias FormatKeyOperation 'lower'|'snake'|'upper'
+
 ---@class OptionCollection
 ---@field accumulated_result? table
 ---@field assignment_operator? string # default `=`
@@ -935,7 +937,7 @@ end)()
 ---@field defaults? table
 ---@field defs? DefinitionCollection
 ---@field false_aliases? table default `{ 'false', 'FALSE', 'False' }`,
----@field format_keys? boolean # default `false`,
+---@field format_keys? boolean|(FormatKeyOperation)[] # default `false`,
 ---@field group_begin? string default `{`,
 ---@field group_end? string default `}`,
 ---@field hooks? HookCollection
@@ -1905,7 +1907,7 @@ local function new()
   ---@param opts? OptionCollection # A table containing options.
   ---
   ---@return table result # The final result of all individual parsing and normalization steps.
-  ---@return table unknown # A table with unknown, undefined key-value pairs.
+  ---@return table|nil unknown # A table with unknown, undefined key-value pairs.
   ---@return table raw # The unprocessed, raw result of the LPeg parser.
   local function parse(kv_string, opts)
     opts = normalize_opts(opts)
@@ -2300,7 +2302,7 @@ local function new()
     ---  used.
     ---
     ---@return table result # The final result of all individual parsing and normalization steps.
-    ---@return table unknown # A table with unknown, undefined key-value pairs.
+    ---@return table|nil unknown # A table with unknown, undefined key-value pairs.
     ---@return table raw # The unprocessed, raw result of the LPeg parser.
     function DefinitionManager:parse(kv_string, key_selection)
       local d
