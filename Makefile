@@ -50,7 +50,7 @@ ctan: doc_pdf
 	cp -f $(jobname).sty $(jobname)/
 	cp -f $(jobname).tex $(jobname)/
 	cp -f luakeys-doc.tex $(jobname)/
-	cp -f luakeys-doc.pdf $(jobname)/$(jobname).pdf
+	cp -f luakeys-doc.pdf $(jobname)/
 	cp -f $(jobname)-debug.tex $(jobname)/
 	cp -f $(jobname)-debug.sty $(jobname)/
 	tar cvfz $(jobname).tar.gz $(jobname)
