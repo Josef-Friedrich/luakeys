@@ -316,7 +316,7 @@ describe('Options', function()
         'one,two,three', { naked_as_value = true }))
     end)
 
-    it(2, function ()
+    it('2', function ()
       assert.are.same({naked=true, csv_strings={'one','two','three'}},
               luakeys.parse('naked, csv_strings={one,two,three}', { naked_as_value = 2 }))
     end)
