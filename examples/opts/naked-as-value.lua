@@ -16,3 +16,13 @@ luakeys.debug(result2)
 it('result2', function ()
   assert.are.same({ 'one', 'two', 'three' }, result2)
 end)
+
+local result3 = luakeys.parse('naked, csv_strings={one,two,three}', { naked_as_value = 2 })
+luakeys.debug(result3)
+ --{ naked = true, csv_strings = { 'one', 'two', 'three' } }
+
+it('result3', function ()
+  assert.are.same({naked=true, csv_strings={'one','two','three'}}, result3)
+end)
+
+

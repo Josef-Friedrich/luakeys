@@ -331,6 +331,26 @@ local utils = (function()
     return result
   end
 
+  ---
+  ---Cast a boolean, string, or number to number, optionally throwing error if unsuccessful.
+  ---
+  ---@param value any The value to be converted.
+  ---@param message string Enable and specify the error message to be thrown.
+  ---
+  ---@return number The converted value.
+  local function cast_number(value, message)
+    if value == true then
+      return 1
+    elseif value == false then
+      return 0
+    end
+    local result = tonumber(value)
+    if result == nil and message ~= nil then
+      throw_error_message(message)
+    end
+    return result
+  end
+
   ---@alias ColorName 'black'|'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'white'|'reset'
   ---@alias ColorMode 'bright'|'dim'
 
@@ -695,6 +715,7 @@ local utils = (function()
     get_table_size = get_table_size,
     get_array_size = get_array_size,
     visit_tree = visit_tree,
+    cast_number = cast_number,
     tex_printf = tex_printf,
     throw_error_message = throw_error_message,
     throw_error_code = throw_error_code,
@@ -950,7 +971,7 @@ end)()
 ---@field hooks? HookCollection
 ---@field invert_flag? string default `!`
 ---@field list_separator? string default `,`
----@field naked_as_value? boolean # default `false`
+---@field naked_as_value? boolean|number # default `false`
 ---@field no_error? boolean # default `false`
 ---@field quotation_begin? string `"`
 ---@field quotation_end? string `"`
@@ -1989,8 +2010,9 @@ local function new()
           return key, value
         end,
 
-        process_naked = function(key, value)
-          if type(key) == 'number' and type(value) == 'string' then
+        process_naked = function(key, value, depth)
+          local level = utils.cast_number(opts.naked_as_value, 'Invalid value used for naked_as_value option. Must be boolean or number.')
+          if (level == 0 or depth < level) and type(key) == 'number' and type(value) == 'string' then
             return value, opts.default
           end
           return key, value
@@ -2028,7 +2050,7 @@ local function new()
         result = utils.visit_tree(result, callbacks.unpack)
       end
 
-      if not opts.naked_as_value and opts.defs == false then
+      if opts.defs == false then
         result = utils.visit_tree(result, callbacks.process_naked)
       end
 

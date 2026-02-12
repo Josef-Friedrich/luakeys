@@ -830,6 +830,14 @@ If we set the option \lua{naked_as_value} to \lua{true}:
 
 \InputLua[firstline=11,lastline=14]{opts/naked-as-value.lua}
 
+\noindent
+Alternatively, a number can be passed which represents the starting level at which naked keys are set to values. In this
+case, setting \lua{naked_as_value} to \lua{0} is equivalent to \lua{false}, \lua{1} is equivalent to \lua{true},
+and \lua{2} treats naked keys as values starting at level 2, and including levels 3, 4, and so on.
+
+\InputLua[firstline=20,lastline=22]{opts/naked-as-value.lua}
+
+
 \DefaultOptDescription{naked_as_value}
 
 %%
