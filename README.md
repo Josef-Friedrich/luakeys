@@ -209,6 +209,7 @@ local opts = {
 
   -- If true, naked keys are converted to values:
   -- { one = true, two = true, three = true } -> { 'one', 'two', 'three' }
+  -- If a number, naked keys are converted starting at the specified level 
   naked_as_value = false,
 
   -- Throw no error if there are unknown keys.
